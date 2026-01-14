@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>indexとsearch_indexの分離</title>
+  <meta name="description" content="Personal note (2026-01-14)" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP",sans-serif;line-height:1.7;margin:0;background:#fff;color:#111}
+    .wrap{max-width:860px;margin:0 auto;padding:24px}
+    a{color:#0b57d0}
+    pre,code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    pre{overflow:auto;padding:12px;background:#f6f8fa;border-radius:8px}
+    code{background:#f6f8fa;padding:.15em .35em;border-radius:6px}
+    h1,h2{line-height:1.25}
+    .meta{font-size:13px;color:#444;margin-top:-8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="content"></div>
+    <script type="text/markdown" id="md"># indexとsearch_indexの分離
+
+- id: `2026-01-14_224109_f66acfd1`
+- updated: 2026-01-14
+
+## CONTEXT
+- メモや会話ログが存在する
+- 検索速度の改善が求められている
+
+## GOAL
+- 検索を速くする
+
+## DECISION
+- indexとsearch_indexを分離する
+
+## PROCEDURE
+- 1. indexの作成手順: TBD
+- 2. search_indexの作成手順: TBD
+- 3. 検索時にsearch_indexを利用するように変更: TBD
+
+## LINKS
+- TBD: 関連するドキュメント、タスク、担当者
+
+## TBD
+- indexとsearch_indexの具体的な構造
+- indexとsearch_indexの作成手順
+- 検索時にsearch_indexを利用するように変更する具体的な方法
+
+## RAW
+&lt;details&gt;&lt;summary&gt;open&lt;/summary&gt;
+
+```
+RAW:
+- ここにメモや会話ログを貼る
+- 目的: 検索を速くしたい
+- 決定: indexとsearch_indexを分離
+
+```
+
+&lt;/details&gt;
+</script>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const md = document.getElementById('md').textContent;
+    document.getElementById('content').innerHTML = marked.parse(md);
+  </script>
+</body>
+</html>
