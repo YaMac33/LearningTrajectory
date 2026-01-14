@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sidenote</title>
+  <meta name="description" content="Personal knowledge vault (fast search)" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="wrap">
+    <h1 class="title">Sidenote</h1>
+    <p class="sub">index.json を読むだけの最小ビュー（一覧 + 検索）</p>
+
+    <div class="controls">
+      <input id="q" class="input" type="search" placeholder="検索（タイトル/タグ/TBD/更新日）" autocomplete="off" />
+      <button id="clear" class="btn" type="button" aria-label="clear">Clear</button>
+    </div>
+
+    <div class="meta">
+      <span id="count">0</span> items
+      <span class="dot">•</span>
+      <span id="status">loading…</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <ul id="list" class="list"></ul>
+    <div id="empty" class="empty" hidden>該当なし</div>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
