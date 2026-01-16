@@ -2,8 +2,8 @@
 // =====================================================
 // Top page renderer:
 // - Fetch ./data/index.json
-// - Render recent posts (latest N)
-// - Render genre/category link pills (unique)
+// - Render recent posts (latest N + Load more)
+// - Render genre/category pills
 // - Lightweight search (title / tags / category / genre)
 // =====================================================
 
@@ -16,6 +16,7 @@
   const elGenreLinks = document.getElementById("genre-links");
   const elCategoryLinks = document.getElementById("category-links");
   const elLastUpdated = document.getElementById("last-updated");
+  const btnLoadMore = document.getElementById("btn-load-more");
 
   // ---- utilities ----
   const toText = (v) => (v == null ? "" : String(v));
@@ -61,41 +62,9 @@
   };
 
   // ---- renderers ----
-  function renderRecent(items) {
-    if (!elRecentList) return;
-    clearChildren(elRecentList);
-
-    if (!items.length) {
-      const li = document.createElement("li");
-      li.className = "muted";
-      li.textContent = "まだ記事がありません";
-      elRecentList.appendChild(li);
-      return;
-    }
-
-    items.slice(0, RECENT_N).forEach((it) => {
-      const li = document.createElement("li");
-
-      const a = document.createElement("a");
-      a.href = it.path ? makeUrl(it.path) : "#";
-      a.textContent = it.title || "(no title)";
-
-      const meta = document.createElement("div");
-      meta.className = "muted";
-      meta.textContent = [
-        it.date || null,
-        it.category || null
-      ].filter(Boolean).join(" / ");
-
-      li.appendChild(a);
-      li.appendChild(meta);
-      elRecentList.appendChild(li);
-    });
-  }
-
   function buildUniqueList(items, field) {
     const map = new Map();
-    items.forEach(it => {
+    items.forEach((it) => {
       const raw = toText(it[field]).trim();
       if (!raw) return;
       const key = normalizeKey(raw);
@@ -109,7 +78,6 @@
   function renderPills(el, items, baseDir) {
     if (!el) return;
     clearChildren(el);
-
     items.forEach(({ key, label }) => {
       const a = document.createElement("a");
       a.className = "pill";
@@ -122,16 +90,14 @@
   function setLastUpdated(items) {
     if (!elLastUpdated) return;
     const newest = items
-      .map(it => ({ d: it.date, t: parseDateForSort(it.date) }))
+      .map((it) => ({ d: it.date, t: parseDateForSort(it.date) }))
       .sort((a, b) => b.t - a.t)[0];
     elLastUpdated.textContent = newest?.d
       ? `Last update: ${newest.d}`
       : "Last update: (unknown)";
   }
 
-  // =====================================================
-  // Search (Lightweight)
-  // =====================================================
+  // ---- Search (Lightweight) ----
   function initSearch(allItems) {
     const input = document.getElementById("search-input");
     const tagBox = document.getElementById("search-tags");
@@ -148,14 +114,15 @@
         ...(Array.isArray(it.tags) ? it.tags : [])
       ].join(" "));
 
-    // tags
+    // build tag buttons
     const tagSet = new Set();
-    allItems.forEach(it =>
-      Array.isArray(it.tags) && it.tags.forEach(t => tagSet.add(t))
+    allItems.forEach(
+      (it) => Array.isArray(it.tags) && it.tags.forEach((t) => tagSet.add(t))
     );
 
-    [...tagSet].sort().forEach(tag => {
+    [...tagSet].sort().forEach((tag) => {
       const btn = document.createElement("button");
+      btn.type = "button";
       btn.textContent = `#${tag}`;
       btn.onclick = () => {
         input.value = tag;
@@ -170,12 +137,13 @@
         resultBox.innerHTML = `<div class="muted">該当する記事はありません</div>`;
         return;
       }
-
       const ul = document.createElement("ul");
-      items.slice(0, 20).forEach(it => {
+      ul.style.paddingLeft = "18px";
+      items.slice(0, 20).forEach((it) => {
         const li = document.createElement("li");
+        li.style.margin = "8px 0";
         const a = document.createElement("a");
-        a.href = it.path;
+        a.href = it.path ? makeUrl(it.path) : "#";
         a.textContent = it.title;
         li.appendChild(a);
         ul.appendChild(li);
@@ -190,8 +158,8 @@
         return;
       }
       const terms = q.split(/\s+/);
-      const matched = allItems.filter(it =>
-        terms.every(t => buildHaystack(it).includes(t))
+      const matched = allItems.filter((it) =>
+        terms.every((t) => buildHaystack(it).includes(t))
       );
       renderResults(matched);
     }
@@ -204,22 +172,75 @@
     try {
       hideError();
       const res = await fetch(DATA_URL, { cache: "no-cache" });
+      if (!res.ok) throw new Error(`Failed to fetch ${DATA_URL}`);
       const data = await res.json();
+      if (!Array.isArray(data)) throw new Error("index.json must be an array");
 
       const sorted = [...data].sort(
         (a, b) => parseDateForSort(b.date) - parseDateForSort(a.date)
       );
 
-      renderRecent(sorted);
+      // --- recent list with "load more" ---
+      let visibleCount = RECENT_N;
 
+      function renderRecentLimited(items) {
+        if (!elRecentList) return;
+        clearChildren(elRecentList);
+
+        if (!items.length) {
+          const li = document.createElement("li");
+          li.className = "muted";
+          li.textContent = "まだ記事がありません";
+          elRecentList.appendChild(li);
+          if (btnLoadMore) btnLoadMore.style.display = "none";
+          return;
+        }
+
+        items.slice(0, visibleCount).forEach((it) => {
+          const li = document.createElement("li");
+
+          const a = document.createElement("a");
+          a.href = it.path ? makeUrl(it.path) : "#";
+          a.textContent = it.title || "(no title)";
+
+          const meta = document.createElement("div");
+          meta.className = "muted";
+          meta.textContent = [
+            it.date || null,
+            it.category || null
+          ].filter(Boolean).join(" / ");
+
+          li.appendChild(a);
+          li.appendChild(meta);
+          elRecentList.appendChild(li);
+        });
+
+        if (btnLoadMore) {
+          btnLoadMore.style.display =
+            visibleCount >= items.length ? "none" : "inline-block";
+        }
+      }
+
+      renderRecentLimited(sorted);
+
+      if (btnLoadMore) {
+        btnLoadMore.onclick = () => {
+          visibleCount += 20;
+          renderRecentLimited(sorted);
+        };
+      }
+
+      // pills & meta
       renderPills(elGenreLinks, buildUniqueList(sorted, "genre"), "./genre");
-      renderPills(elCategoryLinks, buildUniqueList(sorted, "category"), "./category");
-
+      renderPills(
+        elCategoryLinks,
+        buildUniqueList(sorted, "category"),
+        "./category"
+      );
       setLastUpdated(sorted);
 
-      // ★ 検索初期化（ここが重要）
+      // search init
       initSearch(sorted);
-
     } catch (e) {
       console.error(e);
       showError("読み込みに失敗しました");
