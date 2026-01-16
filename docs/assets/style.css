@@ -1,0 +1,208 @@
+/* リセットと基本設定 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #fafafa;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* レイアウトユーティリティ */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    width: 100%;
+}
+
+/* ヘッダー */
+.header {
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.site-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.site-title a:hover, .nav a:hover {
+    color: #2563eb;
+}
+
+.nav a {
+    margin-left: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* メインコンテンツ */
+.main {
+    flex: 1;
+    padding: 2.5rem 0;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.list-header h2 {
+    font-size: 1.25rem;
+    color: #444;
+}
+
+.article-count {
+    font-size: 0.875rem;
+    color: #888;
+}
+
+/* 記事カード */
+.article-card {
+    background: #fff;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.2s;
+    cursor: pointer;
+}
+
+.article-card:hover {
+    transform: translateX(4px);
+    border-left-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #111;
+}
+
+.article-card:hover .card-title {
+    color: #2563eb;
+}
+
+.card-date {
+    font-size: 0.85rem;
+    color: #999;
+    font-family: monospace;
+}
+
+.card-summary {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tag {
+    display: inline-block;
+    background-color: #f3f4f6;
+    color: #666;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.read-more {
+    font-size: 0.875rem;
+    color: #2563eb;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s;
+}
+
+.article-card:hover .read-more {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* フッター */
+.footer {
+    border-top: 1px solid #eee;
+    background: #fff;
+    padding: 2rem 0;
+    text-align: center;
+    color: #888;
+    font-size: 0.875rem;
+}
+
+/* ローディングスケルトン */
+.loading-skeleton {
+    height: 100px;
+    background: #eee;
+    border-radius: 8px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* アニメーション用クラス */
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* モバイル対応 */
+@media (max-width: 640px) {
+    .card-header {
+        flex-direction: column;
+    }
+    .card-date {
+        margin-top: 0.25rem;
+    }
+}
+
