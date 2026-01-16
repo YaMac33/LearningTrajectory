@@ -1,86 +1,79 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const listContainer = document.getElementById('article-list');
-    const countLabel = document.getElementById('article-count');
+  const listContainer = document.getElementById('article-list');
+  const countLabel = document.getElementById('article-count');
 
-    // JSONデータの取得先
-    const DATA_URL = './data/index.json';
+  if (!listContainer || !countLabel) {
+    console.error('Missing DOM nodes:', { listContainer, countLabel });
+    return;
+  }
 
-    // 日付フォーマット関数
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('ja-JP', options);
-    };
+  const DATA_URL = './data/index.json';
 
-    // メイン処理
-    const init = async () => {
-        try {
-            // JSONファイルをフェッチ
-            const response = await fetch(DATA_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const articles = await response.json();
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('ja-JP', options);
+  };
 
-            // 日付順（新しい順）にソート
-            articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+  const init = async () => {
+    try {
+      const response = await fetch(DATA_URL, { cache: 'no-store' });
+      console.log('fetch', DATA_URL, response.status);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-            // 記事数を更新
-            countLabel.textContent = `${articles.length} posts`;
+      const articles = await response.json();
+      console.log('articles[0]', articles?.[0]);
 
-            // HTML生成
-            if (articles.length === 0) {
-                listContainer.innerHTML = '<p style="color:#888;">記事はまだありません。</p>';
-                return;
-            }
+      articles.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
-            const html = articles.map((article, index) => {
-                // アニメーション遅延
-                const delayStyle = `animation-delay: ${index * 0.05}s`;
-                
-                // タグ生成
-                const tagsHtml = article.tags.map(tag => 
-                    `<span class="tag">#${tag}</span>`
-                ).join('');
+      countLabel.textContent = `${articles.length} posts`;
 
-                // リンクパス生成: docs/name/index.html へ
-                // 相対パスなので ./name/ でOK
-                const linkPath = `../${article.dir}/`;
+      if (!Array.isArray(articles) || articles.length === 0) {
+        listContainer.innerHTML = '<p style="color:#888;">記事はまだありません。</p>';
+        return;
+      }
 
-                return `
-                <article class="article-card fade-in" style="${delayStyle}" onclick="location.href='${linkPath}'">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <a href="${linkPath}">${article.title}</a>
-                        </h3>
-                        <time class="card-date" datetime="${article.date}">
-                            ${formatDate(article.date)}
-                        </time>
-                    </div>
-                    
-                    <p class="card-summary">
-                        ${article.summary}
-                    </p>
-                    
-                    <div class="card-footer">
-                        <div class="tags">
-                            ${tagsHtml}
-                        </div>
-                        <span class="read-more">Read more &rarr;</span>
-                    </div>
-                </article>
-                `;
-            }).join('');
+      const html = articles.map((article, index) => {
+        const delayStyle = `animation-delay: ${index * 0.05}s`;
 
-            // DOM更新
-            listContainer.innerHTML = html;
+        const tags = Array.isArray(article.tags) ? article.tags : [];
+        const tagsHtml = tags.map(tag => `<span class="tag">#${tag}</span>`).join('');
 
-        } catch (error) {
-            console.error('記事データの取得に失敗しました:', error);
-            listContainer.innerHTML = '<p style="color:red;">記事データの読み込みに失敗しました。</p>';
-            countLabel.textContent = 'Error';
-        }
-    };
+        // ✅ トップ(/repo/) → 記事(/repo/name/) なので ./name/
+        const linkPath = `./${article.dir}/`;
 
-    init();
+        return `
+          <article class="article-card fade-in" style="${delayStyle}" onclick="location.href='${linkPath}'">
+            <div class="card-header">
+              <h3 class="card-title">
+                <a href="${linkPath}">${article.title ?? '(no title)'}</a>
+              </h3>
+              <time class="card-date" datetime="${article.date ?? ''}">
+                ${article.date ? formatDate(article.date) : ''}
+              </time>
+            </div>
+
+            <p class="card-summary">
+              ${article.summary ?? ''}
+            </p>
+
+            <div class="card-footer">
+              <div class="tags">
+                ${tagsHtml}
+              </div>
+              <span class="read-more">Read more &rarr;</span>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      listContainer.innerHTML = html;
+
+    } catch (error) {
+      console.error('記事データの取得に失敗しました:', error);
+      listContainer.innerHTML = '<p style="color:red;">記事データの読み込みに失敗しました。</p>';
+      countLabel.textContent = 'Error';
+    }
+  };
+
+  init();
 });
-
