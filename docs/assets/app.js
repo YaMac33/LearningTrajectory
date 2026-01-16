@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // リンクパス生成: docs/name/index.html へ
                 // 相対パスなので ./name/ でOK
-                const linkPath = `./${article.dir}/`;
+                const linkPath = `../${article.dir}/`;
 
                 return `
                 <article class="article-card fade-in" style="${delayStyle}" onclick="location.href='${linkPath}'">
