@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- GTM Tag (Required at the beginning of head) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-MQ9ZB4LYWP');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Log: Pipeline Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0; /* Slate 200 */
+        }
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #22d3ee 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .step-connector {
+            position: absolute;
+            left: 24px;
+            top: 40px;
+            bottom: -24px;
+            width: 2px;
+            background: #334155;
+            z-index: 0;
+        }
+        .last-step .step-connector {
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative overflow-x-hidden selection:bg-cyan-500 selection:text-white">
+
+    <!-- Background Elements -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-900/20 rounded-full blur-[100px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/20 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 glass-card border-b border-slate-700/50 px-6 py-4 flex items-center justify-between">
+        <a href="https://yamac33.github.io/sidenote/" class="group flex items-center text-sm font-medium text-slate-400 hover:text-cyan-400 transition-colors duration-300">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"></i>
+            Back to Home
+        </a>
+        <div class="text-xs font-mono text-slate-500">DEV LOG v1.0</div>
+    </nav>
+
+    <!-- Header -->
+    <header class="pt-32 pb-16 px-6 max-w-4xl mx-auto text-center">
+        <div class="inline-flex items-center justify-center px-3 py-1 mb-6 rounded-full bg-cyan-950/50 border border-cyan-800/50 text-cyan-400 text-xs font-mono tracking-wider">
+            ARCHITECTURE SUMMARY
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight leading-tight">
+            思考メモ <span class="text-slate-500 mx-2">→</span> <span class="gradient-text">自動整形・公開</span><br>
+            パイプライン開発ログ
+        </h1>
+        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Notionでの知識保管とGitHub PagesでのWeb公開を一元管理する、スマホ起点のオートメーションシステム。
+        </p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 pb-32 space-y-24">
+
+        <!-- Section 1: Goal -->
+        <section class="relative">
+            <div class="flex items-center mb-8">
+                <span class="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 font-bold text-xl mr-4">1</span>
+                <h2 class="text-2xl font-bold text-white">目指している全体像</h2>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-8 border-l-4 border-l-cyan-500">
+                <div class="grid md:grid-cols-3 gap-6 items-center">
+                    <div class="text-center p-4 bg-slate-800/50 rounded-xl">
+                        <i data-lucide="smartphone" class="w-8 h-8 mx-auto text-slate-400 mb-2"></i>
+                        <div class="font-bold text-white">Input</div>
+                        <div class="text-sm text-slate-400">iPhone/iPad</div>
+                    </div>
+                    <div class="hidden md:flex justify-center">
+                        <i data-lucide="arrow-right" class="w-6 h-6 text-slate-600"></i>
+                    </div>
+                    <div class="md:hidden flex justify-center">
+                        <i data-lucide="arrow-down" class="w-6 h-6 text-slate-600"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" class="w-5 h-5 mr-3 opacity-80" alt="Notion">
+                            <div>
+                                <div class="font-bold text-sm text-white">Notion</div>
+                                <div class="text-xs text-slate-400">スパースノート保管・検索</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                            <i data-lucide="github" class="w-5 h-5 mr-3 text-white"></i>
+                            <div>
+                                <div class="font-bold text-sm text-white">GitHub Pages</div>
+                                <div class="text-xs text-slate-400">記事HTML公開・カード一覧</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t border-slate-700/50 text-sm text-slate-400 font-mono break-all">
+                    Data: timestamp / title / summary / tags / dir / repo_path / public_url
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Logic Split -->
+        <section>
+            <div class="flex items-center mb-8">
+                <span class="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-indigo-400 font-bold text-xl mr-4">2</span>
+                <h2 class="text-2xl font-bold text-white">設計ロジックの分離</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Logic A -->
+                <div class="glass-card rounded-2xl p-6 hover:border-slate-600 transition-colors">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-white">Aロジック</h3>
+                        <span class="px-2 py-1 rounded bg-slate-800 text-xs text-slate-400 border border-slate-700">知識保管</span>
+                    </div>
+                    <ul class="space-y-3 text-slate-300 text-sm list-disc list-inside marker:text-slate-500">
+                        <li>フォームから本文送信</li>
+                        <li>GAS → OpenAIで解析</li>
+                        <li><span class="text-cyan-400">スパースノート＋タグ＋ジャンル</span>生成</li>
+                        <li>Notion DBに保存（横断検索用）</li>
+                    </ul>
+                </div>
+
+                <!-- Logic B -->
+                <div class="glass-card rounded-2xl p-6 hover:border-slate-600 transition-colors">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-white">Bロジック</h3>
+                        <span class="px-2 py-1 rounded bg-slate-800 text-xs text-slate-400 border border-slate-700">Web公開</span>
+                    </div>
+                    <ul class="space-y-3 text-slate-300 text-sm list-disc list-inside marker:text-slate-500">
+                        <li>フォームから<span class="text-indigo-400">完成HTML全文</span>を送信</li>
+                        <li>GASでGitHubへ配置</li>
+                        <li>パス: <code class="bg-slate-800 px-1 rounded text-xs">docs/YYYY-MM-DD_〇〇/index.html</code></li>
+                        <li>トップページはJSONを読み込みカード表示</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Spreadsheet -->
+        <section>
+            <div class="flex items-center mb-8">
+                <span class="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-green-400 font-bold text-xl mr-4">3</span>
+                <h2 class="text-2xl font-bold text-white">スプレッドシート設計</h2>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-8">
+                <p class="mb-4 text-slate-300">フォーム回答が入るスプシの構成を固定し、用途別に列を拡張。</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-400">
+                        <thead class="text-xs text-slate-200 uppercase bg-slate-800/50">
+                            <tr>
+                                <th class="px-4 py-3 rounded-l-lg">Col A</th>
+                                <th class="px-4 py-3">Col B</th>
+                                <th class="px-4 py-3">OpenAI Generated</th>
+                                <th class="px-4 py-3">GitHub / JSON</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-700/50">
+                                <td class="px-4 py-4 font-mono text-white">timestamp</td>
+                                <td class="px-4 py-4 font-mono text-cyan-400 font-bold">RAW</td>
+                                <td class="px-4 py-4">title / summary / tags / Genre / sparse_note</td>
+                                <td class="px-4 py-4">dir / repo_path / public_url</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: GAS Development -->
+        <section>
+            <div class="flex items-center mb-8">
+                <span class="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-yellow-400 font-bold text-xl mr-4">4</span>
+                <h2 class="text-2xl font-bold text-white">GAS開発ステップ</h2>
+            </div>
+            
+            <div class="space-y-6 relative pl-4 md:pl-0">
+                
+                <!-- Step 1 -->
+                <div class="relative pl-12 md:pl-16 py-2">
+                    <div class="step-connector"></div>
+                    <div class="absolute left-0 top-3 w-8 h-8 bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center text-xs font-bold z-10">01</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Notion疎通</h3>
+                    <p class="text-slate-400 text-sm">Notion APIキー/DB_IDをスクリプトプロパティへ退避。フォーム送信の実成功を確認。</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative pl-12 md:pl-16 py-2">
+                    <div class="step-connector"></div>
+                    <div class="absolute left-0 top-3 w-8 h-8 bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center text-xs font-bold z-10">02</div>
+                    <h3 class="text-lg font-bold text-white mb-2">OpenAIメタ生成</h3>
+                    <p class="text-slate-400 text-sm mb-2">RAWからtitle, summary, tagsなどを生成。</p>
+                    <div class="bg-red-500/10 border border-red-500/20 rounded p-3 text-xs text-red-200 inline-block mb-2">
+                        <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i>
+                        400 Error (Missing required parameter) → 修正
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative pl-12 md:pl-16 py-2 last-step">
+                    <div class="step-connector"></div>
+                    <div class="absolute left-0 top-3 w-8 h-8 bg-slate-800 rounded-full border border-slate-600 flex items-center justify-center text-xs font-bold z-10">03</div>
+                    <h3 class="text-lg font-bold text-white mb-2">JSON固定フォーマット & 復旧</h3>
+                    <p class="text-slate-400 text-sm">生成結果をJSON形式で受け取りスプシに書き戻す構成へ。定数重複エラー等のトラブルシューティングを経て安定化。</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 5: GitHub Implementation -->
+        <section>
+            <div class="flex items-center mb-8">
+                <span class="flex items-center justify-center w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 font-bold text-xl mr-4">5</span>
+                <h2 class="text-2xl font-bold text-white">GitHub公開の実装</h2>
+            </div>
+            <div class="glass-card rounded-2xl p-6 border-t-4 border-t-purple-500">
+                <h3 class="font-bold text-white mb-4">最短パス実装: HTMLそのまま送信</h3>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                        <div class="text-xs text-purple-400 font-mono mb-1">Source</div>
+                        <div class="text-sm text-slate-300">スプシの「html」列の内容をそのまま使用</div>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-800">
+                        <div class="text-xs text-purple-400 font-mono mb-1">Destination</div>
+                        <div class="text-sm text-slate-300">repo/docs/YYYY-MM-DD_〇〇/index.html</div>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm text-slate-400">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>repo_path / public_url は「入力済み」前提で設計を簡素化</li>
+                        <li>GH_OWNER / GH_REPO はスクリプトプロパティで管理</li>
+                        <li>ヘッダ行選択エラー等のエッジケース修正完了</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grouped Sections: JSON / Frontend / Data Issues -->
+        <div class="grid md:grid-cols-2 gap-8">
+            
+            <!-- Section 6: index.json -->
+            <section class="glass-card rounded-2xl p-6">
+                <div class="flex items-center mb-4">
+                    <span class="flex items-center justify-center w-8 h-8 rounded bg-slate-800 text-slate-400 font-bold text-sm mr-3">6</span>
+                    <h3 class="text-lg font-bold text-white">index.json (メタデータ集約)</h3>
+                </div>
+                <p class="text-slate-400 text-sm mb-4">トップページのカード一覧生成に必要な情報を集約。</p>
+                <div class="bg-slate-900 p-3 rounded text-xs font-mono text-cyan-300 mb-4">
+                    { timestamp, title, summary, tags, dir, repo_path, public_url }
+                </div>
+                <p class="text-xs text-slate-500">
+                    Next: GitHub ActionsによるHTMLからのメタ自動抽出（リポジトリ側自動化）も構想中。
+                </p>
+            </section>
+
+            <!-- Section 7: Top Page -->
+            <section class="glass-card rounded-2xl p-6">
+                <div class="flex items-center mb-4">
+                    <span class="flex items-center justify-center w-8 h-8 rounded bg-slate-800 text-slate-400 font-bold text-sm mr-3">7</span>
+                    <h3 class="text-lg font-bold text-white">docs/index.html (Frontend)</h3>
+                </div>
+                <p class="text-slate-400 text-sm mb-4">Fetch APIでJSONを読み込み、カードUIを動的生成。</p>
+                <ul class="space-y-2 text-xs text-slate-400 border-t border-slate-700/50 pt-4">
+                    <li class="flex items-start"><i data-lucide="check" class="w-3 h-3 mt-1 mr-2 text-green-500"></i>tagsは配列前提で処理 (map/join)</li>
+                    <li class="flex items-start"><i data-lucide="check" class="w-3 h-3 mt-1 mr-2 text-green-500"></i>linkPathの基準を統一</li>
+                    <li class="flex items-start"><i data-lucide="check" class="w-3 h-3 mt-1 mr-2 text-green-500"></i>列名の揺らぎ（Tags/tags）を吸収</li>
+                </ul>
+            </section>
+
+            <!-- Section 8: Issues -->
+            <section class="glass-card rounded-2xl p-6">
+                <div class="flex items-center mb-4">
+                    <span class="flex items-center justify-center w-8 h-8 rounded bg-slate-800 text-slate-400 font-bold text-sm mr-3">8</span>
+                    <h3 class="text-lg font-bold text-white">スプシ運用・データ設計</h3>
+                </div>
+                <div class="bg-red-500/5 border border-red-500/10 p-3 rounded mb-3">
+                    <p class="text-xs text-red-200">iPhoneスプシアプリで結合式が参照として認識されない問題</p>
+                </div>
+                <p class="text-xs text-slate-400">
+                    repo_path と public_url のどちらを正とするか、GASとFrontendの責任境界を決定し、運用破綻を防いだ。
+                </p>
+            </section>
+
+            <!-- Section 9: Documentation -->
+            <section class="glass-card rounded-2xl p-6">
+                <div class="flex items-center mb-4">
+                    <span class="flex items-center justify-center w-8 h-8 rounded bg-slate-800 text-slate-400 font-bold text-sm mr-3">9</span>
+                    <h3 class="text-lg font-bold text-white">目次ドキュメント整理</h3>
+                </div>
+                <p class="text-sm text-slate-400 mb-2">Notion/ドキュメント整理UIにおける「INDEX（最新）」運用のバグ修正。</p>
+                <div class="text-xs text-slate-500 font-mono">
+                    undefined check, loop handling, empty value fallback
+                </div>
+            </section>
+        </div>
+
+        <!-- Section 10: Conclusion -->
+        <section class="mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4">Current Status & Next</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-cyan-500 to-indigo-500 mx-auto rounded-full"></div>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border border-slate-700 relative overflow-hidden">
+                <!-- Decorative BG -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-xl font-bold text-cyan-400 mb-6 flex items-center">
+                            <i data-lucide="check-circle-2" class="mr-2"></i> 到達点
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-center text-slate-300">
+                                <span class="w-2 h-2 bg-cyan-500 rounded-full mr-3"></span>
+                                スマホ起点で入力が成立
+                            </li>
+                            <li class="flex items-center text-slate-300">
+                                <span class="w-2 h-2 bg-cyan-500 rounded-full mr-3"></span>
+                                Notionへの構造化データ保存完了
+                            </li>
+                            <li class="flex items-center text-slate-300">
+                                <span class="w-2 h-2 bg-cyan-500 rounded-full mr-3"></span>
+                                GitHub PagesへのHTML公開完了
+                            </li>
+                            <li class="flex items-center text-slate-300">
+                                <span class="w-2 h-2 bg-cyan-500 rounded-full mr-3"></span>
+                                トップページでのカード一覧表示実装
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-indigo-400 mb-6 flex items-center">
+                            <i data-lucide="arrow-up-right" class="mr-2"></i> 次の拡張
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                                <div class="font-bold text-white mb-1">Index JSON Automation</div>
+                                <div class="text-sm text-slate-400">index.jsonへのタグデータ送信GASの実装</div>
+                            </div>
+                            <div class="flex items-center justify-center text-xs text-slate-500 font-mono">OR</div>
+                            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                                <div class="font-bold text-white mb-1">GitHub Actions Pipeline</div>
+                                <div class="text-sm text-slate-400">HTML push時にメタデータを抽出してjsonを更新（Repo側完結）</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-12 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 Development Log. Created with passion for efficiency.</p>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Simple Fade-in Animation on Scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    }
+                });
+            }, observerOptions);
+
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-10');
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
