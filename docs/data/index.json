@@ -1,5 +1,22 @@
 [
   {
+    "timestamp": "2026-01-19T01:04:03+09:00",
+    "title": "KyashとPayPayの違いを比較",
+    "summary": "KyashとPayPayの店舗数や還元率を徹底比較した内容です。あなたに最適なキャッシュレス決済を見つけましょう。",
+    "tags": [
+      "Kyash",
+      "PayPay",
+      "比較",
+      "決済",
+      "還元率",
+      "店舗数",
+      "キャンペーン"
+    ],
+    "dir": "2026-01-19_kyash-paypay-comparison",
+    "repo_path": "/docs/2026-01-19_kyash-paypay-comparison/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-19_kyash-paypay-comparison"
+  },
+  {
     "timestamp": "2026-01-18T22:51:44+09:00",
     "title": "Google Analytics 4 導入ガイド",
     "summary": "Google Analytics 4を使用してウェブサイトの分析を行う方法を解説します。イベントを計測し、ユーザー行動を可視化する手順を紹介します。",
