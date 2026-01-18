@@ -1,5 +1,21 @@
 [
   {
+    "timestamp": "2026-01-19T08:15:10+09:00",
+    "title": "インフレ対策と行動戦略",
+    "summary": "インフレ下での有利な行動戦略を提案します。現金を減らし、資産に連動した行動を取りましょう。",
+    "tags": [
+      "インフレ",
+      "行動戦略",
+      "資産",
+      "固定費",
+      "働き方",
+      "思考法"
+    ],
+    "dir": "2026-01-19_inflation-strategy-action",
+    "repo_path": "/docs/2026-01-19_inflation-strategy-action/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-19_inflation-strategy-action"
+  },
+  {
     "timestamp": "2026-01-19T07:25:20+09:00",
     "title": "生成AIとデジタル出版の未来調査",
     "summary": "本報告書は生成AIがデジタル出版に及ぼす影響とブログ購読率の変化を探ります。信頼性の高いコンテンツの重要性が増しています。",
