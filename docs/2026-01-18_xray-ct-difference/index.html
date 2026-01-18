@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レントゲンとCTの違いって何？ | Docs</title>
+    <style>
+        /* Base Reset & Typography */
+        :root {
+            --bg-color: #f9fafb;
+            --text-color: #1f2937;
+            --accent-color: #2563eb;
+            --border-color: #e5e7eb;
+            --code-bg: #f3f4f6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 10px;
+            text-decoration: none;
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+        .back-link:hover {
+            color: var(--accent-color);
+        }
+
+        /* Article Meta */
+        .article-header h1 {
+            font-size: 2em;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+
+        .meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #6b7280;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tag {
+            background-color: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        .summary-box {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .summary-title {
+            font-weight: bold;
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        /* Article Content Styles */
+        .article-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .article-content h2 {
+            font-size: 1.5em;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            padding-bottom: 0.3em;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .article-content h3 {
+            font-size: 1.25em;
+            margin-top: 1.2em;
+            margin-bottom: 0.6em;
+            color: #374151;
+        }
+
+        .article-content p {
+            margin-bottom: 1.2em;
+        }
+
+        .article-content ul, .article-content ol {
+            margin-bottom: 1.5em;
+            padding-left: 20px;
+        }
+        
+        .article-content li {
+            margin-bottom: 0.5em;
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5em;
+            font-size: 0.95em;
+        }
+
+        .article-content th, .article-content td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .article-content th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid #d1d5db;
+            margin: 1.5em 0;
+            padding-left: 1em;
+            color: #4b5563;
+            font-style: italic;
+        }
+
+        /* Code Block Style */
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.9em;
+            margin-bottom: 1.5em;
+        }
+
+        code {
+            font-family: monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .article-content {
+                padding: 20px;
+            }
+            .article-content table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <a href="../index.html" class="back-link">← Back to Docs</a>
+    </header>
+
+    <main>
+        <article class="article-header">
+            <!-- Data Binding Points -->
+            <h1 id="article-title">レントゲンとCTの違いって何？</h1>
+            
+            <div class="meta-info">
+                <span id="article-timestamp">📅 2026-01-18 15:30</span>
+                <div class="tags" id="article-tags">
+                    <span class="tag">医療</span>
+                    <span class="tag">レントゲン</span>
+                    <span class="tag">CT</span>
+                    <span class="tag">解説</span>
+                </div>
+            </div>
+
+            <div class="summary-box">
+                <span class="summary-title">Summary</span>
+                <p id="article-summary">レントゲンは「写真（2D）」、CTは「輪切り・3Dの模型」。見え方、費用、被ばく量などの違いや、検査の使い分けについて分かりやすく解説します。</p>
+            </div>
+
+            <div class="article-content" id="article-raw">
+                <!-- Content Start -->
+                <p>レントゲンとCTは、どちらも「X線（エックス線）」を使って体の中を見る検査ですが、その<strong>「見え方」と「詳しさ」</strong>が大きく異なります。</p>
+                
+                <p>一言でいうと、<strong>レントゲンは「写真（2D）」、CTは「輪切り・3Dの模型」</strong>のようなイメージです。</p>
+
+                <h2>レントゲンとCTの主な違い</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>項目</th>
+                            <th>レントゲン（X線検査）</th>
+                            <th>CT検査</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>見え方</strong></td>
+                            <td>平面的（2D）。1方向からの影絵。</td>
+                            <td>立体的（3D）。体を輪切りにした断面。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>得意なこと</strong></td>
+                            <td>骨折、胸部（肺）のざっくりした確認。</td>
+                            <td>内臓、血管、複雑な骨折の精密検査。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>検査時間</strong></td>
+                            <td>数秒（一瞬で終わる）。</td>
+                            <td>数分〜10分程度（装置が回転する）。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>被ばく量</strong></td>
+                            <td>非常に少ない。</td>
+                            <td>レントゲンよりは多い。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>費用</strong></td>
+                            <td>安価。</td>
+                            <td>レントゲンより高め。</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>1. レントゲン：手軽な「影絵」</h3>
+                <p>1つの方向からX線を当てて、その「通り抜けにくさ」を画像にします。</p>
+                <ul>
+                    <li><strong>メリット：</strong> とにかく早くて手軽です。健康診断や、パッと見て大きな骨折がないか確認するのに最適です。</li>
+                    <li><strong>デメリット：</strong> 重なっている部分は見えにくいです。例えば、心臓の裏側に小さな病気があっても、心臓の影に隠れて映らないことがあります。</li>
+                </ul>
+
+                <h3>2. CT：詳細な「輪切り」</h3>
+                <p>体の周りを360度回転しながらX線を当て続け、コンピュータで計算して「輪切りの画像」を作ります。</p>
+                <ul>
+                    <li><strong>メリット：</strong> レントゲンでは重なって見えなかった部分も、断面として1mm単位で詳しく見られます。最近では、そのデータを合成して立体的（3D）な画像を作ることも可能です。</li>
+                    <li><strong>デメリット：</strong> 何枚も撮影するため、レントゲンに比べると放射線の量が多くなります。ただし、1回の検査で健康に影響が出るレベルではありません。</li>
+                </ul>
+
+                <h2>どう使い分けるの？</h2>
+                <ul>
+                    <li><strong>まずはレントゲン：</strong> 「転んで足が痛い」「咳が出る」といった場合、まずは全体を素早く把握するためにレントゲンを撮ります。</li>
+                    <li><strong>より詳しくCT：</strong> レントゲンで「何か影がある」と見つかった場合や、複雑な骨折、内臓の病気が疑われる場合に、原因を特定するためにCTへ進みます。</li>
+                </ul>
+
+                <blockquote>
+                    <strong>補足：磁石を使うのは「MRI」</strong><br>
+                    ちなみに、よく似た名前に「MRI」がありますが、こちらはX線ではなく<strong>強力な磁石</strong>を使います。筋肉や神経などの柔らかい組織を見るのが得意な検査です。
+                </blockquote>
+
+                <hr>
+
+                <h2>付録：プレゼン用スライドコード</h2>
+                <p>本記事の内容を元に生成されたGoogle Slidesエクスポート用のHTMLコードの一部です。</p>
+
+<pre><code>&lt;!-- Slide 1: Title --&gt;
+&lt;div class="slide-container" id="slide1"&gt;
+    &lt;div class="two-column"&gt;
+        &lt;div&gt;
+            &lt;h1&gt;レントゲンと&lt;br&gt;CTの違い&lt;/h1&gt;
+            &lt;p class="subtitle"&gt;見え方と役割の完全解説&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="image-wrapper" style="border:none; background:none;"&gt;
+             &lt;!-- Image Placeholder --&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+                <!-- Content End -->
+            </div>
+        </article>
+    </main>
+
+    <!-- Hidden Data Structure for System/Index usage -->
+    <script>
+        // この記事のメタデータ定義（システム連携用）
+        const articleData = {
+            dr: "2026-01-18_xray-vs-ct", // ディレクトリ名
+            timestamp: "2026-01-18 15:30",
+            title: "レントゲンとCTの違いって何？",
+            summary: "レントゲンは「写真（2D）」、CTは「輪切り・3Dの模型」。見え方、費用、被ばく量などの違いや、検査の使い分けについて分かりやすく解説します。",
+            tags: ["医療", "レントゲン", "CT", "解説"],
+            raw: document.getElementById('article-raw').innerHTML // 現在のHTMLコンテンツを取得
+        };
+
+        // 将来的な拡張: index.jsonのフェッチやナビゲーション生成などをここに記述可能
+        console.log("Article Data Loaded:", articleData);
+    </script>
+</div>
+</body>
+</html>
