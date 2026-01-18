@@ -1,5 +1,22 @@
 [
   {
+    "timestamp": "2026-01-19T06:48:57+09:00",
+    "title": "パイプライン開発ログを記録",
+    "summary": "スマホからの知識管理とWeb公開を一元化するシステムの設計をまとめた。NotionとGitHub Pagesを利用して自動化を実現。",
+    "tags": [
+      "パイプライン",
+      "開発",
+      "Notion",
+      "GitHub",
+      "自動化",
+      "ログ",
+      "設計"
+    ],
+    "dir": "2026-01-19_pipeline-development-log",
+    "repo_path": "/docs/2026-01-19_pipeline-development-log/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-19_pipeline-development-log"
+  },
+  {
     "timestamp": "2026-01-19T01:04:03+09:00",
     "title": "KyashとPayPayの違いを比較",
     "summary": "KyashとPayPayの店舗数や還元率を徹底比較した内容です。あなたに最適なキャッシュレス決済を見つけましょう。",
