@@ -1,5 +1,22 @@
 [
   {
+    "timestamp": "2026-01-19T07:25:20+09:00",
+    "title": "生成AIとデジタル出版の未来調査",
+    "summary": "本報告書は生成AIがデジタル出版に及ぼす影響とブログ購読率の変化を探ります。信頼性の高いコンテンツの重要性が増しています。",
+    "tags": [
+      "生成AI",
+      "デジタル出版",
+      "ブログ",
+      "調査報告",
+      "検索トレンド",
+      "影響",
+      "未来"
+    ],
+    "dir": "2026-01-19_future-publishing-report",
+    "repo_path": "/docs/2026-01-19_future-publishing-report/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-19_future-publishing-report"
+  },
+  {
     "timestamp": "2026-01-19T06:48:57+09:00",
     "title": "パイプライン開発ログを記録",
     "summary": "スマホからの知識管理とWeb公開を一元化するシステムの設計をまとめた。NotionとGitHub Pagesを利用して自動化を実現。",
