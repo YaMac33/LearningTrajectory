@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "timestamp": "2026-01-18T15:36:21+09:00",
+    "title": "レントゲンとCTの違いの解説",
+    "summary": "レントゲンは2D画像、CTは3D画像を提供します。違いと使い分けについて詳しく説明します。",
+    "tags": [
+      "医療",
+      "レントゲン",
+      "CT",
+      "検査",
+      "比較"
+    ],
+    "dir": "2026-01-18_xray-ct-difference",
+    "repo_path": "/docs/2026-01-18_xray-ct-difference/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-18_xray-ct-difference"
+  }
+]
