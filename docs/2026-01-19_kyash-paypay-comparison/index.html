@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- 指定のスクリプト -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MQ9ZB4LYWP');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyash vs PayPay 徹底比較 | 決済・還元率の違い</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans JP"', 'sans-serif'],
+                    },
+                    colors: {
+                        paypay: '#FF0033',
+                        kyash: '#24CDDD',
+                        dark: '#1a1a1a',
+                        light: '#f8f9fa'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(135deg, #FF0033 0%, #24CDDD 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased">
+
+    <!-- Header -->
+    <header class="fixed w-full bg-white/90 backdrop-blur-md shadow-sm z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-black tracking-tighter text-gray-900">PAY<span class="text-gray-400">VS</span>KYASH</span>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#comparison" class="text-gray-600 hover:text-gray-900 font-medium transition">比較ポイント</a>
+                    <a href="#table" class="text-gray-600 hover:text-gray-900 font-medium transition">一覧表</a>
+                    <a href="#conclusion" class="text-gray-600 hover:text-gray-900 font-medium transition">結論</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-sm font-semibold mb-6">2026年 最新比較</span>
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                どっちを選ぶ？<br>
+                <span class="gradient-text">Kyash vs PayPay</span>
+            </h1>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto mb-10">
+                使える店舗数とポイント還元率で徹底比較。<br>
+                あなたのライフスタイルに最適なキャッシュレス決済を見つけましょう。
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#comparison" class="px-8 py-4 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-800 transition shadow-lg">
+                    比較を見る
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Comparison Section -->
+    <section id="comparison" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">2つの視点で徹底比較</h2>
+                <p class="text-gray-500">店舗数と還元率、それぞれの強みを分析</p>
+            </div>
+
+            <!-- Point 1: Shops -->
+            <div class="grid md:grid-cols-2 gap-12 items-center mb-24">
+                <div class="order-2 md:order-1">
+                    <div class="bg-white p-8 rounded-2xl shadow-xl card-hover border-l-4 border-paypay">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-store text-paypay text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">PayPay</h3>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-paypay mt-1 mr-3"></i>
+                                <span><strong class="text-gray-900">圧倒的な店舗数</strong><br><span class="text-sm text-gray-500">コンビニ、ドラッグストアから個人経営の飲食店まで網羅。</span></span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-paypay mt-1 mr-3"></i>
+                                <span><strong class="text-gray-900">日常利用に最適</strong><br><span class="text-sm text-gray-500">QRコード決済として街中のほとんどの場所で使用可能。</span></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <h3 class="text-4xl font-bold mb-6">01. 使える店舗数</h3>
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                        日常の買い物での「使える場所の多さ」ならPayPayが圧倒的です。
+                        KyashはVisa加盟店で広く使えますが、QR決済機能自体はないため、国内の実店舗決済ではPayPayに軍配が上がります。
+                    </p>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fab fa-cc-visa text-kyash"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-900">Kyashの場合</h4>
+                        </div>
+                        <p class="text-sm text-gray-500">Visaプリペイドとして世界中のVisa加盟店で利用可能。ただしアプリ単体でのQR決済機能はありません。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Point 2: Points -->
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-4xl font-bold mb-6">02. ポイント還元率</h3>
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                        キャンペーンの爆発力ならPayPay、クレカとの組み合わせによる工夫ならKyash。
+                        PayPayは「超PayPay祭」などで大幅アップのチャンスがあります。
+                    </p>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-coins text-kyash"></i>
+                            </div>
+                            <h4 class="font-bold text-gray-900">Kyashの還元</h4>
+                        </div>
+                        <ul class="text-sm text-gray-500 space-y-2">
+                            <li>• バーチャルカード：約0.5%</li>
+                            <li>• リアルカード：約1% (条件あり)</li>
+                            <li>• <span class="text-kyash font-bold">クレカチャージとの二重取りが可能</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white p-8 rounded-2xl shadow-xl card-hover border-l-4 border-paypay">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-chart-line text-paypay text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">PayPay</h3>
+                        </div>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-paypay mt-1 mr-3"></i>
+                                <span><strong class="text-gray-900">基本 0.5% 〜 1.0%</strong><br><span class="text-sm text-gray-500">条件や利用実績により変動。</span></span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-paypay mt-1 mr-3"></i>
+                                <span><strong class="text-gray-900">最大 2%超 も可能</strong><br><span class="text-sm text-gray-500">キャンペーン適用で還元率が大幅にアップ。</span></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section id="table" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12">機能比較まとめ</h2>
+            <div class="overflow-hidden rounded-xl shadow-lg border border-gray-100">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-200">
+                            <th class="p-6 text-sm font-bold text-gray-500 uppercase tracking-wider w-1/3">比較項目</th>
+                            <th class="p-6 text-lg font-bold text-paypay w-1/3">PayPay</th>
+                            <th class="p-6 text-lg font-bold text-kyash w-1/3">Kyash</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-6 font-medium text-gray-900">使えるお店の多さ</td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-2">◎ 万能</span><br>
+                                QR決済としてほぼ万能。<br>中小店舗にも強い。
+                            </td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mb-2">△ 限定的</span><br>
+                                Visa加盟店は多いが、<br>QR機能がない。
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-6 font-medium text-gray-900">基本還元率</td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-2">○ 良好</span><br>
+                                0.5% 〜 1.0%<br>(条件次第で上昇)
+                            </td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-2">○ 良好</span><br>
+                                0.5% 〜 1.0%<br>(カード種類による)
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-6 font-medium text-gray-900">キャンペーン</td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-2">◎ 頻繁</span><br>
+                                還元率アップの<br>機会が多い。
+                            </td>
+                            <td class="p-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mb-2">△ 少なめ</span><br>
+                                即時アップ系は<br>少ない。
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="p-6 font-medium text-gray-900">日常利用のしやすさ</td>
+                            <td class="p-6 text-xl text-paypay font-bold">◎ 最強</td>
+                            <td class="p-6 text-gray-500">△ 普通</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion Section -->
+    <section id="conclusion" class="py-20 bg-gray-900 text-white relative overflow-hidden">
+        <!-- Background decorative elements -->
+        <div class="absolute top-0 left-0 w-64 h-64 bg-paypay opacity-10 rounded-full filter blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div class="absolute bottom-0 right-0 w-64 h-64 bg-kyash opacity-10 rounded-full filter blur-3xl translate-x-1/2 translate-y-1/2"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h2 class="text-3xl font-bold mb-12">結論：どっちを使うべき？</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-paypay transition duration-300">
+                    <h3 class="text-xl font-bold text-paypay mb-4">PayPayがおすすめな人</h3>
+                    <ul class="text-left space-y-3 text-gray-300">
+                        <li class="flex items-start"><i class="fas fa-check text-paypay mt-1 mr-3"></i>日常の買い物での利便性重視</li>
+                        <li class="flex items-start"><i class="fas fa-check text-paypay mt-1 mr-3"></i>キャンペーンで大きく得したい</li>
+                        <li class="flex items-start"><i class="fas fa-check text-paypay mt-1 mr-3"></i>使えるお店の多さを最優先</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 hover:border-kyash transition duration-300">
+                    <h3 class="text-xl font-bold text-kyash mb-4">Kyashがおすすめな人</h3>
+                    <ul class="text-left space-y-3 text-gray-300">
+                        <li class="flex items-start"><i class="fas fa-check text-kyash mt-1 mr-3"></i>Visa加盟店でのカード決済がメイン</li>
+                        <li class="flex items-start"><i class="fas fa-check text-kyash mt-1 mr-3"></i>クレカ連携で還元率を高めたい</li>
+                        <li class="flex items-start"><i class="fas fa-check text-kyash mt-1 mr-3"></i>支出管理アプリとして活用したい</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center">
+                <p class="text-gray-400 mb-6">利用シーンに合わせて使い分けるのが賢い選択です。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-gray-500 py-8 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-sm">&copy; 2026 Payment Comparison Guide. Based on uploaded data.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
