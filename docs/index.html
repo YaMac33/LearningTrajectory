@@ -1,260 +1,257 @@
 <!DOCTYPE html>
 <html lang="ja" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SideNote - Tech Blog</title>
-    <meta name="description" content="A stylish, lightweight tech blog.">
-    
-    <!-- Tailwind CSS (Lightweight & Utility-first) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter for UI, JetBrains Mono for code/tags -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SideNote - Tech Blog</title>
+  <meta name="description" content="A stylish, lightweight tech blog." />
 
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6', // Teal
-                            600: '#0d9488',
-                            900: '#134e4a',
-                        },
-                        dark: {
-                            bg: '#0f172a', // Slate 900
-                            card: '#1e293b', // Slate 800
-                            text: '#e2e8f0', // Slate 200
-                            muted: '#94a3b8', // Slate 400
-                        }
-                    }
-                }
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              900: '#134e4a',
+            },
+            dark: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              text: '#e2e8f0',
+              muted: '#94a3b8',
             }
+          }
         }
-    </script>
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #e2e8f0;
-            /* Subtle grid background pattern */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.15), 0 8px 10px -6px rgba(20, 184, 166, 0.1);
-            border-color: rgba(20, 184, 166, 0.5);
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569; 
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow:
+        0 10px 25px -5px rgba(20,184,166,0.15),
+        0 8px 10px -6px rgba(20,184,166,0.1);
+      border-color: rgba(20,184,166,0.5);
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- Header -->
-    <header class="w-full border-b border-slate-800 bg-dark-bg/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2 group">
-                <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:rotate-12 transition-transform duration-300">
-                    S
-                </div>
-                <span class="font-bold text-xl tracking-tight group-hover:text-brand-500 transition-colors">SideNote</span>
-            </a>
-            
-            <!-- Simple Social / Link placeholder -->
-            <nav class="hidden sm:flex gap-6 text-sm font-medium text-dark-muted">
-                <a href="#" class="hover:text-brand-500 transition-colors">About</a>
-                <a href="https://github.com/" target="_blank" class="hover:text-brand-500 transition-colors">GitHub</a>
-            </nav>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+<!-- Header -->
+<header class="w-full border-b border-slate-800 bg-dark-bg/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2 group">
+      <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+        S
+      </div>
+      <span class="font-bold text-xl group-hover:text-brand-500 transition-colors">SideNote</span>
+    </a>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full">
+
+  <!-- Hero -->
+  <div class="mb-12">
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-100 via-brand-500 to-blue-500 mb-4">
+      Knowledge Stream
+    </h1>
+    <p class="text-dark-muted text-lg">
+      技術的なメモ、考察、日々の記録。
+    </p>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-10 sticky top-20 z-40">
+    <div class="bg-dark-card rounded-xl border border-slate-700 flex items-center p-2">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search posts (title / summary / tags)"
+        class="w-full bg-transparent outline-none text-white placeholder-slate-500"
+      />
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div id="blogGrid" class="grid grid-cols-1 gap-6">
+    <div id="loadingState" class="animate-pulse space-y-4">
+      <div class="h-40 bg-slate-800 rounded-xl"></div>
+      <div class="h-40 bg-slate-800 rounded-xl"></div>
+    </div>
+  </div>
+
+  <!-- No Results -->
+  <div id="noResults" class="hidden text-center py-20 text-dark-muted">
+    No posts found
+  </div>
+
+  <!-- Error -->
+  <div id="loadError" class="hidden text-center py-20 text-red-400">
+    Failed to load index.json
+    <div id="loadErrorMsg" class="text-sm mt-2 text-dark-muted"></div>
+  </div>
+
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-slate-800 py-8 text-center text-dark-muted text-sm">
+  &copy; <span id="year"></span> SideNote
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ===============================
+  // Config
+  // ===============================
+  const DATA_URL = './data/index.json';
+
+  // ===============================
+  // State / DOM
+  // ===============================
+  let allPosts = [];
+  const grid = document.getElementById('blogGrid');
+  const searchInput = document.getElementById('searchInput');
+  const noResults = document.getElementById('noResults');
+  const loadingState = document.getElementById('loadingState');
+  const loadError = document.getElementById('loadError');
+  const loadErrorMsg = document.getElementById('loadErrorMsg');
+
+  // ===============================
+  // Utils
+  // ===============================
+  function normalizeTags(tags) {
+    if (Array.isArray(tags)) {
+      return tags.map(t => String(t).trim()).filter(Boolean);
+    }
+    if (typeof tags === 'string') {
+      return tags.split(',').map(t => t.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  // ===============================
+  // Fetch
+  // ===============================
+  async function loadPosts() {
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const json = await res.json();
+
+      allPosts = json.map(p => ({
+        title: p.title || '',
+        summary: p.summary || '',
+        tags: normalizeTags(p.tags),
+        timestamp: p.timestamp,
+        url: p.public_url || p.repo_path || '#'
+      }));
+
+      allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      renderPosts(allPosts);
+
+    } catch (e) {
+      console.error(e);
+      loadError.classList.remove('hidden');
+      loadErrorMsg.textContent = e.message;
+    } finally {
+      if (loadingState) loadingState.remove();
+    }
+  }
+
+  // ===============================
+  // Render
+  // ===============================
+  function renderPosts(posts) {
+    grid.innerHTML = '';
+
+    if (posts.length === 0) {
+      noResults.classList.remove('hidden');
+      return;
+    }
+    noResults.classList.add('hidden');
+
+    posts.forEach(post => {
+      const date = new Date(post.timestamp)
+        .toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
+        .replace(/\//g, '.');
+
+      const card = document.createElement('a');
+      card.href = post.url;
+      card.className =
+        'group block bg-dark-card border border-slate-700 rounded-xl p-6 transition-all card-hover';
+
+      card.innerHTML = `
+        <div class="flex flex-wrap items-center gap-2 text-xs font-mono mb-3">
+          <span class="text-brand-500 bg-brand-500/10 px-2 py-1 rounded">${date}</span>
+          ${post.tags.map(tag =>
+            `<span class="border border-slate-700 px-2 py-0.5 rounded text-slate-400">${tag}</span>`
+          ).join('')}
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full">
-        
-        <!-- Hero Section -->
-        <div class="mb-12 text-center sm:text-left">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-100 via-brand-500 to-blue-500 mb-4 pb-2">
-                Knowledge Stream
-            </h1>
-            <p class="text-dark-muted text-lg max-w-2xl">
-                技術的なメモ、考察、日々の記録。
-            </p>
-        </div>
+        <h2 class="text-xl font-bold text-white mb-2 group-hover:text-brand-500 transition-colors">
+          ${post.title}
+        </h2>
 
-        <!-- Search & Filter -->
-        <div class="mb-10 sticky top-20 z-40">
-            <div class="relative group">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand-500 to-blue-600 rounded-xl opacity-30 group-hover:opacity-75 blur transition duration-200"></div>
-                <div class="relative bg-dark-card rounded-xl flex items-center p-1 border border-slate-700">
-                    <svg class="w-5 h-5 ml-3 text-dark-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="searchInput" placeholder="Search posts (title, tag, content)..." 
-                        class="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 h-10 px-3 text-sm sm:text-base">
-                </div>
-            </div>
-            <!-- Active Tags Area -->
-            <div id="activeTags" class="flex flex-wrap gap-2 mt-3 empty:hidden"></div>
-        </div>
+        <p class="text-dark-muted text-sm leading-relaxed">
+          ${post.summary}
+        </p>
+      `;
 
-        <!-- Blog Grid -->
-        <div id="blogGrid" class="grid grid-cols-1 gap-6">
-            <!-- Loading State -->
-            <div class="animate-pulse space-y-4">
-                <div class="h-48 bg-slate-800 rounded-xl"></div>
-                <div class="h-48 bg-slate-800 rounded-xl"></div>
-                <div class="h-48 bg-slate-800 rounded-xl"></div>
-            </div>
-        </div>
-        
-        <!-- No Results Message -->
-        <div id="noResults" class="hidden text-center py-20">
-            <div class="text-6xl mb-4">🔍</div>
-            <h3 class="text-xl font-bold text-white mb-2">No posts found</h3>
-            <p class="text-dark-muted">Try adjusting your search terms.</p>
-        </div>
+      grid.appendChild(card);
+    });
+  }
 
-    </main>
+  // ===============================
+  // Search
+  // ===============================
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    const filtered = allPosts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.summary.toLowerCase().includes(q) ||
+      p.tags.join(' ').toLowerCase().includes(q)
+    );
+    renderPosts(filtered);
+  });
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 py-8 bg-dark-bg mt-12">
-        <div class="max-w-4xl mx-auto px-4 text-center text-dark-muted text-sm">
-            <p>&copy; <span id="year"></span> SideNote. Built with lightweight HTML & Tailwind.</p>
-        </div>
-    </footer>
+  // Init
+  loadPosts();
+</script>
 
-    <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
-
-        // --- Configuration ---
-        // JSONファイルのパス。index.htmlから見た相対パス。
-        const DATA_URL = './data/index.json';
-        
-        // --- State ---
-        let allPosts = [];
-
-        // --- DOM Elements ---
-        const grid = document.getElementById('blogGrid');
-        const searchInput = document.getElementById('searchInput');
-        const noResults = document.getElementById('noResults');
-        const activeTagsContainer = document.getElementById('activeTags');
-
-        // --- Fetch Data ---
-        async function loadPosts() {
-            try {
-                // 実際の運用ではfetchを使用
-                const response = await fetch(DATA_URL);
-                if (!response.ok) throw new Error('Network response was not ok');
-                allPosts = await response.json();
-                
-                // 日付で降順ソート
-                allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                renderPosts(allPosts);
-            } 
-        }
-
-        // --- Render Function ---
-        function renderPosts(posts) {
-            grid.innerHTML = '';
-            
-            if (posts.length === 0) {
-                noResults.classList.remove('hidden');
-                return;
-            } else {
-                noResults.classList.add('hidden');
-            }
-
-            posts.forEach(post => {
-                // Tagの処理 (カンマ区切り文字列を配列化)
-                const tags = post.tags ? post.tags.split(',').map(t => t.trim()) : [];
-                
-                // 日付フォーマット
-                const dateObj = new Date(post.timestamp);
-                const dateStr = dateObj.toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '.');
-
-                // カード生成
-                const card = document.createElement('a');
-                card.href = post.public_url;
-                // 新しいタブで開く場合は下記を有効化
-                // card.target = "_blank"; 
-                card.className = `group block bg-dark-card border border-slate-700 rounded-xl p-6 transition-all duration-300 card-hover relative overflow-hidden`;
-                
-                // HTML構築
-                card.innerHTML = `
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-brand-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-150"></div>
-                    
-                    <div class="relative z-10">
-                        <div class="flex flex-wrap items-center gap-3 mb-3 text-xs font-mono">
-                            <span class="text-brand-500 font-bold bg-brand-500/10 px-2 py-1 rounded">${dateStr}</span>
-                            <div class="flex gap-2 flex-wrap" id="tags-${Math.random().toString(36).substr(2, 9)}">
-                                ${tags.map(tag => `<span class="text-slate-400 border border-slate-700 px-2 py-0.5 rounded hover:text-brand-400 hover:border-brand-500 transition-colors pointer-events-none">${tag}</span>`).join('')}
-                            </div>
-                        </div>
-
-                        <h2 class="text-xl sm:text-2xl font-bold text-white mb-3 group-hover:text-brand-500 transition-colors line-clamp-2">
-                            ${post.title}
-                        </h2>
-
-                        <p class="text-dark-muted mb-4 line-clamp-3 text-sm sm:text-base leading-relaxed">
-                            ${post.summary}
-                        </p>
-
-                        <div class="flex items-center text-brand-500 font-semibold text-sm">
-                            Read Article
-                            <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                        </div>
-                    </div>
-                `;
-                
-                grid.appendChild(card);
-            });
-        }
-
-        // --- Search & Filter Logic ---
-        function filterPosts() {
-            const query = searchInput.value.toLowerCase();
-            
-            const filtered = allPosts.filter(post => {
-                const title = (post.title || '').toLowerCase();
-                const summary = (post.summary || '').toLowerCase();
-                const tags = (post.tags || '').toLowerCase();
-                
-                return title.includes(query) || summary.includes(query) || tags.includes(query);
-            });
-            
-            renderPosts(filtered);
-        }
-
-        // Event Listener
-        searchInput.addEventListener('input', filterPosts);
-
-        // --- Init ---
-        loadPosts();
-
-    </script>
 </body>
 </html>
-
