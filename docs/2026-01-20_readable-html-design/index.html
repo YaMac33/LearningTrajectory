@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>読みやすいブログ記事のサンプル</title>
+    <style>
+        /* ベーススタイル */
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.8; /* 日本語は行間が広めの方が読みやすい */
+            color: #333;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 記事のコンテナ（中央寄せ・幅制限） */
+        .container {
+            max-width: 800px; /* 読みやすい最適な幅 */
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 見出しのデザイン */
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 0.5rem;
+            color: #111;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 0.3rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 本文とリスト */
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 16px;
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* リンク */
+        a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* コードブロック（Markdown風） */
+        pre {
+            background-color: #f6f8fa;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.9rem;
+            line-height: 1.45;
+            margin-bottom: 1.5rem;
+        }
+
+        code {
+            font-family: Consolas, "Courier New", monospace;
+            background-color: #f6f8fa;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 85%;
+        }
+
+        /* 引用（Blockquote） */
+        blockquote {
+            border-left: 4px solid #dfe2e5;
+            color: #6a737d;
+            margin: 0 0 1.5rem 0;
+            padding: 0 1rem;
+        }
+
+        /* 画像 */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 2rem auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 強調 */
+        strong {
+            font-weight: 700;
+            color: #24292e;
+        }
+        
+        /* 区切り線 */
+        hr {
+            height: 0.25em;
+            padding: 0;
+            margin: 24px 0;
+            background-color: #e1e4e8;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Markdownのように読めるHTMLデザイン</h1>
+        
+        <p>この記事は、生のHTMLでありながら、まるでMarkdownエディタで書いたような「読みやすさ」を重視したデザインのサンプルです。ブログやドキュメント作成に最適です。</p>
+
+        <h2>1. なぜ読みやすいのか？</h2>
+        <p>読みやすいWebページにはいくつかの共通点があります。このテンプレートでは以下のCSS設定を行っています。</p>
+
+        <ul>
+            <li><strong>適切な行間 (Line-height):</strong> 日本語は英語よりも文字の密度が高いため、<code>1.8</code>程度の広めの行間を設定しています。</li>
+            <li><strong>読みやすい文字幅 (Max-width):</strong> 一行が長すぎると目が疲れます。幅を<code>800px</code>に制限し、中央揃えにしています。</li>
+            <li><strong>視覚的な階層構造:</strong> 見出し（H1, H2）の下に細い線を入れることで、話題の区切りを明確にしています。</li>
+        </ul>
+
+        <h2>2. コードの表示例</h2>
+        <p>エンジニアブログには欠かせないコードブロックの表示も、Githubのようなスタイルにしています。</p>
+
+        <pre><code>// JavaScriptのサンプルコード
+function helloWorld() {
+    console.log("Hello, simple world!");
+}
+
+helloWorld();</code></pre>
+        
+        <p>文中の短いコードは <code>const readability = "high";</code> のようにハイライトされます。</p>
+
+        <h2>3. 引用と強調</h2>
+        <p>重要なポイントを伝えるための引用デザインです。</p>
+
+        <blockquote>
+            <p>シンプルさは究極の洗練である。<br>
+            — レオナルド・ダ・ヴィンチ</p>
+        </blockquote>
+
+        <hr>
+
+        <h2>まとめ</h2>
+        <p>このHTMLファイルをベースにすれば、CSSフレームワークを読み込むことなく、軽量で美しいページを作成できます。コンテンツ（中身）の作成に集中しましょう。</p>
+
+        <p>詳しくは <a href="#">ドキュメントのリンク（ダミー）</a> を参照してください。</p>
+    </div>
+
+</body>
+</html>
