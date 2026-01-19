@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Style Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="font-bold text-xl tracking-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                DevLog<span class="text-blue-500">.md</span>
+            </a>
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8">
+                <span class="text-sm font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">Update: 2024-05-20</span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-2 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    Markdownのように書く、<br class="hidden sm:block" />シンプルで美しいWebデザインの考察
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg">
+                    可読性を最大化するためのタイポグラフィと、HTML/CSS設計のベストプラクティスについて。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-8">
+                
+                <!-- セクション 1 -->
+                <section>
+                    <p class="leading-8 text-lg">
+                        Webにおける「読みやすさ」とは何でしょうか？それは、読者がコンテンツに没頭できる環境を作ることです。装飾過多なデザインは時にノイズとなります。この記事では、<strong class="font-bold text-slate-900 dark:text-white bg-yellow-100 dark:bg-yellow-900/40 px-1 rounded-sm">「Markdownファイルを表示しているかのようなシンプルさ」</strong>を目指したデザインについて解説します。
+                    </p>
+                </section>
+
+                <!-- セクション 2 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        1. タイポグラフィの重要性
+                    </h2>
+                    <p class="mb-4 leading-7">
+                        読みやすいブログ記事を作成するためには、以下の3つの要素が重要です。
+                    </p>
+                    <ul class="list-disc list-outside pl-6 space-y-2 mb-6 text-slate-700 dark:text-slate-300">
+                        <li class="pl-2"><span class="font-semibold text-slate-900 dark:text-slate-100">フォントサイズ</span>: 本文は16px〜18pxが最適とされています。</li>
+                        <li class="pl-2"><span class="font-semibold text-slate-900 dark:text-slate-100">行間 (Line Height)</span>: 文字サイズの1.6〜1.8倍程度確保することで、視線の移動がスムーズになります。</li>
+                        <li class="pl-2"><span class="font-semibold text-slate-900 dark:text-slate-100">コントラスト</span>: 真っ黒（#000）ではなく、濃いグレー（#333など）を使うと目が疲れません。</li>
+                    </ul>
+                    
+                    <blockquote class="border-l-4 border-blue-500 bg-slate-50 dark:bg-dark-card pl-4 py-3 pr-4 my-6 italic text-slate-600 dark:text-slate-400 rounded-r">
+                        "デザインとは、単にどう見えるか、どう感じるかということではない。デザインとは、どう機能するかということだ。" 
+                        <footer class="text-sm not-italic mt-2 text-slate-500">— Steve Jobs</footer>
+                    </blockquote>
+                </section>
+
+                <!-- セクション 3: コードブロック -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        2. コードの可読性
+                    </h2>
+                    <p class="mb-4 leading-7">
+                        技術ブログにおいて、コードブロックの可読性は命です。インラインコードは <code class="bg-slate-100 dark:bg-slate-800 text-pink-500 dark:text-pink-400 px-1.5 py-0.5 rounded font-mono text-sm border border-slate-200 dark:border-slate-700">font-mono</code> で強調し、ブロックコードはシンタックスハイライトのような配色にします。
+                    </p>
+
+                    <!-- コードブロックコンポーネント -->
+                    <div class="my-6 relative group rounded-lg overflow-hidden border border-slate-200 dark:border-dark-border bg-[#282c34]">
+                        <div class="flex items-center justify-between px-4 py-2 bg-[#21252b] border-b border-slate-700">
+                            <span class="text-xs text-slate-400 font-mono">example.js</span>
+                            <button onclick="copyCode()" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1 focus:outline-none">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <span id="copy-text">Copy</span>
+                            </button>
+                        </div>
+                        <div class="p-4 overflow-x-auto">
+<pre class="text-sm font-mono leading-relaxed text-[#abb2bf]"><code id="code-content"><span class="text-[#c678dd]">const</span> <span class="text-[#e5c07b]">calculateMetric</span> <span class="text-[#56b6c2]">=</span> (<span class="text-[#d19a66]">a</span>, <span class="text-[#d19a66]">b</span>) <span class="text-[#56b6c2]=></span> {
+  <span class="text-[#7f848e]">// 読みやすさを計算する架空の関数</span>
+  <span class="text-[#c678dd]">if</span> (a <span class="text-[#56b6c2]"><</span> <span class="text-[#d19a66]">0</span>) <span class="text-[#c678dd]">return</span> <span class="text-[#d19a66]">0</span>;
+  
+  <span class="text-[#c678dd]">return</span> (a <span class="text-[#56b6c2]>*</span> <span class="text-[#d19a66]">1.618</span>) <span class="text-[#56b6c2]>+</span> b;
+};
+
+<span class="text-[#e06c75]">console</span>.<span class="text-[#61afef]">log</span>(<span class="text-[#98c379]">'Hello, Clean Web!'</span>);</code></pre>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-500 mt-2 text-center">図1: シンタックスハイライトを模したカラーリング</p>
+                </section>
+
+                 <!-- セクション 4: テーブル -->
+                 <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        3. 情報の構造化 (Table)
+                    </h2>
+                    <p class="mb-6 leading-7">
+                        テーブルもシンプルであるべきです。罫線は最小限にし、余白を適切に取ります。
+                    </p>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">要素</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">推奨値 (Tailwind)</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">備考</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-blue-600 dark:text-blue-400">max-width</td>
+                                    <td class="px-6 py-4">max-w-3xl</td>
+                                    <td class="px-6 py-4 text-slate-500">一行の文字数を適切に制限</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-blue-600 dark:text-blue-400">text-color</td>
+                                    <td class="px-6 py-4">slate-800 / gray-800</td>
+                                    <td class="px-6 py-4 text-slate-500">完全な黒を避ける</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-blue-600 dark:text-blue-400">line-height</td>
+                                    <td class="px-6 py-4">leading-relaxed</td>
+                                    <td class="px-6 py-4 text-slate-500">ゆったりとした行間</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">まとめ</h3>
+                    <p class="leading-8 text-lg mb-6">
+                        Markdown風のWebデザインは、開発者にとっても読者にとっても親しみやすく、情報の伝達効率が高いスタイルです。HTMLとCSS（Tailwind）だけで、ここまでクリーンな表現が可能です。
+                    </p>
+                    <div class="flex gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm shadow-blue-500/30">
+                            記事をシェアする
+                        </button>
+                        <button class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2024 Markdown Style Blog. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-blue-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- トースト通知 (コピー完了時などに表示) -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="bg-slate-800 text-white px-4 py-2 rounded shadow-lg flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span class="text-sm font-medium">Copied to clipboard!</span>
+        </div>
+    </div>
+
+    <script>
+        // ダークモード切り替えロジック
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // 初期設定：OSの設定またはローカルストレージを確認
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeText = document.getElementById('code-content').innerText;
+            const copyBtnText = document.getElementById('copy-text');
+            
+            // クリップボードにコピー
+            const textArea = document.createElement("textarea");
+            textArea.value = codeText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+                
+                // ボタンのテキストを一時的に変更
+                const originalText = copyBtnText.innerText;
+                copyBtnText.innerText = 'Copied!';
+                setTimeout(() => {
+                    copyBtnText.innerText = originalText;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        // トースト通知表示
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
