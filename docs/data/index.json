@@ -1,5 +1,21 @@
 [
   {
+    "timestamp": "2026-01-20T07:52:37+09:00",
+    "title": "Markdown風の読みやすいHTMLデザイン",
+    "summary": "このHTMLはMarkdownのような読みやすさを実現するためのデザインサンプルです。ブログやドキュメント作成に適しています。",
+    "tags": [
+      "HTML",
+      "デザイン",
+      "CSS",
+      "読みやすさ",
+      "Markdown",
+      "ブログ"
+    ],
+    "dir": "2026-01-20_readable-html-design",
+    "repo_path": "/docs/2026-01-20_readable-html-design/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_readable-html-design"
+  },
+  {
     "timestamp": "2026-01-20T07:44:48+09:00",
     "title": "Markdown風のシンプルなWebデザイン",
     "summary": "可読性を最大化するためのタイポグラフィと、HTML/CSS設計のベストプラクティスを解説します。デザインがどう機能するかに焦点を当てた考察です。",
