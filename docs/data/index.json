@@ -1,5 +1,22 @@
 [
   {
+    "timestamp": "2026-01-19T19:40:24+09:00",
+    "title": "生成AIが自殺予防に及ぼす影響",
+    "summary": "生成AIは自殺予防において重要な役割を果たす。特に日本において、AIが感情的サポートを提供することで社会的孤立を緩和する可能性がある。",
+    "tags": [
+      "生成AI",
+      "自殺予防",
+      "メンタルヘルス",
+      "AI",
+      "孤独",
+      "デジタルヘルス",
+      "日本"
+    ],
+    "dir": "2026-01-19_suicide-prevention-ai",
+    "repo_path": "/docs/2026-01-19_suicide-prevention-ai/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-19_suicide-prevention-ai"
+  },
+  {
     "timestamp": "2026-01-19T19:29:15+09:00",
     "title": "HTML生成のためのガイドライン",
     "summary": "このガイドラインは、Markdown風のHTMLを書くためのルールを示しています。出力には特定のタグとフォーマットが求められます。",
