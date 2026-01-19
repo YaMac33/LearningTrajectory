@@ -1,5 +1,22 @@
 [
   {
+    "timestamp": "2026-01-20T08:03:47+09:00",
+    "title": "コアコンピタンスの重要性",
+    "summary": "コアコンピタンスが企業における競争優位性の源泉であることを解説します。成功するための条件や重要性について触れました。",
+    "tags": [
+      "コアコンピタンス",
+      "企業戦略",
+      "競争優位",
+      "ITパスポート",
+      "技術",
+      "強み",
+      "ビジネス"
+    ],
+    "dir": "2026-01-20_core-competence-importance",
+    "repo_path": "/docs/2026-01-20_core-competence-importance/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_core-competence-importance"
+  },
+  {
     "timestamp": "2026-01-20T07:52:37+09:00",
     "title": "Markdown風の読みやすいHTMLデザイン",
     "summary": "このHTMLはMarkdownのような読みやすさを実現するためのデザインサンプルです。ブログやドキュメント作成に適しています。",
