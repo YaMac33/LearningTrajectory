@@ -1,22 +1,5 @@
 [
   {
-    "timestamp": "2026-01-19T18:51:20+09:00",
-    "title": "リスクアセスメントとリスク対応",
-    "summary": "ITパスポート試験のためのリスクマネジメントを解説します。流れと対応策を詳しく説明し、4つの手法を紹介します。",
-    "tags": [
-      "リスク",
-      "リスクマネジメント",
-      "対策",
-      "ITパスポート",
-      "アセスメント",
-      "危険",
-      "教育"
-    ],
-    "dir": "2026-01-19_risk-management-strategies",
-    "repo_path": "/docs/2026-01-19_risk-management-strategies/index.html",
-    "public_url": "https://yamac33.github.io/sidenote/2026-01-19_risk-management-strategies"
-  },
-  {
     "timestamp": "2026-01-19T16:49:52+09:00",
     "title": "サーバーの基本と活用法",
     "summary": "本記事ではサーバーの定義や種類、Webアプリ開発のための環境について概説します。サーバーを理解することで、効果的な開発が可能になります。",
