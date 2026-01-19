@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたスクリプト -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コアコンピタンスの重要性</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Back to Home Link -->
+            <a href="https://yamac33.github.io/sidenote/" class="font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                <span class="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+                Back to Home
+            </a>
+            
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8 border-b border-slate-200 dark:border-dark-border pb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-20</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#Core Competence</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#企業戦略</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#ITパスポート</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    コアコンピタンスの重要性
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    企業の競争優位性の源泉であるコアコンピタンスの定義と条件を解説。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- ① 1行定義 -->
+                <section>
+                    <h2 class="text-2xl font-bold flex items-center text-slate-900 dark:text-white mb-4 group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        1. 定義（結論）
+                    </h2>
+                    <div class="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-lg font-bold text-slate-800 dark:text-slate-100 m-0">
+                            <span class="text-2xl mr-2">👉</span>
+                            他社には真似できず、企業の競争優位の源泉となる「中核的な強み」
+                        </p>
+                    </div>
+                </section>
+
+                <!-- ② ITパスポート試験での重要ポイント -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        2. ITパスポート試験での重要ポイント
+                    </h2>
+                    <ul class="list-none space-y-3 pl-0 text-slate-700 dark:text-slate-300">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 font-bold">•</span>
+                            自社の強みの中でも「中核」であること
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 font-bold">•</span>
+                            競争優位性を長期的に生み出す
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 font-bold">•</span>
+                            他社が簡単に模倣できない
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 font-bold">•</span>
+                            「技術」「ノウハウ」「組織力」「ブランド力」などが該当
+                        </li>
+                    </ul>
+                    <p class="mt-4 text-sm bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 p-3 rounded border border-yellow-200 dark:border-yellow-800/50 inline-block">
+                        <span class="font-bold">❗ 注意：</span>単なる得意分野や人気商品ではない点が重要
+                    </p>
+                </section>
+
+                <!-- ③ 仕組み・考え方（図解風） -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        3. 仕組み・考え方（なぜ重要？）
+                    </h2>
+                    <p class="mb-4 leading-7">
+                        企業が勝ち続けるためには、「価格競争だけ」や「一時的なヒット商品」に頼るのは危険です。そこで登場するのがコアコンピタンスの考え方です。
+                    </p>
+                    
+                    <!-- 概念図 -->
+                    <div class="my-8 p-6 bg-slate-50 dark:bg-dark-card rounded-xl border border-slate-200 dark:border-dark-border text-center">
+                        <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-wider">企業の資源 (Resources)</h3>
+                        <div class="flex flex-wrap justify-center gap-3 mb-6">
+                            <span class="px-4 py-2 bg-white dark:bg-dark-bg rounded shadow-sm border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">人材</span>
+                            <span class="px-4 py-2 bg-white dark:bg-dark-bg rounded shadow-sm border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">技術</span>
+                            <span class="px-4 py-2 bg-white dark:bg-dark-bg rounded shadow-sm border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">ノウハウ</span>
+                            <span class="px-4 py-2 bg-white dark:bg-dark-bg rounded shadow-sm border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">組織力</span>
+                            <span class="px-4 py-2 bg-white dark:bg-dark-bg rounded shadow-sm border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">ブランド</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center justify-center gap-2 mb-6">
+                            <div class="h-8 w-px bg-slate-300 dark:bg-slate-600"></div>
+                            <span class="text-xs text-slate-500">これらが組み合わさって...</span>
+                            <div class="h-8 w-px bg-slate-300 dark:bg-slate-600"></div>
+                            <svg class="w-6 h-6 text-slate-400 animate-bounce mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                        </div>
+
+                        <div class="inline-block px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-lg font-bold text-lg transform hover:scale-105 transition-transform duration-300">
+                            【他社が真似できない強み】<br>
+                            コアコンピタンス
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ④ コアコンピタンスの3条件 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        4. コアコンピタンスの3条件（試験頻出）
+                    </h2>
+                    <p class="mb-4 text-slate-600 dark:text-slate-400">次の3つを<strong>すべて</strong>満たすことが重要です。</p>
+                    
+                    <div class="grid gap-4 md:grid-cols-3">
+                        <div class="p-4 rounded-lg bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border">
+                            <span class="block text-3xl mb-2">①</span>
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-2">顧客への価値</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">顧客に何らかの利益や価値を提供していること。</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border">
+                            <span class="block text-3xl mb-2">②</span>
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-2">模倣困難性</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">他社が簡単に真似できないこと。</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border">
+                            <span class="block text-3xl mb-2">③</span>
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-2">応用可能性</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">多様な製品・市場・事業へと展開できること。</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm text-slate-500 text-right">📌 この「3条件」は選択肢問題で頻出です。</p>
+                </section>
+
+                <!-- ⑤ 具体例 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        5. 具体例（試験対策）
+                    </h2>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white w-1/3">企業イメージ</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">コアコンピタンスの例</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">自動車メーカー</td>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">エンジン・安全技術の開発力</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">家電メーカー</td>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">小型・省電力設計技術</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">IT企業</td>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">大規模データ処理技術、UX設計力</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">コンビニ</td>
+                                    <td class="px-6 py-4 text-slate-600 dark:text-slate-400">物流網・店舗運営ノウハウ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ⑥ よく混同する用語との違い -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        6. よく混同する用語との違い
+                    </h2>
+                    
+                    <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-200">コアコンピタンス vs 強み</h3>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border mb-6">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">項目</th>
+                                    <th class="px-6 py-3 font-semibold text-blue-600 dark:text-blue-400">コアコンピタンス</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">一般的な強み</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-3 font-mono text-xs text-slate-500 uppercase">範囲</td>
+                                    <td class="px-6 py-3 font-bold">中核的・本質的</td>
+                                    <td class="px-6 py-3">広い</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-3 font-mono text-xs text-slate-500 uppercase">模倣困難性</td>
+                                    <td class="px-6 py-3 font-bold">高い</td>
+                                    <td class="px-6 py-3">低いこともある</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-3 font-mono text-xs text-slate-500 uppercase">持続性</td>
+                                    <td class="px-6 py-3 font-bold">長期</td>
+                                    <td class="px-6 py-3">短期もあり</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="text-lg font-bold mb-3 text-slate-800 dark:text-slate-200">コアコンピタンス vs 競争優位</h3>
+                    <div class="p-4 bg-slate-50 dark:bg-dark-card rounded-lg border-l-4 border-slate-400">
+                        <ul class="list-none space-y-2 m-0 pl-0">
+                            <li><strong class="text-slate-900 dark:text-white">競争優位：</strong> 結果（勝っている状態）</li>
+                            <li><strong class="text-slate-900 dark:text-white">コアコンピタンス：</strong> 原因（勝てる理由）</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- ⑦ ひっかけ例 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        7. ITパスポートでのひっかけ例
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3 p-3 rounded hover:bg-slate-50 dark:hover:bg-dark-card transition-colors">
+                            <span class="text-xl">❌</span>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">「売れている主力商品そのものがコアコンピタンスである」</p>
+                                <p class="text-sm text-slate-500 mt-1">→ ×（商品ではなく、その裏にある技術・能力がコアコンピタンス）</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded hover:bg-slate-50 dark:hover:bg-dark-card transition-colors">
+                            <span class="text-xl">❌</span>
+                            <div>
+                                <p class="font-medium text-slate-900 dark:text-white">「価格が安いことがコアコンピタンス」</p>
+                                <p class="text-sm text-slate-500 mt-1">→ ×（他社が真似できない理由がなければ、ただの安売り）</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ⑧ ミニ確認問題 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        8. ミニ確認問題
+                    </h2>
+                    
+                    <div class="my-6 relative group rounded-lg overflow-hidden border border-slate-200 dark:border-dark-border bg-white dark:bg-[#161b22]">
+                        <div class="flex items-center px-4 py-2 bg-slate-100 dark:bg-[#21252b] border-b border-slate-200 dark:border-slate-700">
+                            <span class="text-xs text-slate-500 dark:text-slate-400 font-mono">Quiz</span>
+                        </div>
+                        <div class="p-6">
+                            <p class="font-bold text-lg mb-4 text-slate-900 dark:text-white">Q. 次のうち、コアコンピタンスとして最も適切なものはどれか？</p>
+                            <div class="space-y-2 mb-6">
+                                <div class="p-2 border border-slate-200 dark:border-slate-700 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors">A. 一時的にヒットした新商品</div>
+                                <div class="p-2 border border-slate-200 dark:border-slate-700 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors">B. 他社より安い販売価格</div>
+                                <div class="p-2 border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-900/20 rounded text-blue-800 dark:text-blue-300 font-semibold cursor-pointer">C. 長年蓄積した高度な設計技術</div>
+                                <div class="p-2 border border-slate-200 dark:border-slate-700 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors">D. 売上が最も高い事業</div>
+                            </div>
+                            <div class="text-sm text-slate-500 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <span class="font-bold text-green-600 dark:text-green-400">👉 正解：C</span><br>
+                                技術やノウハウなどの「中核的な強み」が該当します。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">まとめ（超短縮）</h3>
+                    <p class="leading-8 text-lg mb-6">
+                        <span class="font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1 rounded">「真似できない・価値がある・横展開できる」＝コアコンピタンス</span>
+                    </p>
+                    <div class="flex gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm shadow-blue-500/30">
+                            シェアする
+                        </button>
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 Study Notes. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-blue-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ダークモード切り替えロジック
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // 初期設定：OSの設定またはローカルストレージを確認
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
