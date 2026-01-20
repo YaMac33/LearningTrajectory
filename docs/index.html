@@ -1,254 +1,75 @@
 <!DOCTYPE html>
-<html lang="ja" class="scroll-smooth">
+<html lang="ja">
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SideNote - Knowledge Base</title>
-  <meta name="description" content="A stylish, lightweight tech blog." />
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50: '#f0fdfa',
-              100: '#ccfbf1',
-              500: '#14b8a6',
-              600: '#0d9488',
-              900: '#134e4a',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    body {
-      background-color: #f8fafc; /* Slate-50 */
-      color: #334155; /* Slate-700 */
-      background-image:
-        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
-      background-size: 30px 30px;
-    }
-    .card-hover:hover {
-      transform: translateY(-4px);
-      box-shadow:
-        0 10px 25px -5px rgba(0,0,0,0.05),
-        0 8px 10px -6px rgba(0,0,0,0.01);
-      border-color: #14b8a6; /* Brand-500 */
-    }
-    /* Light mode scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE MONOLITH | Blog</title>
+    <meta name="description" content="A minimalist design blog.">
+    <link rel="stylesheet" href="./assets/styles.css">
 </head>
+<body>
 
-<body class="min-h-screen flex flex-col font-sans antialiased">
+    <div class="container">
+        <header class="site-header">
+            <a href="./index.html" class="site-title">THE MONOLITH.</a>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="./index.html">Articles</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
 
-<!-- Header -->
-<header class="w-full border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-  <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-    <a href="index.html" class="flex items-center gap-2 group">
-      <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-sm">
-        S
-      </div>
-      <span class="font-bold text-xl text-slate-800 group-hover:text-brand-600 transition-colors">SideNote</span>
-    </a>
-  </div>
-</header>
+        <main>
+            <ul class="post-list">
+                <!-- 記事一覧: 本来は index.json から生成しますが、ここでは構造を示すため静的に記述 -->
+                
+                <li class="post-item">
+                    <article>
+                        <time class="post-meta" datetime="2024-03-20">2024.03.20</time>
+                        <h2 class="post-title"><a href="./2024-03-20_minimalist-philosophy/index.html">構造的審美性：余白と文字だけで語るデザインの哲学</a></h2>
+                        <p class="post-excerpt">
+                            色は情報を伝える強力な手段ですが、時にはノイズにもなり得ます。
+                            純粋な構造とタイポグラフィのみで構成されたWebサイトが持つ、
+                            時代に左右されない強さについて考察します。
+                        </p>
+                        <a href="./2024-03-20_minimalist-philosophy/index.html" class="read-more">Read Article →</a>
+                    </article>
+                </li>
 
-<!-- Main -->
-<main class="flex-grow max-w-4xl mx-auto px-4 py-12 w-full">
+                <li class="post-item">
+                    <article>
+                        <time class="post-meta" datetime="2024-02-14">2024.02.14</time>
+                        <h2 class="post-title"><a href="#">静的サイトジェネレーターの再評価</a></h2>
+                        <p class="post-excerpt">
+                            複雑化するフロントエンドエコシステムの中で、
+                            原点回帰とも言えるStatic Site Generation (SSG) のシンプルさが
+                            再び注目されています。パフォーマンスと保守性の観点から。
+                        </p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </article>
+                </li>
 
-  <!-- Hero -->
-  <div class="mb-12">
-    <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-600 via-brand-500 to-blue-600 mb-4 drop-shadow-sm">
-      Knowledge Base
-    </h1>
-    <p class="text-slate-500 text-lg">
-      日々の記録。
-    </p>
-  </div>
+                <li class="post-item">
+                    <article>
+                        <time class="post-meta" datetime="2024-01-05">2024.01.05</time>
+                        <h2 class="post-title"><a href="#">Hello World: デジタルミニマリズムの旅</a></h2>
+                        <p class="post-excerpt">
+                            新しいブログのスタートにあたり、私が選んだのは
+                            「装飾を削ぎ落とす」というアプローチでした。
+                        </p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </article>
+                </li>
+            </ul>
+        </main>
 
-  <!-- Search -->
-  <div class="mb-10 sticky top-20 z-40">
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm flex items-center p-2 focus-within:ring-2 focus-within:ring-brand-500/20 focus-within:border-brand-500 transition-all">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="Search posts (title / summary / tags)"
-        class="w-full bg-transparent outline-none text-slate-800 placeholder-slate-400 px-2"
-      />
+        <footer class="site-footer">
+            <p>&copy; 2024 The Monolith Blog. All rights reserved.</p>
+        </footer>
     </div>
-  </div>
 
-  <!-- Grid -->
-  <div id="blogGrid" class="grid grid-cols-1 gap-6">
-    <div id="loadingState" class="animate-pulse space-y-4">
-      <div class="h-40 bg-slate-200 rounded-xl"></div>
-      <div class="h-40 bg-slate-200 rounded-xl"></div>
-    </div>
-  </div>
-
-  <!-- No Results -->
-  <div id="noResults" class="hidden text-center py-20 text-slate-400">
-    No posts found
-  </div>
-
-  <!-- Error -->
-  <div id="loadError" class="hidden text-center py-20 text-red-500">
-    Failed to load index.json
-    <div id="loadErrorMsg" class="text-sm mt-2 text-slate-500"></div>
-  </div>
-
-</main>
-
-<!-- Footer -->
-<footer class="border-t border-slate-200 py-8 text-center text-slate-400 text-sm">
-  &copy; <span id="year"></span> SideNote
-</footer>
-
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  // ===============================
-  // Config
-  // ===============================
-  const DATA_URL = './data/index.json';
-
-  // ===============================
-  // State / DOM
-  // ===============================
-  let allPosts = [];
-  const grid = document.getElementById('blogGrid');
-  const searchInput = document.getElementById('searchInput');
-  const noResults = document.getElementById('noResults');
-  const loadingState = document.getElementById('loadingState');
-  const loadError = document.getElementById('loadError');
-  const loadErrorMsg = document.getElementById('loadErrorMsg');
-
-  // ===============================
-  // Utils
-  // ===============================
-  function normalizeTags(tags) {
-    if (Array.isArray(tags)) {
-      return tags.map(t => String(t).trim()).filter(Boolean);
-    }
-    if (typeof tags === 'string') {
-      return tags.split(',').map(t => t.trim()).filter(Boolean);
-    }
-    return [];
-  }
-
-  // ===============================
-  // Fetch
-  // ===============================
-  async function loadPosts() {
-    try {
-      const res = await fetch(DATA_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const json = await res.json();
-
-      allPosts = json.map(p => ({
-        title: p.title || '',
-        summary: p.summary || '',
-        tags: normalizeTags(p.tags),
-        timestamp: p.timestamp,
-        url: p.public_url || p.repo_path || '#'
-      }));
-
-      allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      renderPosts(allPosts);
-
-    } catch (e) {
-      console.error(e);
-      loadError.classList.remove('hidden');
-      loadErrorMsg.textContent = e.message;
-    } finally {
-      if (loadingState) loadingState.remove();
-    }
-  }
-
-  // ===============================
-  // Render
-  // ===============================
-  function renderPosts(posts) {
-    grid.innerHTML = '';
-
-    if (posts.length === 0) {
-      noResults.classList.remove('hidden');
-      return;
-    }
-    noResults.classList.add('hidden');
-
-    posts.forEach(post => {
-      const date = new Date(post.timestamp)
-        .toLocaleDateString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit' })
-        .replace(/\//g, '.');
-
-      const card = document.createElement('a');
-      card.href = post.url;
-      // Light mode classes for card
-      card.className =
-        'group block bg-white border border-slate-200 rounded-xl p-6 transition-all card-hover shadow-sm hover:shadow-md';
-
-      card.innerHTML = `
-        <div class="flex flex-wrap items-center gap-2 text-xs font-mono mb-3">
-          <span class="text-brand-600 bg-brand-50 px-2 py-1 rounded font-medium">${date}</span>
-          ${post.tags.map(tag =>
-            `<span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded">${tag}</span>`
-          ).join('')}
-        </div>
-
-        <h2 class="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-600 transition-colors">
-          ${post.title}
-        </h2>
-
-        <p class="text-slate-600 text-sm leading-relaxed">
-          ${post.summary}
-        </p>
-      `;
-
-      grid.appendChild(card);
-    });
-  }
-
-  // ===============================
-  // Search
-  // ===============================
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value.toLowerCase();
-    const filtered = allPosts.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      p.summary.toLowerCase().includes(q) ||
-      p.tags.join(' ').toLowerCase().includes(q)
-    );
-    renderPosts(filtered);
-  });
-
-  // Init
-  loadPosts();
-</script>
-
+    <script src="./assets/app.js"></script>
 </body>
 </html>
-
