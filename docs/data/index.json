@@ -1,5 +1,21 @@
 [
   {
+    "timestamp": "2026-01-20T11:14:27+09:00",
+    "title": "プロジェクト統合マネジメントの概要",
+    "summary": "プロジェクト全体を俯瞰し、計画から実行、終結までを統括・調整する重要な役割について解説します。",
+    "tags": [
+      "プロジェクト管理",
+      "統合管理",
+      "ITパスポート",
+      "マネジメント",
+      "計画",
+      "実行"
+    ],
+    "dir": "2026-01-20_project-integration-management",
+    "repo_path": "/docs/2026-01-20_project-integration-management/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_project-integration-management"
+  },
+  {
     "timestamp": "2026-01-20T10:47:58+09:00",
     "title": "ROA（総資産利益率）の解説",
     "summary": "ROAは企業の総資産を活用してどれだけ利益を上げているかを示す指標です。効率的な経営分析に欠かせない要素を解説します。",
