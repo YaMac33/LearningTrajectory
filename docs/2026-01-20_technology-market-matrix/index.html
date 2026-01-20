@@ -1,0 +1,226 @@
+<!-- 記事メタデータエリア -->
+<div class="mb-8">
+  <!-- 日付 -->
+  <span class="inline-block text-sm text-slate-500 dark:text-slate-400 font-mono mb-3">
+    2026-01-20
+  </span>
+  
+  <!-- タグ -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    <span class="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md dark:text-blue-300 dark:bg-blue-900/30">#技術</span>
+    <span class="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md dark:text-blue-300 dark:bg-blue-900/30">#市場</span>
+    <span class="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md dark:text-blue-300 dark:bg-blue-900/30">#戦略</span>
+    <span class="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md dark:text-blue-300 dark:bg-blue-900/30">#イノベーション</span>
+    <span class="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md dark:text-blue-300 dark:bg-blue-900/30">#分析</span>
+  </div>
+
+  <!-- 記事タイトル -->
+  <h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 leading-tight mb-6">
+    技術市場マトリックスの概要
+  </h1>
+
+  <!-- 導入文（要約） -->
+  <p class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed border-l-4 border-slate-300 dark:border-slate-600 pl-4">
+    技術市場マトリックスは、技術と市場の新旧に基づく戦略分析手法です。
+    事業開発やR&D戦略において、どの方向に進むべきかを整理するためのフレームワークについて解説します。
+  </p>
+</div>
+
+<!-- 本文エリア -->
+<div class="space-y-12 text-slate-800 dark:text-slate-200">
+
+  <!-- セクション1: 1行要約 -->
+  <section>
+    <div class="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+      <h2 class="text-blue-800 dark:text-blue-300 font-bold text-lg mb-2 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        1行要約
+      </h2>
+      <p class="font-bold text-lg text-slate-800 dark:text-slate-100">
+        技術市場マトリックスとは、技術の新旧と市場の新旧を軸にして、事業や技術開発の戦略を整理する分析手法である。
+      </p>
+    </div>
+  </section>
+
+  <!-- セクション2: 定義 -->
+  <section>
+    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 pb-2 border-b border-slate-200 dark:border-slate-700">
+      技術市場マトリックスとは何か
+    </h2>
+    <ul class="list-disc list-inside space-y-3 mb-6 ml-2">
+      <li><strong class="text-indigo-600 dark:text-indigo-400">縦軸：技術</strong>（既存技術 ／ 新技術）</li>
+      <li><strong class="text-indigo-600 dark:text-indigo-400">横軸：市場</strong>（既存市場 ／ 新市場）</li>
+    </ul>
+    <p class="mb-4">
+      この2つの軸を組み合わせることで、「どの技術を使って、どの市場を狙うか」という戦略の方向性を判断するための枠組みです。
+    </p>
+  </section>
+
+  <!-- セクション3: マトリックス図解 -->
+  <section>
+    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6">図解：4つの戦略領域</h3>
+    
+    <!-- CSS Gridによるマトリックス表現 -->
+    <div class="grid grid-cols-[auto_1fr_1fr] gap-2 md:gap-4 max-w-2xl mx-auto text-center text-sm md:text-base">
+      <!-- Header Row -->
+      <div class="col-start-2 text-slate-500 dark:text-slate-400 font-bold">既存市場</div>
+      <div class="col-start-3 text-slate-500 dark:text-slate-400 font-bold">新市場</div>
+
+      <!-- Row 1: 既存技術 -->
+      <div class="flex items-center justify-center font-bold text-slate-500 dark:text-slate-400 writing-vertical-rl md:writing-horizontal-tb">
+        <span class="md:hidden">既存技</span><span class="hidden md:inline">既存技術</span>
+      </div>
+      
+      <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center h-32 md:h-40 hover:shadow-md transition-shadow">
+        <span class="text-xs text-slate-400 mb-1">①</span>
+        <strong class="block mb-2 text-lg">改良・効率化</strong>
+        <span class="px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs rounded-full">リスク小</span>
+      </div>
+
+      <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center h-32 md:h-40 hover:shadow-md transition-shadow">
+        <span class="text-xs text-slate-400 mb-1">③</span>
+        <strong class="block mb-2 text-lg">市場拡大</strong>
+        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300 text-xs rounded-full">市場リスク</span>
+      </div>
+
+      <!-- Row 2: 新技術 -->
+      <div class="flex items-center justify-center font-bold text-slate-500 dark:text-slate-400 writing-vertical-rl md:writing-horizontal-tb">
+        <span class="md:hidden">新技術</span><span class="hidden md:inline">新技術</span>
+      </div>
+
+      <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center h-32 md:h-40 hover:shadow-md transition-shadow">
+        <span class="text-xs text-slate-400 mb-1">②</span>
+        <strong class="block mb-2 text-lg">技術革新</strong>
+        <span class="px-2 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300 text-xs rounded-full">技術リスク</span>
+      </div>
+
+      <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center h-32 md:h-40 hover:shadow-md transition-shadow bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+        <span class="text-xs text-slate-400 mb-1">④</span>
+        <strong class="block mb-2 text-lg text-indigo-700 dark:text-indigo-300">革新事業</strong>
+        <span class="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 text-xs rounded-full">リスク大</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- セクション4: 各領域の詳細 -->
+  <section>
+    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6">各象限の詳細解説</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="space-y-2">
+        <h4 class="font-bold text-slate-700 dark:text-slate-300 border-l-4 border-green-500 pl-3">① 既存技術 × 既存市場</h4>
+        <ul class="text-sm space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400 ml-4">
+          <li>現在の主力領域（キャッシュカウ）</li>
+          <li>改良、効率化、コスト削減が主眼</li>
+          <li>リスクは最も小さい</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-bold text-slate-700 dark:text-slate-300 border-l-4 border-yellow-500 pl-3">② 新技術 × 既存市場</h4>
+        <ul class="text-sm space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400 ml-4">
+          <li>技術革新による競争力の強化</li>
+          <li>既存顧客へ新しい付加価値を提供する</li>
+          <li>技術開発のリスクが存在する</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-bold text-slate-700 dark:text-slate-300 border-l-4 border-yellow-500 pl-3">③ 既存技術 × 新市場</h4>
+        <ul class="text-sm space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400 ml-4">
+          <li>市場拡大や用途の転用（水平展開）</li>
+          <li>異業種への展開などが含まれる</li>
+          <li>市場受容性のリスクが存在する</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-bold text-slate-700 dark:text-slate-300 border-l-4 border-red-500 pl-3">④ 新技術 × 新市場</h4>
+        <ul class="text-sm space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400 ml-4">
+          <li>革新的・破壊的イノベーション</li>
+          <li>全く新しい事業の創出</li>
+          <li>ハイリスク・ハイリターンな領域</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- セクション5: 試験対策 -->
+  <section class="bg-amber-50 dark:bg-amber-900/10 p-6 rounded-xl border border-amber-100 dark:border-amber-800">
+    <h2 class="text-2xl font-bold text-amber-800 dark:text-amber-500 mb-6 flex items-center">
+      <span class="mr-2">🎓</span> ITパスポート試験でのポイント
+    </h2>
+    <div class="space-y-6">
+      <div>
+        <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2">試験での狙われ方</h3>
+        <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+          <li><strong>「技術」と「市場」の2軸</strong>で分析する手法であることを問われます。</li>
+          <li>各象限における<strong>リスクの大小</strong>（①が最小、④が最大）を判断させる問題が出ます。</li>
+          <li>新規事業やイノベーションの文脈で、「どの戦略をとるべきか」という事例問題で登場します。</li>
+        </ul>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm">
+        <h3 class="font-bold text-red-600 dark:text-red-400 mb-2">⚠️ 試験でのひっかけ注意</h3>
+        <ul class="space-y-2">
+          <li class="flex items-start">
+            <span class="text-red-500 mr-2">❌</span>
+            <span class="text-slate-600 dark:text-slate-400">「新市場を開拓するには、必ず新技術が必要である」</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-green-500 mr-2">✅</span>
+            <span class="text-slate-800 dark:text-slate-200 font-medium">既存技術でも、用途を変えれば新市場を開拓できる（領域③）</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- セクション6: 比較表 -->
+  <section>
+    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 pb-2 border-b border-slate-200 dark:border-slate-700">
+      技術市場マトリックス vs アンゾフの成長マトリクス
+    </h2>
+    <p class="mb-4 text-slate-600 dark:text-slate-300">
+      よく似たフレームワークに「アンゾフの成長マトリクス」があります。軸の定義が異なるため、混同しないように整理しましょう。
+    </p>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
+        <thead class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+          <tr>
+            <th class="p-4 rounded-tl-lg">項目</th>
+            <th class="p-4 text-indigo-600 dark:text-indigo-400">技術市場マトリックス</th>
+            <th class="p-4 text-slate-500 dark:text-slate-400 rounded-tr-lg">アンゾフの成長マトリクス</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 dark:divide-slate-700 border-x border-b border-slate-200 dark:border-slate-700 rounded-b-lg">
+          <tr>
+            <th class="p-4 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300">軸の定義</th>
+            <td class="p-4 font-bold">技術 × 市場</td>
+            <td class="p-4">製品 × 市場</td>
+          </tr>
+          <tr>
+            <th class="p-4 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300">分析の主眼</th>
+            <td class="p-4">技術戦略（R&D）</td>
+            <td class="p-4">成長戦略（売上拡大）</td>
+          </tr>
+          <tr>
+            <th class="p-4 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300">主な利用場面</th>
+            <td class="p-4">新技術の活用・開発方針</td>
+            <td class="p-4">事業の多角化・拡大</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- セクション7: 結論 -->
+  <section class="mt-12 text-center">
+    <div class="inline-block p-6 bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-2">試験向け一言まとめ</p>
+      <p class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
+        技術市場マトリックス<br class="md:hidden"> ＝ 「技術と市場の新旧で戦略を考える表」
+      </p>
+    </div>
+  </section>
+
+</div>
