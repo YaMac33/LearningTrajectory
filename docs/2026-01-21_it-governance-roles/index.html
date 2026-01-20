@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたGTMタグ -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITガバナンスの役割分担 | DevLog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 sm:gap-6 overflow-hidden">
+                <!-- 指定されたBackリンク -->
+                <a href="../" class="font-bold text-lg sm:text-xl tracking-tight whitespace-nowrap hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    ← Back to Home
+                </a>
+                
+                <span class="hidden sm:inline text-slate-300 dark:text-slate-600">|</span>
+
+                <a href="#" class="font-bold text-xl tracking-tight truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors hidden sm:block">
+                    DevLog<span class="text-blue-500">.md</span>
+                </a>
+            </div>
+
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none flex-shrink-0" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="text-sm font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-21</span>
+                    <div class="flex flex-wrap gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <span>#ITガバナンス</span>
+                        <span>#経営者</span>
+                        <span>#情報システム</span>
+                        <span>#役割分担</span>
+                    </div>
+                </div>
+                
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    ITガバナンスの役割分担
+                </h1>
+                
+                <div class="p-4 bg-slate-50 dark:bg-dark-card border-l-4 border-blue-500 rounded-r text-slate-700 dark:text-slate-300">
+                    <p class="font-bold mb-1">1行要約：</p>
+                    <p class="leading-relaxed">ITガバナンスでは「方針と投資原則は経営者」「実行と管理は情報システム部門責任者」が担当する。</p>
+                </div>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- セクション 1: 概要 -->
+                <section>
+                    <p class="leading-8 text-lg">
+                        ITガバナンスとは、企業がITを経営戦略に沿って活用し、投資・効果・リスクを最適化するための統治の仕組みです。
+                        「何を目指すか（What/Why）」を決めるのは経営、「どう実行するか（How）」を管理するのが現場（情報システム部門）という原則があります。
+                    </p>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        1. 役割の全体像（フロー図）
+                    </h2>
+
+                    <!-- フロー図 -->
+                    <div class="flex flex-col items-center space-y-4 my-8">
+                        
+                        <!-- 経営者層 -->
+                        <div class="w-full max-w-md p-6 rounded-xl border-2 border-slate-800 dark:border-slate-400 bg-slate-100 dark:bg-slate-800 shadow-md relative">
+                            <div class="absolute -top-3 left-6 bg-slate-800 dark:bg-slate-400 text-white dark:text-slate-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Top Management</div>
+                            <h3 class="text-xl font-bold text-center mb-4 text-slate-900 dark:text-white">経営者</h3>
+                            <div class="space-y-3">
+                                <div class="bg-white dark:bg-dark-bg p-3 rounded border border-slate-200 dark:border-slate-600 shadow-sm flex items-center gap-3">
+                                    <span class="text-blue-500 font-bold">①</span>
+                                    <span>ITガバナンス方針の明確化</span>
+                                </div>
+                                <div class="bg-white dark:bg-dark-bg p-3 rounded border border-slate-200 dark:border-slate-600 shadow-sm flex items-center gap-3">
+                                    <span class="text-blue-500 font-bold">②</span>
+                                    <span>情報化投資の原則制定</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 矢印 -->
+                        <div class="flex flex-col items-center justify-center text-slate-400">
+                            <span class="text-xs font-mono mb-1">指示・モニタリング</span>
+                            <svg class="w-8 h-8 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                        </div>
+
+                        <!-- 情報システム部門 -->
+                        <div class="w-full max-w-md p-6 rounded-xl border border-dashed border-slate-400 dark:border-slate-600 bg-white dark:bg-dark-card shadow-sm relative">
+                            <div class="absolute -top-3 left-6 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">IT Department</div>
+                            <h3 class="text-xl font-bold text-center mb-4 text-slate-900 dark:text-white">情報システム部門責任者</h3>
+                            <div class="space-y-3">
+                                <div class="bg-slate-50 dark:bg-dark-bg p-3 rounded border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                                    <span class="text-green-500 font-bold">③</span>
+                                    <span>部門内の役割分担・権限決定</span>
+                                </div>
+                                <div class="bg-slate-50 dark:bg-dark-bg p-3 rounded border border-slate-200 dark:border-slate-700 shadow-sm flex items-center gap-3">
+                                    <span class="text-green-500 font-bold">④</span>
+                                    <span>システム開発の進捗管理</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- セクション 2: 役割の詳細分類 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        2. 役割の詳細分類
+                    </h2>
+                    <p class="mb-6 text-slate-600 dark:text-slate-400">
+                        試験問題では「どの役割を誰が担うか」が問われます。以下のキーワードで区別しましょう。
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <!-- 経営者の役割 -->
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-lg text-blue-700 dark:text-blue-400 flex items-center">
+                                <span class="bg-blue-100 dark:bg-blue-900/50 p-1.5 rounded mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                </span>
+                                経営者の担当
+                            </h3>
+                            <div class="bg-blue-50 dark:bg-blue-900/10 p-5 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">Keywords</p>
+                                <p class="text-lg font-bold text-slate-800 dark:text-white mb-4">「方針決定」「投資判断」「戦略」</p>
+                                <ul class="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2">●</span>
+                                        <span><strong>方針の明確化</strong>：経営戦略とIT活用の方向性を結びつける。</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-blue-500 mr-2">●</span>
+                                        <span><strong>投資原則の制定</strong>：どこにいくら使うか、リスクとリターンの基準を決める。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- 情シス責任者の役割 -->
+                        <div class="space-y-4">
+                            <h3 class="font-bold text-lg text-green-700 dark:text-green-400 flex items-center">
+                                <span class="bg-green-100 dark:bg-green-900/50 p-1.5 rounded mr-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </span>
+                                情シス責任者の担当
+                            </h3>
+                            <div class="bg-green-50 dark:bg-green-900/10 p-5 rounded-lg border border-green-100 dark:border-green-900/30">
+                                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wide">Keywords</p>
+                                <p class="text-lg font-bold text-slate-800 dark:text-white mb-4">「実行」「組織運営」「進捗管理」</p>
+                                <ul class="space-y-2 text-sm text-slate-700 dark:text-slate-300">
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2">●</span>
+                                        <span><strong>部門内の役割・権限決定</strong>：現場が回るように体制を整える。</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="text-green-500 mr-2">●</span>
+                                        <span><strong>進捗管理</strong>：QCD（品質・コスト・納期）を守ってプロジェクトを進める。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- セクション 3: 試験対策まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">試験対策まとめ</h3>
+                    
+                    <div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p class="text-lg font-bold text-center text-slate-800 dark:text-white mb-4">
+                            覚え方：<br class="sm:hidden">
+                            <span class="text-blue-600 dark:text-blue-400">「方針と投資は経営、実行と管理は情シス」</span>
+                        </p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mt-6 text-sm">
+                            <div class="bg-white/60 dark:bg-white/5 p-3 rounded text-center">
+                                <div class="font-bold text-slate-900 dark:text-white mb-1">経営者</div>
+                                <div class="text-slate-500 dark:text-slate-400">何を・なぜやるか？</div>
+                            </div>
+                            <div class="bg-white/60 dark:bg-white/5 p-3 rounded text-center">
+                                <div class="font-bold text-slate-900 dark:text-white mb-1">情シス</div>
+                                <div class="text-slate-500 dark:text-slate-400">どうやってやるか？</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-xs text-slate-500 dark:text-slate-400 text-center">
+                            ITガバナンスの問題が出たら、この基準で選択肢を分類すれば即答できます。
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex gap-4 justify-center">
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 DevLog.md All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- スクリプト：テーマ切り替えロジック -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const htmlElement = document.documentElement;
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            htmlElement.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
