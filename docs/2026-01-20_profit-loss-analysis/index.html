@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたスクリプト -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>営業利益と損益分岐点の解析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Back to Home Link -->
+            <a href="https://yamac33.github.io/sidenote/" class="font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                <span class="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+                Back to Home
+            </a>
+            
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8 border-b border-slate-200 dark:border-dark-border pb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-20</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#営業利益</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#損益分岐点</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#限界利益</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#ビジネス数学</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    営業利益と損益分岐点の解析
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    販売費用と限界利益の関係式を用いて、営業利益の構造と損益分岐点を数学的に解き明かします。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- ① 前提条件の整理 -->
+                <section>
+                    <h2 class="text-2xl font-bold flex items-center text-slate-900 dark:text-white mb-6 group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        1. 前提条件の整理
+                    </h2>
+                    <p class="mb-4 text-slate-600 dark:text-slate-400">
+                        来訪者数を <code class="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-pink-500">a</code> 人とした場合の、費用と利益の構造を整理します。
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- 販売費用 -->
+                        <div class="p-6 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
+                            <h3 class="font-bold text-red-800 dark:text-red-300 mb-2 flex items-center gap-2">
+                                <span class="text-xl">📉</span> 販売費用 (コスト)
+                            </h3>
+                            <ul class="list-disc list-inside text-sm text-slate-700 dark:text-slate-300 mb-4">
+                                <li>変動費：1人あたり 10円</li>
+                                <li>固定費：月額 50,000円</li>
+                            </ul>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded text-center font-mono font-bold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50">
+                                10a + 50,000 (円)
+                            </div>
+                        </div>
+
+                        <!-- 限界利益 -->
+                        <div class="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                            <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                                <span class="text-xl">📈</span> 限界利益 (リターン)
+                            </h3>
+                            <ul class="list-disc list-inside text-sm text-slate-700 dark:text-slate-300 mb-4">
+                                <li>購入率：10人に1人 (0.1a)</li>
+                                <li>1個あたり利益：400円</li>
+                            </ul>
+                            <div class="bg-white dark:bg-slate-800 p-3 rounded text-center font-mono font-bold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50">
+                                0.1a × 400 = 40a (円)
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ② 営業利益の導出 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        2. 営業利益の導出
+                    </h2>
+                    <p class="mb-6 leading-7">
+                        営業利益は「限界利益 － 販売費用」で求められます。式に代入して計算してみましょう。
+                    </p>
+                    
+                    <div class="flex flex-col items-center justify-center p-8 bg-slate-50 dark:bg-dark-card rounded-xl border border-slate-200 dark:border-dark-border my-6 font-mono">
+                        <div class="w-full max-w-md space-y-4">
+                            <!-- Step 1 -->
+                            <div class="flex items-center gap-2 text-slate-500 text-sm">
+                                <span class="w-20">基本式</span>
+                                <span class="text-slate-800 dark:text-slate-200">営業利益 = 限界利益 - 販売費用</span>
+                            </div>
+                            
+                            <!-- Step 2 -->
+                            <div class="flex items-center gap-2 text-lg">
+                                <span class="w-20 text-sm text-slate-500">代入</span>
+                                <span class="text-slate-800 dark:text-slate-200">= <span class="text-blue-600 dark:text-blue-400">40a</span> - (<span class="text-red-600 dark:text-red-400">10a + 50,000</span>)</span>
+                            </div>
+
+                            <!-- Line -->
+                            <div class="h-px bg-slate-300 dark:bg-slate-600 w-full"></div>
+
+                            <!-- Result -->
+                            <div class="flex items-center gap-2 text-xl font-bold bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded border border-yellow-200 dark:border-yellow-800/50 w-full justify-center">
+                                <span class="text-slate-800 dark:text-white">30a - 50,000 (円)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-white dark:bg-dark-bg border-l-4 border-green-500 shadow-sm rounded-r-lg">
+                        <p class="font-bold text-slate-800 dark:text-white mb-1">💡 式の意味</p>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">
+                            来訪者が1人増えるごとに、営業利益は <strong>30円</strong> ずつ増えていきます。<br>
+                            ただし、最初の固定費 <strong>50,000円</strong> を回収するまでは赤字です。
+                        </p>
+                    </div>
+                </section>
+
+                <!-- ③ 損益分岐点の計算 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        3. 損益分岐点の計算
+                    </h2>
+                    <p class="mb-6 leading-7">
+                        営業利益がちょうど「0円」になる来訪者数（<span class="font-mono text-pink-500">a</span>）を求めます。これが黒字と赤字の分かれ目です。
+                    </p>
+                    
+                    <div class="p-6 bg-slate-50 dark:bg-dark-card rounded-xl border border-slate-200 dark:border-dark-border flex flex-col items-center">
+                        <div class="font-mono text-lg space-y-2 text-center">
+                            <div>30a - 50,000 = 0</div>
+                            <div class="text-slate-400">↓</div>
+                            <div>30a = 50,000</div>
+                            <div class="text-slate-400">↓</div>
+                            <div>a = 50,000 ÷ 30</div>
+                            <div class="text-slate-400">↓</div>
+                            <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mt-2">
+                                a ≈ 1,667 (人)
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <span class="inline-block py-2 px-6 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full font-bold shadow-sm">
+                                結論：月間 1,667人以上で黒字化
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ④ グラフによる可視化 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        4. グラフによる可視化
+                    </h2>
+                    <p class="mb-6 leading-7">
+                        販売費用（コスト）と限界利益（リターン）の関係をグラフにしました。交差する点が損益分岐点です。
+                    </p>
+
+                    <div class="w-full bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl p-6 overflow-hidden relative">
+                        <!-- SVG Graph -->
+                        <svg viewBox="0 0 800 500" class="w-full h-auto font-mono text-xs">
+                            <!-- Background Grid -->
+                            <defs>
+                                <pattern id="grid" width="80" height="50" patternUnits="userSpaceOnUse">
+                                    <path d="M 80 0 L 0 0 0 50" fill="none" stroke="gray" stroke-width="0.5" opacity="0.1"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="none" />
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+
+                            <!-- Axes -->
+                            <line x1="50" y1="450" x2="750" y2="450" stroke="currentColor" stroke-width="2" class="text-slate-400" /> <!-- X -->
+                            <line x1="50" y1="450" x2="50" y2="50" stroke="currentColor" stroke-width="2" class="text-slate-400" /> <!-- Y -->
+
+                            <!-- X Labels (Visitors) -->
+                            <text x="50" y="470" text-anchor="middle" fill="currentColor" class="text-slate-500">0</text>
+                            <text x="400" y="470" text-anchor="middle" fill="currentColor" class="text-slate-500">1000</text>
+                            <text x="750" y="470" text-anchor="middle" fill="currentColor" class="text-slate-500">2000</text>
+                            <text x="750" y="490" text-anchor="end" fill="currentColor" class="text-slate-500 font-bold">来訪者数 (人)</text>
+
+                            <!-- Y Labels (Yen) -->
+                            <text x="40" y="450" text-anchor="end" fill="currentColor" class="text-slate-500">0</text>
+                            <text x="40" y="250" text-anchor="end" fill="currentColor" class="text-slate-500">5万</text>
+                            <text x="40" y="50" text-anchor="end" fill="currentColor" class="text-slate-500">10万</text>
+                            <text x="50" y="30" text-anchor="start" fill="currentColor" class="text-slate-500 font-bold">金額 (円)</text>
+
+                            <!-- Cost Line (10a + 50,000) -->
+                            <!-- y=0 -> 450px, y=100k -> 50px. Scale: 400px = 100k yen. 1px = 250 yen -->
+                            <!-- x=0 -> 50px, x=2000 -> 750px. Scale: 700px = 2000 people. 0.35px = 1 person -->
+                            <!-- Start: x=0, y=50k -> (50, 250) -->
+                            <!-- End: x=2000, y=70k -> (750, 170) -->
+                            <line x1="50" y1="250" x2="750" y2="170" stroke="#ef4444" stroke-width="3" />
+                            <text x="760" y="170" fill="#ef4444" alignment-baseline="middle" font-weight="bold">販売費用</text>
+
+                            <!-- Profit Line (40a) -->
+                            <!-- Start: x=0, y=0 -> (50, 450) -->
+                            <!-- End: x=2000, y=80k -> (750, 130) -->
+                            <line x1="50" y1="450" x2="750" y2="130" stroke="#3b82f6" stroke-width="3" />
+                            <text x="760" y="130" fill="#3b82f6" alignment-baseline="middle" font-weight="bold">限界利益</text>
+
+                            <!-- Break-even Point (1667, 66680) -->
+                            <!-- x=1667 -> 50 + 1667*0.35 = 633 -->
+                            <!-- y=66680 -> 450 - 66680/250 = 183 -->
+                            <circle cx="633" cy="183" r="6" fill="#a855f7" class="animate-pulse" />
+                            <line x1="633" y1="183" x2="633" y2="450" stroke="#a855f7" stroke-width="1" stroke-dasharray="4" />
+                            <text x="633" y="160" text-anchor="middle" fill="#a855f7" font-weight="bold" font-size="14">損益分岐点</text>
+                            <text x="633" y="430" text-anchor="middle" fill="#a855f7" font-weight="bold">1,667人</text>
+
+                            <!-- Areas -->
+                            <text x="300" y="350" fill="#ef4444" opacity="0.5" font-size="20" font-weight="bold">赤字エリア</text>
+                            <text x="700" y="300" fill="#3b82f6" opacity="0.5" font-size="20" font-weight="bold">黒字エリア</text>
+                        </svg>
+                    </div>
+                </section>
+
+                <!-- ⑤ シミュレーション -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        5. 収支シミュレーション
+                    </h2>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border mb-6">
+                        <table class="min-w-full text-left text-sm text-center">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">来訪者数 (a)</th>
+                                    <th class="px-6 py-3 font-semibold text-blue-600 dark:text-blue-400">限界利益 (40a)</th>
+                                    <th class="px-6 py-3 font-semibold text-red-600 dark:text-red-400">販売費用 (10a+5万)</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">営業利益</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-500">判定</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4">1,000人</td>
+                                    <td class="px-6 py-4">40,000円</td>
+                                    <td class="px-6 py-4">60,000円</td>
+                                    <td class="px-6 py-4 text-red-500 font-bold">-20,000円</td>
+                                    <td class="px-6 py-4"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">赤字</span></td>
+                                </tr>
+                                <tr class="bg-purple-50 dark:bg-purple-900/10">
+                                    <td class="px-6 py-4 font-bold text-purple-700 dark:text-purple-300">1,667人</td>
+                                    <td class="px-6 py-4">66,680円</td>
+                                    <td class="px-6 py-4">66,670円</td>
+                                    <td class="px-6 py-4 text-purple-600 font-bold">≈ 0円</td>
+                                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold">分岐点</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4">2,000人</td>
+                                    <td class="px-6 py-4">80,000円</td>
+                                    <td class="px-6 py-4">70,000円</td>
+                                    <td class="px-6 py-4 text-green-500 font-bold">+10,000円</td>
+                                    <td class="px-6 py-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">黒字</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">まとめ</h3>
+                    <p class="leading-8 text-lg mb-6">
+                        <span class="font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1 rounded">「固定費の壁（50,000円）」を、来訪者1人あたり30円の利益で削りきるには、1,667人の集客が必要。</span>
+                    </p>
+                    <div class="flex gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm shadow-blue-500/30">
+                            シェアする
+                        </button>
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 Study Notes. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-blue-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ダークモード切り替えロジック
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // 初期設定：OSの設定またはローカルストレージを確認
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
