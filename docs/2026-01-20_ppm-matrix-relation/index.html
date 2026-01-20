@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたスクリプト -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPMとマトリクスの関係</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Back to Home Link -->
+            <a href="https://yamac33.github.io/sidenote/" class="font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                <span class="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+                Back to Home
+            </a>
+            
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8 border-b border-slate-200 dark:border-dark-border pb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-20</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#PPM</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#マトリクス</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#ビジネス分析</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#技術ポートフォリオ</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#投資判断</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    PPMとマトリクスの関係
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    PPM（プロダクト・ポートフォリオ・マネジメント）を上位概念として、BCG・GE・ADL・技術ポートフォリオがどのように位置づけられるのか、その包含関係と特徴を解説します。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-16">
+                
+                <!-- ① 全体像：包含関係 -->
+                <section>
+                    <h2 class="text-2xl font-bold flex items-center text-slate-900 dark:text-white mb-8 group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        1. 全体像：PPMと各マトリクスの関係
+                    </h2>
+                    
+                    <div class="flex flex-col items-center">
+                        <!-- Parent Box: PPM -->
+                        <div class="w-full max-w-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg p-6 text-center relative z-10">
+                            <h3 class="text-xl font-bold mb-2">PPM (Product Portfolio Management)</h3>
+                            <p class="text-sm opacity-90">
+                                複数事業・製品・技術を俯瞰し、<br class="sm:hidden">資源配分・投資判断を行う「思想・枠組み」
+                            </p>
+                        </div>
+
+                        <!-- Connecting Lines -->
+                        <div class="relative w-full max-w-2xl h-12">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-slate-300 dark:bg-slate-600"></div>
+                            <div class="absolute top-12 left-[12.5%] right-[12.5%] h-0.5 bg-slate-300 dark:bg-slate-600"></div>
+                            <!-- Verticals to children -->
+                            <div class="absolute top-12 left-[12.5%] w-0.5 h-6 bg-slate-300 dark:bg-slate-600"></div>
+                            <div class="absolute top-12 left-[37.5%] w-0.5 h-6 bg-slate-300 dark:bg-slate-600"></div>
+                            <div class="absolute top-12 right-[37.5%] w-0.5 h-6 bg-slate-300 dark:bg-slate-600"></div>
+                            <div class="absolute top-12 right-[12.5%] w-0.5 h-6 bg-slate-300 dark:bg-slate-600"></div>
+                        </div>
+
+                        <!-- Children Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-4">
+                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-center hover:-translate-y-1 transition-transform duration-300 shadow-sm">
+                                <div class="text-2xl mb-2">⭐</div>
+                                <div class="font-bold text-slate-800 dark:text-white text-sm mb-1">BCG</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400">シンプル・定番</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-center hover:-translate-y-1 transition-transform duration-300 shadow-sm">
+                                <div class="text-2xl mb-2">📊</div>
+                                <div class="font-bold text-slate-800 dark:text-white text-sm mb-1">GE</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400">実務的・精緻</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-center hover:-translate-y-1 transition-transform duration-300 shadow-sm">
+                                <div class="text-2xl mb-2">🔄</div>
+                                <div class="font-bold text-slate-800 dark:text-white text-sm mb-1">ADL</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400">ライフサイクル</div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-center hover:-translate-y-1 transition-transform duration-300 shadow-sm">
+                                <div class="text-2xl mb-2">🔬</div>
+                                <div class="font-bold text-slate-800 dark:text-white text-sm mb-1">技術PF</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400">R&D・技術</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-slate-50 dark:bg-dark-card border-l-4 border-blue-500 rounded-r-lg text-sm text-slate-700 dark:text-slate-300">
+                        <strong>ポイント：</strong> PPMという「考え方」を、目的に応じて具体化した「道具」がこれらのマトリクスです。
+                    </div>
+                </section>
+
+                <!-- ② 個別解説 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        2. 各マトリクスの位置づけと中身
+                    </h2>
+
+                    <!-- BCG -->
+                    <div class="mb-12">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 border-l-4 border-yellow-400 pl-3">1. BCGマトリクス（最もシンプル・古典）</h3>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="w-full md:w-1/2 aspect-square max-w-xs mx-auto relative border-l-2 border-b-2 border-slate-400 dark:border-slate-500">
+                                <!-- Y Axis Label -->
+                                <div class="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-bold text-slate-500 text-center w-24">市場成長率<br>(資金需要)</div>
+                                <!-- X Axis Label -->
+                                <div class="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-xs font-bold text-slate-500 text-center w-32">相対的市場シェア<br>(資金流入)</div>
+                                
+                                <div class="grid grid-cols-2 h-full">
+                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-r border-b border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center p-2 text-center">
+                                        <div class="text-2xl">⭐</div>
+                                        <div class="font-bold text-sm text-yellow-700 dark:text-yellow-300">花形</div>
+                                    </div>
+                                    <div class="bg-slate-50 dark:bg-slate-800/50 border-b border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center p-2 text-center">
+                                        <div class="text-2xl">❓</div>
+                                        <div class="font-bold text-sm text-slate-600 dark:text-slate-400">問題児</div>
+                                    </div>
+                                    <div class="bg-green-50 dark:bg-green-900/20 border-r border-dashed border-slate-300 dark:border-slate-600 flex flex-col items-center justify-center p-2 text-center">
+                                        <div class="text-2xl">💰</div>
+                                        <div class="font-bold text-sm text-green-700 dark:text-green-300">金のなる木</div>
+                                    </div>
+                                    <div class="bg-gray-100 dark:bg-slate-800 flex flex-col items-center justify-center p-2 text-center">
+                                        <div class="text-2xl">🐕</div>
+                                        <div class="font-bold text-sm text-gray-500 dark:text-gray-400">負け犬</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center">
+                                <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 text-sm">
+                                    <li><strong>縦軸</strong>：市場成長率（高いと投資が必要）</li>
+                                    <li><strong>横軸</strong>：相対シェア（高いと利益が出る）</li>
+                                    <li><strong>特徴</strong>：単純明快だが、指標が2つだけで粗い。</li>
+                                    <li><strong>目的</strong>：キャッシュフローの配分をざっくり決める。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GE -->
+                    <div class="mb-12">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4 border-l-4 border-blue-500 pl-3">2. GE／マッキンゼー・マトリクス（実務向け）</h3>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="w-full md:w-1/2 aspect-square max-w-xs mx-auto relative border-l-2 border-b-2 border-slate-400 dark:border-slate-500">
+                                <!-- Y Axis -->
+                                <div class="absolute -left-8 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-bold text-slate-500">市場魅力度</div>
+                                <!-- X Axis -->
+                                <div class="absolute bottom-[-20px] left-1/2 -translate-x-1/2 text-xs font-bold text-slate-500">競争優位性</div>
+
+                                <div class="grid grid-cols-3 grid-rows-3 h-full gap-0.5 bg-slate-200 dark:bg-slate-700">
+                                    <!-- Row 1 -->
+                                    <div class="bg-green-200 dark:bg-green-900/60 flex items-center justify-center font-bold text-xs text-green-900 dark:text-green-100">投資</div>
+                                    <div class="bg-green-200 dark:bg-green-900/60 flex items-center justify-center font-bold text-xs text-green-900 dark:text-green-100">投資</div>
+                                    <div class="bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center font-bold text-xs text-yellow-800 dark:text-yellow-200">選択</div>
+                                    <!-- Row 2 -->
+                                    <div class="bg-green-200 dark:bg-green-900/60 flex items-center justify-center font-bold text-xs text-green-900 dark:text-green-100">投資</div>
+                                    <div class="bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center font-bold text-xs text-yellow-800 dark:text-yellow-200">選択</div>
+                                    <div class="bg-red-100 dark:bg-red-900/40 flex items-center justify-center font-bold text-xs text-red-900 dark:text-red-200">撤退</div>
+                                    <!-- Row 3 -->
+                                    <div class="bg-yellow-100 dark:bg-yellow-900/40 flex items-center justify-center font-bold text-xs text-yellow-800 dark:text-yellow-200">選択</div>
+                                    <div class="bg-red-100 dark:bg-red-900/40 flex items-center justify-center font-bold text-xs text-red-900 dark:text-red-200">撤退</div>
+                                    <div class="bg-red-100 dark:bg-red-900/40 flex items-center justify-center font-bold text-xs text-red-900 dark:text-red-200">撤退</div>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center">
+                                <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 text-sm">
+                                    <li><strong>3×3</strong>の9象限でより細かく判断。</li>
+                                    <li><strong>特徴</strong>：軸の定義（魅力度・優位性）を複数の指標で総合的に評価できる。</li>
+                                    <li><strong>目的</strong>：投資・撤退の意思決定を精緻に行う。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADL & Tech PF -->
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- ADL -->
+                        <div class="bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-slate-700 rounded-lg p-5">
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-3 border-l-4 border-purple-500 pl-2">3. ADLマトリクス</h3>
+                            <div class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span>縦：<strong>競争地位</strong></span>
+                                    <span>横：<strong>産業ライフサイクル</strong></span>
+                                </div>
+                                <div class="h-1 bg-gradient-to-r from-blue-300 via-purple-400 to-red-400 rounded"></div>
+                                <div class="flex justify-between text-[10px] mt-1 text-slate-500">
+                                    <span>導入</span><span>成長</span><span>成熟</span><span>衰退</span>
+                                </div>
+                            </div>
+                            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                                <li>事業の「時間軸（寿命）」を考慮できる。</li>
+                                <li>撤退のタイミング判断に強い。</li>
+                            </ul>
+                        </div>
+
+                        <!-- Tech Portfolio -->
+                        <div class="bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-slate-700 rounded-lg p-5">
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-3 border-l-4 border-pink-500 pl-2">4. 技術ポートフォリオ</h3>
+                            <div class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span>縦：<strong>技術の重要性</strong></span>
+                                    <span>横：<strong>技術成熟度</strong></span>
+                                </div>
+                                <div class="relative h-20 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded mt-2">
+                                    <div class="absolute top-2 left-2 text-xs font-bold text-pink-500">コア技術</div>
+                                    <div class="absolute bottom-2 right-2 text-xs text-slate-400">探索技術</div>
+                                </div>
+                            </div>
+                            <ul class="list-disc list-inside text-xs text-slate-600 dark:text-slate-400 space-y-1">
+                                <li>R&D（研究開発）に特化。</li>
+                                <li>どの技術を自社開発し、どれを外部調達するか等の判断に使う。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ③ まとめ -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        3. 比較まとめ
+                    </h2>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border mb-6">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">手法</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">特徴・用途</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">キーワード</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">BCG</td>
+                                    <td class="px-6 py-4">最もシンプル。キャッシュフロー配分。</td>
+                                    <td class="px-6 py-4 text-slate-500">花形・金のなる木</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">GE</td>
+                                    <td class="px-6 py-4">指標を柔軟に設定でき、精緻な判断が可能。</td>
+                                    <td class="px-6 py-4 text-slate-500">3×3・魅力度</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">ADL</td>
+                                    <td class="px-6 py-4">産業の成長段階（ライフサイクル）を考慮。</td>
+                                    <td class="px-6 py-4 text-slate-500">ライフサイクル</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-pink-500 dark:text-pink-400">技術PF</td>
+                                    <td class="px-6 py-4">研究開発テーマの選定・資源配分。</td>
+                                    <td class="px-6 py-4 text-slate-500">R&D・成熟度</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-8 p-6 bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-slate-700 rounded-xl text-center">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">試験・実務で使える一言まとめ</h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
+                            「PPMとは、複数の事業・製品・技術をポートフォリオとして管理する<strong class="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1 rounded">考え方</strong>であり、BCG・GE・ADL・技術ポートフォリオは、その目的や分析対象に応じた<strong class="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1 rounded">具体的手法</strong>である。」
+                        </p>
+                    </div>
+                </section>
+
+                <!-- フッターナビ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border flex justify-between items-center">
+                    <button class="text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-2 text-sm">
+                        <span>←</span> 前の記事：アンゾフと技術市場
+                    </button>
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-4 py-2 rounded-md font-medium text-sm transition-colors">
+                        トップに戻る
+                    </button>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 Study Notes. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-blue-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ダークモード切り替えロジック
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // 初期設定：OSの設定またはローカルストレージを確認
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
