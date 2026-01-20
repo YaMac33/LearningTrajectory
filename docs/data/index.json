@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-21T07:43:25+09:00",
+    "title": "ビットの基本と増加の理解",
+    "summary": "ビットの概念を視覚的に解説し、1ビット増えることで情報量がどのように増加するかを示します。基本的な計算式も紹介しています。",
+    "tags": [
+      "ビット",
+      "情報",
+      "デジタル",
+      "計算",
+      "二進数"
+    ],
+    "dir": "2026-01-21_bits-basic-diagram",
+    "repo_path": "/docs/2026-01-21_bits-basic-diagram/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-21_bits-basic-diagram"
+  },
+  {
     "timestamp": "2026-01-21T07:08:19+09:00",
     "title": "システム稼働率の計算手順",
     "summary": "システム稼働率の計算方法を解説します。WebサーバとDBの接続構成を図解でわかりやすく整理しました。",
