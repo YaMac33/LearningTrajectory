@@ -1,5 +1,21 @@
 [
   {
+    "timestamp": "2026-01-20T10:47:58+09:00",
+    "title": "ROA（総資産利益率）の解説",
+    "summary": "ROAは企業の総資産を活用してどれだけ利益を上げているかを示す指標です。効率的な経営分析に欠かせない要素を解説します。",
+    "tags": [
+      "ROA",
+      "総資産",
+      "利益",
+      "財務分析",
+      "経営指標",
+      "企業評価"
+    ],
+    "dir": "2026-01-20_roa-explanation",
+    "repo_path": "/docs/2026-01-20_roa-explanation/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_roa-explanation"
+  },
+  {
     "timestamp": "2026-01-20T08:24:55+09:00",
     "title": "KPIの基礎と重要性についての解説",
     "summary": "KPIは目標達成度を数値で測る指標で、業務改善に役立ちます。KGIとの関係性も重要です。",
