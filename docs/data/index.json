@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-20T13:17:18+09:00",
+    "title": "IPランドスケープにおける特許分析",
+    "summary": "特許情報を分析し、技術動向や競合を把握する方法を解説します。経営戦略に活かすための手法を紹介します。",
+    "tags": [
+      "特許",
+      "知的財産",
+      "経営戦略",
+      "技術動向",
+      "分析手法"
+    ],
+    "dir": "2026-01-20_ip-landscape-analysis",
+    "repo_path": "/docs/2026-01-20_ip-landscape-analysis/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_ip-landscape-analysis"
+  },
+  {
     "timestamp": "2026-01-20T12:57:11+09:00",
     "title": "エッジコンピューティングの理解",
     "summary": "エッジコンピューティングの意味とIoTにおける重要性を解説します。データ処理を端末の近くで行うメリットについても触れます。",
