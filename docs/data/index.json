@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-20T21:33:37+09:00",
+    "title": "技術市場マトリックスの概要",
+    "summary": "技術市場マトリックスは、技術と市場の新旧に基づく戦略分析手法です。事業開発やR&D戦略において、進むべき方向を整理するためのフレームワークを解説します。",
+    "tags": [
+      "技術",
+      "市場",
+      "戦略",
+      "分析",
+      "イノベーション"
+    ],
+    "dir": "2026-01-20_technology-market-matrix",
+    "repo_path": "/docs/2026-01-20_technology-market-matrix/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_technology-market-matrix"
+  },
+  {
     "timestamp": "2026-01-20T20:57:51+09:00",
     "title": "技術ポートフォリオの概要と活用法",
     "summary": "技術ポートフォリオは、複数の技術を整理・可視化し、意思決定に役立てる手法です。戦略の整合性を図る重要なツールとなります。",
