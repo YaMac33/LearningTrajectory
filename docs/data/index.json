@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-21T01:52:11+09:00",
+    "title": "ITガバナンスにおける役割分担",
+    "summary": "ITガバナンスにおける経営者と情報システム部門の役割を解説。役割分担の明確化が成功の鍵です。",
+    "tags": [
+      "ITガバナンス",
+      "経営者",
+      "情報システム",
+      "役割分担",
+      "プロジェクト管理"
+    ],
+    "dir": "2026-01-21_it-governance-roles",
+    "repo_path": "/docs/2026-01-21_it-governance-roles/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-21_it-governance-roles"
+  },
+  {
     "timestamp": "2026-01-21T00:14:03+09:00",
     "title": "実用新案権の基礎知識",
     "summary": "実用新案権の仕組みと対象を解説しています。対象範囲や保護方法についても具体例を交えて理解を深めます。",
