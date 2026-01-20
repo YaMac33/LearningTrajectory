@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>アナログとデジタルの違い：なぜCDはデジタルなのか？ - Sidenote</title>
+  <meta name="description" content="「アナログ＝連続」「デジタル＝離散」という本質的な違いを、波形図と時計の例で解説。なぜレコードはアナログで、CDはデジタルなのか、サンプリングの仕組みとともに図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="アナログとデジタルの違い：なぜCDはデジタルなのか？" />
+  <meta property="og:description" content="滑らかな波形とカクカクした数値の違いを視覚的に理解する。" />
+  <meta property="og:url" content="https://example.com/articles/analog-vs-digital.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 図解コンテナ共通 */
+    .visual-container {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+    }
+
+    .visual-title {
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: block;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    /* 波形比較図 */
+    .wave-comparison {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+
+    .wave-box {
+      flex: 1;
+      min-width: 260px;
+      background: var(--bg-color);
+      border: 1px solid var(--line-color);
+      padding: 1.5rem;
+      position: relative;
+      height: 180px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .wave-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      background: var(--code-bg);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* アナログ波形（CSS曲線） */
+    .analog-curve {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      height: 100px;
+      overflow: hidden;
+    }
+    .analog-curve::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -10%;
+      width: 120%;
+      height: 100%;
+      border-top: 3px solid var(--text-main);
+      border-radius: 50%;
+    }
+    .analog-desc {
+      position: absolute;
+      bottom: 5px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    /* デジタル棒グラフ（離散値） */
+    .digital-bar-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      width: 100%;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+    .d-bar {
+      width: 12%;
+      background-color: var(--text-main);
+      position: relative;
+    }
+    .d-bar:hover::after {
+      content: attr(data-val);
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+    }
+
+    /* 時計のメタファー */
+    .clock-comparison {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    .clock-box {
+      text-align: center;
+    }
+    .clock-face {
+      width: 80px;
+      height: 80px;
+      border: 2px solid var(--text-main);
+      border-radius: 50%;
+      margin: 0 auto 0.5rem;
+      position: relative;
+    }
+    /* アナログ針 */
+    .hand {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 40%;
+      height: 2px;
+      background: var(--text-main);
+      transform-origin: left center;
+      transform: rotate(-45deg);
+    }
+    /* デジタル数字 */
+    .digital-display {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      border: 2px solid var(--text-main);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      background: #000;
+      color: #fff;
+    }
+
+    /* メディア分類ツリー */
+    .media-tree {
+      list-style: none;
+      padding-left: 1rem;
+    }
+    .media-tree li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .media-tree li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.8em;
+      width: 1rem;
+      height: 1px;
+      background: var(--text-sub);
+    }
+    .media-tree li::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--text-sub);
+    }
+    .media-tree li:last-child::after {
+      height: 0.8em;
+    }
+    .tree-label {
+      font-weight: bold;
+      background: var(--bg-color);
+      padding-right: 0.5rem;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title Changed to Sidenote. -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / 基礎理論・マルチメディア</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">アナログとデジタルの違い：なぜCDはデジタルなのか？</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#アナログ</li>
+            <li>#デジタル</li>
+            <li>#データ比較</li>
+            <li>#サンプリング</li>
+            <li>#量子化</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「アナログ」と「デジタル」。日常的に使う言葉ですが、ITの分野で定義を問われると、意外と言葉に詰まるものです。</p>
+        <p>この記事では、両者の決定的な違いである<strong>「連続」</strong>か<strong>「離散（バラバラ）」</strong>かという点に注目し、なぜ音楽CDがデジタルメディアに分類されるのかを解説します。</p>
+
+        <h2>1. 連続 vs 離散：視覚的な違い</h2>
+        <p>アナログとデジタルの最大の違いは、データを「なめらかな線」として扱うか、「区切られた点（数値）」として扱うかです。</p>
+
+        <div class="visual-container">
+            <span class="visual-title">データの表現形式</span>
+            <div class="wave-comparison">
+                <!-- アナログ -->
+                <div class="wave-box">
+                    <span class="wave-label">アナログ</span>
+                    <div class="analog-curve"></div>
+                    <span class="analog-desc">切れ目なく連続している</span>
+                </div>
+                
+                <!-- デジタル -->
+                <div class="wave-box">
+                    <span class="wave-label">デジタル</span>
+                    <div class="digital-bar-container">
+                        <div class="d-bar" style="height: 20%" data-val="2"></div>
+                        <div class="d-bar" style="height: 50%" data-val="5"></div>
+                        <div class="d-bar" style="height: 80%" data-val="8"></div>
+                        <div class="d-bar" style="height: 50%" data-val="5"></div>
+                        <div class="d-bar" style="height: 20%" data-val="2"></div>
+                    </div>
+                    <span class="analog-desc">値が飛び飛び（段階的）</span>
+                </div>
+            </div>
+        </div>
+
+        <p>図の通り、アナログはスロープ（坂道）のようなもので、中間の高さが無限に存在します。対してデジタルは階段のようなもので、「1段目と2段目の間」という場所には立てません。</p>
+
+        <h3>時計で例えると？</h3>
+        <p>秒針のあるアナログ時計と、数字だけのデジタル時計を想像すると分かりやすいでしょう。</p>
+        
+        <div class="visual-container" style="padding: 1.5rem;">
+            <div class="clock-comparison">
+                <div class="clock-box">
+                    <div class="clock-face">
+                        <div class="hand"></div>
+                    </div>
+                    <p><strong>アナログ時計</strong><br><small>秒針が滑らかに動く<br>「秒の間」がある</small></p>
+                </div>
+                <div class="clock-box">
+                    <div class="digital-display">12:01</div>
+                    <p><strong>デジタル時計</strong><br><small>数字がカクッと変わる<br>中間の時間がない</small></p>
+                </div>
+            </div>
+        </div>
+
+        <h2>2. 音楽メディアでの分類</h2>
+        <p>この「連続 vs 離散」の違いは、音楽の記録方式にそのまま当てはまります。</p>
+
+        <div style="background:var(--code-bg); padding:1.5rem; border-radius:4px; margin:1.5rem 0;">
+            <ul class="media-tree">
+                <li><span class="tree-label">音楽データ</span>
+                    <ul class="media-tree">
+                        <li><span class="tree-label">アナログ</span>
+                            <ul>
+                                <li>レコード（溝の形が波形そのもの）</li>
+                                <li>カセットテープ（磁気の強弱が連続）</li>
+                            </ul>
+                        </li>
+                        <li><span class="tree-label">デジタル</span>
+                            <ul>
+                                <li>CD（数値を記録）</li>
+                                <li>MP3（数値を圧縮）</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <h2>3. なぜCDは「デジタル」なのか？</h2>
+        <p>音そのものは空気の振動であり、本来はアナログ（連続的な波）です。しかし、CDはそれをデジタルデータとして扱います。なぜでしょうか？</p>
+        <p>それは、CDが音の波形をそのまま記録しているのではなく、<strong>「一定間隔で計測した数値の集まり」</strong>として記録しているからです。</p>
+
+        <h3>デジタル化の2ステップ</h3>
+        <p>アナログ音声をデジタル化する手順（PCM方式）は、以下の2段階で行われます。</p>
+
+        <h4>① 標本化（サンプリング）</h4>
+        <p>時間を一定間隔で区切り、その瞬間の波の高さを測ります。CDの場合、1秒間に44,100回も計測します（44.1kHz）。</p>
+
+        <h4>② 量子化（クオンタイゼーション）</h4>
+        <p>測った高さを、一番近い目盛りの数値（整数）に置き換えます。CDは16ビットなので、音の大きさを65,536段階の数値で表現します。</p>
+
+        <p>最終的に、CDには<code>01001010...</code>という「0と1の羅列」だけが焼き付けられます。物理的な溝の形（アナログ）ではなく、記号としての数値（デジタル）を記録しているため、CDはデジタルメディアに分類されるのです。</p>
+
+        <h2>まとめ</h2>
+        <p>試験対策としては、以下のキーワードの対比を覚えておきましょう。</p>
+        <ul>
+            <li><strong>アナログ：</strong>連続量。物理量そのものの変化。（例：レコードの溝、水銀温度計）</li>
+            <li><strong>デジタル：</strong>離散値。段階的な数値。（例：CDのピット、デジカメの画素）</li>
+        </ul>
+        <p>「レーザーで読み取るからデジタル」ではなく、「数値を記録しているからデジタル」と理解することが重要です。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
