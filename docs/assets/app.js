@@ -1,47 +1,66 @@
-// docs/assets/app.js
-// Common JS (Dark mode toggle)
+/**
+ * Application Logic
+ * Handles Google Analytics, Scroll Progress, and minimal interactions.
+ */
 
-(function () {
-  function applyTheme(theme) {
-    const root = document.documentElement;
-    const sunIcon = document.getElementById("sun-icon");
-    const moonIcon = document.getElementById("moon-icon");
+const GA_ID = 'G-MQ9ZB4LYWP';
 
-    if (theme === "dark") {
-      root.classList.add("dark");
-      if (sunIcon) sunIcon.classList.remove("hidden");
-      if (moonIcon) moonIcon.classList.add("hidden");
-    } else {
-      root.classList.remove("dark");
-      if (sunIcon) sunIcon.classList.add("hidden");
-      if (moonIcon) moonIcon.classList.remove("hidden");
-    }
-  }
+document.addEventListener('DOMContentLoaded', () => {
+    initAnalytics();
+    initScrollProgress();
+    initSmoothScroll();
+});
 
-  function getInitialTheme() {
-    const stored = localStorage.getItem("theme");
-    if (stored === "dark" || stored === "light") return stored;
+/**
+ * Initialize Google Analytics (GA4)
+ * Injects the tag dynamically to keep HTML clean.
+ */
+function initAnalytics() {
+    // Inject Script Tag
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+    document.head.appendChild(script);
 
-    // default: system preference
-    const prefersDark =
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    return prefersDark ? "dark" : "light";
-  }
+    // Initialize DataLayer
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', GA_ID);
+    
+    console.log('GA initialized:', GA_ID);
+}
 
-  // 1) Apply ASAP
-  applyTheme(getInitialTheme());
+/**
+ * Scroll Progress Bar
+ * Adds a subtle reading indicator at the top of the screen.
+ */
+function initScrollProgress() {
+    const progressBar = document.createElement('div');
+    progressBar.id = 'scroll-progress';
+    document.body.prepend(progressBar);
 
-  // 2) Bind toggle when DOM is ready
-  document.addEventListener("DOMContentLoaded", () => {
-    const btn = document.getElementById("theme-toggle");
-    if (!btn) return;
-
-    btn.addEventListener("click", () => {
-      const isDark = document.documentElement.classList.contains("dark");
-      const next = isDark ? "light" : "dark";
-      localStorage.setItem("theme", next);
-      applyTheme(next);
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + '%';
     });
-  });
-})();
+}
+
+/**
+ * Smooth Scroll for internal anchor links
+ */
+function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
