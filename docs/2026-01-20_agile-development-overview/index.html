@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたスクリプト -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アジャイル開発手法の概要</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Back to Home Link -->
+            <a href="https://yamac33.github.io/sidenote/" class="font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                <span class="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+                Back to Home
+            </a>
+            
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8 border-b border-slate-200 dark:border-dark-border pb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-20</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#アジャイル</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#ソフトウェア開発</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#スクラム</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#XP</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    アジャイル開発手法の概要
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    変化に迅速に対応するための柔軟な開発手法「アジャイル」。その代表的な手法であるXPとスクラムを中心に解説します。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- ① 1行定義 -->
+                <section>
+                    <h2 class="text-2xl font-bold flex items-center text-slate-900 dark:text-white mb-4 group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        1. アジャイル開発とは
+                    </h2>
+                    <div class="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-lg font-bold text-slate-800 dark:text-slate-100 m-0">
+                            <span class="text-2xl mr-2">👉</span>
+                            柔軟で段階的に開発を進め、仕様変更や市場の変化に<span class="text-blue-600 dark:text-blue-400">迅速（Agile）に対応</span>するソフトウェア開発手法
+                        </p>
+                    </div>
+                    <ul class="mt-4 list-disc list-outside pl-6 space-y-2 text-slate-700 dark:text-slate-300">
+                        <li><strong>目的:</strong> 要件変更や市場の変化に素早く対応すること。</li>
+                        <li><strong>特徴:</strong> ドキュメントよりも「動くソフトウェア」を優先。顧客との対話を重視。</li>
+                        <li><strong>開発単位:</strong> 「イテレーション」と呼ばれる小さなサイクルを繰り返す。</li>
+                    </ul>
+                </section>
+
+                <!-- ② 開発サイクルの比較 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        2. 開発サイクルの違い
+                    </h2>
+                    <p class="mb-6">従来型の「ウォーターフォール」と比較すると違いが明確になります。</p>
+                    
+                    <div class="space-y-6">
+                        <!-- Waterfall -->
+                        <div class="p-4 bg-slate-50 dark:bg-dark-card rounded-lg border border-slate-200 dark:border-slate-700">
+                            <div class="font-bold text-slate-600 dark:text-slate-400 mb-3 text-sm flex items-center gap-2">
+                                <span class="text-xl">🌊</span> ウォーターフォール型
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 text-xs md:text-sm">
+                                <div class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded">要件定義</div>
+                                <span class="text-slate-400">→</span>
+                                <div class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded">設計</div>
+                                <span class="text-slate-400">→</span>
+                                <div class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded">実装</div>
+                                <span class="text-slate-400">→</span>
+                                <div class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded">テスト</div>
+                                <span class="text-slate-400">→</span>
+                                <div class="px-3 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded font-bold">リリース</div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">※ 後戻りせず、工程を順番に終わらせていく。</p>
+                        </div>
+
+                        <!-- Agile -->
+                        <div class="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <div class="font-bold text-blue-600 dark:text-blue-400 mb-3 text-sm flex items-center gap-2">
+                                <span class="text-xl">🔄</span> アジャイル型
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="flex-1 relative">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] md:text-xs bg-white dark:bg-slate-800 p-2 rounded-full border-2 border-dashed border-blue-400 dark:border-blue-600 relative z-10 shadow-sm">
+                                        <span>計画</span>→<span>設計</span>→<span>実装</span>→<span>テスト</span>
+                                        <div class="absolute -right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">↺</div>
+                                    </div>
+                                    <div class="text-center text-xs text-blue-600 dark:text-blue-400 mt-1 font-bold">反復 1</div>
+                                </div>
+                                <span class="text-slate-400 text-xl">→</span>
+                                <div class="flex-1 relative">
+                                    <div class="flex items-center justify-center gap-1 text-[10px] md:text-xs bg-white dark:bg-slate-800 p-2 rounded-full border-2 border-dashed border-blue-400 dark:border-blue-600 relative z-10 shadow-sm">
+                                        <span>計画</span>→<span>設計</span>→<span>実装</span>→<span>テスト</span>
+                                        <div class="absolute -right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">↺</div>
+                                    </div>
+                                    <div class="text-center text-xs text-blue-600 dark:text-blue-400 mt-1 font-bold">反復 2...</div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-3">※ 小さなサイクル（イテレーション）を繰り返して完成度を高める。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ③ XPとスクラム -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        3. 代表的な2つの手法
+                    </h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- XP -->
+                        <div class="bg-white dark:bg-dark-bg border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg text-2xl">💻</span>
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white">XP (エクストリームプログラミング)</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                                技術的な実践（プラクティス）を重視し、品質を高める手法。
+                            </p>
+                            <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg text-sm border border-slate-100 dark:border-slate-700">
+                                <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                                    <li><strong>ペアプログラミング</strong>：2人で書く</li>
+                                    <li><strong>テスト駆動開発</strong>：テストを先に書く</li>
+                                    <li><strong>継続的インテグレーション</strong>：頻繁に統合</li>
+                                </ul>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <span class="inline-block px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-xs font-bold rounded-full">単位：イテレーション</span>
+                            </div>
+                        </div>
+
+                        <!-- Scrum -->
+                        <div class="bg-white dark:bg-dark-bg border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-2xl">🏉</span>
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white">スクラム (Scrum)</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                                チームのコミュニケーションとプロセス管理を重視する手法。
+                            </p>
+                            <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg text-sm border border-slate-100 dark:border-slate-700">
+                                <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                                    <li><strong>プロダクトオーナー</strong>：何を作るか</li>
+                                    <li><strong>スクラムマスター</strong>：支援役</li>
+                                    <li><strong>デイリースクラム</strong>：毎日の共有</li>
+                                </ul>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <span class="inline-block px-3 py-1 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 text-xs font-bold rounded-full">単位：スプリント</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ④ 全体構造図 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        4. アジャイル開発の体系図
+                    </h2>
+                    
+                    <div class="flex flex-col items-center py-6">
+                        <!-- Root -->
+                        <div class="w-full max-w-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-xl text-center shadow-lg relative z-10">
+                            <h3 class="font-bold text-lg">アジャイル開発</h3>
+                            <p class="text-xs opacity-90">柔軟で段階的な開発の総称</p>
+                        </div>
+
+                        <!-- Connector -->
+                        <div class="h-8 w-0.5 bg-slate-300 dark:bg-slate-600"></div>
+                        <div class="w-full max-w-lg h-0.5 bg-slate-300 dark:bg-slate-600 relative">
+                            <div class="absolute left-0 top-0 w-0.5 h-4 bg-slate-300 dark:bg-slate-600"></div>
+                            <div class="absolute right-0 top-0 w-0.5 h-4 bg-slate-300 dark:bg-slate-600"></div>
+                        </div>
+
+                        <!-- Branches -->
+                        <div class="flex justify-between w-full max-w-lg mt-4 gap-4">
+                            <!-- XP Branch -->
+                            <div class="flex-1 flex flex-col items-center">
+                                <div class="bg-white dark:bg-slate-800 border border-green-300 dark:border-green-800 p-4 rounded-lg shadow-sm text-center w-full">
+                                    <div class="font-bold text-green-700 dark:text-green-400 mb-1">XP</div>
+                                    <div class="text-[10px] text-slate-500">技術・品質重視</div>
+                                </div>
+                                <div class="h-4 w-0.5 bg-slate-300 dark:bg-slate-600"></div>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-2 rounded text-xs text-center border border-slate-200 dark:border-slate-700 w-full">
+                                    <strong>イテレーション</strong><br>
+                                    (数日〜数週間)
+                                </div>
+                            </div>
+
+                            <!-- Scrum Branch -->
+                            <div class="flex-1 flex flex-col items-center">
+                                <div class="bg-white dark:bg-slate-800 border border-orange-300 dark:border-orange-800 p-4 rounded-lg shadow-sm text-center w-full">
+                                    <div class="font-bold text-orange-700 dark:text-orange-400 mb-1">スクラム</div>
+                                    <div class="text-[10px] text-slate-500">チーム・プロセス重視</div>
+                                </div>
+                                <div class="h-4 w-0.5 bg-slate-300 dark:bg-slate-600"></div>
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-2 rounded text-xs text-center border border-slate-200 dark:border-slate-700 w-full">
+                                    <strong>スプリント</strong><br>
+                                    (1〜4週間)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ⑤ 比較表 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        5. XP vs スクラム 対比表
+                    </h2>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border mb-6">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">項目</th>
+                                    <th class="px-6 py-3 font-semibold text-green-600 dark:text-green-400">XP (Extreme Programming)</th>
+                                    <th class="px-6 py-3 font-semibold text-orange-600 dark:text-orange-400">スクラム (Scrum)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-600 dark:text-slate-300">開発単位</td>
+                                    <td class="px-6 py-4">イテレーション</td>
+                                    <td class="px-6 py-4">スプリント</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-600 dark:text-slate-300">重視点</td>
+                                    <td class="px-6 py-4 font-bold">技術・エンジニアリング</td>
+                                    <td class="px-6 py-4 font-bold">マネジメント・チームワーク</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-600 dark:text-slate-300">特徴的な活動</td>
+                                    <td class="px-6 py-4">ペアプログラミング<br>テスト駆動開発</td>
+                                    <td class="px-6 py-4">デイリースクラム<br>スプリントレビュー</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-600 dark:text-slate-300">成果物</td>
+                                    <td class="px-6 py-4">機能単位で動くソフト</td>
+                                    <td class="px-6 py-4">完成した機能セット</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">まとめ</h3>
+                    <p class="leading-8 text-lg mb-6">
+                        <span class="font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1 rounded">どちらも「短期間で開発→改善」を繰り返すが、技術重視ならXP、チーム運営重視ならスクラム。</span>
+                    </p>
+                    <div class="flex gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm shadow-blue-500/30">
+                            シェアする
+                        </button>
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 Study Notes. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-blue-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ダークモード切り替えロジック
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // 初期設定：OSの設定またはローカルストレージを確認
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
