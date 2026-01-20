@@ -1,5 +1,22 @@
 [
   {
+    "timestamp": "2026-01-20T12:19:12+09:00",
+    "title": "変更管理委員会の重要性",
+    "summary": "変更管理委員会(CAB)は、システム変更に伴うリスクを審議・承認する重要な組織です。ITILに基づくベストプラクティスが反映されています。",
+    "tags": [
+      "変更管理",
+      "CAB",
+      "ITIL",
+      "リスク管理",
+      "ITパスポート",
+      "承認",
+      "業務影響"
+    ],
+    "dir": "2026-01-20_change-management-cab",
+    "repo_path": "/docs/2026-01-20_change-management-cab/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_change-management-cab"
+  },
+  {
     "timestamp": "2026-01-20T12:14:59+09:00",
     "title": "ライブマイグレーションの解説",
     "summary": "稼働中のシステムを止めずに別の物理サーバーへ移動させる仮想化技術について解説します。",
