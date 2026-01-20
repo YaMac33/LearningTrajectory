@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-20T19:57:12+09:00",
+    "title": "資産とエクイティの違い",
+    "summary": "この文章では、資産とエクイティの違いについて詳しく解説します。財務諸表からの視点も取り入れ、理解を深めます。",
+    "tags": [
+      "資産",
+      "エクイティ",
+      "財務諸表",
+      "企業経営",
+      "会計"
+    ],
+    "dir": "2026-01-20_asset-equity-difference",
+    "repo_path": "/docs/2026-01-20_asset-equity-difference/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_asset-equity-difference"
+  },
+  {
     "timestamp": "2026-01-20T19:43:14+09:00",
     "title": "GitHub Actionsの排他制御についての解説",
     "summary": "GitHub Actionsは競合を検知して同時処理を停止するが、実際には排他制御とは言えない。排他制御の定義や目的を解説する。",
