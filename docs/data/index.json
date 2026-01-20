@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-20T20:57:51+09:00",
+    "title": "技術ポートフォリオの概要と活用法",
+    "summary": "技術ポートフォリオは、複数の技術を整理・可視化し、意思決定に役立てる手法です。戦略の整合性を図る重要なツールとなります。",
+    "tags": [
+      "技術ポートフォリオ",
+      "研究開発",
+      "投資判断",
+      "戦略分析",
+      "技術マップ"
+    ],
+    "dir": "2026-01-20_technology-portfolio-overview",
+    "repo_path": "/docs/2026-01-20_technology-portfolio-overview/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-20_technology-portfolio-overview"
+  },
+  {
     "timestamp": "2026-01-20T20:20:59+09:00",
     "title": "ITパスポートの尺度を理解する",
     "summary": "ITパスポート試験における尺度の理解を深め、正しい計算方法を学ぶためのガイドです。データの計算方法とそれに伴う尺度選択の重要性を解説します。",
