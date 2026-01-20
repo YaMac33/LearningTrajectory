@@ -1,7 +1,11 @@
 /**
- * Application Logic
- * - Index page: render post list from ./data/index.json + search
- * - Common: GA init (config only), scroll progress, smooth scroll
+ * docs/assets/app.js
+ *
+ * - GA4 init（<head> に gtag.js がある前提）
+ * - Scroll progress bar
+ * - Smooth scroll for in-page anchors
+ * - Index page: load ./data/index.json -> render list -> search
+ * - Tag click: fill search box + apply filter
  */
 
 const GA_ID = 'G-MQ9ZB4LYWP';
@@ -20,11 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 function initAnalytics() {
   window.dataLayer = window.dataLayer || [];
-  function gtag(){ dataLayer.push(arguments); }
+  function gtag() { dataLayer.push(arguments); }
   window.gtag = window.gtag || gtag;
 
-  gtag('js', new Date());
-  gtag('config', GA_ID);
+  window.gtag('js', new Date());
+  window.gtag('config', GA_ID);
 }
 
 /**
@@ -49,15 +53,19 @@ function initScrollProgress() {
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+
       e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth' });
+      target.scrollIntoView({ behavior: 'smooth' });
     });
   });
 }
 
 /**
- * Index page: load + render posts + search
+ * Index page: load + render posts + search + tag click
  */
 function initIndexPage() {
   const yearEl = document.getElementById('year');
@@ -70,11 +78,14 @@ function initIndexPage() {
   const loadError = document.getElementById('loadError');
   const loadErrorMsg = document.getElementById('loadErrorMsg');
 
-  // index.html 以外でも app.js を読み得るので、DOMがなければ終了
+  // If not on index page (or DOM missing), do nothing.
   if (!list || !searchInput) return;
 
   let allPosts = [];
 
+  // -------------------------------
+  // Utils
+  // -------------------------------
   function normalizeTags(tags) {
     if (Array.isArray(tags)) return tags.map(t => String(t).trim()).filter(Boolean);
     if (typeof tags === 'string') return tags.split(',').map(t => t.trim()).filter(Boolean);
@@ -91,6 +102,7 @@ function initIndexPage() {
   }
 
   function formatDateJa(timestamp) {
+    // Display: YYYY.MM.DD
     const d = new Date(timestamp);
     if (Number.isNaN(d.getTime())) return '';
     const y = d.getFullYear();
@@ -100,6 +112,7 @@ function initIndexPage() {
   }
 
   function toDatetimeAttr(timestamp) {
+    // datetime attr: YYYY-MM-DD
     const d = new Date(timestamp);
     if (Number.isNaN(d.getTime())) return '';
     const y = d.getFullYear();
@@ -108,6 +121,9 @@ function initIndexPage() {
     return `${y}-${m}-${day}`;
   }
 
+  // -------------------------------
+  // Render
+  // -------------------------------
   function renderPosts(posts) {
     list.innerHTML = '';
 
@@ -130,7 +146,11 @@ function initIndexPage() {
       const tags = Array.isArray(post.tags) ? post.tags : [];
       const tagsHtml = tags.length
         ? `<ul class="tag-list" aria-label="tags">
-            ${tags.map(t => `<li class="tag">${escapeHtml(t)}</li>`).join('')}
+            ${tags.map(t => `
+              <li>
+                <button type="button" class="tag" data-tag="${escapeHtml(t)}">${escapeHtml(t)}</button>
+              </li>
+            `).join('')}
           </ul>`
         : '';
 
@@ -150,6 +170,22 @@ function initIndexPage() {
     });
   }
 
+  // -------------------------------
+  // Filter
+  // -------------------------------
+  function applyFilter(query) {
+    const q = (query || '').toLowerCase();
+    const filtered = allPosts.filter(p =>
+      (p.title || '').toLowerCase().includes(q) ||
+      (p.summary || '').toLowerCase().includes(q) ||
+      (p.tags || []).join(' ').toLowerCase().includes(q)
+    );
+    renderPosts(filtered);
+  }
+
+  // -------------------------------
+  // Fetch
+  // -------------------------------
   async function loadPosts() {
     try {
       const res = await fetch(DATA_URL, { cache: 'no-store' });
@@ -162,7 +198,7 @@ function initIndexPage() {
         summary: p.summary || '',
         tags: normalizeTags(p.tags),
         timestamp: p.timestamp || '',
-        url: p.public_url || p.repo_path || '#'
+        url: p.public_url || p.repo_path || '#',
       }));
 
       allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -177,15 +213,25 @@ function initIndexPage() {
     }
   }
 
+  // -------------------------------
+  // Events
+  // -------------------------------
   searchInput.addEventListener('input', () => {
-    const q = (searchInput.value || '').toLowerCase();
-    const filtered = allPosts.filter(p =>
-      (p.title || '').toLowerCase().includes(q) ||
-      (p.summary || '').toLowerCase().includes(q) ||
-      (p.tags || []).join(' ').toLowerCase().includes(q)
-    );
-    renderPosts(filtered);
+    applyFilter(searchInput.value);
   });
 
+  // Tag click -> fill search + filter
+  // (event delegation so it works after re-render)
+  list.addEventListener('click', (e) => {
+    const btn = e.target.closest('button.tag[data-tag]');
+    if (!btn) return;
+
+    const tag = btn.getAttribute('data-tag') || '';
+    searchInput.value = tag;
+    searchInput.focus();
+    applyFilter(tag);
+  });
+
+  // Init
   loadPosts();
 }
