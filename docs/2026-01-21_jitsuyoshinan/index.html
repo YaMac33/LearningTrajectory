@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたGTMタグ -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>実用新案権の基礎知識 | DevLog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 sm:gap-6 overflow-hidden">
+                <!-- 指定されたBackリンク -->
+                <a href="../" class="font-bold text-lg sm:text-xl tracking-tight whitespace-nowrap hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    ← Back to Home
+                </a>
+                
+                <span class="hidden sm:inline text-slate-300 dark:text-slate-600">|</span>
+
+                <a href="#" class="font-bold text-xl tracking-tight truncate hover:text-blue-600 dark:hover:text-blue-400 transition-colors hidden sm:block">
+                    DevLog<span class="text-blue-500">.md</span>
+                </a>
+            </div>
+
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none flex-shrink-0" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8">
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <span class="text-sm font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-21</span>
+                    <div class="flex flex-wrap gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <span>#知的財産</span>
+                        <span>#実用新案</span>
+                        <span>#特許</span>
+                        <span>#法律</span>
+                    </div>
+                </div>
+                
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    実用新案権の基礎知識
+                </h1>
+                
+                <div class="p-4 bg-slate-50 dark:bg-dark-card border-l-4 border-blue-500 rounded-r text-slate-700 dark:text-slate-300">
+                    <p class="font-bold mb-1">1行要約：</p>
+                    <p class="leading-relaxed">実用新案権は「物品の形状・構造・組合せ」に限定され、プログラム・ビジネスモデル・方法は対象外である。</p>
+                </div>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- セクション 1: 概要 -->
+                <section>
+                    <p class="leading-8 text-lg">
+                        実用新案権とは、物品の形状、構造又は組合せに係る「考案」を保護する権利です。「モノのつくり」に関するちょっとした工夫（小発明）を保護するための制度といえます。
+                    </p>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        1. 保護の対象範囲 (OK vs NG)
+                    </h2>
+
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <!-- OKの範囲 -->
+                        <div class="border-2 border-green-100 dark:border-green-900/30 bg-green-50 dark:bg-green-900/10 rounded-xl p-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-bl">対象 (OK)</div>
+                            <h3 class="font-bold text-green-700 dark:text-green-400 mb-4 flex items-center">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                物品の工夫
+                            </h3>
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-3 bg-white dark:bg-dark-bg p-3 rounded border border-green-100 dark:border-green-900/30 shadow-sm">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">形状</span>
+                                </li>
+                                <li class="flex items-center gap-3 bg-white dark:bg-dark-bg p-3 rounded border border-green-100 dark:border-green-900/30 shadow-sm">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">構造</span>
+                                </li>
+                                <li class="flex items-center gap-3 bg-white dark:bg-dark-bg p-3 rounded border border-green-100 dark:border-green-900/30 shadow-sm">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">組合せ</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- NGの範囲 -->
+                        <div class="border-2 border-red-100 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 rounded-xl p-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-bl">対象外 (NG)</div>
+                            <h3 class="font-bold text-red-700 dark:text-red-400 mb-4 flex items-center">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                「モノ」ではないもの
+                            </h3>
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-3 bg-white dark:bg-dark-bg p-3 rounded border border-red-100 dark:border-red-900/30 shadow-sm">
+                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">方法・手順</span>
+                                </li>
+                                <li class="flex items-center gap-3 bg-white dark:bg-dark-bg p-3 rounded border border-red-100 dark:border-red-900/30 shadow-sm">
+                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">プログラム</span>
+                                </li>
+                                <li class="flex items-center gap-3 bg-white dark:bg-dark-bg p-3 rounded border border-red-100 dark:border-red-900/30 shadow-sm">
+                                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">ビジネスモデル</span>
+                                </li>
+                            </ul>
+                            <p class="text-xs text-red-600 dark:text-red-400 mt-3 text-right">※これらは特許権で保護</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- セクション 2: クイズ -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        2. 具体的ケーススタディ
+                    </h2>
+                    <p class="mb-6 text-slate-600 dark:text-slate-400">
+                        「実用新案権の対象となるものはどれか？」という設問に対する判断例です。
+                    </p>
+
+                    <div class="space-y-4">
+                        <!-- 選択肢ア -->
+                        <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-card opacity-70">
+                            <div class="sm:w-16 flex-shrink-0 flex items-center justify-center">
+                                <span class="inline-block px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-bold">ア</span>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-slate-800 dark:text-white mb-2">圧縮比率を大きくしても高い復元性を得られる工夫をした画像処理プログラム</p>
+                                <div class="text-sm">
+                                    <span class="text-red-500 font-bold mr-2">❌ 対象外</span>
+                                    <span class="text-slate-600 dark:text-slate-400">プログラムは「物品」ではないため。特許権の対象。</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 選択肢イ -->
+                        <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-card opacity-70">
+                            <div class="sm:w-16 flex-shrink-0 flex items-center justify-center">
+                                <span class="inline-block px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-bold">イ</span>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-slate-800 dark:text-white mb-2">インターネットを利用し、顧客の多様な要望に対応できるビジネスモデル</p>
+                                <div class="text-sm">
+                                    <span class="text-red-500 font-bold mr-2">❌ 対象外</span>
+                                    <span class="text-slate-600 dark:text-slate-400">ビジネスモデルは「方法・仕組み」であり物品ではないため。</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 選択肢ウ -->
+                        <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-dark-card opacity-70">
+                            <div class="sm:w-16 flex-shrink-0 flex items-center justify-center">
+                                <span class="inline-block px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-bold">ウ</span>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-slate-800 dark:text-white mb-2">岩石に含まれているレアメタルを無駄なく抽出して、資源を有効活用する方法</p>
+                                <div class="text-sm">
+                                    <span class="text-red-500 font-bold mr-2">❌ 対象外</span>
+                                    <span class="text-slate-600 dark:text-slate-400">製造「方法」であるため。</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 選択肢エ (正解) -->
+                        <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border-2 border-blue-400 dark:border-blue-600 bg-white dark:bg-dark-bg shadow-md relative">
+                            <div class="absolute -top-3 -right-3 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow font-bold text-lg">✓</div>
+                            <div class="sm:w-16 flex-shrink-0 flex items-center justify-center">
+                                <span class="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded font-bold">エ</span>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-slate-900 dark:text-white font-semibold mb-2">電気スタンドと時計を組み合わせて夜間でも容易に時刻を確かめられる機器</p>
+                                <div class="text-sm">
+                                    <span class="text-green-600 dark:text-green-400 font-bold mr-2">⭕️ 正解</span>
+                                    <span class="text-slate-600 dark:text-slate-400">物品の「組合せ」に係る考案であり、実体のある「モノ」だから。</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- セクション 3: 比較テーブル -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-12 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        3. 比較：実用新案権 vs 特許権
+                    </h2>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border shadow-sm">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white w-1/4">項目</th>
+                                    <th class="px-6 py-3 font-semibold text-blue-700 dark:text-blue-400 w-1/3">実用新案権</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">特許権</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                    <td class="px-6 py-4 font-mono text-slate-500 dark:text-slate-400">対象</td>
+                                    <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">物品のみ</td>
+                                    <td class="px-6 py-4">物品・方法・プログラム</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                    <td class="px-6 py-4 font-mono text-slate-500 dark:text-slate-400">保護対象</td>
+                                    <td class="px-6 py-4">考案（小発明）</td>
+                                    <td class="px-6 py-4">発明（高度なもの）</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                    <td class="px-6 py-4 font-mono text-slate-500 dark:text-slate-400">具体例</td>
+                                    <td class="px-6 py-4">形状・構造・組合せ</td>
+                                    <td class="px-6 py-4">製造方法、ビジネスモデル等も含む</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- セクション 4: 試験対策 -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">試験対策まとめ</h3>
+                    
+                    <div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 rounded-lg border border-blue-100 dark:border-slate-700">
+                        <p class="text-lg font-bold text-center text-slate-800 dark:text-white mb-4">
+                            覚え方：<br class="sm:hidden">
+                            <span class="text-blue-600 dark:text-blue-400">「モノなら実用新案、やり方なら特許」</span>
+                        </p>
+                        
+                        <div class="space-y-2 text-sm text-slate-600 dark:text-slate-400 text-center">
+                            <p>「プログラム」や「方法」という単語が出たら、<br class="hidden sm:inline">実用新案権は<span class="font-bold text-red-500">不正解</span>の可能性が高いです。</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex gap-4 justify-center">
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 DevLog.md All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- スクリプト：テーマ切り替えロジック -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const htmlElement = document.documentElement;
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            htmlElement.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
