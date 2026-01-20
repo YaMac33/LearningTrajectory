@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- GTM Tag (Requested) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITパスポートの尺度の理解</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-6">
+                <!-- Requested Back Link -->
+                <a href="../" class="font-bold text-xl tracking-tight hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    ← Back to Home
+                </a>
+                <!-- Site Name / Logo Placeholder -->
+                <span class="hidden sm:block text-slate-300 dark:text-slate-600">|</span>
+                <a href="#" class="hidden sm:block font-bold text-lg tracking-tight text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    StudyLog
+                </a>
+            </div>
+
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8 border-b border-slate-200 dark:border-dark-border pb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-sm font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-20</span>
+                    <span class="text-sm font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-dark-border px-2 py-1 rounded">#ITパスポート</span>
+                    <span class="text-sm font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-dark-border px-2 py-1 rounded">#尺度</span>
+                    <span class="text-sm font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-dark-border px-2 py-1 rounded">#データ分析</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    ITパスポートの尺度の理解
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg">
+                    データの計算方法を理解し、正しい尺度選択が試験での得点源となる。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- 導入 -->
+                <section>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mb-8">
+                        <p class="font-bold text-yellow-800 dark:text-yellow-200 m-0">
+                            1行要約（超重要）
+                        </p>
+                        <p class="mt-2 text-slate-700 dark:text-slate-300 m-0">
+                            尺度とは、データをどこまで計算してよいかを決める物差し。名義 → 順序 → 間隔 → 比例の順に、扱える計算の自由度が増える。
+                        </p>
+                    </div>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        尺度（Measurement Scale）とは何か
+                    </h2>
+                    <ul class="list-disc list-outside pl-6 space-y-2 mb-6 text-slate-700 dark:text-slate-300">
+                        <li><strong class="text-slate-900 dark:text-white">定義</strong>: データをどのようなルールで数値化しているかの分類。数字そのものではなく、数字に許された意味の範囲を表す。</li>
+                        <li><strong class="text-slate-900 dark:text-white">なぜ重要か</strong>: 尺度を誤ると「やってはいけない計算」を正しいと思ってしまう。「このデータ、平均していい？」「2倍って言っていい？」を見抜けるかが問われる。</li>
+                        <li><strong class="text-slate-900 dark:text-white">ITパスポートの狙い</strong>: 統計の知識そのものより、計算できる／できないの判断力を見る。</li>
+                    </ul>
+                </section>
+
+                <!-- 4つの尺度 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        4つの尺度（本体）
+                    </h2>
+
+                    <!-- 1. 名義尺度 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">① 名義尺度（Nominal Scale）</h3>
+                        <div class="pl-4 border-l-2 border-slate-200 dark:border-slate-700 space-y-2">
+                            <p><span class="font-semibold">特徴:</span> 分類・ラベル付けのみ。数字はただの記号（意味なし）。</p>
+                            <p><span class="font-semibold text-green-600 dark:text-green-400">できること:</span> 同じ／違うの判定</p>
+                            <p><span class="font-semibold text-red-600 dark:text-red-400">できないこと:</span> 大小比較、足し算・平均</p>
+                            <div class="mt-2 bg-slate-50 dark:bg-dark-card p-3 rounded text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-bold">例:</span> 性別（1=男性, 2=女性）、血液型、都道府県コード<br>
+                                ※ [男性=1] と [女性=2] → 2の方が大きい？ ❌ → 平均1.5？ ❌
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 順序尺度 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">② 順序尺度（Ordinal Scale）</h3>
+                        <div class="pl-4 border-l-2 border-slate-200 dark:border-slate-700 space-y-2">
+                            <p><span class="font-semibold">特徴:</span> 順番・順位に意味がある。ただし「差の大きさ」は不明。</p>
+                            <p><span class="font-semibold text-green-600 dark:text-green-400">できること:</span> 大小比較（どちらが上か）</p>
+                            <p><span class="font-semibold text-red-600 dark:text-red-400">できないこと:</span> 差の計算、比率の計算</p>
+                            <div class="mt-2 bg-slate-50 dark:bg-dark-card p-3 rounded text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-bold">例:</span> 成績（A・B・C）、満足度（高・中・低）、順位<br>
+                                ※ A > B > C → OK、AとBの差は？ → ❌（わからない）
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 間隔尺度 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">③ 間隔尺度（Interval Scale）</h3>
+                        <div class="pl-4 border-l-2 border-slate-200 dark:border-slate-700 space-y-2">
+                            <p><span class="font-semibold">特徴:</span> 差（間隔）に意味がある。ゼロは「基準点」であり絶対ではない。</p>
+                            <p><span class="font-semibold text-green-600 dark:text-green-400">できること:</span> 足し算・引き算、平均</p>
+                            <p><span class="font-semibold text-red-600 dark:text-red-400">できないこと:</span> 比率（◯倍）</p>
+                            <div class="mt-2 bg-slate-50 dark:bg-dark-card p-3 rounded text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-bold">例:</span> 気温（℃）、西暦<br>
+                                ※ 20℃ − 10℃ = 10℃ → OK、20℃は10℃の2倍 → ❌
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 比例尺度 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">④ 比例尺度（Ratio Scale）</h3>
+                        <div class="pl-4 border-l-2 border-slate-200 dark:border-slate-700 space-y-2">
+                            <p><span class="font-semibold">特徴:</span> 差も比も意味がある。絶対的なゼロ（＝存在しない状態）がある。</p>
+                            <p><span class="font-semibold text-green-600 dark:text-green-400">できること:</span> 四則演算すべて</p>
+                            <div class="mt-2 bg-slate-50 dark:bg-dark-card p-3 rounded text-sm text-slate-600 dark:text-slate-400">
+                                <span class="font-bold">例:</span> 売上金額、重量、長さ、年齢<br>
+                                ※ 20歳は10歳の2倍 → OK、0円 = 何もない → OK
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 図解：扱える計算の範囲 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        図解：扱える計算の範囲（必須暗記）
+                    </h2>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">尺度</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">扱える計算</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">名義尺度</td>
+                                    <td class="px-6 py-4">同じ／違う</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">順序尺度</td>
+                                    <td class="px-6 py-4">＋ 大小関係</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">間隔尺度</td>
+                                    <td class="px-6 py-4">＋ 差・<span class="text-blue-600 dark:text-blue-400 font-bold">平均</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">比例尺度</td>
+                                    <td class="px-6 py-4">＋ <span class="text-blue-600 dark:text-blue-400 font-bold">比</span>・四則演算</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-center mt-3 text-sm text-slate-500">👉 下に行くほど「できる計算が増える」</p>
+                </section>
+
+                <!-- 比較表 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        A vs B（試験で最重要）間隔尺度 vs 比例尺度
+                    </h2>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-dark-border mb-4">
+                        <table class="min-w-full text-left text-sm">
+                            <thead class="bg-slate-50 dark:bg-dark-card border-b border-slate-200 dark:border-dark-border">
+                                <tr>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">観点</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">間隔尺度</th>
+                                    <th class="px-6 py-3 font-semibold text-slate-900 dark:text-white">比例尺度</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-dark-border bg-white dark:bg-dark-bg">
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-slate-500">ゼロ</td>
+                                    <td class="px-6 py-4">基準点（意味なし）</td>
+                                    <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">無（意味あり）</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-slate-500">比</td>
+                                    <td class="px-6 py-4 text-red-500">意味なし</td>
+                                    <td class="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">意味あり</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-slate-500">例</td>
+                                    <td class="px-6 py-4">気温</td>
+                                    <td class="px-6 py-4">年齢</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">
+                        20℃は10℃の2倍？ → ❌<br>
+                        20歳は10歳の2倍？ → ✅<br>
+                        👉 <span class="font-bold">「ゼロに意味があるか」だけで判断できる</span>
+                    </p>
+                </section>
+
+                <!-- 試験のポイント -->
+                <section>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-100 dark:border-blue-900/50">
+                        <h3 class="text-xl font-bold mb-4 text-blue-800 dark:text-blue-300">試験対策・覚え方</h3>
+                        
+                        <div class="mb-4">
+                            <span class="block text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">覚え方（鉄板）</span>
+                            <p class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                                名・順・間・比 <span class="text-lg font-normal text-slate-500">（めい・じゅん・かん・ひ）</span>
+                            </p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">→ 下に行くほど「計算OK」</p>
+                        </div>
+
+                        <div class="mb-0">
+                            <span class="block text-sm font-bold text-slate-500 uppercase tracking-wide mb-2">試験の引っかけポイント</span>
+                            <ul class="space-y-2 list-disc pl-5 text-slate-700 dark:text-slate-300">
+                                <li>「平均を求めよ」→ <span class="font-bold underline decoration-blue-500 decoration-2">間隔尺度・比例尺度のみ</span></li>
+                                <li>「◯倍である」→ <span class="font-bold underline decoration-blue-500 decoration-2">比例尺度のみ</span></li>
+                                <li>数字が出てきても安心するな → 数字 ≠ 計算OK</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 深掘り解説 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 text-xl group-hover:text-blue-500 transition-colors">#</span>
+                        理解を深めるQ&A
+                    </h2>
+
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-lg font-bold mb-2 text-slate-800 dark:text-slate-200">Q. 「順位」は差の計算ができそうなのに、なぜできない？</h3>
+                            <p class="text-slate-600 dark:text-slate-400 mb-2">
+                                直感的には「1位と3位の差は2」と考えがちですが、順位は「量」ではなく<span class="font-bold">「位置番号」</span>だからです。
+                            </p>
+                            <div class="bg-slate-100 dark:bg-dark-card p-4 rounded text-sm font-mono">
+                                ケースA（接戦）: 1位(100点)、2位(99点)、3位(98点) → 順位差2、点数差2<br>
+                                ケースB（圧勝）: 1位(100点)、2位(60点)、3位(10点) → 順位差2、点数差90<br>
+                                👉 順位の差は、実際の「実力差」を保証しない。
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold mb-2 text-slate-800 dark:text-slate-200">Q. 間隔尺度の「ゼロは基準点」とは？</h3>
+                            <p class="text-slate-600 dark:text-slate-400 mb-2">
+                                0℃は「熱さが何もない」わけではなく、単に氷が溶ける温度を0と決めただけです。
+                                0円（お金がない＝存在しない）のような<span class="font-bold">「絶対的な無」</span>とは異なります。
+                            </p>
+                            <p class="font-bold text-blue-600 dark:text-blue-400">試験用フレーズ：ゼロが動くなら、それは基準点</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">まとめ（超短縮）</h3>
+                    <ul class="list-none space-y-3 mb-6">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="text-lg text-slate-700 dark:text-slate-300">尺度 = 計算の免許証</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="text-lg text-slate-700 dark:text-slate-300">ゼロに意味がある？ → <strong class="text-slate-900 dark:text-white">比例尺度</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="text-lg text-slate-700 dark:text-slate-300">平均できる？ → <strong class="text-slate-900 dark:text-white">間隔以上</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span class="text-lg text-slate-700 dark:text-slate-300">比を言ってる？ → <strong class="text-slate-900 dark:text-white">比例しか無理</strong></span>
+                        </li>
+                    </ul>
+                    
+                    <div class="flex gap-4 mt-8">
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 IT Passport Study Log. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ダークモードスクリプト -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        // テーマ設定のロード
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        // トグルボタンのクリックイベント
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
