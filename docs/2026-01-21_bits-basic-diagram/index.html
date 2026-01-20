@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>ビットの基本と図解：なぜ「1増えると2倍」なのか？ - Sidenote</title>
+  <meta name="description" content="ITパスポートや基本情報で必須の「ビット（bit）」の概念を解説。なぜ1ビット増えると情報量が2倍になるのか、箱の分割図とツリー構造で視覚的に整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ビットの基本と図解：なぜ「1増えると2倍」なのか？" />
+  <meta property="og:description" content="ビットの増加が情報の多様性を生む様子を視覚的に理解するための図解と説明。" />
+  <meta property="og:url" content="https://example.com/articles/bits-basic-diagram.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 図解用: 倍々ゲームの可視化 */
+    .bit-visualizer {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    .bit-row {
+      display: flex;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    .bit-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .bit-label {
+      width: 100px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .bit-boxes {
+      display: flex;
+      flex: 1;
+      gap: 4px;
+    }
+
+    .bit-box {
+      flex: 1;
+      background: var(--bg-color);
+      border: 1px solid var(--text-main);
+      text-align: center;
+      padding: 0.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      position: relative;
+      transition: all 0.3s ease;
+      min-width: 40px; /* スマホでの潰れ防止 */
+    }
+
+    .bit-box:hover {
+      background: var(--text-main);
+      color: var(--bg-color);
+    }
+
+    /* 矢印装飾 */
+    .expansion-arrow {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--text-sub);
+      margin: -1rem 0 0.5rem 100px; /* ラベル分ずらす */
+      transform: scaleX(2); /* 横に伸ばす */
+    }
+
+    /* 数式強調 */
+    .math-highlight {
+      background: #fff5e6;
+      padding: 0.2em 0.5em;
+      border-radius: 4px;
+      font-weight: bold;
+      border-bottom: 2px solid #ffcc80;
+    }
+
+    /* 分岐図（Preタグ代用） */
+    .ascii-tree {
+      font-family: var(--font-mono);
+      line-height: 1.2;
+      background: var(--text-main);
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title Changed to Sidenote. -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / 基礎理論・デジタル</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ビットの基本と図解：なぜ「1増えると2倍」なのか？</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#ビット</li>
+            <li>#情報</li>
+            <li>#デジタル</li>
+            <li>#計算</li>
+            <li>#二進数</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>コンピュータの世界を理解する上で避けて通れないのが「ビット（bit）」です。定義としては「情報の最小単位」や「二進数の1桁（Binary Digit）」と言われますが、直感的にイメージするのは意外と難しいものです。</p>
+        
+        <p>この記事では、計算式ではなく「箱が増えていくイメージ」を使って、ビットが増えるとなぜ情報量が爆発的に増えるのかを図解します。</p>
+
+        <h2>ビットとは「区別できる数」のこと</h2>
+        <p>ビットの本質は「0か1か」という記号そのものではなく、<strong>「いくつ区別できるか（パターンの数）」</strong>にあります。</p>
+        <ul>
+            <li>1ビット：コインの裏表（2通り）</li>
+            <li>2ビット：ジャンケンの手（3通り）も余裕で表現可能（4通りまでOK）</li>
+        </ul>
+
+        <h2>【図解】箱が分裂して倍になる</h2>
+        <p>「1ビット増える」とは、既存のすべてのパターンに対して「0の場合」と「1の場合」の2通りが追加されることを意味します。つまり、世界が2倍に広がります。</p>
+
+        <div class="bit-visualizer">
+            <!-- 1 bit -->
+            <div class="bit-row">
+                <div class="bit-label">1 bit<br><span style="font-size:0.7em; color:#666">2通り</span></div>
+                <div class="bit-boxes">
+                    <div class="bit-box">0</div>
+                    <div class="bit-box">1</div>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="expansion-arrow">↓ ×2</div>
+
+            <!-- 2 bits -->
+            <div class="bit-row">
+                <div class="bit-label">2 bits<br><span style="font-size:0.7em; color:#666">4通り</span></div>
+                <div class="bit-boxes">
+                    <div class="bit-box">00</div>
+                    <div class="bit-box">01</div>
+                    <div class="bit-box">10</div>
+                    <div class="bit-box">11</div>
+                </div>
+            </div>
+
+            <!-- Arrow -->
+            <div class="expansion-arrow">↓ ×2</div>
+
+            <!-- 3 bits -->
+            <div class="bit-row">
+                <div class="bit-label">3 bits<br><span style="font-size:0.7em; color:#666">8通り</span></div>
+                <div class="bit-boxes">
+                    <div class="bit-box">000</div>
+                    <div class="bit-box">001</div>
+                    <div class="bit-box">010</div>
+                    <div class="bit-box">011</div>
+                    <div class="bit-box">100</div>
+                    <div class="bit-box">101</div>
+                    <div class="bit-box">110</div>
+                    <div class="bit-box">111</div>
+                </div>
+            </div>
+        </div>
+
+        <p>このように、ビットが1つ増えるたびに、箱（表現できるパターン）の数が倍々に増えていきます。</p>
+
+        <h3>数式での理解：2のn乗</h3>
+        <p>この増え方は「2のn乗（<span class="math-highlight">2ⁿ</span>）」で表されます。</p>
+        <ul>
+            <li>1ビット：2¹ = 2通り</li>
+            <li>2ビット：2² = 4通り</li>
+            <li>3ビット：2³ = 8通り</li>
+            <li>...</li>
+            <li>8ビット：2⁸ = 256通り（これが1バイト！）</li>
+        </ul>
+        <p>8ビット（1バイト）あれば、アルファベット（26文字）や数字、記号を含めても十分に区別できるため、文字情報の基本単位として使われています。</p>
+
+        <h2>「分岐」としてイメージする</h2>
+        <p>試験などで「nビットで表現できる数は？」と聞かれたときは、以下の「分岐ツリー」を頭に浮かべると計算しやすくなります。</p>
+
+        <div class="ascii-tree">
+Start
+ ├─ 0
+ │   ├─ 00
+ │   │   ├─ 000
+ │   │   └─ 001
+ │   └─ 01
+ │       ├─ 010
+ │       └─ 011
+ └─ 1
+     ├─ 10
+     │   ├─ 100
+     │   └─ 101
+     └─ 11
+         ├─ 110
+         └─ 111
+        </div>
+        <p style="font-size:0.9rem; color:var(--text-sub); margin-top:0.5rem;">
+            ※右に行く（ビットが増える）たびに、枝が2つに分かれて倍増しています。
+        </p>
+
+        <h2>まとめ：試験対策ワンポイント</h2>
+        <p>ビットの問題が出たら、複雑に考えずに以下のフレーズを思い出してください。</p>
+        <blockquote>
+            <strong>「ビットが1増えるたび、世界（表現できる数）は2倍になる」</strong>
+        </blockquote>
+        <p>5ビットなら？ 4ビット(16)の倍で32。<br>
+        6ビットなら？ 32の倍で64。<br>
+        この感覚を持っていれば、計算式を忘れても答えにたどり着けます。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
