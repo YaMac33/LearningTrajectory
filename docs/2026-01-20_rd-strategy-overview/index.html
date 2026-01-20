@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <!-- 指定されたスクリプト -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R&D戦略の全体像</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Arial', '"Hiragino Kaku Gothic ProN"', '"Hiragino Sans"', 'Meiryo', 'sans-serif'],
+                        mono: ['"Menlo"', '"Monaco"', '"Consolas"', '"Courier New"', 'monospace'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        dark: {
+                            bg: '#0d1117',
+                            card: '#161b22',
+                            border: '#30363d',
+                            text: '#c9d1d9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* カスタムスクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #30363d;
+        }
+
+        /* リンクのホバーアニメーション */
+        .hover-underline-animation {
+            display: inline-block;
+            position: relative;
+        }
+        .hover-underline-animation::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: currentColor;
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+        .hover-underline-animation:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 antialiased transition-colors duration-300 dark:bg-dark-bg dark:text-dark-text min-h-screen flex flex-col">
+
+    <!-- ヘッダー -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-dark-bg/80 border-b border-slate-200 dark:border-dark-border">
+        <div class="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <!-- Back to Home Link -->
+            <a href="https://yamac33.github.io/sidenote/" class="font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                <span class="group-hover:-translate-x-1 transition-transform duration-200">←</span>
+                Back to Home
+            </a>
+            
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-dark-border transition-colors focus:outline-none" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="flex-grow w-full max-w-3xl mx-auto px-6 py-12">
+        
+        <!-- 記事ヘッダー -->
+        <article class="prose prose-slate dark:prose-invert max-w-none">
+            <div class="mb-8 border-b border-slate-200 dark:border-dark-border pb-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="text-xs font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">2026-01-20</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#R&D</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#技術経営</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#イノベーション</span>
+                    <span class="text-xs font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">#知財戦略</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 mb-4 tracking-tight text-slate-900 dark:text-white leading-tight">
+                    R&D戦略の全体像
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed">
+                    経営目標から研究開発、そして事業化へ。R&D戦略の主要要素とその流れを、一目でわかる構造図で解説します。
+                </p>
+            </div>
+
+            <!-- 本文 -->
+            <div class="space-y-12">
+                
+                <!-- ① 導入 -->
+                <section>
+                    <h2 class="text-2xl font-bold flex items-center text-slate-900 dark:text-white mb-4 group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        1. はじめに
+                    </h2>
+                    <p class="leading-7 text-slate-600 dark:text-slate-400">
+                        R&D（Research and Development：研究開発）は、ただ新技術を作れば良いわけではありません。経営目標と連動し、最終的に事業として収益を生むまでの一貫したストーリーが必要です。その全体構造を可視化しました。
+                    </p>
+                </section>
+
+                <!-- ② 全体構造図（メインコンテンツ） -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        2. R&D戦略 全体構造図
+                    </h2>
+                    
+                    <div class="flex flex-col items-center gap-6 relative">
+                        
+                        <!-- 縦のライン（背景） -->
+                        <div class="absolute top-8 bottom-8 left-1/2 w-0.5 bg-slate-200 dark:bg-slate-700 -z-10"></div>
+
+                        <!-- Top: 経営戦略 -->
+                        <div class="w-full max-w-lg bg-gradient-to-r from-slate-800 to-slate-700 dark:from-slate-700 dark:to-slate-600 text-white p-6 rounded-xl shadow-lg text-center relative z-10">
+                            <h3 class="font-bold text-xl mb-2">経営戦略・経営目標</h3>
+                            <div class="text-sm opacity-90 flex justify-center gap-4 flex-wrap">
+                                <span class="bg-white/20 px-2 py-1 rounded">売上向上</span>
+                                <span class="bg-white/20 px-2 py-1 rounded">シェア拡大</span>
+                                <span class="bg-white/20 px-2 py-1 rounded">競争優位</span>
+                            </div>
+                            <!-- Down Arrow -->
+                            <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-slate-400 dark:text-slate-500">▼</div>
+                        </div>
+
+                        <!-- Step 1: 目的 -->
+                        <div class="w-full max-w-md bg-white dark:bg-slate-800 border-2 border-blue-500 dark:border-blue-600 p-4 rounded-lg shadow-sm text-center relative z-10">
+                            <div class="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">STEP 1</div>
+                            <h4 class="font-bold text-lg mb-2 text-slate-900 dark:text-white">目的の明確化</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">経営目標とR&Dの整合性を取る<br>「何のための研究か？」を定義</p>
+                            <!-- Down Arrow -->
+                            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-slate-300 dark:text-slate-600">▼</div>
+                        </div>
+
+                        <!-- Step 2: ロードマップ -->
+                        <div class="w-full max-w-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-lg shadow-sm text-center relative z-10 mt-2">
+                            <div class="text-xs font-bold text-slate-500 mb-1">STEP 2</div>
+                            <h4 class="font-bold text-lg mb-2 text-slate-900 dark:text-white">技術ロードマップ</h4>
+                            <div class="flex justify-center items-center gap-2 text-xs text-slate-600 dark:text-slate-400 mb-2">
+                                <span class="border border-slate-300 px-2 py-1 rounded">基礎</span>
+                                <span>→</span>
+                                <span class="border border-slate-300 px-2 py-1 rounded">応用</span>
+                                <span>→</span>
+                                <span class="border border-slate-300 px-2 py-1 rounded">開発</span>
+                            </div>
+                            <p class="text-xs text-slate-500">いつまでに・どの技術を・どのレベルまで</p>
+                            
+                            <!-- Branching Arrows -->
+                            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-full h-8">
+                                <div class="absolute top-0 left-1/2 w-0.5 h-4 bg-slate-300 dark:bg-slate-600 -translate-x-1/2"></div>
+                                <div class="absolute top-4 left-1/4 right-1/4 h-0.5 bg-slate-300 dark:bg-slate-600"></div>
+                                <div class="absolute top-4 left-1/4 w-0.5 h-4 bg-slate-300 dark:bg-slate-600"></div>
+                                <div class="absolute top-4 right-1/4 w-0.5 h-4 bg-slate-300 dark:bg-slate-600"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 & 4: Parallel -->
+                        <div class="grid grid-cols-2 gap-4 w-full max-w-xl mt-4 relative z-10">
+                            <!-- Left: Resource -->
+                            <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 p-4 rounded-lg text-center">
+                                <div class="text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">STEP 3 (内部)</div>
+                                <h4 class="font-bold text-md mb-2 text-slate-900 dark:text-white">リソース配分</h4>
+                                <ul class="text-xs text-left list-disc list-inside text-slate-600 dark:text-slate-400 space-y-1 pl-2">
+                                    <li>研究開発費</li>
+                                    <li>人材配置</li>
+                                    <li>重点分野への集中</li>
+                                </ul>
+                            </div>
+                            <!-- Right: Open Innovation -->
+                            <div class="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 p-4 rounded-lg text-center">
+                                <div class="text-xs font-bold text-green-600 dark:text-green-400 mb-1">STEP 4 (外部)</div>
+                                <h4 class="font-bold text-md mb-2 text-slate-900 dark:text-white">オープンイノベーション</h4>
+                                <ul class="text-xs text-left list-disc list-inside text-slate-600 dark:text-slate-400 space-y-1 pl-2">
+                                    <li>大学・研究機関連携</li>
+                                    <li>他社アライアンス</li>
+                                    <li>スタートアップ連携</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Merger Arrow -->
+                        <div class="w-full max-w-xl h-6 relative mt-[-10px]">
+                             <div class="absolute top-0 left-1/4 w-0.5 h-4 bg-slate-300 dark:bg-slate-600"></div>
+                             <div class="absolute top-0 right-1/4 w-0.5 h-4 bg-slate-300 dark:bg-slate-600"></div>
+                             <div class="absolute top-4 left-1/4 right-1/4 h-0.5 bg-slate-300 dark:bg-slate-600"></div>
+                             <div class="absolute top-4 left-1/2 w-0.5 h-4 bg-slate-300 dark:bg-slate-600 -translate-x-1/2"></div>
+                        </div>
+
+                        <!-- Step 5: IP Strategy -->
+                        <div class="w-full max-w-md bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-4 rounded-lg shadow-sm text-center relative z-10">
+                            <div class="text-xs font-bold text-yellow-700 dark:text-yellow-500 mb-1">STEP 5</div>
+                            <h4 class="font-bold text-lg mb-2 text-slate-900 dark:text-white">知的財産戦略</h4>
+                            <div class="flex justify-center gap-2 mb-2">
+                                <span class="text-2xl">🔒</span>
+                                <span class="text-2xl">💰</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">特許取得・ノウハウ秘匿<br>技術の独占と収益化</p>
+                            <!-- Down Arrow -->
+                            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-slate-300 dark:text-slate-600">▼</div>
+                        </div>
+
+                        <!-- Step 6: Goal -->
+                        <div class="w-full max-w-md bg-gradient-to-r from-green-600 to-teal-600 text-white p-6 rounded-xl shadow-lg text-center relative z-10 mt-2">
+                            <div class="text-xs font-bold text-white/80 mb-1">GOAL (STEP 6)</div>
+                            <h3 class="font-bold text-xl mb-2">事業化への連携</h3>
+                            <p class="text-sm opacity-90">
+                                新製品・サービスの市場投入<br>
+                                <strong>R&D成果を収益に変える</strong>
+                            </p>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ③ 図解のポイント解説 -->
+                <section>
+                    <h2 class="text-2xl font-bold border-b border-slate-200 dark:border-dark-border pb-2 mb-6 mt-8 flex items-center text-slate-900 dark:text-white group">
+                        <span class="text-slate-300 dark:text-slate-600 mr-2 group-hover:text-blue-500 transition-colors">#</span>
+                        3. 図解の読み取りポイント
+                    </h2>
+                    
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                            <h3 class="font-bold text-blue-600 dark:text-blue-400 mb-2">一貫した流れ（縦軸）</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                「経営戦略」から始まり、「事業化」で終わるのがR&Dの基本です。研究のための研究にならず、最終的にビジネスへの貢献が求められます。
+                            </p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                            <h3 class="font-bold text-green-600 dark:text-green-400 mb-2">内部と外部の並列（横軸）</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                技術ロードマップを実現するためには、自社のリソース（ヒト・カネ）だけでなく、外部の知恵（オープンイノベーション）も同時に活用することが現代の主流です。
+                            </p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                            <h3 class="font-bold text-yellow-600 dark:text-yellow-400 mb-2">知的財産戦略の重要性</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                生まれた技術をそのままにするのではなく、「特許」として守るか、「ノウハウ」として隠すかなどの知財戦略が、事業の競争力を左右するフィルターとなります。
+                            </p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                            <h3 class="font-bold text-teal-600 dark:text-teal-400 mb-2">死の谷を越える（事業化）</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                R&Dと事業部門の連携（STEP 6）は最も難しい部分の一つ（魔の川・死の谷・ダーウィンの海）ですが、ここを突破して初めて価値が生まれます。
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- まとめ -->
+                <section class="mt-16 pt-8 border-t border-slate-200 dark:border-dark-border">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">まとめ</h3>
+                    <p class="leading-8 text-lg mb-6">
+                        <span class="font-bold bg-yellow-100 dark:bg-yellow-900/40 px-1 rounded">R&Dは単独では存在しない。経営と事業をつなぐ「橋渡し」である。</span>
+                    </p>
+                    <div class="flex gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors shadow-sm shadow-blue-500/30">
+                            シェアする
+                        </button>
+                        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'});" class="border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-dark-card text-slate-700 dark:text-slate-300 px-6 py-2 rounded-md font-medium transition-colors">
+                            トップに戻る
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </article>
+    </main>
+
+    <!-- フッター -->
+    <footer class="border-t border-slate-200 dark:border-dark-border mt-12 py-8 bg-slate-50 dark:bg-dark-card transition-colors">
+        <div class="max-w-3xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-sm">
+            <p>&copy; 2026 Study Notes. All rights reserved.</p>
+            <div class="flex gap-4 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-blue-600 transition-colors">Privacy</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Terms</a>
+                <a href="#" class="hover:text-blue-600 transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ダークモード切り替えロジック
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        // 初期設定：OSの設定またはローカルストレージを確認
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
