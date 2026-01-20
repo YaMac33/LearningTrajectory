@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-21T06:57:27+09:00",
+    "title": "GPT-4o miniがもたらすAI革命",
+    "summary": "OpenAIの新モデル「GPT-4o mini」は、低価格で高性能なAIを実現し、AIの利用を広げる革新的な製品です。この記事ではその特徴と影響を解説します。",
+    "tags": [
+      "OpenAI",
+      "AI",
+      "GPT-4o mini",
+      "技術革新",
+      "コストパフォーマンス"
+    ],
+    "dir": "2026-01-21_gpt-4o-mini-innovation",
+    "repo_path": "/docs/2026-01-21_gpt-4o-mini-innovation/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-21_gpt-4o-mini-innovation"
+  },
+  {
     "timestamp": "2026-01-21T01:52:11+09:00",
     "title": "ITガバナンスにおける役割分担",
     "summary": "ITガバナンスにおける経営者と情報システム部門の役割を解説。役割分担の明確化が成功の鍵です。",
