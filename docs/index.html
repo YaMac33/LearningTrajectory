@@ -1,75 +1,208 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE MONOLITH | Blog</title>
-    <meta name="description" content="A minimalist design blog.">
-    <link rel="stylesheet" href="./assets/styles.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidenote | Blog</title>
+  <meta name="description" content="A minimalist design blog.">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="./assets/styles.css">
 </head>
+
 <body>
+  <div class="container">
+    <header class="site-header">
+      <a href="./index.html" class="site-title">Sidenote</a>
+    </header>
 
-    <div class="container">
-        <header class="site-header">
-            <a href="./index.html" class="site-title">THE MONOLITH.</a>
-            <nav class="site-nav">
-                <ul>
-                    <li><a href="./index.html">Articles</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Contact</a></li>
-                </ul>
-            </nav>
-        </header>
+    <main>
+      <!-- Search（機能は維持：見た目は styles.css 側で整える想定） -->
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search posts (title / summary / tags)"
+          aria-label="Search posts"
+        />
+      </div>
 
-        <main>
-            <ul class="post-list">
-                <!-- 記事一覧: 本来は index.json から生成しますが、ここでは構造を示すため静的に記述 -->
-                
-                <li class="post-item">
-                    <article>
-                        <time class="post-meta" datetime="2024-03-20">2024.03.20</time>
-                        <h2 class="post-title"><a href="./2024-03-20_minimalist-philosophy/index.html">構造的審美性：余白と文字だけで語るデザインの哲学</a></h2>
-                        <p class="post-excerpt">
-                            色は情報を伝える強力な手段ですが、時にはノイズにもなり得ます。
-                            純粋な構造とタイポグラフィのみで構成されたWebサイトが持つ、
-                            時代に左右されない強さについて考察します。
-                        </p>
-                        <a href="./2024-03-20_minimalist-philosophy/index.html" class="read-more">Read Article →</a>
-                    </article>
-                </li>
+      <!-- List -->
+      <ul class="post-list" id="postList">
+        <!-- JSで index.json から生成 -->
+        <li id="loadingState" class="post-item">
+          <article>
+            <time class="post-meta">Loading...</time>
+            <h2 class="post-title">Loading posts</h2>
+            <p class="post-excerpt">Please wait.</p>
+          </article>
+        </li>
+      </ul>
 
-                <li class="post-item">
-                    <article>
-                        <time class="post-meta" datetime="2024-02-14">2024.02.14</time>
-                        <h2 class="post-title"><a href="#">静的サイトジェネレーターの再評価</a></h2>
-                        <p class="post-excerpt">
-                            複雑化するフロントエンドエコシステムの中で、
-                            原点回帰とも言えるStatic Site Generation (SSG) のシンプルさが
-                            再び注目されています。パフォーマンスと保守性の観点から。
-                        </p>
-                        <a href="#" class="read-more">Read Article →</a>
-                    </article>
-                </li>
+      <!-- No Results -->
+      <div id="noResults" style="display:none;">
+        No posts found
+      </div>
 
-                <li class="post-item">
-                    <article>
-                        <time class="post-meta" datetime="2024-01-05">2024.01.05</time>
-                        <h2 class="post-title"><a href="#">Hello World: デジタルミニマリズムの旅</a></h2>
-                        <p class="post-excerpt">
-                            新しいブログのスタートにあたり、私が選んだのは
-                            「装飾を削ぎ落とす」というアプローチでした。
-                        </p>
-                        <a href="#" class="read-more">Read Article →</a>
-                    </article>
-                </li>
-            </ul>
-        </main>
+      <!-- Error -->
+      <div id="loadError" style="display:none;">
+        Failed to load index.json
+        <div id="loadErrorMsg"></div>
+      </div>
+    </main>
 
-        <footer class="site-footer">
-            <p>&copy; 2024 The Monolith Blog. All rights reserved.</p>
-        </footer>
-    </div>
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> The Monolith Blog. All rights reserved.</p>
+    </footer>
+  </div>
 
-    <script src="./assets/app.js"></script>
+  <!-- External JS -->
+  <script src="./assets/app.js"></script>
+
+  <!-- Page init (index.json 読み込み機能を維持) -->
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===============================
+    // Config
+    // ===============================
+    const DATA_URL = './data/index.json';
+
+    // ===============================
+    // State / DOM
+    // ===============================
+    let allPosts = [];
+    const list = document.getElementById('postList');
+    const searchInput = document.getElementById('searchInput');
+    const noResults = document.getElementById('noResults');
+    const loadingState = document.getElementById('loadingState');
+    const loadError = document.getElementById('loadError');
+    const loadErrorMsg = document.getElementById('loadErrorMsg');
+
+    // ===============================
+    // Utils
+    // ===============================
+    function normalizeTags(tags) {
+      if (Array.isArray(tags)) return tags.map(t => String(t).trim()).filter(Boolean);
+      if (typeof tags === 'string') return tags.split(',').map(t => t.trim()).filter(Boolean);
+      return [];
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function formatDateJa(timestamp) {
+      // 表示: YYYY.MM.DD（例: 2026.01.18）
+      const d = new Date(timestamp);
+      if (Number.isNaN(d.getTime())) return '';
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}.${m}.${day}`;
+    }
+
+    function toDatetimeAttr(timestamp) {
+      const d = new Date(timestamp);
+      if (Number.isNaN(d.getTime())) return '';
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    // ===============================
+    // Fetch
+    // ===============================
+    async function loadPosts() {
+      try {
+        const res = await fetch(DATA_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const json = await res.json();
+
+        allPosts = (json || []).map(p => ({
+          title: p.title || '',
+          summary: p.summary || '',
+          tags: normalizeTags(p.tags),
+          timestamp: p.timestamp || '',
+          // public_url 優先（GitHub Pagesでそのまま飛べる）
+          url: p.public_url || p.repo_path || '#'
+        }));
+
+        allPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        renderPosts(allPosts);
+
+      } catch (e) {
+        console.error(e);
+        loadError.style.display = 'block';
+        loadErrorMsg.textContent = e.message || String(e);
+      } finally {
+        if (loadingState) loadingState.remove();
+      }
+    }
+
+    // ===============================
+    // Render
+    // ===============================
+    function renderPosts(posts) {
+      list.innerHTML = '';
+
+      if (!posts || posts.length === 0) {
+        noResults.style.display = 'block';
+        return;
+      }
+      noResults.style.display = 'none';
+
+      posts.forEach(post => {
+        const dateLabel = formatDateJa(post.timestamp);
+        const datetime = toDatetimeAttr(post.timestamp);
+
+        const li = document.createElement('li');
+        li.className = 'post-item';
+
+        const safeTitle = escapeHtml(post.title);
+        const safeSummary = escapeHtml(post.summary);
+
+        li.innerHTML = `
+          <article>
+            <time class="post-meta" datetime="${escapeHtml(datetime)}">${escapeHtml(dateLabel)}</time>
+            <h2 class="post-title">
+              <a href="${escapeHtml(post.url)}">${safeTitle}</a>
+            </h2>
+            <p class="post-excerpt">${safeSummary}</p>
+            <a href="${escapeHtml(post.url)}" class="read-more">Read Article →</a>
+          </article>
+        `;
+
+        list.appendChild(li);
+      });
+    }
+
+    // ===============================
+    // Search
+    // ===============================
+    searchInput.addEventListener('input', () => {
+      const q = (searchInput.value || '').toLowerCase();
+
+      const filtered = allPosts.filter(p =>
+        (p.title || '').toLowerCase().includes(q) ||
+        (p.summary || '').toLowerCase().includes(q) ||
+        (p.tags || []).join(' ').toLowerCase().includes(q)
+      );
+
+      renderPosts(filtered);
+    });
+
+    // Init
+    loadPosts();
+  </script>
 </body>
 </html>
