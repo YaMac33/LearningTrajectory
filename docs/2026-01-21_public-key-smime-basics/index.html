@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>公開鍵暗号とS/MIMEの基礎：4つの鍵の役割を完全図解 - Sidenote</title>
+  <meta name="description" content="S/MIMEの裏側にある「公開鍵暗号方式」を解説。なぜ署名には秘密鍵、暗号化には公開鍵を使うのか？送信者と受信者が持つ合計4つの鍵の関係を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="公開鍵暗号とS/MIMEの基礎：4つの鍵の役割を完全図解" />
+  <meta property="og:description" content="暗号化と署名、どっちがどっちの鍵？迷いを断つ完全図解。" />
+  <meta property="og:url" content="https://example.com/articles/public-key-smime-basics.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 鍵の役割マトリックス図 */
+    .key-matrix-container {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .matrix-section {
+      background: var(--bg-color);
+      padding: 1.5rem;
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .matrix-title {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--text-main);
+      color: #fff;
+      padding: 0 10px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+
+    .key-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .key-card {
+      flex: 1;
+      padding: 1rem;
+      border: 2px solid;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    /* 秘密鍵スタイル */
+    .key-private {
+      border-color: #d32f2f;
+      background: #ffebee;
+      color: #b71c1c;
+    }
+    .key-private::before { content: "🔑 "; }
+
+    /* 公開鍵スタイル */
+    .key-public {
+      border-color: #1976d2;
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+    .key-public::before { content: "🔓 "; }
+
+    .action-arrow {
+      font-size: 1.2rem;
+      color: var(--text-sub);
+      font-weight: bold;
+    }
+
+    .target-box {
+      background: var(--code-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    /* 全体フロー図 */
+    .full-process {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 2rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+
+    .process-box {
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid var(--text-main);
+      padding: 1rem;
+      margin: 0.5rem 0;
+      position: relative;
+      background: var(--bg-color);
+    }
+    
+    .process-label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      display: block;
+      border-bottom: 1px dashed var(--line-color);
+      padding-bottom: 0.2rem;
+    }
+
+    .process-arrow {
+      font-size: 1.5rem;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / セキュリティ・暗号技術</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">公開鍵暗号とS/MIMEの基礎：4つの鍵の役割を完全図解</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#S/MIME</li>
+            <li>#公開鍵暗号</li>
+            <li>#電子署名</li>
+            <li>#セキュリティ</li>
+            <li>#ITパスポート</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>S/MIME（電子メールのセキュリティ技術）を理解する上で最大の壁となるのが、<strong>「どの鍵で暗号化して、どの鍵で復号するのか？」</strong>という問題です。</p>
+        <p>「公開鍵暗号」には、送信者と受信者それぞれに2本ずつ、合計4本の鍵が登場します。この記事では、それぞれの鍵がいつ、何のために使われるのかを整理します。</p>
+
+        <h2>全体像：S/MIMEの処理フロー</h2>
+        <p>まずはメールが送られてから届くまでの全体像を確認しましょう。S/MIMEでは「署名（本人証明）」と「暗号化（盗聴防止）」を同時に行います。</p>
+
+        <div class="full-process">
+            <div class="process-box">
+                <span class="process-label">送信者 A</span>
+                本文を作成
+            </div>
+            
+            <div class="process-arrow">↓</div>
+            
+            <div class="process-box" style="background:#fff3e0;">
+                <span class="process-label">処理①：電子署名</span>
+                <strong>秘密鍵A</strong> で署名データを作成<br>
+                <small>（本人証明・改ざん防止）</small>
+            </div>
+            
+            <div class="process-arrow">↓</div>
+            
+            <div class="process-box" style="background:#e3f2fd;">
+                <span class="process-label">処理②：暗号化</span>
+                <strong>公開鍵B</strong> で全体をロック<br>
+                <small>（受信者Bだけが読める状態にする）</small>
+            </div>
+            
+            <div class="process-arrow">↓</div>
+            <div style="font-size:0.8rem; margin:0.5rem;">インターネット（安全に転送）</div>
+            <div class="process-arrow">↓</div>
+
+            <div class="process-box" style="background:#e3f2fd;">
+                <span class="process-label">処理③：復号</span>
+                <strong>秘密鍵B</strong> でロックを解除<br>
+                <small>（暗号文を平文に戻す）</small>
+            </div>
+            
+            <div class="process-arrow">↓</div>
+            
+            <div class="process-box" style="background:#fff3e0;">
+                <span class="process-label">処理④：署名検証</span>
+                <strong>公開鍵A</strong> で署名をチェック<br>
+                <small>（本当にAさんか確認する）</small>
+            </div>
+            
+            <div class="process-arrow">↓</div>
+            
+            <div class="process-box">
+                <span class="process-label">受信者 B</span>
+                安全なメールを読む
+            </div>
+        </div>
+
+        <h2>なぜ鍵が4本も必要なのか？</h2>
+        <p>1通の安全なメールを送るために、以下の2組の鍵ペア（合計4本）がフル活用されています。</p>
+        <ul>
+            <li><strong>送信者Aのペア：</strong>「私が送りました」と証明するため（署名用）</li>
+            <li><strong>受信者Bのペア：</strong>「あなたにしか読めない」ようにするため（暗号化用）</li>
+        </ul>
+
+        <h2>【図解】鍵の役割マトリックス</h2>
+        <p>試験でよく問われる「どの鍵を使うか」を、目的別に整理しました。この図の矢印の関係を覚えておきましょう。</p>
+
+        <div class="key-matrix-container">
+            <!-- 署名の仕組み -->
+            <div class="matrix-section">
+                <span class="matrix-title">① 電子署名（誰が送ったか？）</span>
+                <p style="margin-top:0.5rem; font-size:0.9rem;">送信者本人のみが持っている鍵で「印鑑」を押し、誰でも持てる鍵で「照合」します。</p>
+                <div class="key-flow">
+                    <div class="key-card key-private">送信者Aの<br>秘密鍵</div>
+                    <span class="action-arrow">→ 作成 →</span>
+                    <div class="target-box">署名データ</div>
+                    <span class="action-arrow">→ 検証 →</span>
+                    <div class="key-card key-public">送信者Aの<br>公開鍵</div>
+                </div>
+            </div>
+
+            <!-- 暗号化の仕組み -->
+            <div class="matrix-section">
+                <span class="matrix-title">② 暗号化（誰が読めるか？）</span>
+                <p style="margin-top:0.5rem; font-size:0.9rem;">誰でも鍵をかけられますが、開けられるのは鍵の持ち主（受信者）だけです。</p>
+                <div class="key-flow">
+                    <div class="key-card key-public">受信者Bの<br>公開鍵</div>
+                    <span class="action-arrow">→ 閉める →</span>
+                    <div class="target-box">暗号文</div>
+                    <span class="action-arrow">→ 開ける →</span>
+                    <div class="key-card key-private">受信者Bの<br>秘密鍵</div>
+                </div>
+            </div>
+        </div>
+
+        <h2>よくある勘違いポイント</h2>
+        <p>学習中に陥りやすい誤解を解消しておきましょう。</p>
+        
+        <h3>❌「公開鍵で暗号化したら、公開鍵で戻せる？」</h3>
+        <p><strong>間違いです。</strong>公開鍵は「南京錠」のようなものです。誰でもロックできますが、ロックした鍵（公開鍵）で開けることはできません。開けるには対になる「秘密鍵」が必要です。</p>
+
+        <h3>❌「公開鍵で署名を作る？」</h3>
+        <p><strong>間違いです。</strong>署名は「本人証明」なので、世界中に公開されている公開鍵で作れてしまっては意味がありません。本人しか持っていない「秘密鍵」で作成します。</p>
+
+        <h2>まとめ：試験対策ワンポイント</h2>
+        <p>ITパスポートや基本情報技術者試験では、以下の組み合わせを即答できるようにしましょう。</p>
+        <ul>
+            <li><strong>署名したい</strong> → 自分の秘密鍵（作成）、相手に自分の公開鍵（検証）を使わせる</li>
+            <li><strong>暗号化したい</strong> → 相手の公開鍵（暗号化）、相手に秘密鍵（復号）を使わせる</li>
+        </ul>
+        <p>「秘密の印鑑（署名）」と「公開された南京錠（暗号化）」というイメージを持てば、複雑なパズルも解けるようになります。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
