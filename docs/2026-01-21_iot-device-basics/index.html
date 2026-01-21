@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>IoTデバイスの基本概念：センサーと通信が変える「モノ」の役割 - Sidenote</title>
+  <meta name="description" content="IoTデバイスとは単なる「ネットにつながる家電」ではありません。センサー、CPU、通信機能が連携して動く「小さなコンピュータ」としての仕組みと、そのセキュリティリスクを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="IoTデバイスの基本概念：センサーと通信が変える「モノ」の役割" />
+  <meta property="og:description" content="自動で測り、送り、動く。「モノのインターネット」の最小単位を解剖する。" />
+  <meta property="og:url" content="https://example.com/articles/iot-device-basics.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 構成図：IoTデバイスの中身 */
+    .structure-container {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .device-box {
+      background: var(--bg-color);
+      border: 2px solid var(--text-main);
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      border-radius: 8px;
+    }
+
+    .device-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--text-main);
+      color: #fff;
+      padding: 0 10px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .component-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .component {
+      background: var(--code-bg);
+      padding: 0.8rem;
+      border: 1px dashed var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .comp-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+    }
+
+    .comp-info {
+      flex: 1;
+    }
+    
+    .comp-title {
+      font-weight: bold;
+      font-size: 0.95rem;
+      display: block;
+    }
+    
+    .comp-desc {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .cloud-connection {
+      text-align: center;
+      margin-top: 1rem;
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      position: relative;
+    }
+    .cloud-connection::before {
+      content: "↓ 通信 (Wi-Fi / LTE)";
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .cloud-box {
+      background: #e3f2fd;
+      border: 2px dashed #1976d2;
+      color: #0d47a1;
+      padding: 1rem;
+      border-radius: 50px;
+      width: 80%;
+      text-align: center;
+      font-weight: bold;
+      margin: 0 auto;
+    }
+
+    /* 比較表：IoT vs PC */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .compare-card {
+      border: 1px solid var(--line-color);
+      padding: 0;
+      background: var(--bg-color);
+    }
+
+    .card-header {
+      background: var(--code-bg);
+      padding: 1rem;
+      text-align: center;
+      font-weight: bold;
+      border-bottom: 1px solid var(--line-color);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-item {
+      margin-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--line-color);
+      padding-bottom: 0.3rem;
+    }
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+
+    .f-label {
+      color: var(--text-sub);
+      font-size: 0.85rem;
+    }
+    .f-value {
+      font-weight: bold;
+    }
+
+    /* 具体例アイコンリスト */
+    .example-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+
+    .example-item {
+      background: var(--code-bg);
+      padding: 0.8rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      border: 1px solid var(--line-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / テクノロジー・IoT</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">IoTデバイスの基本概念：センサーと通信が変える「モノ」の役割</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#IoT</li>
+            <li>#デバイス</li>
+            <li>#センサー</li>
+            <li>#自動制御</li>
+            <li>#ネットワーク</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「IoT（Internet of Things）」という言葉は、直訳すれば「モノのインターネット」です。しかし、単にモノがネットに繋がるだけではありません。</p>
+        <p>IoTの本質は、<strong>「モノが人の代わりに自動で計測し、判断し、動く」</strong>という点にあります。この記事では、IoTデバイスの中身がどうなっているのか、普通のパソコンと何が違うのかを解剖します。</p>
+
+        <h2>1. IoTデバイスの中身（基本構成）</h2>
+        <p>IoTデバイスは、大きく分けて3つの部品と、データを送る先のクラウドで構成されています。</p>
+
+        <div class="structure-container">
+            <div class="device-box">
+                <span class="device-label">IoTデバイス（物理的な端末）</span>
+                <div class="component-flow">
+                    <div class="component">
+                        <span class="comp-icon">🌡️</span>
+                        <div class="comp-info">
+                            <span class="comp-title">センサー</span>
+                            <span class="comp-desc">温度、湿度、位置、動きなどを「測る」</span>
+                        </div>
+                    </div>
+                    <div class="component">
+                        <span class="comp-icon">🧠</span>
+                        <div class="comp-info">
+                            <span class="comp-title">CPU（マイコン）</span>
+                            <span class="comp-desc">データを処理し、動作を「判断・制御する」</span>
+                        </div>
+                    </div>
+                    <div class="component">
+                        <span class="comp-icon">📡</span>
+                        <div class="comp-info">
+                            <span class="comp-title">通信モジュール</span>
+                            <span class="comp-desc">Wi-Fi, Bluetooth, LTEなどで「送受信する」</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cloud-connection">
+                <div class="cloud-box">☁️ クラウド / サーバー<br><small>データの蓄積・分析・可視化</small></div>
+            </div>
+        </div>
+
+        <h2>2. 身近なIoTデバイスの例</h2>
+        <p>「IoT」といっても、特別な産業機械ばかりではありません。私たちの生活やインフラの中にすでに溶け込んでいます。</p>
+
+        <div class="example-list">
+            <div class="example-item">🏠 スマート家電</div>
+            <div class="example-item">⌚ スマートウォッチ</div>
+            <div class="example-item">🏭 工場センサー</div>
+            <div class="example-item">🚜 農業用監視装置</div>
+            <div class="example-item">📷 見守りカメラ</div>
+        </div>
+
+        <h2>3. IoTデバイス vs 普通のIT機器</h2>
+        <p>スマホやパソコンもネットに繋がりますが、IoTデバイスとは「役割」と「主役」が決定的に異なります。</p>
+
+        <div class="comparison-grid">
+            <div class="compare-card">
+                <div class="card-header">IoTデバイス</div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="f-label">主役</span>
+                            <span class="f-value">モノ</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="f-label">操作</span>
+                            <span class="f-value">自動（自律的）</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="f-label">通信</span>
+                            <span class="f-value">常時または定期的</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="f-label">画面</span>
+                            <span class="f-value">ないことが多い</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="compare-card" style="opacity: 0.7;">
+                <div class="card-header">PC / スマホ</div>
+                <div class="card-body">
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="f-label">主役</span>
+                            <span class="f-value">人</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="f-label">操作</span>
+                            <span class="f-value">手動（人が入力）</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="f-label">通信</span>
+                            <span class="f-value">必要な時だけ</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="f-label">画面</span>
+                            <span class="f-value">必ずある</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>4. セキュリティの重要性</h2>
+        <p>IoTデバイスは「小さなコンピュータ」ですが、PCのように人間が常に見張っているわけではありません。そのため、独特のセキュリティリスクがあります。</p>
+        
+        <ul>
+            <li><strong>リスク要因：</strong>常時ネットに接続されている、台数が膨大、パスワードが初期設定のまま放置されやすい。</li>
+            <li><strong>対策：</strong>「なりすまし」を防ぐための<strong>デバイス認証</strong>や、通信内容を守る<strong>暗号化</strong>（公開鍵暗号方式など）が不可欠です。</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <p>IoTデバイスを理解するキーワードは<strong>「センサー＋通信＋自動化」</strong>です。</p>
+        <p>人が操作しなくても、モノが勝手にデータを送り、クラウドが分析し、現実世界を制御する。このサイクルの入り口を担うのがIoTデバイスなのです。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
