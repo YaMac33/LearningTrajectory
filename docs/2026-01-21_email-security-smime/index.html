@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>S/MIMEで守るメールの安全：暗号化と署名の仕組み - Sidenote</title>
+  <meta name="description" content="電子メールのセキュリティ規格「S/MIME」を解説。なぜメールは「はがき」と同じなのか？暗号化とデジタル署名を組み合わせた鉄壁の仕組みを、鍵の流れとともに図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="S/MIMEで守るメールの安全：暗号化と署名の仕組み" />
+  <meta property="og:description" content="メールを「封筒」に入れる技術、S/MIMEの全貌。" />
+  <meta property="og:url" content="https://example.com/articles/smime-security.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 図解：S/MIMEの送信フロー */
+    .flow-container {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    .flow-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      min-width: 600px; /* 図崩れ防止 */
+    }
+
+    .flow-stage {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .actor-box {
+      width: 120px;
+      text-align: center;
+      font-weight: bold;
+      padding: 0.5rem;
+      background: var(--text-main);
+      color: var(--bg-color);
+      border-radius: 4px;
+    }
+
+    .process-line {
+      flex: 1;
+      height: 2px;
+      background: var(--line-color);
+      position: relative;
+      margin: 0 1.5rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .process-step {
+      background: var(--bg-color);
+      border: 1px solid var(--text-main);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      border-radius: 20px;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      min-width: 140px;
+    }
+
+    .key-icon {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+    }
+    
+    .key-icon strong {
+      color: #d32f2f; /* 鍵の強調色 */
+    }
+
+    .mail-icon {
+      font-size: 2rem;
+      background: var(--bg-color);
+      padding: 0 1rem;
+      z-index: 1;
+    }
+
+    /* セキュリティ要素グリッド */
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .security-card {
+      background: var(--bg-color);
+      border: 1px solid var(--line-color);
+      padding: 1.2rem;
+    }
+
+    .sec-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+      border-bottom: 2px solid var(--code-bg);
+      padding-bottom: 0.3rem;
+    }
+
+    .sec-desc {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    /* 比較表 */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .compare-table th, .compare-table td {
+      border: 1px solid var(--line-color);
+      padding: 0.8rem;
+      text-align: left;
+    }
+
+    .compare-table th {
+      background: var(--code-bg);
+      width: 30%;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / セキュリティ・通信技術</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">S/MIMEで守るメールの安全：暗号化と署名の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#S/MIME</li>
+            <li>#セキュリティ</li>
+            <li>#暗号化</li>
+            <li>#電子署名</li>
+            <li>#公開鍵暗号</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>インターネット上の電子メールは、しばしば「はがき」に例えられます。配達に関わる人なら誰でも中身を読めるし、差出人の名前を偽ることも簡単だからです。</p>
+        <p>この「はがき」を、中身が見えない「封筒」に入れ、さらに「実印」を押して送るような技術が<strong>S/MIME（エスマイム）</strong>です。</p>
+
+        <h2>S/MIMEが実現する4つの安全性</h2>
+        <p>S/MIMEは「暗号化」と「電子署名」の2つの機能を組み合わせることで、以下の4つのセキュリティ要素を同時に実現します。</p>
+
+        <div class="security-grid">
+            <div class="security-card">
+                <span class="sec-title">① 機密性 (Confidentiality)</span>
+                <p class="sec-desc">メール本文を暗号化し、第三者に盗聴されても中身が読めないようにします。</p>
+            </div>
+            <div class="security-card">
+                <span class="sec-title">② 完全性 (Integrity)</span>
+                <p class="sec-desc">途中で文章が書き換えられていない（改ざんされていない）ことを保証します。</p>
+            </div>
+            <div class="security-card">
+                <span class="sec-title">③ 認証 (Authentication)</span>
+                <p class="sec-desc">送信者が「なりすまし」ではなく、本人であることを証明します。</p>
+            </div>
+            <div class="security-card">
+                <span class="sec-title">④ 否認防止 (Non-repudiation)</span>
+                <p class="sec-desc">デジタル署名により、送信者は後から「送っていない」と嘘をつけなくなります。</p>
+            </div>
+        </div>
+
+        <h2>仕組みの図解：鍵のリレー</h2>
+        <p>S/MIMEの最大の特徴は、公開鍵暗号方式を使って「暗号化」と「署名」を一度に行う点です。誰の鍵を使って何をするのか、その流れを追ってみましょう。</p>
+
+        <div class="flow-container">
+            <div class="flow-wrapper">
+                <!-- 送信側のフロー -->
+                <div class="flow-stage">
+                    <div class="actor-box">送信者 A</div>
+                    <div class="process-line">
+                        <div class="process-step">
+                            電子署名を作成<br>
+                            <span class="key-icon">🔑 <strong>自分の秘密鍵</strong></span>
+                        </div>
+                        <div class="process-step">
+                            メールを暗号化<br>
+                            <span class="key-icon">🔓 <strong>相手の公開鍵</strong></span>
+                        </div>
+                    </div>
+                    <div class="mail-icon">✉️</div>
+                </div>
+
+                <!-- 転送中 -->
+                <p style="text-align:center; font-size:0.8rem; color:var(--text-sub); margin:0;">
+                    インターネット（暗号化された状態）
+                </p>
+
+                <!-- 受信側のフロー -->
+                <div class="flow-stage">
+                    <div class="mail-icon">📨</div>
+                    <div class="process-line">
+                        <div class="process-step">
+                            暗号を復号<br>
+                            <span class="key-icon">🔑 <strong>自分の秘密鍵</strong></span>
+                        </div>
+                        <div class="process-step">
+                            署名を検証<br>
+                            <span class="key-icon">🔓 <strong>相手の公開鍵</strong></span>
+                        </div>
+                    </div>
+                    <div class="actor-box">受信者 B</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>ポイント：鍵の役割が逆になる</h3>
+        <ul>
+            <li><strong>署名：</strong>「私しか持っていない鍵（秘密鍵）」で印鑑を押す → 皆が私の公開鍵で検証できる。</li>
+            <li><strong>暗号化：</strong>「あなたしか開けられない鍵（公開鍵）」で鍵をかける → あなたの秘密鍵でのみ開けられる。</li>
+        </ul>
+
+        <h2>導入のハードル：証明書が必要</h2>
+        <p>S/MIMEを利用するには、信頼できる第三者機関（認証局：CA）から発行された「電子証明書」が必要です。</p>
+        <p>似た仕組みに「PGP」がありますが、信頼の担保の仕方が異なります。</p>
+
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    <th>S/MIME</th>
+                    <th>PGP</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>信頼の基点</strong></td>
+                    <td><strong>認証局 (CA)</strong><br>公的な第三者が保証する</td>
+                    <td><strong>Web of Trust</strong><br>利用者同士で互いに保証し合う</td>
+                </tr>
+                <tr>
+                    <td><strong>主な用途</strong></td>
+                    <td>ビジネス、組織利用<br>（Outlook等が標準対応）</td>
+                    <td>個人利用、技術者間<br>（専用ソフトが必要なことが多い）</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>試験対策のまとめ</h2>
+        <p>ITパスポートや基本情報技術者試験では、以下の特徴が狙われます。</p>
+        <ul>
+            <li><strong>「電子メールの本文そのもの」</strong>を暗号化する技術である（通信経路の暗号化であるSSL/TLSとは別物）。</li>
+            <li><strong>「公開鍵暗号方式」</strong>を利用して、暗号化と署名の両方を行う。</li>
+            <li>利用には<strong>「認証局（CA）」</strong>の発行する証明書が必要である。</li>
+        </ul>
+        <p>「S/MIME ＝ メールを封筒に入れて実印を押す技術」と覚えておけば、基本はバッチリです。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
