@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>E-R図の基本と試験対策：「静的な関係」を捉える重要図解 - Sidenote</title>
+  <meta name="description" content="ITパスポートや基本情報技術者試験で頻出の「E-R図」を完全解説。エンティティ・リレーションシップの意味や、フローチャート・DFDとの決定的な違いを図解で攻略します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="E-R図の基本と試験対策：「静的な関係」を捉える重要図解" />
+  <meta property="og:description" content="業務フローとは違う。「データの構造」だけを見るE-R図の読み方と書き方。" />
+  <meta property="og:url" content="https://example.com/articles/er-diagram-basics.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 図解用: E-R図の要素 */
+    .er-element-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin: 2rem 0;
+      justify-content: center;
+    }
+
+    .er-card {
+      background: var(--bg-color);
+      border: 1px solid var(--line-color);
+      padding: 1.5rem;
+      width: 260px;
+      text-align: center;
+      position: relative;
+      border-radius: 4px;
+    }
+
+    .er-card h4 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .er-shape {
+      margin: 1rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-family: var(--font-mono);
+    }
+
+    /* エンティティ（四角） */
+    .shape-entity {
+      width: 120px;
+      height: 60px;
+      border: 2px solid var(--text-main);
+      background: #fff;
+    }
+
+    /* リレーションシップ（線） */
+    .shape-relation {
+      width: 100%;
+      height: 40px;
+      position: relative;
+    }
+    .shape-relation::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: var(--text-main);
+    }
+    .shape-relation::after {
+      content: "注文する";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      background: var(--bg-color);
+      padding: 0 0.5rem;
+    }
+
+    /* 属性（リスト） */
+    .shape-attribute {
+      text-align: left;
+      border: 1px solid var(--text-main);
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      width: 140px;
+      margin: 0 auto;
+    }
+    .shape-attribute div {
+      border-bottom: 1px solid #eee;
+      padding: 2px 0;
+    }
+    .shape-attribute div:first-child {
+      font-weight: bold;
+      background: #eee;
+      text-align: center;
+    }
+
+    /* 図解比較テーブル */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .comp-box {
+      border: 1px solid var(--line-color);
+      padding: 1rem;
+      background: var(--code-bg);
+    }
+    
+    .comp-box.correct {
+      border-left: 4px solid var(--text-main);
+      background: #fff;
+    }
+
+    .comp-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .comp-desc {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    /* 実例図（1対多） */
+    .er-example {
+      background: var(--code-bg);
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      overflow-x: auto;
+    }
+
+    .er-node {
+      background: #fff;
+      border: 2px solid var(--text-main);
+      padding: 0.8rem 1.5rem;
+      font-weight: bold;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .er-line {
+      flex: 1;
+      height: 2px;
+      background: var(--text-main);
+      position: relative;
+      min-width: 100px;
+    }
+    
+    .er-cardinality {
+      position: absolute;
+      top: -1.5rem;
+      font-family: var(--font-mono);
+      font-weight: bold;
+    }
+    .c-left { left: 0; }
+    .c-right { right: 0; }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title Changed to Sidenote. -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / データベース設計</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">E-R図の基本と試験対策：「静的な関係」を捉える重要図解</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#E-R図</li>
+            <li>#データ構造</li>
+            <li>#試験対策</li>
+            <li>#エンティティ</li>
+            <li>#リレーションシップ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>システム開発において、データベースの設計図として欠かせないのが「E-R図（Entity-Relationship Diagram）」です。</p>
+        <p>ITパスポートや基本情報の試験では、業務フロー図やDFDといった「他の図」と混同させる問題が頻出します。この記事では、E-R図が何を表す図なのか、その本質を徹底的に整理します。</p>
+
+        <h2>E-R図の本質：データの「構造」だけを見る</h2>
+        <p>E-R図を理解する上で最も重要なルールは、<strong>「時間の流れや処理の手順は一切表さない」</strong>ということです。</p>
+        <p>E-R図が表すのは以下の3点だけです。これ以外の要素（誰がいつ入力するか、承認フローなど）は含みません。</p>
+
+        <div class="er-element-container">
+            <!-- 要素1: エンティティ -->
+            <div class="er-card">
+                <h4>1. Entity</h4>
+                <p>実体（管理対象）</p>
+                <div class="er-shape">
+                    <div class="shape-entity">顧客</div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-sub);">「名詞」で表せるデータのまとまり</p>
+            </div>
+
+            <!-- 要素2: アトリビュート -->
+            <div class="er-card">
+                <h4>2. Attribute</h4>
+                <p>属性（項目）</p>
+                <div class="er-shape">
+                    <div class="shape-attribute">
+                        <div>顧客</div>
+                        <div>顧客ID(PK)</div>
+                        <div>氏名</div>
+                        <div>TEL</div>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-sub);">エンティティが持つ詳細情報</p>
+            </div>
+
+            <!-- 要素3: リレーションシップ -->
+            <div class="er-card">
+                <h4>3. Relationship</h4>
+                <p>関連（関係性）</p>
+                <div class="er-shape">
+                    <div class="shape-relation"></div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-sub);">「AはBを注文する」などのつながり</p>
+            </div>
+        </div>
+
+        <h2>実例で見る：1対多の関係</h2>
+        <p>試験で最もよく出るパターンが「1対多（1:N）」の関係です。例えば「顧客」と「注文」の関係を見てみましょう。</p>
+        
+        <div class="er-example">
+            <div class="er-node">顧客</div>
+            <div class="er-line">
+                <span class="er-cardinality c-left">1</span>
+                <span class="er-cardinality c-right">N</span>
+            </div>
+            <div class="er-node">注文</div>
+        </div>
+
+        <ul>
+            <li><strong>顧客（1）：</strong>1人の顧客は、過去に何度も注文している可能性がある（または0回）。</li>
+            <li><strong>注文（N）：</strong>1つの注文データは、必ず特定の1人の顧客に紐づく。</li>
+        </ul>
+        <p>この「カーディナリティ（多重度）」を整理することが、関係データベース（RDB）設計の第一歩となります。</p>
+
+        <h2>試験対策：他の図との混同を避ける</h2>
+        <p>「次のうち、E-R図の説明として正しいものはどれか」という問題では、必ず「流れ」や「処理」といった言葉を使った引っ掛け選択肢が登場します。</p>
+
+        <div class="comparison-grid">
+            <div class="comp-box correct">
+                <span class="comp-title">E-R図</span>
+                <span class="comp-desc">データ同士の「静的な関係」を表す。<br>（誰と誰が繋がっているか）</span>
+            </div>
+            <div class="comp-box">
+                <span class="comp-title">業務フロー図</span>
+                <span class="comp-desc">「作業の手順」や「処理の流れ」を表す。<br>（次になにをするか）</span>
+            </div>
+            <div class="comp-box">
+                <span class="comp-title">DFD (データフロー図)</span>
+                <span class="comp-desc">データの「流れ」を表す。<br>（データがどこから来てどこへ行くか）</span>
+            </div>
+            <div class="comp-box">
+                <span class="comp-title">BPMN</span>
+                <span class="comp-desc">ビジネスプロセスの「手順」を詳細に記述する。</span>
+            </div>
+        </div>
+
+        <h3>一発判定のキーワード</h3>
+        <p>選択肢の文章を読んで、以下のキーワードが出てきたら即座に判定してください。</p>
+        <ul>
+            <li><strong>❌ 不正解ワード：</strong>「ワークフロー」「処理の手順」「データの流れ」「時間の経過」</li>
+            <li><strong>✅ 正解ワード：</strong>「実体と関連」「データの構造」「管理対象間の関係」「概念設計」</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <p>E-R図は「システムの骨格（データ構造）」を表す図です。骨格には時間は流れていません。</p>
+        <blockquote>
+            <strong>E-R図 = 「誰と誰が、どう関係しているか」を見る静的な地図</strong>
+        </blockquote>
+        <p>このイメージを持っておけば、動的な図（フローチャート等）との区別は簡単につくようになります。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
