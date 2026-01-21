@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-22T06:48:48+09:00",
+    "title": "内部統制の基本要素と関係性",
+    "summary": "内部統制の全体像と6つの基本要素の関係を解説します。組織の目標達成に必要な仕組みを理解するための図解が提供されています。",
+    "tags": [
+      "内部統制",
+      "組織管理",
+      "リスク評価",
+      "業務効率",
+      "管理手法"
+    ],
+    "dir": "2026-01-22_internal-control-elements",
+    "repo_path": "/docs/2026-01-22_internal-control-elements/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-22_internal-control-elements"
+  },
+  {
     "timestamp": "2026-01-21T22:04:17+09:00",
     "title": "公開鍵暗号による社会の安全を支える",
     "summary": "公開鍵暗号方式は、現代社会のあらゆる場面で使用され、セキュリティの根幹を形成しています。具体的な事例を通じてその役割を解説します。",
