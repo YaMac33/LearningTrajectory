@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>損益計算書の4つの利益：比較と分析ポイント完全ガイド - Sidenote</title>
+  <meta name="description" content="売上総利益・営業利益・経常利益・当期純利益の4つを徹底比較。計算式から分析の視点、経営チェックポイントまでを表形式で分かりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="損益計算書の4つの利益：比較と分析ポイント完全ガイド" />
+  <meta property="og:description" content="安売りしていないか？借金は重くないか？数字から経営の実態を読み解く。" />
+  <meta property="og:url" content="https://example.com/articles/profit-comparison-chart.html" />
+
+  <!-- Assets -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 比較表のグリッドレイアウト */
+    .profit-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin: 2.5rem 0;
+    }
+
+    /* 各利益のカード（カラム） */
+    .profit-column {
+      background: var(--bg-color);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ヘッダー部分 */
+    .profit-header {
+      background: var(--code-bg);
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 2px solid var(--text-main);
+    }
+
+    .profit-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    /* コンテンツ部分 */
+    .profit-body {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .info-group {
+      border-bottom: 1px dashed var(--line-color);
+      padding-bottom: 1rem;
+    }
+    
+    .info-group:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .info-value.formula {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--code-bg);
+      padding: 0.4rem;
+      border-radius: 4px;
+    }
+
+    .info-value.check-point {
+      color: #d32f2f; /* 注意喚起色 */
+      font-weight: bold;
+      background: #ffebee;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* スマホ対応：1カラムにしてカード化 */
+    @media (max-width: 768px) {
+      .profit-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .profit-column {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      }
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / 財務分析・経営</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">損益計算書の4つの利益：比較と分析ポイント完全ガイド</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#損益計算書</li>
+            <li>#利益比較</li>
+            <li>#経営分析</li>
+            <li>#財務諸表</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>損益計算書（P/L）には段階に応じて複数の「利益」が登場します。それぞれの利益は、企業の異なる側面（商品力、営業力、財務体質など）を映し出しています。</p>
+        <p>以下の表は、主要な4つの利益について「計算式」「意味」「分析の視点」「チェックポイント」を整理したものです。</p>
+
+        <div class="profit-grid">
+            <!-- 1. 売上総利益 -->
+            <div class="profit-column">
+                <div class="profit-header">
+                    <h3>売上総利益</h3>
+                </div>
+                <div class="profit-body">
+                    <div class="info-group">
+                        <span class="info-label">意味</span>
+                        <div class="info-value">商品・製品自体の儲け</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">計算式</span>
+                        <div class="info-value formula">売上高<br>－ 売上原価</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">分析の視点</span>
+                        <div class="info-value">原価管理ができているかが分かる</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Check Point</span>
+                        <div class="info-value check-point">安売りしていないか？</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 営業利益 -->
+            <div class="profit-column">
+                <div class="profit-header">
+                    <h3>営業利益</h3>
+                </div>
+                <div class="profit-body">
+                    <div class="info-group">
+                        <span class="info-label">意味</span>
+                        <div class="info-value">本業全体の儲け</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">計算式</span>
+                        <div class="info-value formula">売上総利益<br>－ 販管費</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">分析の視点</span>
+                        <div class="info-value">営業力・コスト力が分かる</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Check Point</span>
+                        <div class="info-value check-point">本業が儲かっているか？</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 経常利益 -->
+            <div class="profit-column">
+                <div class="profit-header">
+                    <h3>経常利益</h3>
+                </div>
+                <div class="profit-body">
+                    <div class="info-group">
+                        <span class="info-label">意味</span>
+                        <div class="info-value">会社全体の通常利益</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">計算式</span>
+                        <div class="info-value formula">営業利益<br>＋ 営業外収益<br>－ 営業外費用</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">分析の視点</span>
+                        <div class="info-value">財務体質が分かる</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Check Point</span>
+                        <div class="info-value check-point">借金が重くないか？</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 当期純利益 -->
+            <div class="profit-column">
+                <div class="profit-header">
+                    <h3>当期純利益</h3>
+                </div>
+                <div class="profit-body">
+                    <div class="info-group">
+                        <span class="info-label">意味</span>
+                        <div class="info-value">最終結果の儲け</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">計算式</span>
+                        <div class="info-value formula">税引前純利益<br>－ 法人税等</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">分析の視点</span>
+                        <div class="info-value">経営の最終成果</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Check Point</span>
+                        <div class="info-value check-point">黒字倒産していないか？</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>活用ポイント</h2>
+        <p>この表を横に見るだけでなく、以下のような視点で比較すると企業の課題が見えてきます。</p>
+        
+        <h3>粗利はあるが、営業利益がない場合</h3>
+        <p>「商品は良い（売上総利益はプラス）が、売り方や管理コストに問題がある（販管費が高い）」という状態です。広告宣伝費のかけ過ぎや、人件費の高騰を疑う必要があります。</p>
+
+        <h3>営業利益はあるが、経常利益がない場合</h3>
+        <p>「本業は順調だが、借金の利息支払いが重い」という財務体質の問題が考えられます。過去の過剰な設備投資が負担になっているケースなどが該当します。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <script>
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
