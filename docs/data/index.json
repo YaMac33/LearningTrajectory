@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-21T20:50:21+09:00",
+    "title": "公開鍵暗号とS/MIMEの基礎を解説",
+    "summary": "この記事では、S/MIMEにおける公開鍵暗号の仕組みと4つの鍵の役割について詳しく解説します。暗号化と署名のプロセスを図解で説明します。",
+    "tags": [
+      "S/MIME",
+      "公開鍵暗号",
+      "電子署名",
+      "セキュリティ",
+      "ITパスポート"
+    ],
+    "dir": "2026-01-21_public-key-smime-basics",
+    "repo_path": "/docs/2026-01-21_public-key-smime-basics/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-21_public-key-smime-basics"
+  },
+  {
     "timestamp": "2026-01-21T19:43:42+09:00",
     "title": "S/MIMEによるメールの安全性と技術",
     "summary": "S/MIMEは、電子メールのセキュリティ技術として、暗号化と電子署名を組み合わせて安全性を向上させます。具体的な仕組みとその重要性について解説します。",
