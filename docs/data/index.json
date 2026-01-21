@@ -1,5 +1,21 @@
 [
   {
+    "timestamp": "2026-01-21T22:04:17+09:00",
+    "title": "公開鍵暗号による社会の安全を支える",
+    "summary": "公開鍵暗号方式は、現代社会のあらゆる場面で使用され、セキュリティの根幹を形成しています。具体的な事例を通じてその役割を解説します。",
+    "tags": [
+      "公開鍵暗号",
+      "セキュリティ",
+      "HTTPS",
+      "ブロックチェーン",
+      "電子商取引",
+      "VPN"
+    ],
+    "dir": "2026-01-21_public-key-applications",
+    "repo_path": "/docs/2026-01-21_public-key-applications/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-21_public-key-applications"
+  },
+  {
     "timestamp": "2026-01-21T21:57:30+09:00",
     "title": "IoTデバイスの仕組みとセキュリティ",
     "summary": "IoTデバイスは、センサーと自動化の仕組みを持つ小さなコンピュータです。この記事では、その基本的な構成とセキュリティリスクについて説明します。",
