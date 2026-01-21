@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>損益計算書の流れと利益分類：5つの利益を完全図解 - Sidenote</title>
+  <meta name="description" content="ITパスポートや簿記で必須の「損益計算書（P/L）」を解説。売上高から当期純利益までの計算フローと、費用の分類方法を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="損益計算書の流れと利益分類：5つの利益を完全図解" />
+  <meta property="og:description" content="売上総利益から当期純利益まで、5つの利益の違いを一目で理解する。" />
+  <meta property="og:url" content="https://example.com/articles/pl-profit-flow.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 図解用：P/Lウォーターフォール */
+    .pl-flow-container {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pl-box {
+      background: var(--bg-color);
+      border: 2px solid var(--text-main);
+      padding: 1rem;
+      width: 100%;
+      max-width: 300px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .pl-box.main-profit {
+      background: var(--text-main);
+      color: var(--bg-color);
+      border-color: var(--text-main);
+    }
+
+    .pl-calc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      background: rgba(255,255,255,0.8);
+      padding: 0.3rem 0.8rem;
+      border-radius: 10px;
+      margin: 0.5rem 0;
+      position: relative;
+      border: 1px dashed var(--text-sub);
+    }
+
+    .arrow-down {
+      color: var(--text-main);
+      font-size: 1.2rem;
+      margin: -0.2rem 0;
+    }
+
+    /* 利益比較テーブル */
+    .profit-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+    }
+    
+    .profit-table th, .profit-table td {
+      border: 1px solid var(--line-color);
+      padding: 1rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .profit-table th {
+      background: var(--code-bg);
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* 分類フローチャート */
+    .step-card {
+      background: var(--bg-color);
+      border: 1px solid var(--line-color);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-left: 5px solid var(--text-main);
+    }
+
+    .step-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .step-question {
+      font-size: 1.05rem;
+      margin-bottom: 0.8rem;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .decision-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .decision-box {
+      flex: 1;
+      padding: 0.8rem;
+      background: var(--code-bg);
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+
+    .decision-box.yes {
+      background: #e6ffe6;
+      border: 1px solid #b3ffb3;
+    }
+    .decision-box.no {
+      background: #ffe6e6;
+      border: 1px solid #ffb3b3;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-21">2026.01.21 / 経済・財務分析</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">損益計算書の流れと利益分類：5つの利益を完全図解</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#損益計算書</li>
+            <li>#利益分類</li>
+            <li>#試験対策</li>
+            <li>#財務会計</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「売上高」から始まって、最終的に手元に残る「当期純利益」まで。損益計算書（P/L）には5つの異なる利益が登場します。</p>
+        <p>ITパスポートや簿記の試験では、それぞれの利益が何を意味するのか、どの費用を引いた結果なのかを問われます。この記事では、計算の流れを縦型の図で整理し、費用の分類方法を直感的に解説します。</p>
+
+        <h2>1. 損益計算書の全体像（計算フロー）</h2>
+        <p>損益計算書は、上から順に費用を引いていく「引き算のゲーム」です。上に行くほど本業に近く、下に行くほど最終的な結果になります。</p>
+
+        <div class="pl-flow-container">
+            <div class="pl-box">売上高</div>
+            
+            <div class="arrow-down">↓</div>
+            <div class="pl-calc">－ 売上原価</div>
+            <div class="arrow-down">↓</div>
+            
+            <div class="pl-box main-profit">① 売上総利益</div>
+            
+            <div class="arrow-down">↓</div>
+            <div class="pl-calc">－ 販管費</div>
+            <div class="arrow-down">↓</div>
+            
+            <div class="pl-box main-profit">② 営業利益</div>
+            
+            <div class="arrow-down">↓</div>
+            <div class="pl-calc">＋ 営業外収益 － 営業外費用</div>
+            <div class="arrow-down">↓</div>
+            
+            <div class="pl-box main-profit">③ 経常利益</div>
+            
+            <div class="arrow-down">↓</div>
+            <div class="pl-calc">＋ 特別利益 － 特別損失</div>
+            <div class="arrow-down">↓</div>
+            
+            <div class="pl-box">④ 税引前期純利益</div>
+            
+            <div class="arrow-down">↓</div>
+            <div class="pl-calc">－ 法人税等</div>
+            <div class="arrow-down">↓</div>
+            
+            <div class="pl-box main-profit" style="border-width:4px;">⑤ 当期純利益</div>
+        </div>
+
+        <h2>2. 各利益の意味と比較</h2>
+        <p>それぞれの利益が「企業の何の力」を表しているのかを整理します。</p>
+
+        <table class="profit-table">
+            <thead>
+                <tr>
+                    <th>利益の名称</th>
+                    <th>意味・分析の視点</th>
+                    <th>計算式</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>① 売上総利益</strong><br><small>（粗利）</small></td>
+                    <td><strong>商品そのものの儲け</strong><br>原価管理ができているか？安売りしすぎていないか？</td>
+                    <td>売上高 － 売上原価</td>
+                </tr>
+                <tr>
+                    <td><strong>② 営業利益</strong></td>
+                    <td><strong>本業の儲け</strong><br>営業努力やコスト管理の成果。銀行や投資家が最も重視する指標の一つ。</td>
+                    <td>売上総利益 － 販管費</td>
+                </tr>
+                <tr>
+                    <td><strong>③ 経常利益</strong></td>
+                    <td><strong>会社としての通常の儲け</strong><br>本業に加え、借金の利息などの財務活動を含めた実力値。</td>
+                    <td>営業利益 ＋ 営業外収益 － 営業外費用</td>
+                </tr>
+                <tr>
+                    <td><strong>⑤ 当期純利益</strong></td>
+                    <td><strong>最終的な成果</strong><br>税金を払い、臨時的な損益もすべて含めた、株主に残る利益。</td>
+                    <td>税引前利益 － 法人税等</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. 費用の分類を一瞬で見抜く3ステップ</h2>
+        <p>試験でよく出るのが「この費用はどこに含まれるか？」という分類問題です。迷ったときは以下の3段階で判断しましょう。</p>
+
+        <div class="step-card">
+            <span class="step-title">STEP 1</span>
+            <div class="step-question">「売るモノそのもの」に直接かかったか？</div>
+            <div class="decision-row">
+                <div class="decision-box yes">YES → <strong>売上原価</strong><br><small>例：仕入代金、工場の材料費</small></div>
+                <div class="decision-box no">NO → STEP 2へ</div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <span class="step-title">STEP 2</span>
+            <div class="step-question">本業を回すために「日常的に」必要か？</div>
+            <div class="decision-row">
+                <div class="decision-box yes">YES → <strong>販管費</strong><br><small>例：広告費、給料、家賃</small></div>
+                <div class="decision-box no">NO → STEP 3へ</div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <span class="step-title">STEP 3</span>
+            <div class="step-question">本業以外で、しかも「継続的」か？</div>
+            <div class="decision-row">
+                <div class="decision-box yes">YES → <strong>営業外費用</strong><br><small>例：支払利息</small></div>
+                <div class="decision-box no">NO(臨時) → <strong>特別損失</strong><br><small>例：災害損失、固定資産売却損</small></div>
+            </div>
+        </div>
+
+        <h2>間違いやすいポイント</h2>
+        <p>試験対策として、以下のひっかけ問題に注意してください。</p>
+        <ul>
+            <li><strong>運賃：</strong>商品を「仕入れる時」にかかれば売上原価ですが、販売時（お客様へ送る時）にかかれば販管費です。</li>
+            <li><strong>減価償却費：</strong>工場の機械なら売上原価、本社ビルなら販管費になります。「場所」で区別します。</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <p>損益計算書は、単なる数字の羅列ではなく「企業の成績表」です。</p>
+        <ul>
+            <li>モノで儲けたか？ → <strong>売上総利益</strong></li>
+            <li>本業で儲けたか？ → <strong>営業利益</strong></li>
+            <li>会社全体で儲けたか？ → <strong>経常利益</strong></li>
+        </ul>
+        <p>この基本イメージを持っておけば、複雑な計算問題でも迷わず解けるようになります。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
