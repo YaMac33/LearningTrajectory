@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>不正アクセス禁止法の概要：どこからが犯罪になるのか？ - Sidenote</title>
+  <meta name="description" content="ITパスポートや情報セキュリティ試験で頻出の「不正アクセス禁止法」。4つの成立要件と5つの禁止行為、そして「ウイルス作成」などがこの法律の対象外になる理由を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="不正アクセス禁止法の概要：どこからが犯罪になるのか？" />
+  <meta property="og:description" content="侵入だけじゃない。「パスワードを教える行為」も犯罪になる理由。" />
+  <meta property="og:url" content="https://example.com/articles/unauthorized-access-law.html" />
+
+  <!-- Assets: 記事は1階層下なので ../ 固定 -->
+  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS -->
+  <style>
+    /* 1. 成立要件フロー図 */
+    .flow-container {
+      margin: 2.5rem 0;
+      padding: 2rem;
+      background-color: var(--code-bg);
+      border: 1px solid var(--line-color);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .flow-step {
+      background: var(--bg-color);
+      border: 2px solid var(--text-main);
+      padding: 1rem;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+      border-radius: 8px;
+    }
+
+    .step-number {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--text-main);
+      color: #fff;
+      padding: 0 10px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .arrow-down {
+      font-size: 1.5rem;
+      color: var(--text-main);
+      font-weight: bold;
+    }
+
+    .result-box {
+      background: #d32f2f;
+      color: #fff;
+      padding: 1rem 2rem;
+      font-weight: bold;
+      border-radius: 4px;
+      margin-top: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    /* 2. 禁止行為リスト */
+    .prohibited-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .prohibited-card {
+      background: var(--bg-color);
+      border: 1px solid var(--line-color);
+      padding: 1.2rem;
+      border-left: 5px solid #d32f2f;
+    }
+
+    .card-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.05rem;
+      color: var(--text-main);
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    /* 3. 事例判定○× */
+    .case-box {
+      border: 1px solid var(--line-color);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--bg-color);
+      position: relative;
+    }
+
+    .case-header {
+      font-weight: bold;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .badge-guilty { background: #d32f2f; }
+    .badge-innocent { background: #1976d2; }
+
+    .reason-text {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      margin-top: 0.5rem;
+      border-top: 1px dashed var(--line-color);
+      padding-top: 0.5rem;
+    }
+
+    /* 4. 判断チャート */
+    .decision-chart {
+      background: var(--code-bg);
+      padding: 2rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .decision-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .decision-row:last-child { margin-bottom: 0; }
+
+    .decision-q {
+      background: #fff;
+      border: 1px solid var(--text-main);
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      flex: 1;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .decision-arrow {
+      margin: 0 1rem;
+      color: var(--text-sub);
+      font-weight: bold;
+    }
+
+    /* Tag List Styling */
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    .tag-list li {
+      font-size: 0.8rem;
+      background: var(--code-bg);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <!-- GEN: Site Title -->
+      <a href="../index.html" class="site-title">Sidenote.</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-22">2026.01.22 / 法律・セキュリティ</time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">不正アクセス禁止法の概要：どこからが犯罪になるのか？</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list" aria-label="tags">
+            <li>#不正アクセス</li>
+            <li>#ITパスポート</li>
+            <li>#法律</li>
+            <li>#情報セキュリティ</li>
+            <li>#規制</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「不正アクセス禁止法」は、単にコンピュータへの侵入を取り締まるだけの法律ではありません。IDやパスワードを不正に取得したり、勝手に他人に教えたりする行為も規制対象となります。</p>
+        <p>ITパスポート試験などでよく問われる「これは違法か？」「どの法律で裁かれるか？」の判断基準を、図解で整理します。</p>
+
+        <h2>1. 不正アクセス行為の4要件</h2>
+        <p>そもそも、どのような状態になれば「不正アクセス」とみなされるのでしょうか。以下の4つのステップが揃った時に、法律上の不正アクセス行為が成立します。</p>
+
+        <div class="flow-container">
+            <div class="flow-step">
+                <span class="step-number">要件①</span>
+                <strong>アクセス制御</strong>がある<br>
+                <small>（ID・パスワード等で守られている）</small>
+            </div>
+            <div class="arrow-down">↓</div>
+            <div class="flow-step">
+                <span class="step-number">要件②</span>
+                <strong>ネットワーク</strong>を経由している<br>
+                <small>（インターネットやLANを通じて）</small>
+            </div>
+            <div class="arrow-down">↓</div>
+            <div class="flow-step">
+                <span class="step-number">要件③</span>
+                <strong>他人の認証情報</strong>を無断で入力<br>
+                <small>（またはセキュリティホールを攻撃）</small>
+            </div>
+            <div class="arrow-down">↓</div>
+            <div class="flow-step">
+                <span class="step-number">要件④</span>
+                <strong>制限された機能</strong>を利用可能にする<br>
+                <small>（ログイン成功・データ閲覧可能状態）</small>
+            </div>
+            <div class="result-box">不正アクセス行為（成立）</div>
+        </div>
+
+        <h2>2. 禁止されている5つの行為</h2>
+        <p>この法律で禁止されているのは、実際に侵入する行為だけではありません。侵入を手助けするような行為（助長行為）もアウトです。</p>
+
+        <div class="prohibited-grid">
+            <div class="prohibited-card">
+                <span class="card-title">① 不正アクセス行為</span>
+                <p class="card-desc">他人のIDで勝手にログインすること。これ自体が犯罪です。</p>
+            </div>
+            <div class="prohibited-card">
+                <span class="card-title">② 認証情報の取得</span>
+                <p class="card-desc">不正アクセスする目的で、他人のIDやパスワードを盗み取ること。</p>
+            </div>
+            <div class="prohibited-card">
+                <span class="card-title">③ 認証情報の提供</span>
+                <p class="card-desc">正当な理由なく、他人のIDやパスワードを第三者に教えること。</p>
+            </div>
+            <div class="prohibited-card">
+                <span class="card-title">④ 認証情報の保管</span>
+                <p class="card-desc">不正アクセスする目的で、他人のIDやパスワードを保存しておくこと。</p>
+            </div>
+            <div class="prohibited-card">
+                <span class="card-title">⑤ なりすまし要求</span>
+                <p class="card-desc">管理者などを装って、利用者にパスワードを入力させたり聞き出したりすること（フィッシング等）。</p>
+            </div>
+        </div>
+
+        <h2>3. ケーススタディ：これは違法？</h2>
+        <p>試験でよく出る具体的なシチュエーションで、違法かどうかを判断してみましょう。</p>
+
+        <div class="case-box">
+            <div class="case-header">
+                <span class="badge badge-guilty">違法</span>
+                ケースA：正当な理由なく、他人のパスワードを友人に教えた
+            </div>
+            <p>本人がログインしていなくても、教えた時点で<strong>「不正アクセスを助長する行為」</strong>として規制されます。</p>
+            <div class="reason-text">適用条文：認証情報の提供（第5条）</div>
+        </div>
+
+        <div class="case-box">
+            <div class="case-header">
+                <span class="badge badge-guilty">違法</span>
+                ケースB：他人のIDを使って、勝手にメールを見た
+            </div>
+            <p>4つの要件（制御あり・ネットワーク・他人情報・無断利用）をすべて満たす、典型的な不正アクセスです。</p>
+            <div class="reason-text">適用条文：不正アクセス行為の禁止（第3条）</div>
+        </div>
+
+        <div class="case-box" style="border-left: 5px solid #1976d2;">
+            <div class="case-header">
+                <span class="badge badge-innocent">対象外</span>
+                ケースC：他人のパスワードを無効にするウイルスを作成した
+            </div>
+            <p>これは「悪いこと」ですが、<strong>不正アクセス禁止法の対象ではありません</strong>。ウイルスの作成は「刑法（不正指令電磁的記録作成等）」で裁かれます。</p>
+            <div class="reason-text">注意：侵入目的ではない（破壊目的）ため、別の法律になる。</div>
+        </div>
+
+        <h2>4. 即断チェックフロー</h2>
+        <p>迷ったときは、以下のフローチャートで判断してください。</p>
+
+        <div class="decision-chart">
+            <div class="decision-row">
+                <div class="decision-q">他人のID・パスワードですか？</div>
+                <div class="decision-arrow">NO →</div>
+                <div>原則 対象外</div>
+            </div>
+            <div style="text-align:center; color:var(--text-sub);">↓ YES</div>
+            
+            <div class="decision-row">
+                <div class="decision-q">ネットワーク経由ですか？</div>
+                <div class="decision-arrow">NO →</div>
+                <div>対象外（物理的破壊など）</div>
+            </div>
+            <div style="text-align:center; color:var(--text-sub);">↓ YES</div>
+
+            <div class="decision-row">
+                <div class="decision-q">本人の許可はありますか？</div>
+                <div class="decision-arrow">YES →</div>
+                <div>合法（代理操作など）</div>
+            </div>
+            <div style="text-align:center; color:var(--text-sub);">↓ NO</div>
+
+            <div class="decision-row">
+                <div class="decision-q" style="background:#ffebee; border-color:#d32f2f; color:#d32f2f;">不正アクセス行為（または助長）</div>
+            </div>
+        </div>
+
+        <h2>まとめ</h2>
+        <p>不正アクセス禁止法は、「侵入したかどうか」だけでなく、その前段階である<strong>「鍵（パスワード）の不正なやり取り」</strong>も厳しく規制しています。</p>
+        <p>「侵入してないからセーフ」ではなく、「パスワードを教えた時点でアウト」という点をしっかり押さえておきましょう。</p>
+
+        <!-- GEN: REFERENCES -->
+        <section class="article-references">
+          <!-- 参考文献があればここに記載 -->
+        </section>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Sidenote Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    /* 必要に応じて追加 */
+  </script>
+
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
