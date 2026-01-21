@@ -1,5 +1,20 @@
 [
   {
+    "timestamp": "2026-01-21T21:10:08+09:00",
+    "title": "WBSの活用法と重要性を解説",
+    "summary": "WBS（作業分解図）はプロジェクト管理の成功を支える重要な手法です。ToDoリストとの違いや実務での利点を解説します。",
+    "tags": [
+      "WBS",
+      "プロジェクト管理",
+      "成果物",
+      "ITパスポート",
+      "計画"
+    ],
+    "dir": "2026-01-21_wbs-importance-usage",
+    "repo_path": "/docs/2026-01-21_wbs-importance-usage/index.html",
+    "public_url": "https://yamac33.github.io/sidenote/2026-01-21_wbs-importance-usage"
+  },
+  {
     "timestamp": "2026-01-21T20:50:21+09:00",
     "title": "公開鍵暗号とS/MIMEの基礎を解説",
     "summary": "この記事では、S/MIMEにおける公開鍵暗号の仕組みと4つの鍵の役割について詳しく解説します。暗号化と署名のプロセスを図解で説明します。",
