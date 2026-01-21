@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リスクマネジメントの基本 - Sidenote</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        /* リスクマトリクス用の最小限のスタイル */
+        .risk-matrix {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            background: #fafafa;
+        }
+        .risk-matrix pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            background: transparent;
+            padding: 0;
+        }
+        /* テーブル用のスタイル */
+        .comparison-table {
+            width: 100%;
+            margin: 1.5rem 0;
+            border-collapse: collapse;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="site-header">
+            <a href="../index.html" class="site-title">Sidenote</a>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="../index.html">Back to List</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <article class="article-content">
+                <header class="article-header">
+                    <time class="post-meta" datetime="2026-01-22">2026.01.22 / IT MANAGEMENT</time>
+                    <h1 class="article-title">リスクマネジメントの基本</h1>
+                </header>
+
+                <p>
+                    リスクマネジメント（Risk Management）とは、将来起こり得る不確実な事象を事前に洗い出し、影響を最小化するために管理・対応する活動です。目的は「リスクをゼロにする」ことではなく、「想定内に収める」ことにあります。
+                </p>
+
+                <h2>リスクマネジメントとは</h2>
+                <p>
+                    リスクマネジメントの基本的な考え方は以下の通りです。
+                </p>
+                <ul>
+                    <li><strong>起こるかもしれない問題（リスク）</strong>を事前に想定し、</li>
+                    <li>発生確率と影響度を評価し、</li>
+                    <li>被害を防ぐ・減らす・受け入れるための方針を決めて管理すること</li>
+                </ul>
+
+                <h2>リスクマネジメントの基本プロセス</h2>
+                <p>
+                    ITパスポート試験でも頻出する、リスクマネジメントの4つの基本プロセスを解説します。
+                </p>
+
+                <h3>① リスクの特定</h3>
+                <p>
+                    どんな問題が起こり得るかを洗い出す段階です。具体例として、以下のようなリスクが考えられます。
+                </p>
+                <ul>
+                    <li>システム障害</li>
+                    <li>要員不足</li>
+                    <li>納期遅延</li>
+                    <li>情報漏えい</li>
+                </ul>
+
+                <h3>② リスクの分析・評価</h3>
+                <p>
+                    発生確率と影響度を掛け合わせて重要度を判断します。以下のリスクマトリクスを用いることで、優先的に対応すべきリスクを可視化できます。
+                </p>
+
+                <div class="risk-matrix">
+                    <pre>
+影響度
+  高 ┌─────────────────┐
+     │                 │
+     │   重点管理      │
+     │   エリア        │
+     │                 │
+  低 └─────────────────┘
+     低     →     高
+          発生確率
+                    </pre>
+                </div>
+
+                <p>
+                    「確率も影響も高いもの」を優先的に対応することが重要です。
+                </p>
+
+                <h3>③ リスクへの対応</h3>
+                <p>
+                    リスクへの対応方法は主に4つに分類されます。すべてのリスクに対策する必要はありません。
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>対応方法</th>
+                            <th>内容</th>
+                            <th>例</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>回避</strong></td>
+                            <td>リスクの原因をなくす</td>
+                            <td>危険な作業をやめる</td>
+                        </tr>
+                        <tr>
+                            <td><strong>低減</strong></td>
+                            <td>確率・影響を下げる</td>
+                            <td>バックアップを取る</td>
+                        </tr>
+                        <tr>
+                            <td><strong>移転</strong></td>
+                            <td>他者に任せる</td>
+                            <td>保険・外注</td>
+                        </tr>
+                        <tr>
+                            <td><strong>受容</strong></td>
+                            <td>起きても許容</td>
+                            <td>軽微なトラブル</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>④ 監視・見直し</h3>
+                <p>
+                    状況変化に応じて再評価を行います。具体的には、以下のような活動が含まれます。
+                </p>
+                <ul>
+                    <li>新しいリスクの追加</li>
+                    <li>対策の有効性確認</li>
+                    <li>環境変化に応じた再評価</li>
+                </ul>
+
+                <h2>リスクマネジメントと危機管理の違い</h2>
+                <p>
+                    リスクマネジメントと危機管理はよく混同されますが、以下のような違いがあります。
+                </p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>観点</th>
+                            <th>リスクマネジメント</th>
+                            <th>危機管理</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>タイミング</strong></td>
+                            <td>事前</td>
+                            <td>事後</td>
+                        </tr>
+                        <tr>
+                            <td><strong>目的</strong></td>
+                            <td>予防・被害軽減</td>
+                            <td>収束・復旧</td>
+                        </tr>
+                        <tr>
+                            <td><strong>例</strong></td>
+                            <td>事前のバックアップ</td>
+                            <td>障害対応</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>IT・プロジェクトでの具体例</h2>
+
+                <h3>ITシステムにおけるリスクマネジメント</h3>
+                <ul>
+                    <li><strong>データ消失</strong> → バックアップ（低減）</li>
+                    <li><strong>サーバ障害</strong> → 冗長化（低減）</li>
+                </ul>
+
+                <h3>プロジェクトにおけるリスクマネジメント</h3>
+                <ul>
+                    <li><strong>メンバー離脱</strong> → 複数人で共有（低減）</li>
+                    <li><strong>仕様変更</strong> → 変更管理ルール（低減）</li>
+                </ul>
+
+                <h2>ITパスポート試験での狙われ方</h2>
+                <p>
+                    試験では以下のポイントが問われます。
+                </p>
+                <ul>
+                    <li>「リスクを洗い出し、評価し、対策する一連の活動」の理解</li>
+                    <li>回避・低減・移転・受容の区別</li>
+                    <li>「想定外だった」＝リスクマネジメント不十分という理解</li>
+                </ul>
+
+                <blockquote>
+                    <p>リスクマネジメント = 起こる前に考える</p>
+                </blockquote>
+
+                <h2>実務と試験をつなぐ一言</h2>
+                <p>
+                    事前にToDoを作る、失敗パターンを想定する。これも立派なリスクマネジメントです。ITパスポート試験では「事前」「評価」「対応」という3つのキーワードが出てきたら、即座にリスクマネジメントと判断してください。
+                </p>
+            </article>
+        </main>
+
+        <footer class="site-footer">
+            <p>&copy; 2026 Sidenote. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="../assets/app.js"></script>
+</body>
+</html>
