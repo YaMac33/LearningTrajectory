@@ -215,86 +215,85 @@
   }
 
   function renderCategoryTree(posts) {
-    const mount = ensureCategoryTreeMount();
-    if (!mount) return;
+  const mount = ensureCategoryTreeMount();
+  if (!mount) return;
 
-    const tree = buildCategoryTree(posts);
-    const lv1Order = ["ストラテジ系", "マネジメント系", "テクノロジ系"];
+  const tree = buildCategoryTree(posts);
+  const lv1Order = ["ストラテジ系", "マネジメント系", "テクノロジ系"];
 
-    const activeLv1 = currentFilter.lv1;
-    const activeLv2 = currentFilter.lv2;
+  const activeLv1 = currentFilter.lv1;
+  const activeLv2 = currentFilter.lv2;
 
-    const html = [];
-    html.push(`
-      <div class="category-tree">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;">
-          <div style="font-weight:600;">カテゴリ</div>
-          <button type="button" id="clearCategoryBtn" class="read-more" style="padding:6px 10px;">
-            フィルタ解除
-          </button>
+  const parts = [];
+  parts.push(`
+    <div class="category-tree">
+      <div class="category-tree__header">
+        <div>
+          <div class="category-tree__title">カテゴリ</div>
+          <div class="category-tree__hint">クリックで絞り込み（検索とも併用できます）</div>
         </div>
+        <button type="button" id="clearCategoryBtn" class="category-tree__clear">フィルタ解除</button>
+      </div>
+  `);
+
+  for (const lv1 of lv1Order.filter((x) => tree[x])) {
+    const lv2Map = tree[lv1];
+    const lv2Names = Object.keys(lv2Map);
+
+    lv2Names.sort((a, b) => (lv2Map[b].length - lv2Map[a].length) || a.localeCompare(b, "ja"));
+
+    const total = lv2Names.reduce((n, k) => n + lv2Map[k].length, 0);
+
+    parts.push(`
+      <details class="category-group" ${activeLv1 === lv1 ? "open" : ""}>
+        <summary>
+          <span>${escapeHtml(lv1)}</span>
+          <span class="category-group__meta">${total}件</span>
+        </summary>
+
+        <div class="category-pills">
+          <button type="button"
+            class="category-pill ${activeLv1 === lv1 && !activeLv2 ? "is-active" : ""}"
+            data-lv1="${escapeHtml(lv1)}"
+            data-lv2="">
+            ${escapeHtml(lv1)}（全て）
+            <span class="category-pill__count">${total}</span>
+          </button>
     `);
 
-    for (const lv1 of lv1Order.filter((x) => tree[x])) {
-      const lv2Map = tree[lv1];
-      const lv2Names = Object.keys(lv2Map);
-
-      lv2Names.sort((a, b) => (lv2Map[b].length - lv2Map[a].length) || a.localeCompare(b, "ja"));
-
-      const total = lv2Names.reduce((n, k) => n + lv2Map[k].length, 0);
-
-      html.push(`
-        <details ${activeLv1 === lv1 ? "open" : ""} style="border:1px solid rgba(148,163,184,.35); border-radius:12px; padding:10px 12px; margin:10px 0;">
-          <summary style="cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px;">
-            <span>${escapeHtml(lv1)}</span>
-            <span style="opacity:.7; font-size:.9em;">${total}件</span>
-          </summary>
-          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
-      `);
-
-      html.push(`
+    for (const lv2 of lv2Names) {
+      const count = lv2Map[lv2].length;
+      parts.push(`
         <button type="button"
-          class="tag"
+          class="category-pill ${activeLv1 === lv1 && activeLv2 === lv2 ? "is-active" : ""}"
           data-lv1="${escapeHtml(lv1)}"
-          data-lv2=""
-          style="cursor:pointer; padding:6px 10px; border-radius:999px; border:1px solid rgba(148,163,184,.45); background:transparent;">
-          ${activeLv1 === lv1 && !activeLv2 ? "✅ " : ""}${escapeHtml(lv1)}（全て）
+          data-lv2="${escapeHtml(lv2)}">
+          ${escapeHtml(lv2)}
+          <span class="category-pill__count">${count}</span>
         </button>
-      `);
-
-      for (const lv2 of lv2Names) {
-        const count = lv2Map[lv2].length;
-        html.push(`
-          <button type="button"
-            class="tag"
-            data-lv1="${escapeHtml(lv1)}"
-            data-lv2="${escapeHtml(lv2)}"
-            style="cursor:pointer; padding:6px 10px; border-radius:999px; border:1px solid rgba(148,163,184,.45); background:transparent;">
-            ${activeLv1 === lv1 && activeLv2 === lv2 ? "✅ " : ""}${escapeHtml(lv2)}（${count}）
-          </button>
-        `);
-      }
-
-      html.push(`
-          </div>
-        </details>
       `);
     }
 
-    html.push(`</div>`);
-    mount.innerHTML = html.join("");
-
-    const clearBtn = $("clearCategoryBtn");
-    if (clearBtn) clearBtn.onclick = () => clearCategoryFilter();
-
-    mount.querySelectorAll('button.tag[data-lv1]').forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const lv1 = btn.getAttribute("data-lv1") || "";
-        const lv2 = btn.getAttribute("data-lv2") || "";
-        setCategoryFilter(lv1, lv2);
-      });
-    });
+    parts.push(`
+        </div>
+      </details>
+    `);
   }
+
+  parts.push(`</div>`);
+  mount.innerHTML = parts.join("");
+
+  const clearBtn = document.getElementById("clearCategoryBtn");
+  if (clearBtn) clearBtn.onclick = () => clearCategoryFilter();
+
+  mount.querySelectorAll("button.category-pill[data-lv1]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const lv1 = btn.getAttribute("data-lv1") || "";
+      const lv2 = btn.getAttribute("data-lv2") || "";
+      setCategoryFilter(lv1, lv2);
+    });
+  });
+ }
 
   // ===============================
   // Render (List)
