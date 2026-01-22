@@ -2,7 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 
-// ====== slug マップ（必要に応じて追加） ======
+// ====== slug マップ ======
 const LV1 = {
   "ストラテジ系": "strategy",
   "マネジメント系": "management",
@@ -32,20 +32,26 @@ const LV2 = {
 const NEW_ITEMS_DIR = path.join("docs", "data", "new_items");
 const DOCS_DIR = "docs";
 
-// /posts/<dr>/ に飛ばす（GitHub Pages の docs/ 配下想定）
-function makeRedirectHtml(dr) {
-  const target = `/posts/${dr}/`;
+/**
+ * docs/<lv1>/<lv2>/<dr>/index.html から
+ * docs/posts/<dr>/ へ飛ばす相対パスは
+ * "../../../" + post_path
+ */
+function makeRedirectHtml(targetRelativePath) {
+  const target = targetRelativePath;
+  const escaped = escapeHtml(target);
+
   return `<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="refresh" content="0; url=${target}" />
-  <link rel="canonical" href="${target}" />
+  <meta http-equiv="refresh" content="0; url=${escaped}" />
+  <link rel="canonical" href="${escaped}" />
   <meta name="robots" content="noindex" />
   <title>Redirecting...</title>
 </head>
 <body>
-  <p>Redirecting to <a href="${target}">${target}</a></p>
+  <p>Redirecting to <a href="${escaped}">${escaped}</a></p>
 </body>
 </html>
 `;
@@ -55,13 +61,30 @@ function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function normalizePostPath(p) {
+  // "posts/xxx/" を想定。先頭スラッシュが付いてたら剥がす
+  let s = String(p || "").trim();
+  s = s.replace(/^\/+/, "");
+  // 末尾は / で統一
+  if (s && !s.endsWith("/")) s += "/";
+  return s;
+}
+
 function main() {
   if (!fs.existsSync(NEW_ITEMS_DIR)) {
     console.log(`[skip] ${NEW_ITEMS_DIR} not found`);
     return;
   }
 
-  const files = fs.readdirSync(NEW_ITEMS_DIR).filter(f => f.endsWith(".json"));
+  const files = fs.readdirSync(NEW_ITEMS_DIR).filter((f) => f.endsWith(".json"));
   if (files.length === 0) {
     console.log("[skip] no new_items json");
     return;
@@ -79,11 +102,12 @@ function main() {
       continue;
     }
 
-    const dr = meta.id || meta.dr;
+    const dr = (meta.id || meta.dr || "").trim();
     const lv1Name = (meta.category_lv1 || "").trim();
     const lv2Name = (meta.category_lv2 || "").trim();
+    const postPath = normalizePostPath(meta.post_path);
 
-    if (!dr || !lv1Name || !lv2Name) {
+    if (!dr || !lv1Name || !lv2Name || !postPath) {
       console.log(`[warn] missing fields in ${file}`);
       continue;
     }
@@ -96,11 +120,15 @@ function main() {
       continue;
     }
 
+    // ここが重要：Project Pagesでも壊れない相対リンクにする
+    const target = `../../../${postPath}`;
+
     const outDir = path.join(DOCS_DIR, lv1Slug, lv2Slug, dr);
     ensureDir(outDir);
 
     const outPath = path.join(outDir, "index.html");
-    fs.writeFileSync(outPath, makeRedirectHtml(dr), "utf8");
+    fs.writeFileSync(outPath, makeRedirectHtml(target), "utf8");
+
     generated++;
   }
 
