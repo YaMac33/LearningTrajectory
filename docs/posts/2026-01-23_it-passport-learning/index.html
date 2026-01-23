@@ -13,7 +13,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="ITパスポート俯瞰マップ" />
   <meta property="og:description" content="ITパスポート試験の頻出用語を「考え方」「方法」「管理対象」「仕組み」の4つに分類して俯瞰するマップ。丸暗記ではなく体系的に整理して覚えるための学習法を解説します。" />
-  
+
   <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
   <link rel="stylesheet" href="../../assets/styles.css" />
 
@@ -51,7 +51,7 @@
       min-height: 200px;
       box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
     }
-    
+
     /* 各象限の色分け */
     .q-concept { border-top: 6px solid #0056b3; background-color: #f0f8ff; } /* 考え方：青 */
     .q-method { border-top: 6px solid #27ae60; background-color: #f0fff4; }  /* 方法：緑 */
@@ -144,16 +144,84 @@
       font-size: 1.1em;
     }
 
+    /* 用語解説（グロッサリー） */
+    .glossary-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 1.5rem;
+    }
+    .glossary-nav a {
+      display: inline-block;
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.15);
+      background: #fff;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .glossary-block {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      background: #fff;
+    }
+    .glossary-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .glossary-title h3 {
+      margin: 0;
+    }
+    .glossary-hint {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .term-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    details.term {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      background: #fafafa;
+    }
+    details.term summary {
+      cursor: pointer;
+      font-weight: bold;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      list-style: none;
+    }
+    details.term summary::-webkit-details-marker { display:none; }
+    .term-body {
+      margin-top: 0.6rem;
+      color: #222;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+    .term-body ul {
+      margin: 0.4rem 0 0.1rem 1.2rem;
+    }
+    .term-body li {
+      margin: 0.2rem 0;
+    }
+
     /* レスポンシブ */
     @media (max-width: 600px) {
-      .matrix-container {
-        grid-template-columns: 1fr; /* スマホは1列 */
-      }
+      .matrix-container { grid-template-columns: 1fr; } /* スマホは1列 */
       .drill-options {
         flex-direction: column;
         align-items: center;
         gap: 0.5rem;
       }
+      .term-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -204,7 +272,7 @@
 
         <div class="diagram-section">
           <div class="matrix-container">
-            
+
             <!-- 左上：考え方 -->
             <div class="quadrant q-concept">
               <span class="q-title">① 考え方・戦略・概念</span>
@@ -310,7 +378,7 @@
 
         <div class="diagram-section" style="width:100%; max-width:600px;">
           <div class="drill-container">
-            
+
             <!-- Q1 -->
             <div class="drill-card">
               <div class="drill-q">Q1. 業務の流れを抜本的に見直し、企業活動全体の効率化を図る取組みはどれか。</div>
@@ -370,6 +438,319 @@
           </div>
         </div>
 
+        <!-- ★ ここから追加：用語解説（同ページ内に組み込み） -->
+        <h2 id="glossary">4. 用語解説（カテゴリ別）</h2>
+        <p>マップに出てくる用語を、同じページ内でサッと確認できるようにまとめました。<br>
+        <strong>使い方：</strong> 試験中に迷いやすい用語は、まず「どの箱か？」を見てから、該当カテゴリ内で意味を確認してください。</p>
+
+        <div class="glossary-nav">
+          <a href="#g-concept">考え方</a>
+          <a href="#g-method">方法</a>
+          <a href="#g-target">管理対象</a>
+          <a href="#g-system">仕組み</a>
+        </div>
+
+        <!-- 考え方 -->
+        <section class="glossary-block" id="g-concept">
+          <div class="glossary-title">
+            <h3>① 考え方・戦略・概念</h3>
+            <span class="glossary-hint">（迷ったら：姿勢／視点／方針っぽい話）</span>
+          </div>
+
+          <div class="term-grid">
+            <details class="term"><summary>MOT</summary><div class="term-body">
+              技術を「作る」だけでなく「経営にどう活かすか」を重視する考え方。
+              <ul><li>キーワード：技術×経営／事業価値／競争優位</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CSR</summary><div class="term-body">
+              企業が社会に対して果たすべき責任を重視する考え方。
+              <ul><li>キーワード：法令遵守／環境配慮／ステークホルダー</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CSV</summary><div class="term-body">
+              社会課題の解決と企業の利益を両立させる考え方。
+              <ul><li>CSR（責任）より「価値創造」に寄る</li></ul>
+            </div></details>
+
+            <details class="term"><summary>DX</summary><div class="term-body">
+              デジタル技術を使って業務やビジネスそのものを変革する考え方。
+              <ul><li>キーワード：変革／ビジネスモデル／データ活用</li></ul>
+            </div></details>
+
+            <details class="term"><summary>BSC</summary><div class="term-body">
+              経営を複数の視点でバランス良く評価・管理する枠組み。
+              <ul><li>キーワード：財務だけに偏らない／戦略と指標</li></ul>
+            </div></details>
+
+            <details class="term"><summary>SWOT</summary><div class="term-body">
+              強み・弱み・機会・脅威の4区分で状況を整理する枠組み。
+              <ul><li>内部：強み/弱み　外部：機会/脅威</li></ul>
+            </div></details>
+
+            <details class="term"><summary>PEST</summary><div class="term-body">
+              外部環境を政治・経済・社会・技術の観点で整理する枠組み。
+              <ul><li>キーワード：マクロ環境分析</li></ul>
+            </div></details>
+
+            <details class="term"><summary>3C</summary><div class="term-body">
+              市場・競合・自社（3要素）で事業環境を整理する枠組み。
+              <ul><li>キーワード：市場の見立て／競合との差／自社の強み</li></ul>
+            </div></details>
+
+            <details class="term"><summary>VRIO</summary><div class="term-body">
+              経営資源が競争優位になり得るかを4観点で評価する枠組み。
+              <ul><li>キーワード：価値／希少性／模倣困難性／組織</li></ul>
+            </div></details>
+
+            <details class="term"><summary>PDCA</summary><div class="term-body">
+              計画→実行→評価→改善のサイクルで継続改善する考え方。
+              <ul><li>キーワード：継続的改善／回す</li></ul>
+            </div></details>
+
+            <details class="term"><summary>OODA</summary><div class="term-body">
+              状況観察→判断→意思決定→行動のループで素早く動く考え方。
+              <ul><li>キーワード：変化が激しい環境で有効</li></ul>
+            </div></details>
+
+            <details class="term"><summary>TQM</summary><div class="term-body">
+              組織全体で品質を作り込む・維持するという考え方。
+              <ul><li>キーワード：全員参加／品質第一／継続改善</li></ul>
+            </div></details>
+
+            <details class="term"><summary>JIT</summary><div class="term-body">
+              必要なものを、必要なときに、必要な量だけ。無駄を減らす考え方。
+              <ul><li>キーワード：在庫最小化／タイミング重視</li></ul>
+            </div></details>
+
+            <details class="term"><summary>SLA</summary><div class="term-body">
+              サービス提供側と利用側で合意する「サービス水準」の考え方（合意内容）。
+              <ul><li>キーワード：稼働率／応答時間／復旧時間など</li></ul>
+            </div></details>
+          </div>
+        </section>
+
+        <!-- 方法 -->
+        <section class="glossary-block" id="g-method">
+          <div class="glossary-title">
+            <h3>② 方法・手法・計算</h3>
+            <span class="glossary-hint">（迷ったら：分析／手順／やり方っぽい話）</span>
+          </div>
+
+          <div class="term-grid">
+            <details class="term"><summary>BPR</summary><div class="term-body">
+              業務プロセスを抜本的に作り直して大きく改善する方法。
+              <ul><li>キーワード：抜本改革／ゼロベース再設計</li></ul>
+            </div></details>
+
+            <details class="term"><summary>BPM</summary><div class="term-body">
+              業務プロセスを設計→実行→監視→改善で継続的に管理する方法。
+              <ul><li>BPRが「一気に作り直す」なら、BPMは「回し続ける」</li></ul>
+            </div></details>
+
+            <details class="term"><summary>パレート</summary><div class="term-body">
+              重要少数（80:20）を見つけて優先度を決める分析。
+              <ul><li>キーワード：重要少数／重点化</li></ul>
+            </div></details>
+
+            <details class="term"><summary>回帰分析</summary><div class="term-body">
+              2つのデータの関係を「だいたい当てはまる式」で表す手法。
+              <ul><li>キーワード：目的変数／説明変数／傾向の式</li></ul>
+            </div></details>
+
+            <details class="term"><summary>線形計画</summary><div class="term-body">
+              制約条件の範囲内で、目的の値（利益など）を最大/最小にする解を求める手法。
+              <ul><li>キーワード：制約条件／最適化</li></ul>
+            </div></details>
+
+            <details class="term"><summary>デルファイ</summary><div class="term-body">
+              専門家に匿名で複数回アンケートし、意見を収束させる手法。
+              <ul><li>キーワード：匿名／反復／合意形成</li></ul>
+            </div></details>
+
+            <details class="term"><summary>AHP</summary><div class="term-body">
+              複数の選択肢を「基準ごと」に比較して重み付けし、総合評価する手法。
+              <ul><li>キーワード：多基準評価／重要度の重み</li></ul>
+            </div></details>
+
+            <details class="term"><summary>ABC</summary><div class="term-body">
+              活動（作業）ごとにコストを把握し、原価をより正確に割り当てる手法。
+              <ul><li>キーワード：活動基準／間接費の配賦</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CPM</summary><div class="term-body">
+              工程のうち、遅れると全体が遅れる「クリティカルパス」を求める手法。
+              <ul><li>キーワード：最長経路／余裕ゼロ</li></ul>
+            </div></details>
+
+            <details class="term"><summary>PERT</summary><div class="term-body">
+              工程時間にばらつきがある前提で、期待値などを使い計画する手法。
+              <ul><li>キーワード：確率的／見積りの幅</li></ul>
+            </div></details>
+
+            <details class="term"><summary>QC7つ道具</summary><div class="term-body">
+              品質管理でよく使う基本的な7つの図表・手法の総称。
+              <ul><li>キーワード：現場の見える化／原因の整理</li></ul>
+            </div></details>
+
+            <details class="term"><summary>EVM</summary><div class="term-body">
+              進捗・コストを「出来高」で管理し、遅れ/超過を早期把握する手法。
+              <ul><li>キーワード：出来高／差異分析</li></ul>
+            </div></details>
+
+            <details class="term"><summary>KPT</summary><div class="term-body">
+              振り返りで、良かった点・課題・次にやることを整理する方法。
+              <ul><li>キーワード：改善の型／継続的学習</li></ul>
+            </div></details>
+          </div>
+        </section>
+
+        <!-- 管理対象 -->
+        <section class="glossary-block" id="g-target">
+          <div class="glossary-title">
+            <h3>③ 管理対象（人・物・金）</h3>
+            <span class="glossary-hint">（迷ったら：何を管理してる話か？）</span>
+          </div>
+
+          <div class="term-grid">
+            <details class="term"><summary>HRM</summary><div class="term-body">
+              人材を採用・配置・育成・評価して、組織の成果につなげる管理。
+              <ul><li>キーワード：人材戦略／評価制度</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CRM</summary><div class="term-body">
+              顧客との関係を管理し、継続購入や満足度向上につなげる管理。
+              <ul><li>キーワード：顧客情報／関係強化</li></ul>
+            </div></details>
+
+            <details class="term"><summary>SCM</summary><div class="term-body">
+              調達から販売までの供給連鎖を最適化する管理。
+              <ul><li>キーワード：在庫／物流／リードタイム</li></ul>
+            </div></details>
+
+            <details class="term"><summary>SRM</summary><div class="term-body">
+              取引先（サプライヤ）との関係・評価・調達を最適化する管理。
+              <ul><li>キーワード：調達／サプライヤ管理</li></ul>
+            </div></details>
+
+            <details class="term"><summary>ITIL</summary><div class="term-body">
+              ITサービスを安定提供するための運用管理のベストプラクティス。
+              <ul><li>キーワード：インシデント／変更／サービス管理</li></ul>
+            </div></details>
+
+            <details class="term"><summary>ISMS</summary><div class="term-body">
+              情報セキュリティを「仕組みとして」管理する枠組み。
+              <ul><li>キーワード：リスク評価／継続的改善／運用</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CSIRT</summary><div class="term-body">
+              セキュリティ事故（インシデント）に対応する体制・チーム。
+              <ul><li>キーワード：検知／対応／再発防止</li></ul>
+            </div></details>
+
+            <details class="term"><summary>KGI</summary><div class="term-body">
+              最終目標（ゴール）を数値で表す指標。
+              <ul><li>例：売上、利益、達成率 など</li></ul>
+            </div></details>
+
+            <details class="term"><summary>KPI</summary><div class="term-body">
+              目標達成に向けた途中の達成度を測る指標。
+              <ul><li>例：成約率、問い合わせ数、納期遵守率 など</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CSF</summary><div class="term-body">
+              成功に不可欠な要因（ここがダメだと失敗するポイント）。
+              <ul><li>KPIは「測る」、CSFは「重要ポイント」</li></ul>
+            </div></details>
+
+            <details class="term"><summary>BCM</summary><div class="term-body">
+              事業継続を実現するための管理（運用の枠組み）。
+              <ul><li>キーワード：平時の準備／訓練／継続改善</li></ul>
+            </div></details>
+
+            <details class="term"><summary>BCP</summary><div class="term-body">
+              災害・事故時に事業を続けるための具体的な計画書。
+              <ul><li>キーワード：手順／代替手段／復旧</li></ul>
+            </div></details>
+          </div>
+        </section>
+
+        <!-- 仕組み -->
+        <section class="glossary-block" id="g-system">
+          <div class="glossary-title">
+            <h3>④ 仕組み・システム・技術</h3>
+            <span class="glossary-hint">（迷ったら：統合・基盤・自動化・仕組みっぽい話）</span>
+          </div>
+
+          <div class="term-grid">
+            <details class="term"><summary>ERP</summary><div class="term-body">
+              会計・販売・在庫・人事などの基幹業務を統合して扱う仕組み。
+              <ul><li>キーワード：全社統合／一元管理</li></ul>
+            </div></details>
+
+            <details class="term"><summary>MRP</summary><div class="term-body">
+              生産計画や部品構成から、必要な資材量を算出する仕組み。
+              <ul><li>キーワード：所要量計算／押し出し</li></ul>
+            </div></details>
+
+            <details class="term"><summary>DRP</summary><div class="term-body">
+              配送・補充の計画を立て、在庫や供給を最適化する仕組み。
+              <ul><li>キーワード：流通／補充計画</li></ul>
+            </div></details>
+
+            <details class="term"><summary>MES</summary><div class="term-body">
+              製造現場の作業実行を管理・可視化する仕組み。
+              <ul><li>キーワード：現場進捗／指示／トレーサビリティ</li></ul>
+            </div></details>
+
+            <details class="term"><summary>かんばん</summary><div class="term-body">
+              後工程が必要な分だけ引き取ることで生産を制御する仕組み。
+              <ul><li>キーワード：後工程引き取り／作りすぎ防止</li></ul>
+            </div></details>
+
+            <details class="term"><summary>JIT</summary><div class="term-body">
+              （考え方としても使われるが）運用面では、必要なタイミングに合わせる仕組みとして扱われることがある。
+              <ul><li>キーワード：納入タイミング／在庫最小化</li></ul>
+            </div></details>
+
+            <details class="term"><summary>TOC</summary><div class="term-body">
+              制約（ボトルネック）を特定・改善して全体最適を狙う仕組み。
+              <ul><li>キーワード：制約条件／全体の流れ</li></ul>
+            </div></details>
+
+            <details class="term"><summary>RPA</summary><div class="term-body">
+              定型作業をソフトウェアで自動化する仕組み。
+              <ul><li>キーワード：繰り返し作業／自動化</li></ul>
+            </div></details>
+
+            <details class="term"><summary>BI</summary><div class="term-body">
+              経営判断のためにデータを集計・分析・可視化する仕組み。
+              <ul><li>キーワード：ダッシュボード／分析</li></ul>
+            </div></details>
+
+            <details class="term"><summary>DWH</summary><div class="term-body">
+              分析に使うため、複数システムのデータを統合して蓄える基盤。
+              <ul><li>キーワード：データ統合／分析用</li></ul>
+            </div></details>
+
+            <details class="term"><summary>CMS</summary><div class="term-body">
+              Webコンテンツ（ページや記事）を管理・更新しやすくする仕組み。
+              <ul><li>キーワード：更新の仕組み／管理画面</li></ul>
+            </div></details>
+
+            <details class="term"><summary>SFA</summary><div class="term-body">
+              営業活動を可視化し、案件管理や行動管理を支援する仕組み。
+              <ul><li>キーワード：営業支援／案件管理</li></ul>
+            </div></details>
+
+            <details class="term"><summary>ETL</summary><div class="term-body">
+              データを抽出→変換→格納して、分析や統合に使える形に整える処理。
+              <ul><li>キーワード：データ加工／DWHの前処理</li></ul>
+            </div></details>
+          </div>
+        </section>
+        <!-- ★ 追加ここまで -->
+
         <h2>まとめ</h2>
         <p>ITパスポート試験は、用語の意味を辞書的に覚えている人よりも、<strong>「これは何の話なのか（カテゴリ）」</strong>を整理できている人が勝つ試験です。</p>
         <p>このマップを頭の中に描けるようになれば、初見の略語が出ても「あ、これはシステムの箱にあるやつだ」と推測が効くようになります。</p>
@@ -391,4 +772,3 @@
   </script>
 </body>
 </html>
-
