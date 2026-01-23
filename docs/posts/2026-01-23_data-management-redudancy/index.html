@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>冗長性とデータ管理の重要性 - IT passport study map</title>
+  <meta name="description" content="「サーバーは冗長化すべきだが、データは重複させてはいけない」というパラドックスを解説。物理的冗長性と論理的冗長性の違い、正規化を崩してあえて冗長化するケースまでを整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="冗長性とデータ管理の重要性" />
+  <meta property="og:description" content="「サーバーは冗長化すべきだが、データは重複させてはいけない」というパラドックスを解説。物理的冗長性と論理的冗長性の違い、正規化を崩してあえて冗長化するケースまでを整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 良い冗長 vs 悪い冗長 対比図 */
+    .vs-container {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .concept-box {
+      flex: 1;
+      min-width: 280px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    
+    /* Server Redundancy (Good) */
+    .concept-box.server {
+      border-color: #27ae60;
+      background: #f0fff4;
+    }
+    .concept-box.server::before {
+      content: "⭕ 物理的冗長性";
+      display: block;
+      color: #27ae60;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .server-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Data Redundancy (Bad) */
+    .concept-box.data {
+      border-color: #c0392b;
+      background: #fff5f5;
+    }
+    .concept-box.data::before {
+      content: "❌ 論理的冗長性";
+      display: block;
+      color: #c0392b;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .data-table-visual {
+      font-family: monospace;
+      font-size: 0.85rem;
+      text-align: left;
+      background: #fff;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      margin: 0 auto;
+      display: inline-block;
+    }
+    .mismatch {
+      color: #d00;
+      font-weight: bold;
+      background: #ffcccc;
+    }
+
+    /* レプリケーション図 */
+    .replication-flow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-weight: bold;
+    }
+    .db-box {
+      border: 2px solid #333;
+      border-radius: 4px;
+      padding: 0.8rem;
+      background: #fff;
+      text-align: center;
+    }
+    .sync-arrow {
+      color: #0056b3;
+      font-size: 0.9rem;
+      border-top: 2px dashed #0056b3;
+      padding-top: 2px;
+      position: relative;
+    }
+    .sync-arrow::after {
+      content: "自動同期";
+      position: absolute;
+      top: -1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 25%;
+    }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .vs-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / テクノロジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">冗長性とデータ管理の重要性</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#冗長性</li>
+            <li class="tag">#データベース</li>
+            <li class="tag">#可用性</li>
+            <li class="tag">#正規化</li>
+            <li class="tag">#システム設計</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「サーバーは故障に備えて冗長化（二重化）すべき」と言われる一方で、データベース設計では「データを冗長化（重複）させてはいけない」と教わります。<br>
+        一見矛盾しているように見えますが、これは<strong>「物理的な予備」の話と「データの論理構造」の話</strong>を区別することでスッキリ理解できます。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          システム（箱）は冗長化して「止まらない」ようにするが、データ（中身）は重複させず「矛盾しない」ようにする。
+        </div>
+
+        <h2>1. 「良い冗長」と「悪い冗長」の違い</h2>
+        <p>ITシステムにおいて、冗長性（Redundancy）という言葉は文脈によって意味が異なります。</p>
+
+        <div class="diagram-section">
+          <div class="vs-container">
+            
+            <!-- サーバーの冗長化 -->
+            <div class="concept-box server">
+              <div class="server-icon">🖥️ ＋ 🖥️</div>
+              <p><strong>サーバーの冗長構成</strong></p>
+              <p style="font-size:0.9rem; text-align:left;">
+                ・片方が壊れても動き続ける<br>
+                ・負荷を分散できる<br>
+                ・<strong>目的：可用性（Availability）</strong>
+              </p>
+            </div>
+
+            <!-- データの冗長化 -->
+            <div class="concept-box data">
+              <div class="data-table-visual">
+                顧客A: 東京都...<br>
+                注文1: 顧客A, <span class="mismatch">大阪府...</span>
+              </div>
+              <p style="margin-top:0.5rem;"><strong>データの重複管理</strong></p>
+              <p style="font-size:0.9rem; text-align:left;">
+                ・同じ情報が複数の場所にある<br>
+                ・更新漏れで矛盾が起きる<br>
+                ・<strong>リスク：不整合（Inconsistency）</strong>
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <h3>なぜDBの「値」は重複してはいけないのか？</h3>
+        <p>例えば、「顧客テーブル」と「注文テーブル」の両方に「住所」を持たせたとします。<br>
+        顧客が引っ越して住所変更をした際、顧客テーブルだけ書き換えて注文テーブルを忘れると、<strong>「この人はどこに住んでいるのか？」というデータの矛盾</strong>が発生します。</p>
+        <p>これを防ぐために行うのが<strong>「正規化（Normalization）」</strong>です。情報を1箇所だけで管理するように整理します。</p>
+
+        <h2>2. それでも「DBサーバー」は冗長化する</h2>
+        <p>ここで重要なのが、「データを重複させない」ことと「DBサーバーを1台にする」ことはイコールではない点です。<br>
+        DBサーバーが1台だと、それが壊れたら終わりです。そのため、<strong>「中身は完全に同じ（同期された）予備のDB」</strong>を用意します。</p>
+
+        <div class="diagram-section">
+          <div class="replication-flow">
+            <div class="db-box">
+              DB（現用）<br>
+              <span style="font-size:0.8rem; color:#0056b3;">書き込み</span>
+            </div>
+            <div class="sync-arrow">──────▶</div>
+            <div class="db-box">
+              DB（待機）<br>
+              <span style="font-size:0.8rem; color:#666;">読み取り専用</span>
+            </div>
+          </div>
+          <p style="font-size:0.9rem; color:#666; margin-top:1rem;">これは「レプリケーション（複製）」と呼ばれ、推奨される構成です。</p>
+        </div>
+
+        <h2>3. 実務テクニック：あえて冗長化するケース</h2>
+        <p>基本原則は「データの重複排除（正規化）」ですが、実務では<strong>性能や履歴管理のために、あえて正規化を崩す（非正規化する）</strong>ことがあります。</p>
+
+        <h3>パターン①：検索速度を優先する</h3>
+        <p>ECサイトの注文履歴などでよくあるケースです。</p>
+        <ul>
+          <li><strong>正規化（原則）：</strong>注文テーブルには「顧客ID」だけ持ち、名前を表示するたびに顧客テーブルを見に行く（JOINする）。→ <strong>遅い</strong></li>
+          <li><strong>非正規化（例外）：</strong>注文テーブルに「顧客名」もコピーして持たせておく。→ <strong>速い</strong></li>
+        </ul>
+        <p>※ただし、名前が変わったときの同期処理などの対策が必要です。</p>
+
+        <h3>パターン②：過去の事実を保存する</h3>
+        <p>「注文時の価格」が典型的です。</p>
+        <ul>
+          <li>商品マスタの価格は変動します。</li>
+          <li>注文データに「商品ID」しかないと、今の価格で計算されてしまいます。</li>
+          <li>そのため、注文データには<strong>「その時点の単価」をあえて重複して記録</strong>します。これは必要な冗長性です。</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <p>試験や実務での判断基準は以下の通りです。</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>対象</th>
+              <th>冗長性の判断</th>
+              <th>理由・目的</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ハードウェア・構成</strong></td>
+              <td><span style="color:#0056b3; font-weight:bold;">⭕ 推奨</span></td>
+              <td>可用性向上（止まらないようにする）</td>
+            </tr>
+            <tr>
+              <td><strong>データの中身</strong></td>
+              <td><span style="color:#d00; font-weight:bold;">❌ 原則禁止</span></td>
+              <td>整合性維持（矛盾を防ぐ）</td>
+            </tr>
+            <tr>
+              <td><strong>例外ケース</strong></td>
+              <td><span style="color:#e67e22; font-weight:bold;">⚠️ 条件付きOK</span></td>
+              <td>性能向上、履歴保存のため<br>（ただし管理コストは増える）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>「冗長」という言葉が出たら、それが「箱（システム）の話」なのか「中身（データ）の話」なのかを見極めることが重要です。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
