@@ -13,7 +13,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="線形計画法の基本" />
   <meta property="og:description" content="線形計画法とは何か？「制約条件」と「実行可能領域」の概念を図解し、なぜ最適解が領域の「角」になるのかを直感的に解説します。" />
-  
+
   <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
   <link rel="stylesheet" href="../../assets/styles.css" />
 
@@ -37,11 +37,26 @@
       position: relative;
       width: 320px;
       height: 280px;
-      border-left: 3px solid #333;
-      border-bottom: 3px solid #333;
       margin: 1rem auto;
       background: #fff;
+      border-left: 3px solid #333;
+      border-bottom: 3px solid #333;
+      overflow: hidden; /* 変なはみ出しを抑制 */
     }
+
+    /* 目盛りっぽい補助（任意：見やすさUP） */
+    .lp-chart::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(0,0,0,0.06) 1px, transparent 1px),
+        linear-gradient(to top, rgba(0,0,0,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .axis-label-y {
       position: absolute;
       top: -25px;
@@ -49,6 +64,7 @@
       font-weight: bold;
       font-size: 0.95rem;
       color: #333;
+      z-index: 6;
     }
     .axis-label-x {
       position: absolute;
@@ -57,57 +73,120 @@
       font-weight: bold;
       font-size: 0.95rem;
       color: #333;
+      z-index: 6;
     }
-    
-    /* 実行可能領域（多角形） */
+
+    /*
+      ✅修正ポイント
+      - 実行可能領域が「制約線」や「目的関数線」を覆ってしまう問題を z-index で解消
+      - clip-path の頂点を“それっぽい凸多角形”に整理（変な凹みや歪みを減らす）
+    */
     .feasible-region {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(66, 135, 245, 0.2);
-      clip-path: polygon(0% 100%, 0% 30%, 50% 50%, 70% 100%);
+      inset: 0;
+      background: rgba(66, 135, 245, 0.20);
+      z-index: 1;
+
+      /* 0,0 は左上 / 0,100 は左下
+         LP図の「第一象限」っぽく、左下原点からの領域を表現 */
+      clip-path: polygon(
+        0% 100%,   /* 原点(0,0) */
+        0% 35%,    /* y軸上の交点 */
+        48% 55%,   /* 2本の制約の交点っぽい位置 */
+        70% 100%   /* x軸上の交点 */
+      );
     }
-    
+
     /* 制約条件の線 */
     .constraint-line {
       position: absolute;
-      background: #666;
       height: 2px;
+      background: #666;
+      z-index: 2; /* 領域より前に */
+      opacity: 0.95;
     }
+
+    /* 斜め上がりの制約線 */
     .cl-1 {
-      bottom: 0;
-      left: 0;
-      width: 140%;
-      transform-origin: bottom left;
+      left: -30%;
+      bottom: -10%;
+      width: 160%;
+      transform-origin: left bottom;
       transform: rotate(25deg);
     }
+
+    /* 斜め下がりの制約線 */
     .cl-2 {
-      top: 50%;
-      left: 0;
-      width: 120%;
-      transform-origin: top left;
+      left: -25%;
+      bottom: 55%;
+      width: 150%;
+      transform-origin: left center;
       transform: rotate(-20deg);
     }
 
-    /* 最適解の点 */
+    /* 目的関数の線 */
+    .objective-line {
+      position: absolute;
+      height: 0;
+      border-top: 2px solid #ff8c42; /* ✅ border で線を描く */
+      z-index: 3;
+      transform-origin: center;
+    }
+
+    /* 目的関数（開始位置：点線） */
+    .ol-start {
+      left: 5%;
+      bottom: 18%;
+      width: 190px;
+      opacity: 0.55;
+      border-top-style: dashed; /* ✅ dashed を有効に */
+      transform: rotate(35deg);
+    }
+
+    /* 目的関数（最大化方向にスライドした位置：実線） */
+    .ol-goal {
+      left: 50%;
+      bottom: 52%;
+      width: 210px;
+      opacity: 1;
+      border-top-style: solid;
+      transform: translate(-50%, 50%) rotate(35deg);
+    }
+
+    .slide-arrow {
+      position: absolute;
+      font-size: 2rem;
+      color: #ff8c42;
+      font-weight: bold;
+      left: 20%;
+      bottom: 30%;
+      transform: rotate(30deg);
+      text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* 最適解の点（“角”に置く：座標を明示） */
     .optimal-point {
       position: absolute;
-      bottom: 50%;
-      left: 50%;
+      /* ✅ ここで「角」の位置を調整（見た目の頂点に合わせる） */
+      left: 154px;    /* お好みで微調整 */
+      bottom: 126px;  /* お好みで微調整 */
+
       width: 14px;
       height: 14px;
       background: #dc3545;
       border-radius: 50%;
       transform: translate(-50%, 50%);
-      z-index: 10;
+      z-index: 5;
       box-shadow: 0 0 0 5px rgba(220, 53, 69, 0.25);
     }
+
     .optimal-label {
       position: absolute;
-      bottom: 55%;
-      left: 55%;
+      left: 168px;    /* 点の右上あたり */
+      bottom: 145px;
+
       background: #dc3545;
       color: #fff;
       font-size: 0.85rem;
@@ -115,40 +194,7 @@
       border-radius: 4px;
       font-weight: bold;
       white-space: nowrap;
-    }
-
-    /* 目的関数の線（スライドイメージ） */
-    .objective-line {
-      position: absolute;
-      height: 2px;
-      background: #ff8c42;
-      transform-origin: center;
-    }
-    .ol-start {
-      bottom: 15%;
-      left: 5%;
-      width: 180px;
-      transform: rotate(35deg);
-      opacity: 0.5;
-      border-bottom: 2px dashed #ff8c42;
-      background: none;
-    }
-    .ol-goal {
-      bottom: 50%;
-      left: 50%;
-      width: 200px;
-      transform: translate(-50%, 50%) rotate(35deg);
-      opacity: 1;
-    }
-    .slide-arrow {
-      position: absolute;
-      font-size: 2rem;
-      color: #ff8c42;
-      font-weight: bold;
-      bottom: 28%;
-      left: 20%;
-      transform: rotate(30deg);
-      text-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+      z-index: 6;
     }
 
     /* 比較テーブル */
@@ -227,7 +273,7 @@
 
         <h2>1. 何をやっている手法か？</h2>
         <p>難しい数式の前に、やっていることのイメージを掴みましょう。</p>
-        
+
         <h3>具体例：お菓子工場の場合</h3>
         <ul>
           <li><strong>作りたいもの：</strong>クッキー(x) と ケーキ(y)</li>
@@ -250,24 +296,28 @@
           <div class="lp-chart">
             <div class="axis-label-y">商品B (y)</div>
             <div class="axis-label-x">商品A (x)</div>
-            
-            <!-- 制約条件の線 -->
+
+            <!-- 実行可能領域（最背面寄り） -->
+            <div class="feasible-region"></div>
+
+            <!-- 制約条件の線（領域より前面） -->
             <div class="constraint-line cl-1"></div>
             <div class="constraint-line cl-2"></div>
 
-            <!-- 実行可能領域 -->
-            <div class="feasible-region"></div>
-            
-            <!-- 目的関数のスライド -->
+            <!-- 目的関数のスライド（さらに前面） -->
             <div class="objective-line ol-start"></div>
             <div class="slide-arrow">↗</div>
             <div class="objective-line ol-goal"></div>
 
-            <!-- 最適解 -->
+            <!-- 最適解（最前面） -->
             <div class="optimal-point"></div>
             <div class="optimal-label">最適解！</div>
           </div>
-          <p style="font-size:0.9rem; color:#666;">オレンジの線（利益）を右上にスライドさせて、<br>最後に領域と接する「角」が最大利益になります。</p>
+
+          <p style="font-size:0.9rem; color:#666;">
+            オレンジの線（利益）を右上にスライドさせて、<br>
+            最後に領域と接する「角」が最大利益になります。
+          </p>
         </div>
 
         <h3>図の重要用語</h3>
@@ -293,7 +343,7 @@
             <span class="term-title">目的関数</span>
             <p><strong>「最大化（または最小化）したい式」</strong>のこと。<br>例：利益 ＝ 100円×クッキー ＋ 300円×ケーキ</p>
           </div>
-          
+
           <div class="term-box">
             <span class="term-title">制約条件（1次不等式）</span>
             <p><strong>「守らなければならないルール」</strong>のこと。<br>例：小麦粉の使用量 ≦ 100kg</p>
@@ -357,4 +407,3 @@
   </script>
 </body>
 </html>
-
