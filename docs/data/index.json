@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "2026-01-23_dx-governance-importance",
+    "timestamp": "2026-01-23T16:30:58+09:00",
+    "title": "DXガバナンスの重要性",
+    "summary": "DXガバナンスとITガバナンスの違いを解説します。変革を持続させるための必要性を考察します。",
+    "tags": [
+      "DXガバナンス",
+      "ITガバナンス",
+      "リスク管理",
+      "経営戦略",
+      "企業変革"
+    ],
+    "category_lv1": "ストラテジ系",
+    "category_lv2": "経営戦略",
+    "post_path": "posts/2026-01-23_dx-governance-importance/"
+  }
+]
