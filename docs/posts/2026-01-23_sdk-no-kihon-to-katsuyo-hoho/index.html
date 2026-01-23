@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>SDKの基本と活用方法 - IT passport study map</title>
+  <meta name="description" content="SDK（ソフトウェア開発キット）とは何か？APIやライブラリとの違い、主な構成要素、具体的な活用例を初心者向けに図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SDKの基本と活用方法" />
+  <meta property="og:description" content="SDK（ソフトウェア開発キット）とは何か？APIやライブラリとの違い、主な構成要素、具体的な活用例を初心者向けに図解で解説します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 道具箱（ツールボックス）の図解 */
+    .toolbox-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      background: #e74c3c;
+      border-radius: 8px 8px 12px 12px;
+      padding: 3rem 1.5rem 1.5rem;
+      border: 4px solid #c0392b;
+      box-shadow: 0 5px 0 #96281b;
+      margin-top: 1rem;
+    }
+    /* 取っ手 */
+    .toolbox-handle {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 20px;
+      background: #bdc3c7;
+      border: 4px solid #7f8c8d;
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+    }
+    .toolbox-label {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.2);
+      color: #fff;
+      font-weight: bold;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    /* 中身のグリッド */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+    .tool-item {
+      background: #fff;
+      border-radius: 4px;
+      padding: 0.5rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: #333;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+    }
+
+    /* 構成要素ツリー */
+    .tree-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 450px;
+      font-family: monospace;
+    }
+    .tree-root {
+      background: #333;
+      color: #fff;
+      padding: 0.8rem;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .tree-branch {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tree-line {
+      color: #999;
+      font-weight: bold;
+    }
+    .tree-leaf {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      flex: 1;
+      font-size: 0.9rem;
+    }
+    .leaf-desc {
+      font-size: 0.8rem;
+      color: #666;
+      margin-left: 0.5rem;
+      font-weight: normal;
+    }
+
+    /* 具体例リスト */
+    .example-list {
+      width: 100%;
+      list-style: none;
+      padding: 0;
+    }
+    .example-item {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .example-name {
+      font-weight: bold;
+      color: #0056b3;
+      min-width: 120px;
+    }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .example-item {
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / テクノロジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SDKの基本と活用方法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#SDK</li>
+            <li class="tag">#ソフトウェア開発</li>
+            <li class="tag">#API</li>
+            <li class="tag">#ツール</li>
+            <li class="tag">#ライブラリ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「SDK」という言葉は、アプリ開発やシステム連携の話で必ず登場します。<br>
+        Software Development Kit（ソフトウェア開発キット）の略ですが、これはいわば<strong>「開発者のための道具箱」</strong>です。</p>
+        
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          SDKとは、ある特定のシステムやサービスの開発に必要な「プログラム部品」「説明書」「ツール」などが一式揃ったパッケージのこと。
+        </div>
+
+        <h2>1. イメージで理解するSDK</h2>
+        <p>日曜大工（DIY）に例えると分かりやすいでしょう。<br>
+        「椅子を作りたい」と思ったとき、木材だけ渡されても困ります。ノコギリ、釘、金槌、そして設計図が必要です。</p>
+        <p>SDKは、これらをセットにして提供してくれる「組み立てキット」のようなものです。</p>
+
+        <div class="diagram-section">
+          <div class="toolbox-container">
+            <div class="toolbox-handle"></div>
+            <div class="toolbox-label">SDK (開発キット)</div>
+            <div class="tools-grid">
+              <div class="tool-item">API / ライブラリ</div>
+              <div class="tool-item">ドキュメント</div>
+              <div class="tool-item">サンプルコード</div>
+              <div class="tool-item">デバッグツール</div>
+            </div>
+          </div>
+          <p style="font-size:0.9rem; color:#666; margin-top:1rem;">これさえあれば、すぐに開発を始められる！</p>
+        </div>
+
+        <h2>2. SDKの主な構成要素</h2>
+        <p>「キット」の中には具体的に何が入っているのでしょうか。一般的な中身を整理します。</p>
+
+        <div class="diagram-section">
+          <div class="tree-diagram">
+            <div class="tree-root">SDK (Package)</div>
+            
+            <div class="tree-branch">
+              <span class="tree-line">├─</span>
+              <div class="tree-leaf"><strong>API / ライブラリ</strong><span class="leaf-desc">機能を呼び出す部品</span></div>
+            </div>
+            
+            <div class="tree-branch">
+              <span class="tree-line">├─</span>
+              <div class="tree-leaf"><strong>ドキュメント</strong><span class="leaf-desc">仕様書・マニュアル</span></div>
+            </div>
+            
+            <div class="tree-branch">
+              <span class="tree-line">├─</span>
+              <div class="tree-leaf"><strong>サンプルコード</strong><span class="leaf-desc">動く見本プログラム</span></div>
+            </div>
+
+            <div class="tree-branch">
+              <span class="tree-line">├─</span>
+              <div class="tree-leaf"><strong>開発ツール</strong><span class="leaf-desc">デバッガ・コンパイラ等</span></div>
+            </div>
+
+            <div class="tree-branch">
+              <span class="tree-line">└─</span>
+              <div class="tree-leaf"><strong>ライセンス</strong><span class="leaf-desc">利用規約・NDA</span></div>
+            </div>
+          </div>
+        </div>
+
+        <h2>3. 身近な具体例</h2>
+        <p>用途によって様々なSDKが存在します。</p>
+
+        <ul class="example-list">
+          <li class="example-item">
+            <span class="example-name">Android SDK</span>
+            <span>Androidアプリを作るためのキット（Google提供）</span>
+          </li>
+          <li class="example-item">
+            <span class="example-name">iOS SDK</span>
+            <span>iPhone/iPadアプリを作るためのキット（Apple提供）</span>
+          </li>
+          <li class="example-item">
+            <span class="example-name">Unity SDK</span>
+            <span>ゲーム開発エンジンUnityの機能を使うためのキット</span>
+          </li>
+          <li class="example-item">
+            <span class="example-name">Google Maps SDK</span>
+            <span>自分のアプリの中にGoogleマップを表示するためのキット</span>
+          </li>
+        </ul>
+
+        <h2>4. SDKと「限定提供データ」</h2>
+        <p>SDKの中には、誰でも無料でダウンロードできるもの（オープンなもの）もあれば、<strong>契約したパートナー企業にしか渡されないもの</strong>もあります。</p>
+        <p>後者の場合、SDK自体が不正競争防止法などにおける「限定提供データ」として扱われることがあります。開発前にNDA（秘密保持契約）を結ぶ必要があるのはこのためです。</p>
+
+        <h2>まとめ</h2>
+        <ul>
+          <li><strong>SDK ＝ 開発キット（道具箱）。</strong></li>
+          <li>中身は「部品（API/ライブラリ）」「説明書（ドキュメント）」「道具（ツール）」の3点セット。</li>
+          <li>これを使うことで、ゼロから作る手間を省き、効率よく開発できる。</li>
+        </ul>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
