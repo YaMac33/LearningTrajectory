@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidenote | IT passport study map</title>
+  <meta name="description" content="A minimalist design blog.">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="./index.html" class="site-title">IT passport study map</a>
+    </header>
+
+    <main>
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search posts (title / summary / tags)"
+          aria-label="Search posts"
+        />
+      </div>
+
+      <ul class="post-list" id="postList">
+        <li id="loadingState" class="post-item">
+          <article>
+            <time class="post-meta">Loading...</time>
+            <h2 class="post-title">Loading posts</h2>
+            <p class="post-excerpt">Please wait.</p>
+          </article>
+        </li>
+      </ul>
+
+      <div id="noResults" style="display:none;">No posts found</div>
+
+      <div id="loadError" style="display:none;">
+        Failed to load index.json
+        <div id="loadErrorMsg"></div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- JSは外部ファイルのみ（inline scriptは無し） -->
+  <script src="./assets/app.js"></script>
+</body>
+</html>
