@@ -1,0 +1,16 @@
+{
+  "id": "2026-01-23_soa-microservices-evolution",
+  "timestamp": "2026-01-23T09:53:29+09:00",
+  "title": "SOAとマイクロサービスの違いと進化",
+  "summary": "SOAとマイクロサービスの関係性を説明します。中央集権的なSOAと自律分散的なマイクロサービスの違いを整理しました。",
+  "tags": [
+    "SOA",
+    "マイクロサービス",
+    "アーキテクチャ",
+    "サービス指向",
+    "ITパスポート"
+  ],
+  "category_lv1": "テクノロジ系",
+  "category_lv2": "基礎理論",
+  "post_path": "posts/2026-01-23_soa-microservices-evolution/"
+}
