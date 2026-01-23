@@ -1,5 +1,22 @@
 [
   {
+    "id": "2026-01-24_saas-asp-chigai",
+    "timestamp": "2026-01-24T07:10:24+09:00",
+    "title": "SaaSとASPの違いを解説",
+    "summary": "SaaSとASPの違いを整理し、時代背景やITパスポート試験での取り扱いについて詳しく解説します。両者の関係を理解するためのポイントも紹介。",
+    "tags": [
+      "SaaS",
+      "ASP",
+      "クラウド",
+      "ITパスポート",
+      "サービス",
+      "比較"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "基礎理論",
+    "post_path": "posts/2026-01-24_saas-asp-chigai/"
+  },
+  {
     "id": "2026-01-24_virtual-currency-centralization-difference",
     "timestamp": "2026-01-24T06:45:32+09:00",
     "title": "仮想通貨と中央集権の違い",
