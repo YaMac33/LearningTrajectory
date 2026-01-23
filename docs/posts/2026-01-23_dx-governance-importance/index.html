@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>DXガバナンスの重要性 - IT passport study map</title>
+  <meta name="description" content="DXガバナンスとITガバナンスの違いを徹底解説。なぜDXにおいて「守り」だけでなく「攻め」の統制が必要なのか、その理由と関係性を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DXガバナンスの重要性" />
+  <meta property="og:description" content="DXガバナンスとITガバナンスの違いを徹底解説。なぜDXにおいて「守り」だけでなく「攻め」の統制が必要なのか、その理由と関係性を図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 対比図（守り vs 攻め） */
+    .vs-container {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .gov-card {
+      flex: 1;
+      min-width: 280px;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    /* ITガバナンス（守り） */
+    .gov-card.it {
+      border-top: 6px solid #0056b3;
+    }
+    .gov-icon.it {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    /* DXガバナンス（攻め＋守り） */
+    .gov-card.dx {
+      border-top: 6px solid #e67e22;
+    }
+    .gov-icon.dx {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .gov-title {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .gov-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+    .badge-it { background: #0056b3; }
+    .badge-dx { background: #e67e22; }
+
+    .gov-desc {
+      font-size: 0.95rem;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* 包含関係図 */
+    .inclusion-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      padding: 1rem;
+    }
+    .box-outer {
+      background: #fff8e1;
+      border: 2px dashed #e67e22;
+      border-radius: 12px;
+      padding: 3rem 2rem 2rem;
+      position: relative;
+      color: #e67e22;
+    }
+    .label-outer {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #e67e22;
+      color: #fff;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .box-inner {
+      background: #fff;
+      border: 2px solid #0056b3;
+      border-radius: 8px;
+      padding: 1.5rem;
+      color: #0056b3;
+      margin-top: 1rem;
+      position: relative;
+    }
+    .label-inner {
+      position: absolute;
+      top: -12px;
+      left: 15px;
+      background: #0056b3;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 25%;
+    }
+    .comparison-table td:nth-child(2) { background: #f0f8ff; } /* IT */
+    .comparison-table td:nth-child(3) { background: #fffaf0; } /* DX */
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .vs-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / ストラテジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DXガバナンスの重要性</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#DXガバナンス</li>
+            <li class="tag">#ITガバナンス</li>
+            <li class="tag">#リスク管理</li>
+            <li class="tag">#経営戦略</li>
+            <li class="tag">#企業変革</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「ガバナンス」と聞くと、ルールで縛る「守り」のイメージが強いかもしれません。<br>
+        しかし、DX（デジタルトランスフォーメーション）においては、むしろ「変革を止めない」ための攻めのガバナンスが求められます。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          ITガバナンスは「ITを正しく管理する守りの統制」だが、DXガバナンスは「変革を持続させるための攻めと守りの統制」である。
+        </div>
+
+        <h2>1. ITガバナンスとDXガバナンスの違い</h2>
+        <p>この2つは似て非なるものです。最大の違いは「目的」と「スタンス」にあります。</p>
+
+        <div class="diagram-section">
+          <div class="vs-container">
+            
+            <!-- ITガバナンス -->
+            <div class="gov-card it">
+              <div class="gov-icon it">🛡️</div>
+              <span class="gov-title">ITガバナンス</span>
+              <span class="gov-badge badge-it">守り・管理</span>
+              <p class="gov-desc">
+                システムを安定稼働させ、リスクを防ぐこと。<br>
+                <strong>「ITを正しく使わせる」</strong>
+              </p>
+            </div>
+
+            <!-- DXガバナンス -->
+            <div class="gov-card dx">
+              <div class="gov-icon dx">⚔️🛡️</div>
+              <span class="gov-title">DXガバナンス</span>
+              <span class="gov-badge badge-dx">攻め ＋ 守り</span>
+              <p class="gov-desc">
+                変革を推進し、価値を生み続けること。<br>
+                <strong>「DXを正しく進ませ続ける」</strong>
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <h3>比較テーブル</h3>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>ITガバナンス</th>
+              <th>DXガバナンス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>主眼</th>
+              <td>管理・統制</td>
+              <td>変革の持続</td>
+            </tr>
+            <tr>
+              <th>対象</th>
+              <td>ITシステム・投資</td>
+              <td>ビジネス・組織・文化</td>
+            </tr>
+            <tr>
+              <th>重視点</th>
+              <td>安定性・安全性</td>
+              <td>俊敏性・価値創出</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>2. 両者の関係性（包含関係）</h2>
+        <p>注意すべきなのは、「DXガバナンスがあればITガバナンスは不要」ではないということです。<br>
+        DXガバナンスは、ITガバナンス（土台となる安全性）を含みつつ、さらにビジネス変革の視点を加えた「拡張版」と言えます。</p>
+
+        <div class="diagram-section">
+          <div class="inclusion-wrapper">
+            <div class="box-outer">
+              <span class="label-outer">DXガバナンス</span>
+              <p style="margin-bottom:1rem; font-weight:bold;">
+                ビジョン策定・人材育成・データ活用・文化醸成
+              </p>
+              
+              <div class="box-inner">
+                <span class="label-inner">ITガバナンス</span>
+                <p style="margin:0; font-size:0.9rem;">
+                  セキュリティ・システム安定性・コスト管理
+                </p>
+              </div>
+              <p style="margin-top:1rem; font-size:0.85rem; text-align:center;">
+                守り（IT）を固めつつ、攻め（DX）を統制する
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h2>3. なぜ今、DXガバナンスが必要なのか？</h2>
+        <p>DXが進むにつれて、「自由にやらせるだけ」では以下のような問題（リスク）が発生しやすくなるためです。</p>
+
+        <ul>
+            <li><strong>現場の孤立（サイロ化）：</strong>各部署が勝手にツールを導入し、データがバラバラになる。</li>
+            <li><strong>PoC疲れ：</strong>「とりあえずAIを試してみた」だけで終わり、成果が出ない。</li>
+            <li><strong>新たなリスク：</strong>AIの誤判断や、データの不適切な利用によるコンプライアンス違反。</li>
+        </ul>
+
+        <div class="key-point">
+            <strong>DXガバナンスの役割</strong><br>
+            「なんでも自由にやっていい」ではなく、「全社戦略に沿って、安全かつスピーディに変革できる環境」を整えること。
+        </div>
+
+        <h2>まとめ</h2>
+        <p>試験や面接で問われた際は、以下のフレーズで整理しましょう。</p>
+        <ul>
+            <li><strong>ITガバナンス：</strong>ITを「正しく・安全に」管理する仕組み。</li>
+            <li><strong>DXガバナンス：</strong>DXを「迷走させず・止めず・暴走させない」ための仕組み。</li>
+        </ul>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
