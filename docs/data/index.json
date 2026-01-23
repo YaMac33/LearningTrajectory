@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-23_ying-simi-to-gentei-teikyou-data-no-chigai",
+    "timestamp": "2026-01-23T14:18:53+09:00",
+    "title": "営業秘密と限定提供データの違い",
+    "summary": "営業秘密と限定提供データの定義や法的保護、利用範囲の違いについて解説します。管理ポイントも詳しく紹介します。",
+    "tags": [
+      "営業秘密",
+      "限定提供データ",
+      "知的財産",
+      "不正競争防止法",
+      "法務"
+    ],
+    "category_lv1": "ストラテジ系",
+    "category_lv2": "企業と法務",
+    "post_path": "posts/2026-01-23_ying-simi-to-gentei-teikyou-data-no-chigai/"
+  },
+  {
     "id": "2026-01-23_ui-ux-relationship",
     "timestamp": "2026-01-23T14:13:34+09:00",
     "title": "UIとUXの関係性の解説",
