@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>目標利益達成の売上高計算 - IT passport study map</title>
+  <meta name="description" content="CVP分析を用いて、目標利益を達成するために必要な売上高や販売個数を計算する方法を解説。ITパスポート試験で頻出の公式と計算手順を図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="目標利益達成の売上高計算" />
+  <meta property="og:description" content="CVP分析を用いて、目標利益を達成するために必要な売上高や販売個数を計算する方法を解説。ITパスポート試験で頻出の公式と計算手順を図解します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 売上構成図（バーチャート風） */
+    .bar-chart-container {
+      width: 100%;
+      max-width: 500px;
+      font-family: monospace;
+    }
+    .bar-row {
+      display: flex;
+      width: 100%;
+      height: 50px;
+      margin-bottom: 1rem;
+      border: 1px solid #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #fff;
+      flex-direction: column;
+      line-height: 1.2;
+    }
+    
+    /* 計算式ボックス */
+    .formula-box {
+      background: #fff;
+      border: 2px solid #333;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      margin: 1rem 0;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+    }
+    .formula-title {
+      font-size: 0.9rem;
+      color: #666;
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    .math-expr {
+      font-size: 1.4rem;
+      font-weight: bold;
+      font-family: "Times New Roman", serif;
+    }
+    .fraction {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      margin: 0 0.2rem;
+    }
+    .numerator {
+      border-bottom: 2px solid #333;
+      padding-bottom: 2px;
+    }
+    .denominator {
+      padding-top: 2px;
+    }
+
+    /* 増分イメージ図 */
+    .step-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .step-box {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 4px;
+      position: relative;
+      padding-left: 3rem;
+    }
+    .step-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+    }
+    .highlight-diff {
+      background-color: #e6fffa;
+      border-color: #00a080;
+      color: #007050;
+      font-weight: bold;
+    }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / ストラテジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">目標利益達成の売上高計算</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#CVP分析</li>
+            <li class="tag">#損益分岐点</li>
+            <li class="tag">#財務会計</li>
+            <li class="tag">#計算問題</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「利益をこれだけ出したいなら、いくら売り上げればいい？」<br>
+        この問いに答えるのが、CVP分析（損益分岐点分析）の応用計算です。ITパスポート試験でも、単なる損益分岐点だけでなく「目標利益」を含めた計算が出題されます。</p>
+
+        <div class="key-point">
+          <strong>計算の結論（公式）</strong>
+          <p>必要な売上高 ＝ （固定費 ＋ 目標利益） ÷ （1 － 変動費率）</p>
+        </div>
+
+        <h2>1. 基本問題：目標売上高を求める</h2>
+        <p>まずは公式を使って、以下の条件で必要な売上高を計算してみましょう。</p>
+        <ul>
+          <li><strong>固定費：</strong> 2,100</li>
+          <li><strong>目標利益：</strong> 1,000</li>
+          <li><strong>変動費率：</strong> 7/12（売上の約58%）</li>
+        </ul>
+
+        <h3>計算ステップ</h3>
+        <p>公式に当てはめていきます。</p>
+        
+        <div class="diagram-section">
+          <div class="formula-box">
+            <span class="formula-title">目標利益達成売上高 N</span>
+            <div class="math-expr">
+              N = 
+              <div class="fraction">
+                <span class="numerator">2,100 + 1,000</span>
+                <span class="denominator">1 − (7/12)</span>
+              </div>
+            </div>
+          </div>
+          
+          <p>分母を整理します：<br>
+          $1 - 7/12 = 5/12$</p>
+          
+          <div class="formula-box">
+            <div class="math-expr">
+              N = 
+              <div class="fraction">
+                <span class="numerator">3,100</span>
+                <span class="denominator">5/12</span>
+              </div>
+            </div>
+          </div>
+          
+          <p>分数で割るということは、<strong>逆数を掛ける</strong>のと同じです。</p>
+          <p style="font-size:1.2rem; font-weight:bold;">
+            $N = 3,100 \times \frac{12}{5} = 7,440$
+          </p>
+        </div>
+
+        <p>答えは <strong>7,440</strong> です。<br>
+        この売上高の内訳を図解すると、以下のようになります。</p>
+
+        <div class="diagram-section">
+          <div class="bar-chart-container">
+            <p style="text-align:center; margin-bottom:0.5rem; font-weight:bold;">売上高 7,440 の内訳</p>
+            <div class="bar-row">
+              <div class="bar-segment" style="width: 58%; background-color: #999;">
+                変動費<br>(4,340)
+              </div>
+              <div class="bar-segment" style="width: 28%; background-color: #666;">
+                固定費<br>(2,100)
+              </div>
+              <div class="bar-segment" style="width: 14%; background-color: #333;">
+                利益<br>(1,000)
+              </div>
+            </div>
+            <div style="text-align:center; font-size:0.8rem; color:#666;">
+              ※固定費と利益を合わせた部分（右側）を「限界利益」と呼びます。<br>
+              限界利益率 ＝ 1 − 変動費率（7/12） ＝ 5/12
+            </div>
+          </div>
+        </div>
+
+        <h2>2. 応用問題：あと何個売ればいい？</h2>
+        <p>次は、金額ではなく「個数」で考えるアプローチです。実務的で直感的にわかりやすい方法です。</p>
+
+        <p><strong>条件：</strong></p>
+        <ul>
+          <li>現在の売上高：6,000万（販売数：5,000個 ※単価1.2万）</li>
+          <li>現在の利益：400万</li>
+          <li>1個あたりの変動費：7,000円</li>
+          <li><strong>目標利益：1,000万</strong>（＋600万したい）</li>
+        </ul>
+
+        <h3>考え方：限界利益単価を使う</h3>
+        <p>1個売るたびに、手元にいくら残るか（固定費回収や利益に回せるお金）を考えます。</p>
+        
+        <div class="key-point">
+          <strong>限界利益単価 ＝ 販売単価 － 1個あたり変動費</strong><br>
+          12,000円 － 7,000円 ＝ <strong>5,000円</strong>
+        </div>
+        
+        <p>つまり、<strong>「1個売るごとに5,000円ずつ利益（の源泉）が積み上がる」</strong>ということです。</p>
+
+        <h3>計算ステップ</h3>
+        <p>目標利益（1,000万）まで、あと600万円足りません。<br>
+        1個売ると5,000円稼げるので、あと何個売ればいいでしょうか？</p>
+
+        <div class="diagram-section">
+          <div class="step-diagram">
+            <div class="step-box">
+              <span class="step-icon">🏁</span>
+              <strong>目標との差額（不足分）</strong><br>
+              1,000万 － 400万 ＝ <span style="color:#d00; font-weight:bold;">600万円</span>
+            </div>
+            <div style="text-align:center; font-size:1.5rem;">÷</div>
+            <div class="step-box">
+              <span class="step-icon">📦</span>
+              <strong>1個あたりの稼ぎ（限界利益）</strong><br>
+              <span style="font-weight:bold;">5,000円</span> ／個
+            </div>
+            <div style="text-align:center; font-size:1.5rem;">⬇</div>
+            <div class="step-box highlight-diff">
+              <span class="step-icon">💡</span>
+              <strong>追加で必要な個数</strong><br>
+              6,000,000 ÷ 5,000 ＝ <strong>1,200 個</strong>
+            </div>
+          </div>
+        </div>
+
+        <p>あと1,200個売れば達成です。<br>
+        この方法なら、わざわざ固定費の総額を逆算しなくても答えが出せます。</p>
+
+        <h2>まとめ</h2>
+        <ul>
+          <li><strong>公式で解く場合：</strong><br>
+          売上高 ＝ （固定費＋目標利益） ÷ 限界利益率</li>
+          <li><strong>個数で解く場合（増分）：</strong><br>
+          追加個数 ＝ 足りない利益 ÷ 1個あたりの限界利益</li>
+        </ul>
+        <p>問題文の条件に合わせて、使いやすい方を選びましょう。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
