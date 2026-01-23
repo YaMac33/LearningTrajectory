@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>リスクマネジメント総まとめ - IT passport study map</title>
+  <meta name="description" content="リスクマネジメントの全体像から各工程（特定・分析・評価・対応）の詳細までを徹底解説。ITパスポート試験で頻出の「リスクアセスメント」の範囲もしっかり整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="リスクマネジメント総まとめ" />
+  <meta property="og:description" content="リスクマネジメントの全体像から各工程（特定・分析・評価・対応）の詳細までを徹底解説。ITパスポート試験で頻出の「リスクアセスメント」の範囲もしっかり整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ツリー図解 */
+    .tree-diagram {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-weight: bold;
+    }
+    .tree-root {
+      background: #333;
+      color: #fff;
+      padding: 0.8rem 1.2rem;
+      border-radius: 4px;
+    }
+    .tree-branch {
+      border-left: 2px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem 0 1rem 1.5rem;
+      position: relative;
+    }
+    .tree-branch::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 15px;
+      height: 2px;
+      background: #333;
+      transform: translateY(-50%);
+    }
+    .tree-node {
+      background: #fff;
+      border: 2px solid #333;
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      min-width: 160px;
+      text-align: center;
+      position: relative;
+    }
+    .tree-node::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -1.5rem; /* パディング分戻る */
+      width: 1.5rem;
+      height: 2px;
+      background: #333;
+    }
+    /* リスクアセスメントのグループ化 */
+    .assessment-group {
+      border: 2px dashed #d00;
+      background: rgba(221, 0, 0, 0.05);
+      padding: 1rem;
+      border-radius: 8px;
+      position: relative;
+    }
+    .assessment-label {
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      background: #fff;
+      color: #d00;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 0 5px;
+    }
+
+    /* フロー図解 */
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    .flow-step {
+      width: 100%;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #333;
+      border-radius: 4px;
+      text-align: center;
+      position: relative;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .flow-step.assessment {
+      border-color: #d00;
+      background: #fff5f5;
+    }
+    .flow-arrow {
+      color: #333;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .flow-desc {
+      display: block;
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 4px;
+    }
+    .boundary-line {
+      width: 100%;
+      text-align: center;
+      border-top: 2px dashed #666;
+      height: 0.1px;
+      margin: 1rem 0;
+      position: relative;
+    }
+    .boundary-label {
+      background: #f9f9f9;
+      color: #666;
+      padding: 0 10px;
+      position: relative;
+      top: -12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* 暗記用フレーズボックス */
+    .phrase-box {
+      background: #333;
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 6px;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .phrase-title {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 0.5rem;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .phrase-text {
+      font-size: 1.4rem;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .tree-diagram {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .tree-branch {
+        border-left: none;
+        padding-left: 0;
+        gap: 0.5rem;
+        margin-left: 1rem;
+      }
+      .tree-branch::before { display: none; }
+      .tree-node::before { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">Sidenote</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / マネジメント系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">リスクマネジメント総まとめ</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#リスク管理</li>
+            <li class="tag">#ITパスポート</li>
+            <li class="tag">#知識整理</li>
+            <li class="tag">#勉強法</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ITパスポート試験や基本情報技術者試験で、必ずと言っていいほど出題される「リスクマネジメント」。<br>
+        この分野は、用語の定義とプロセスの順番さえ整理できていれば確実に得点できる「おいしい」ゾーンです。</p>
+        <p>この記事では、試験直前に見直したい全体像と重要ポイントを総まとめします。</p>
+
+        <h2>1. まず全体像（これが答え）</h2>
+        <p>リスクマネジメントの構造は、以下の図の通りです。この構造を頭に焼き付けるだけで、正答率がグッと上がります。</p>
+
+        <div class="diagram-section">
+          <div class="tree-diagram">
+            <div class="tree-root">リスクマネジメント</div>
+            <div class="tree-branch">
+              <!-- リスクアセスメントのグループ -->
+              <div class="assessment-group">
+                <span class="assessment-label">リスクアセスメント</span>
+                <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                  <div class="tree-node">① リスク特定</div>
+                  <div class="tree-node">② リスク分析</div>
+                  <div class="tree-node">③ リスク評価</div>
+                </div>
+              </div>
+              
+              <div class="tree-node" style="margin-top:0.5rem; border-color:#666; background:#eee;">④ リスク対応</div>
+            </div>
+          </div>
+          <p style="font-size:0.9rem; color:#666;">※「アセスメント」の中に「対応」は含まれない点に注意！</p>
+        </div>
+
+        <h2>2. リスクマネジメントとは？</h2>
+        <p>リスクマネジメントとは、組織の目標達成を妨げるリスクを継続的に管理する一連の活動です。</p>
+        <ul>
+          <li><strong>継続的であること：</strong>一回やって終わりではありません。</li>
+          <li><strong>ゼロにするわけではない：</strong>リスクを完全に消すのではなく、「許容可能なレベル」まで抑えることが目標です。</li>
+        </ul>
+
+        <h2>3. リスクマネジメントの流れ（完全版）</h2>
+        <p>プロセスは必ず以下の順序で進みます。「評価してから分析」したりはしません。</p>
+
+        <div class="diagram-section">
+          <div class="flow-container">
+            <div class="flow-step assessment">
+              <strong>① リスク特定</strong>
+              <span class="flow-desc">何が起こる？洗い出す</span>
+            </div>
+            <div class="flow-arrow">↓</div>
+            
+            <div class="flow-step assessment">
+              <strong>② リスク分析</strong>
+              <span class="flow-desc">どれくらい危険？（確率×影響）</span>
+            </div>
+            <div class="flow-arrow">↓</div>
+            
+            <div class="flow-step assessment">
+              <strong>③ リスク評価</strong>
+              <span class="flow-desc">対応は必要？優先度は？</span>
+            </div>
+            
+            <div class="boundary-line">
+              <span class="boundary-label">ここから「行動」へ</span>
+            </div>
+            
+            <div class="flow-step">
+              <strong>④ リスク対応</strong>
+              <span class="flow-desc">回避・低減・移転・受容</span>
+            </div>
+            <div class="flow-arrow">↓</div>
+            
+            <div class="flow-step" style="border-style:dashed;">
+              <strong>⑤ 監視・見直し</strong>
+              <span class="flow-desc">効果測定・PDCA</span>
+            </div>
+          </div>
+        </div>
+
+        <h2>4. 各工程のポイント整理</h2>
+        <p>用語の混同を防ぐために、各ステップを一言で整理します。</p>
+
+        <h3>① リスク特定</h3>
+        <p>「どんなリスクがあるか洗い出す」フェーズです。<br>
+        例：情報漏えい、サーバーダウン、操作ミスなどを見つけ出します。</p>
+
+        <h3>② リスク分析</h3>
+        <p>「リスクの大きさを見積もる」フェーズです。<br>
+        一般的に以下の式で算出します。</p>
+        <div style="background:#eee; padding:0.5rem 1rem; display:inline-block; border-radius:4px; font-family:monospace;">
+          リスクの大きさ ＝ 発生可能性 × 影響度
+        </div>
+
+        <h3>③ リスク評価</h3>
+        <p>「対応が必要かどうか判断する」フェーズです。<br>
+        分析結果をもとに、「このリスクは許容できるか？」「優先的に対策すべきか？」を決定します。</p>
+        <blockquote>
+          ここまでが<strong>「リスクアセスメント」</strong>です。「頭で考えて判断する」までがアセスメント、と覚えましょう。
+        </blockquote>
+
+        <h3>④ リスク対応</h3>
+        <p>「具体的にどうするか決めて実行する」フェーズです。<br>
+        リスクコントロール（回避、低減）や、リスクファイナンス（移転、受容）などの手法を選択します。</p>
+
+        <h2>5. 試験でのひっかけポイント</h2>
+        <p>ITパスポート試験などで最も狙われやすいのが、用語の包含関係です。</p>
+
+        <div style="margin: 2rem 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+          <div style="background: #ffebeb; padding: 1rem; color: #d00; font-weight: bold; border-bottom: 1px solid #ddd;">
+            ❌ よくある誤解
+          </div>
+          <div style="padding: 1rem;">
+            「リスク対応」は「リスクアセスメント」に含まれる。
+          </div>
+          <div style="background: #e6fffa; padding: 1rem; color: #007050; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+            ⭕ 正解
+          </div>
+          <div style="padding: 1rem;">
+            <strong>リスクアセスメント ＝ 特定 ＋ 分析 ＋ 評価</strong><br>
+            リスク対応は、アセスメントが終わった後の「別工程」です。
+          </div>
+        </div>
+
+        <h2>6. まとめ：1問即答フレーズ</h2>
+        <p>最後に、試験直前に見直すための「キーワードと工程の紐づけ」を置いておきます。</p>
+
+        <ul>
+          <li>発生可能性と影響度を計算 → <strong>リスク分析</strong></li>
+          <li>許容可能か判断する → <strong>リスク評価</strong></li>
+          <li>回避や低減を実施する → <strong>リスク対応</strong></li>
+        </ul>
+
+        <div class="phrase-box">
+          <span class="phrase-title">最強の暗記公式</span>
+          <div class="phrase-text">RM ＝ アセスメント(特定/分析/評価) ＋ 対応</div>
+        </div>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
