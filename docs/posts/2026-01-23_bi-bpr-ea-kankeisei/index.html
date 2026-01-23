@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>BI・BPR・EAの関連性 - IT passport study map</title>
+  <meta name="description" content="BI（ビジネスインテリジェンス）、BPR（業務プロセス改革）、EA（エンタープライズアーキテクチャ）の違いと相互関係を解説。業務改革における分析から全体最適までの流れを整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="BI・BPR・EAの関連性" />
+  <meta property="og:description" content="BI（ビジネスインテリジェンス）、BPR（業務プロセス改革）、EA（エンタープライズアーキテクチャ）の違いと相互関係を解説。業務改革における分析から全体最適までの流れを整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ボックス図解スタイル */
+    .box-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .d-box {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 6px;
+      padding: 1rem 1.5rem;
+      width: 100%;
+      text-align: center;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .d-box-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .d-box-desc {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .arrow-up {
+      font-size: 1.5rem;
+      color: #333;
+      font-weight: bold;
+      line-height: 1;
+    }
+    
+    /* 作用を表す矢印とラベル */
+    .action-label {
+      background: #eee;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .comparison-table td {
+      background-color: #fff;
+    }
+    /* 列ごとの色分け */
+    .comparison-table td:nth-child(2) { background: #fdfdfd; } /* BI */
+    .comparison-table td:nth-child(3) { background: #fffaf0; } /* BPR */
+    .comparison-table td:nth-child(4) { background: #f0f8ff; } /* EA */
+
+    /* EAの4階層リスト */
+    .ea-layers {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .ea-layers li {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem 1rem;
+      margin-bottom: -1px; /* 枠線を重ねる */
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .ea-layers li:first-child { border-radius: 4px 4px 0 0; background: #eee; font-weight:bold; }
+    .ea-layers li:last-child { border-radius: 0 0 4px 4px; }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">Sidenote</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / ストラテジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">BI・BPR・EAの関連性</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#BI</li>
+            <li class="tag">#BPR</li>
+            <li class="tag">#EA</li>
+            <li class="tag">#業務改革</li>
+            <li class="tag">#分析</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ITパスポートや基本情報技術者試験で頻出する「BI」「BPR」「EA」。<br>
+        これらは単独で出題されることもありますが、セットで理解しておくと「業務改善の流れ」として頭に入りやすくなります。</p>
+        
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          BIは「分析」、BPRは「根本的作り変え」、EAは「全体地図」。<br>
+          分析して、作り変えて、全体を整えるという関係にあります。
+        </div>
+
+        <h2>1. 3つの用語の定義（役割の違い）</h2>
+        <p>まずはそれぞれの言葉が何を指しているのか、個別に確認します。</p>
+
+        <h3>BI（Business Intelligence）</h3>
+        <p><strong>「現状を正しく知る」ための道具です。</strong><br>
+        蓄積された大量の業務データを分析・加工し、経営の意思決定に役立てる手法や技術のことです。</p>
+        <ul>
+            <li>例：ダッシュボードで売上の推移をリアルタイム表示する。</li>
+            <li>目的：データに基づく判断（データドリブン）を行う。</li>
+        </ul>
+
+        <h3>BPR（Business Process Re-engineering）</h3>
+        <p><strong>「業務をゼロベースで作り変える」活動です。</strong><br>
+        既存のやり方を少し改善するのではなく、「そもそもその業務は必要なのか？」という根本的な問い直しを行い、プロセスを抜本的に再設計します。</p>
+        <ul>
+            <li>例：ハンコによる承認リレーを廃止し、完全デジタルのワークフローに移行する。</li>
+            <li>目的：コスト削減、スピード向上。</li>
+        </ul>
+
+        <h3>EA（Enterprise Architecture）</h3>
+        <p><strong>「企業全体の構造を整理した設計図」です。</strong><br>
+        組織、業務、データ、システムを統一的なルールで記述し、全体最適化を図るための枠組みです。以下の4階層で整理されます。</p>
+        
+        <div class="diagram-section" style="padding:1.5rem;">
+          <ul class="ea-layers">
+            <li>EAの4つの体系</li>
+            <li>BA：ビジネス（業務）アーキテクチャ</li>
+            <li>DA：データアーキテクチャ</li>
+            <li>AA：アプリケーションアーキテクチャ</li>
+            <li>TA：テクノロジ（技術）アーキテクチャ</li>
+          </ul>
+        </div>
+
+        <h2>2. 違いを一発で比較</h2>
+        <p>試験で混同しやすいポイントを表で整理しました。</p>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>項目</th>
+                    <th>BI</th>
+                    <th>BPR</th>
+                    <th>EA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>キーワード</strong></td>
+                    <td>分析・可視化</td>
+                    <td>抜本的改革</td>
+                    <td>全体最適</td>
+                </tr>
+                <tr>
+                    <td><strong>アクション</strong></td>
+                    <td>見る</td>
+                    <td>変える</td>
+                    <td>整える</td>
+                </tr>
+                <tr>
+                    <td><strong>対象</strong></td>
+                    <td>データ</td>
+                    <td>業務プロセス</td>
+                    <td>企業全体</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>3. 相互関係（改善のストーリー）</h2>
+        <p>これらはバラバラに存在するのではなく、以下のような段階的なストーリーでつながっています。</p>
+
+        <div class="diagram-section">
+          <div class="box-diagram">
+            
+            <div class="d-box" style="border-color: #666;">
+                <span class="d-box-title">EA（全体設計図）</span>
+                <span class="d-box-desc">改革後の新しい標準として、全体構造を整える</span>
+            </div>
+
+            <div class="arrow-up">↑</div>
+            <div class="action-label">全体最適化・標準化</div>
+            <div class="arrow-up">↑</div>
+
+            <div class="d-box" style="border-color: #d00;">
+                <span class="d-box-title">BPR（業務改革）</span>
+                <span class="d-box-desc">問題のある業務を抜本的に作り変える</span>
+            </div>
+
+            <div class="arrow-up">↑</div>
+            <div class="action-label">分析結果を反映</div>
+            <div class="arrow-up">↑</div>
+
+            <div class="d-box" style="border-color: #0056b3;">
+                <span class="d-box-title">BI（分析）</span>
+                <span class="d-box-desc">データを見て、どこに無駄があるか発見する</span>
+            </div>
+
+          </div>
+        </div>
+
+        <p>この図の流れを文章にすると以下のようになります。</p>
+        <ol>
+            <li><strong>BIで発見：</strong>データを分析して「この業務プロセスに無駄がある」「利益率が低い」ことを発見する。</li>
+            <li><strong>BPRで実行：</strong>その原因となっている古い業務フローを破壊し、ITを前提とした新しい形に作り変える。</li>
+            <li><strong>EAで定着：</strong>新しくなった業務やシステムが、会社全体のシステムと矛盾しないように整理・統合する。</li>
+        </ol>
+
+        <h2>4. 試験対策：ひっかけポイント</h2>
+        <p>ITパスポート試験などでは、用語の説明を入れ替えた選択肢がよく出ます。</p>
+        <ul>
+            <li>❌ <strong>誤：</strong>「BIとは、業務プロセスを抜本的に再設計することである」<br>
+                → <strong>正：</strong>それはBPRの説明です。BIは「分析」です。</li>
+            <li>❌ <strong>誤：</strong>「EAとは、データを可視化して意思決定を支援するツールである」<br>
+                → <strong>正：</strong>それはBIの説明です。EAは「全体設計図」です。</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <p>それぞれの単語の頭文字と役割をセットで覚えましょう。</p>
+        <ul>
+            <li><strong>BI</strong> (Intelligence) ＝ <strong>知る・見る</strong></li>
+            <li><strong>BPR</strong> (Re-engineering) ＝ <strong>変える・作り直す</strong></li>
+            <li><strong>EA</strong> (Architecture) ＝ <strong>整える・設計図</strong></li>
+        </ul>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
