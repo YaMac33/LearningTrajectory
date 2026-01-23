@@ -1,0 +1,15 @@
+{
+  "id": "2026-01-23_dispersed-processing-grid-computing",
+  "timestamp": "2026-01-23T13:56:59+09:00",
+  "title": "分散処理とグリッドコンピューティング",
+  "summary": "分散処理システムとグリッドコンピューティングの違いを解説します。図解を用いてそれぞれの目的やアプローチを整理しました。",
+  "tags": [
+    "分散処理",
+    "グリッドコンピューティング",
+    "クラウド",
+    "システム構成"
+  ],
+  "category_lv1": "テクノロジ系",
+  "category_lv2": "ネットワーク",
+  "post_path": "posts/2026-01-23_dispersed-processing-grid-computing/"
+}
