@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-24_bpo-bpr-bpm-kyokai",
+    "timestamp": "2026-01-24T07:33:15+09:00",
+    "title": "BPO/BPR/BPMの役割とは",
+    "summary": "BPO、BPR、BPMの違いを解説し、それぞれの役割分担を図解で整理します。業務改善の手法を理解するための基礎知識です。",
+    "tags": [
+      "BPO",
+      "BPR",
+      "BPM",
+      "ビジネスプロセス",
+      "業務改善"
+    ],
+    "category_lv1": "ストラテジ系",
+    "category_lv2": "経営戦略",
+    "post_path": "posts/2026-01-24_bpo-bpr-bpm-kyokai/"
+  },
+  {
     "id": "2026-01-24_saas-asp-chigai",
     "timestamp": "2026-01-24T07:10:24+09:00",
     "title": "SaaSとASPの違いを解説",
