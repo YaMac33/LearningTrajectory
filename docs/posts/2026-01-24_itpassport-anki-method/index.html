@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>ITパスポートの暗記法と重要用語 - IT passport study map</title>
+  <meta name="description" content="ITパスポート試験で頻出する略語や重要用語を、10個の「ファミリー（カテゴリ）」に分類して解説。丸暗記ではなく体系的に覚えるためのコツを紹介します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ITパスポートの暗記法と重要用語" />
+  <meta property="og:description" content="ITパスポート試験で頻出する略語や重要用語を、10個の「ファミリー（カテゴリ）」に分類して解説。丸暗記ではなく体系的に覚えるためのコツを紹介します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* カテゴリカードグリッド */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+    }
+    .cat-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .cat-header {
+      background: #333;
+      color: #fff;
+      padding: 0.8rem 1rem;
+      font-weight: bold;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cat-badge {
+      background: #fff;
+      color: #333;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .cat-body {
+      padding: 1rem;
+    }
+    
+    /* 用語リスト */
+    .term-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .term-item {
+      display: flex;
+      margin-bottom: 0.8rem;
+      border-bottom: 1px dashed #eee;
+      padding-bottom: 0.5rem;
+    }
+    .term-item:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .term-name {
+      font-weight: bold;
+      color: #0056b3;
+      width: 80px;
+      flex-shrink: 0;
+    }
+    .term-desc {
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    /* 暗記のコツ図解 */
+    .tips-box {
+      background: #eef6ff;
+      border: 2px solid #0056b3;
+      border-radius: 8px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .breakdown {
+      font-family: monospace;
+      font-size: 1.5rem;
+      margin: 1rem 0;
+      font-weight: bold;
+    }
+    .bd-part {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border: 1px solid #999;
+      background: #fff;
+      margin: 0 2px;
+      border-radius: 4px;
+      position: relative;
+    }
+    .bd-label {
+      position: absolute;
+      top: -1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #0056b3;
+      white-space: nowrap;
+      font-family: sans-serif;
+    }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-24">
+            2026.01.24 / 学習法
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ITパスポートの暗記法と重要用語</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#ITパスポート</li>
+            <li class="tag">#試験</li>
+            <li class="tag">#用語</li>
+            <li class="tag">#暗記</li>
+            <li class="tag">#カテゴリー</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ITパスポート試験には、似たようなアルファベットの略語が山のように出題されます。<br>
+        これらを一つずつ丸暗記するのは非効率です。ここでは、試験に出やすい用語を「ファミリー（カテゴリ）」ごとにまとめて整理しました。</p>
+
+        <div class="key-point">
+          <strong>学習のコツ</strong><br>
+          単語単体ではなく、「Bの仲間」「Sの仲間」といった<strong>グループ関係</strong>で覚えるのが最短ルートです。
+        </div>
+
+        <h2>1. 業務・マネジメント系の用語ファミリー</h2>
+
+        <div class="category-grid">
+          <!-- 1. 業務・プロセス系 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ① 業務・プロセス系
+              <span class="cat-badge">B◯◯</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">BPR</span>
+                  <span class="term-desc">業務の<strong>抜本的改革</strong>（作り直し）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">BPM</span>
+                  <span class="term-desc">業務の<strong>継続的な管理</strong>・改善</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">BPO</span>
+                  <span class="term-desc">業務の<strong>外部委託</strong>（アウトソース）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">BCP</span>
+                  <span class="term-desc">事業継続<strong>計画</strong>（災害対策）</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 2. サービスレベル系 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ② サービスレベル系
+              <span class="cat-badge">SL◯</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">SLA</span>
+                  <span class="term-desc">サービスレベル<strong>合意書</strong>（約束）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">SLM</span>
+                  <span class="term-desc">サービスレベル<strong>管理</strong>（維持・改善）</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 3. ITサービス・運用系 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ③ ITサービス・運用系
+              <span class="cat-badge">IT / IS</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">ITIL</span>
+                  <span class="term-desc">IT運用の<strong>ベストプラクティス集</strong>（教科書）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">ISMS</span>
+                  <span class="term-desc">情報セキュリティ<strong>マネジメントシステム</strong></span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 4. 経営・戦略系 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ④ 経営・戦略系
+              <span class="cat-badge">指標・分析</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">KPI</span>
+                  <span class="term-desc">中間目標・<strong>評価指標</strong></span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">KGI</span>
+                  <span class="term-desc"><strong>最終目標</strong>（ゴール）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">CSF</span>
+                  <span class="term-desc"><strong>重要成功要因</strong>（成功のカギ）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">SWOT</span>
+                  <span class="term-desc">強み・弱み・機会・脅威の分析</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h2>2. テクノロジ系の用語ファミリー</h2>
+
+        <div class="category-grid">
+          <!-- 5. クラウド・提供形態 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ⑤ クラウド・提供形態
+              <span class="cat-badge">◯aaS</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">SaaS</span>
+                  <span class="term-desc"><strong>アプリ</strong>を提供（Software）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">PaaS</span>
+                  <span class="term-desc"><strong>実行環境</strong>を提供（Platform）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">IaaS</span>
+                  <span class="term-desc"><strong>インフラ</strong>を提供（Infrastructure）</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 6. データ・分析系 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ⑥ データ・分析系
+              <span class="cat-badge">Data</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">BI</span>
+                  <span class="term-desc">データの<strong>分析・可視化</strong>ツール</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">DWH</span>
+                  <span class="term-desc">データウェアハウス（<strong>倉庫</strong>）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">ETL</span>
+                  <span class="term-desc">抽出(E)・変換(T)・格納(L)する処理</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 7. 生産・在庫・物流 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ⑦ 生産・在庫・物流
+              <span class="cat-badge">◯RP</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">ERP</span>
+                  <span class="term-desc">経営資源の<strong>統合管理</strong>（ヒト・モノ・カネ）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">MRP</span>
+                  <span class="term-desc">資材所要量計画（必要な<strong>材料</strong>の計算）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">SCM</span>
+                  <span class="term-desc">サプライチェーン管理（<strong>供給網</strong>全体）</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 8. セキュリティ対応 -->
+          <div class="cat-card">
+            <div class="cat-header">
+              ⑧ セキュリティ対応
+              <span class="cat-badge">CS◯</span>
+            </div>
+            <div class="cat-body">
+              <ul class="term-list">
+                <li class="term-item">
+                  <span class="term-name">CSIRT</span>
+                  <span class="term-desc">事故発生時の<strong>対応チーム</strong>（消防隊）</span>
+                </li>
+                <li class="term-item">
+                  <span class="term-name">SOC</span>
+                  <span class="term-desc">24時間365日の<strong>監視センター</strong></span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <h2>3. 暗記のテクニック（分解して読む）</h2>
+        <p>略語は、最後の1文字（接尾辞）が「それが何か」を表していることが多いです。</p>
+
+        <div class="diagram-section">
+          <div class="tips-box">
+            <div class="breakdown">
+              <span class="bd-part">S</span>
+              <span class="bd-part">L</span>
+              <span class="bd-part" style="background:#fff3cd; border-color:#e67e22;">A</span>
+            </div>
+            <div style="font-size:0.9rem; margin-bottom:1.5rem;">
+              <strong>A = Agreement（合意・約束）</strong><br>
+              → だから「契約書・約束事」のこと
+            </div>
+
+            <div class="breakdown">
+              <span class="bd-part">S</span>
+              <span class="bd-part">L</span>
+              <span class="bd-part" style="background:#d4edda; border-color:#28a745;">M</span>
+            </div>
+            <div style="font-size:0.9rem;">
+              <strong>M = Management（管理）</strong><br>
+              → だから「維持・改善する活動」のこと
+            </div>
+          </div>
+        </div>
+
+        <h3>よく出る接尾辞リスト</h3>
+        <ul>
+          <li><strong>M (Management)：</strong> 管理、運用、活動（例：BPM, SCM, CRM）</li>
+          <li><strong>P (Planning / Plan)：</strong> 計画、設計（例：BCP, MRP）</li>
+          <li><strong>S (System)：</strong> 仕組み、システム（例：ISMS, DBMS）</li>
+          <li><strong>A (Agreement)：</strong> 合意、契約（例：SLA）</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <p>ITパスポートの用語問題は、「単語の意味を知っているか」よりも<strong>「どのグループの言葉か分かっているか」</strong>を問うものが大半です。</p>
+        <p>「B◯◯」なら業務系、「◯aaS」ならクラウド系、といった大枠の分類を意識するだけで、正答率はグッと上がります。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
