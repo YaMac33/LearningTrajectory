@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>ITパスポート俯瞰マップ - IT passport study map</title>
+  <meta name="description" content="ITパスポート試験の頻出用語を「考え方」「方法」「管理対象」「仕組み」の4つに分類して俯瞰するマップ。丸暗記ではなく体系的に整理して覚えるための学習法を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ITパスポート俯瞰マップ" />
+  <meta property="og:description" content="ITパスポート試験の頻出用語を「考え方」「方法」「管理対象」「仕組み」の4つに分類して俯瞰するマップ。丸暗記ではなく体系的に整理して覚えるための学習法を解説します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 4象限マトリクス */
+    .matrix-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 700px;
+    }
+    .quadrant {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 200px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+    }
+    
+    /* 各象限の色分け */
+    .q-concept { border-top: 6px solid #0056b3; background-color: #f0f8ff; } /* 考え方：青 */
+    .q-method { border-top: 6px solid #27ae60; background-color: #f0fff4; }  /* 方法：緑 */
+    .q-target { border-top: 6px solid #e67e22; background-color: #fffaf0; }  /* 対象：オレンジ */
+    .q-system { border-top: 6px solid #c0392b; background-color: #fff5f5; }  /* 仕組み：赤 */
+
+    .q-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: block;
+      border-bottom: 2px solid rgba(0,0,0,0.1);
+      width: 100%;
+      text-align: center;
+      padding-bottom: 0.5rem;
+    }
+    .word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .word-tag {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* ドリル問題 */
+    .drill-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .drill-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .drill-q {
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      font-weight: bold;
+    }
+    .drill-options {
+      padding: 1rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-around;
+      border-bottom: 1px dashed #eee;
+    }
+    .drill-option {
+      background: #f4f4f4;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: bold;
+    }
+    .drill-answer {
+      padding: 1rem;
+      background: #f9f9f9;
+    }
+    .ans-label {
+      font-weight: bold;
+      color: #d00;
+      margin-right: 0.5rem;
+    }
+    .logic-arrow {
+      color: #0056b3;
+      font-weight: bold;
+    }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .matrix-container {
+        grid-template-columns: 1fr; /* スマホは1列 */
+      }
+      .drill-options {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / 学習法
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ITパスポート俯瞰マップ</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#ITパスポート</li>
+            <li class="tag">#俯瞰</li>
+            <li class="tag">#学習法</li>
+            <li class="tag">#略語</li>
+            <li class="tag">#分類</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ITパスポート試験の最大の壁は、似たような「アルファベット3文字・4文字の略語」が大量に出ることです。<br>
+        これらを一つずつ丸暗記するのは効率が悪すぎます。そこで、用語を4つの「箱（カテゴリ）」に分類して俯瞰するマップを作成しました。</p>
+
+        <div class="key-point">
+          <strong>学習のコツ</strong><br>
+          意味を完璧に覚えるのではなく、「これは『方法』の話だ」「これは『仕組み』の話だ」という<strong>分類（位置関係）</strong>を覚えること。それだけで選択肢の半分は削れます。
+        </div>
+
+        <h2>1. ITパスポート俯瞰マップ</h2>
+        <p>用語を「考え方」「方法」「管理対象」「仕組み」の4つに整理しました。</p>
+
+        <div class="diagram-section">
+          <div class="matrix-container">
+            
+            <!-- 左上：考え方 -->
+            <div class="quadrant q-concept">
+              <span class="q-title">① 考え方・戦略・概念</span>
+              <div class="word-list">
+                <span class="word-tag">MOT</span>
+                <span class="word-tag">CSR</span>
+                <span class="word-tag">CSV</span>
+                <span class="word-tag">DX</span>
+                <span class="word-tag">BSC</span>
+                <span class="word-tag">SWOT</span>
+                <span class="word-tag">PEST</span>
+                <span class="word-tag">3C</span>
+                <span class="word-tag">VRIO</span>
+                <span class="word-tag">PDCA</span>
+                <span class="word-tag">OODA</span>
+                <span class="word-tag">TQM</span>
+                <span class="word-tag">JIT</span>
+                <span class="word-tag">SLA</span>
+              </div>
+            </div>
+
+            <!-- 右上：方法 -->
+            <div class="quadrant q-method">
+              <span class="q-title">② 方法・手法・計算</span>
+              <div class="word-list">
+                <span class="word-tag">BPR</span>
+                <span class="word-tag">BPM</span>
+                <span class="word-tag">パレート</span>
+                <span class="word-tag">回帰分析</span>
+                <span class="word-tag">線形計画</span>
+                <span class="word-tag">デルファイ</span>
+                <span class="word-tag">AHP</span>
+                <span class="word-tag">ABC</span>
+                <span class="word-tag">CPM</span>
+                <span class="word-tag">PERT</span>
+                <span class="word-tag">QC7つ道具</span>
+                <span class="word-tag">EVM</span>
+                <span class="word-tag">KPT</span>
+              </div>
+            </div>
+
+            <!-- 左下：管理対象 -->
+            <div class="quadrant q-target">
+              <span class="q-title">③ 管理対象（人・物・金）</span>
+              <div class="word-list">
+                <span class="word-tag">HRM</span>
+                <span class="word-tag">CRM</span>
+                <span class="word-tag">SCM</span>
+                <span class="word-tag">SRM</span>
+                <span class="word-tag">ITIL</span>
+                <span class="word-tag">ISMS</span>
+                <span class="word-tag">CSIRT</span>
+                <span class="word-tag">KPI</span>
+                <span class="word-tag">KGI</span>
+                <span class="word-tag">CSF</span>
+                <span class="word-tag">BCM</span>
+                <span class="word-tag">BCP</span>
+              </div>
+            </div>
+
+            <!-- 右下：仕組み -->
+            <div class="quadrant q-system">
+              <span class="q-title">④ 仕組み・システム・技術</span>
+              <div class="word-list">
+                <span class="word-tag">ERP</span>
+                <span class="word-tag">MRP</span>
+                <span class="word-tag">DRP</span>
+                <span class="word-tag">MES</span>
+                <span class="word-tag">かんばん</span>
+                <span class="word-tag">JIT</span>
+                <span class="word-tag">TOC</span>
+                <span class="word-tag">RPA</span>
+                <span class="word-tag">BI</span>
+                <span class="word-tag">DWH</span>
+                <span class="word-tag">CMS</span>
+                <span class="word-tag">SFA</span>
+                <span class="word-tag">ETL</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <h2>2. このマップの使い方</h2>
+        <p>試験本番では、問題文を一字一句読む前に、以下の手順で思考するとスムーズです。</p>
+        <ol>
+          <li><strong>問題文の「属性」を見る：</strong> 「～する考え方はどれか」「～を行うための手法はどれか」「～を実現するシステムはどれか」といった文末に注目します。</li>
+          <li><strong>箱を特定する：</strong> 上記のマップのどの象限の話か（考え方？方法？システム？）を特定します。</li>
+          <li><strong>選択肢を切る：</strong> 違う象限の用語が含まれていたら、即座に除外します。</li>
+        </ol>
+
+        <h3>紛らわしい用語の整理例</h3>
+        <p>以下のような「似た略語」も、箱が違うと分かれば混同しません。</p>
+        <ul>
+          <li><strong>BPR</strong>（業務改革）は「② 方法」</li>
+          <li><strong>ERP</strong>（統合基幹業務システム）は「④ 仕組み」</li>
+          <li><strong>HRM</strong>（人的資源管理）は「③ 管理対象」</li>
+          <li><strong>CSR</strong>（企業の社会的責任）は「① 考え方」</li>
+        </ul>
+
+        <h2>3. 2択瞬殺ドリル</h2>
+        <p>実際にこの「分類思考」を使って、問題を解いてみましょう。意味を深く考えず、<strong>「どの箱か？」</strong>だけで判断してください。</p>
+
+        <div class="diagram-section" style="width:100%; max-width:600px;">
+          <div class="drill-container">
+            
+            <!-- Q1 -->
+            <div class="drill-card">
+              <div class="drill-q">Q1. 業務の流れを抜本的に見直し、企業活動全体の効率化を図る取組みはどれか。</div>
+              <div class="drill-options">
+                <span class="drill-option">A. BPR</span>
+                <span class="drill-option">B. ERP</span>
+              </div>
+              <div class="drill-answer">
+                <span class="ans-label">答え：A</span>
+                問題文は「取組み（方法）」の話。<br>
+                <span class="logic-arrow">👉</span> BPRは方法、ERPはシステム（仕組み）なので、Aが正解。
+              </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="drill-card">
+              <div class="drill-q">Q2. 技術開発を経営戦略と結び付け、競争優位を確立しようとする考え方はどれか。</div>
+              <div class="drill-options">
+                <span class="drill-option">A. HRM</span>
+                <span class="drill-option">B. MOT</span>
+              </div>
+              <div class="drill-answer">
+                <span class="ans-label">答え：B</span>
+                問題文は「考え方」の話。<br>
+                <span class="logic-arrow">👉</span> MOT（技術経営）は考え方、HRM（人）は管理対象なので、Bが正解。
+              </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="drill-card">
+              <div class="drill-q">Q3. 需要予測に基づいて必要な資材量を算出し、生産計画を立てる仕組みはどれか。</div>
+              <div class="drill-options">
+                <span class="drill-option">A. MRP</span>
+                <span class="drill-option">B. かんばん</span>
+              </div>
+              <div class="drill-answer">
+                <span class="ans-label">答え：A</span>
+                問題文は「予測・算出する仕組み（押し出し）」の話。<br>
+                <span class="logic-arrow">👉</span> MRPは資材所要量計画（計算）、かんばんは「引き取り」の指示なので、Aが正解。
+              </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="drill-card">
+              <div class="drill-q">Q4. 少数の重要な要因が結果の大部分を占めることを明らかにする分析手法はどれか。</div>
+              <div class="drill-options">
+                <span class="drill-option">A. 回帰分析</span>
+                <span class="drill-option">B. パレート分析</span>
+              </div>
+              <div class="drill-answer">
+                <span class="ans-label">答え：B</span>
+                「重要少数（80:20の法則）」を見つける手法。<br>
+                <span class="logic-arrow">👉</span> 回帰分析は「関係式」を作るものなので、Bが正解。
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <h2>まとめ</h2>
+        <p>ITパスポート試験は、用語の意味を辞書的に覚えている人よりも、<strong>「これは何の話なのか（カテゴリ）」</strong>を整理できている人が勝つ試験です。</p>
+        <p>このマップを頭の中に描けるようになれば、初見の略語が出ても「あ、これはシステムの箱にあるやつだ」と推測が効くようになります。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
