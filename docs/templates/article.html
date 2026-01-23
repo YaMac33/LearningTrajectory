@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時にここだけ置換） -->
+  <title>{{TITLE}} - IT passport study map</title>
+  <meta name="description" content="{{DESCRIPTION}}" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら生成時に空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{TITLE}}" />
+  <meta property="og:description" content="{{DESCRIPTION}}" />
+  {{OGP_URL_META}}
+
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS用。不要なら空） -->
+  <style>
+    /* {{EXTRA_CSS}} */
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">Sidenote</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="{{DATE_ISO}}">
+            {{DATE_DOT}} / {{CATEGORY}}
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">{{H1_HTML}}</h1>
+
+          <!-- GEN: TAGS -->
+          {{TAGS_HTML}}
+        </header>
+
+        <!-- GEN: BODY -->
+        {{BODY_HTML}}
+
+        <!-- GEN: REFERENCES（不要なら空セクション） -->
+        {{REFERENCES_SECTION_HTML}}
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS（図解などの補助JS。不要なら空） -->
+  <script>
+    /* {{EXTRA_JS}} */
+  </script>
+
+  <script>
+    // 共通：年表示（生成では触らない）
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
