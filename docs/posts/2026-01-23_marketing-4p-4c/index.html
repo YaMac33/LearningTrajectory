@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>マーケティングの4Pと4C - IT passport study map</title>
+  <meta name="description" content="マーケティングミックスの基本である4P（企業視点）と4C（顧客視点）を解説。それぞれの対応関係と、現代マーケティングにおける重要性を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="マーケティングの4Pと4C" />
+  <meta property="og:description" content="マーケティングミックスの基本である4P（企業視点）と4C（顧客視点）を解説。それぞれの対応関係と、現代マーケティングにおける重要性を図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 4要素グリッド */
+    .four-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .grid-item {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .grid-label {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+    .grid-sub {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
+    /* 4P vs 4C 対比図 */
+    .vs-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    .vs-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.8rem;
+      border-radius: 4px;
+      position: relative;
+    }
+    .vs-item {
+      flex: 1;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .vs-arrow {
+      color: #999;
+      font-size: 1.2rem;
+      padding: 0 1rem;
+    }
+    /* ラベルバッジ */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+      color: #fff;
+    }
+    .badge-p { background-color: #0056b3; }
+    .badge-c { background-color: #d00; }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .vs-row {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+      .vs-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-23">
+            2026.01.23 / ストラテジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">マーケティングの4Pと4C</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#マーケティング</li>
+            <li class="tag">#4P</li>
+            <li class="tag">#4C</li>
+            <li class="tag">#戦略</li>
+            <li class="tag">#顧客視点</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>商品やサービスを売るための戦略（マーケティングミックス）には、2つの大きな視点があります。<br>
+        企業側の視点である「4P」と、顧客側の視点である「4C」。この2つは対立するものではなく、表裏一体の関係にあります。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          「売り手目線の4P」を「買い手目線の4C」に置き換えて考えることで、より顧客に響くマーケティング戦略が可能になる。
+        </div>
+
+        <h2>1. 4P（企業視点）</h2>
+        <p>1960年代に提唱された、企業が「どうやって売るか」を考えるフレームワークです。頭文字のPをとって4Pと呼ばれます。</p>
+
+        <div class="diagram-section">
+          <div style="margin-bottom:0.5rem; font-weight:bold; color:#0056b3;">企業側のアクション</div>
+          <div class="four-grid">
+            <div class="grid-item">
+              <span class="grid-label">Product</span>
+              <span class="grid-sub">製品・商品</span>
+            </div>
+            <div class="grid-item">
+              <span class="grid-label">Price</span>
+              <span class="grid-sub">価格</span>
+            </div>
+            <div class="grid-item">
+              <span class="grid-label">Place</span>
+              <span class="grid-sub">流通・場所</span>
+            </div>
+            <div class="grid-item">
+              <span class="grid-label">Promotion</span>
+              <span class="grid-sub">販促・広告</span>
+            </div>
+          </div>
+        </div>
+
+        <ul>
+          <li><strong>Product：</strong>何を売るか（品質、デザイン、ブランド）</li>
+          <li><strong>Price：</strong>いくらで売るか（価格設定、利益率）</li>
+          <li><strong>Place：</strong>どこで売るか（店舗、EC、代理店）</li>
+          <li><strong>Promotion：</strong>どう知らせるか（CM、SNS、チラシ）</li>
+        </ul>
+
+        <h2>2. 4C（顧客視点）</h2>
+        <p>1990年代に提唱された、顧客が「どう買うか（どう感じるか）」を重視するフレームワークです。4Pを顧客目線で読み替えたものです。</p>
+
+        <div class="diagram-section">
+          <div style="margin-bottom:0.5rem; font-weight:bold; color:#d00;">顧客側のメリット</div>
+          <div class="four-grid">
+            <div class="grid-item" style="border-color:#d00;">
+              <span class="grid-label">Customer Value</span>
+              <span class="grid-sub">顧客価値</span>
+            </div>
+            <div class="grid-item" style="border-color:#d00;">
+              <span class="grid-label">Cost</span>
+              <span class="grid-sub">顧客コスト</span>
+            </div>
+            <div class="grid-item" style="border-color:#d00;">
+              <span class="grid-label">Convenience</span>
+              <span class="grid-sub">利便性</span>
+            </div>
+            <div class="grid-item" style="border-color:#d00;">
+              <span class="grid-label">Communication</span>
+              <span class="grid-sub">対話</span>
+            </div>
+          </div>
+        </div>
+
+        <h2>3. 4Pと4Cの対応関係（重要）</h2>
+        <p>この2つはセットで覚えるのが基本です。試験でも「Promotionに対応する4Cはどれか？」といった形式で問われます。</p>
+
+        <div class="diagram-section">
+          <div class="vs-container">
+            <!-- Product vs Value -->
+            <div class="vs-row">
+              <div class="vs-item">
+                <span class="badge badge-p">Product</span><br>
+                良い製品を作る
+              </div>
+              <div class="vs-arrow">➡</div>
+              <div class="vs-item">
+                <span class="badge badge-c">Customer Value</span><br>
+                自分にとって<br>価値があるか？
+              </div>
+            </div>
+
+            <!-- Price vs Cost -->
+            <div class="vs-row">
+              <div class="vs-item">
+                <span class="badge badge-p">Price</span><br>
+                価格を決める
+              </div>
+              <div class="vs-arrow">➡</div>
+              <div class="vs-item">
+                <span class="badge badge-c">Cost</span><br>
+                手間も含めて<br>納得できる費用か？
+              </div>
+            </div>
+
+            <!-- Place vs Convenience -->
+            <div class="vs-row">
+              <div class="vs-item">
+                <span class="badge badge-p">Place</span><br>
+                店に置く
+              </div>
+              <div class="vs-arrow">➡</div>
+              <div class="vs-item">
+                <span class="badge badge-c">Convenience</span><br>
+                欲しい時に<br>すぐ買えるか？
+              </div>
+            </div>
+
+            <!-- Promotion vs Communication -->
+            <div class="vs-row">
+              <div class="vs-item">
+                <span class="badge badge-p">Promotion</span><br>
+                宣伝する
+              </div>
+              <div class="vs-arrow">➡</div>
+              <div class="vs-item">
+                <span class="badge badge-c">Communication</span><br>
+                納得できる<br>情報が得られるか？
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2>まとめ</h2>
+        <p>現代のマーケティングでは、企業主体（4P）で「いいものを作って宣伝すれば売れる」という時代から、顧客主体（4C）で「顧客にとっての価値や利便性を高める」時代へとシフトしています。</p>
+        <p>試験対策としては、<strong>「PとCのペア」</strong>を丸暗記するのではなく、上記の図のように「企業のアクション」対「顧客の受け取り方」というストーリーで紐付けておきましょう。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
