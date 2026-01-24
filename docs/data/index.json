@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-25_energy-harvesting-introduction",
+    "timestamp": "2026-01-25T08:18:17+09:00",
+    "title": "エネルギーハーベスティングの基本",
+    "summary": "エネルギーハーベスティングは、周囲の微小エネルギーを回収して電力に変える技術です。環境発電の仕組みとIoTへの応用例を解説します。",
+    "tags": [
+      "エネルギー",
+      "IoT",
+      "ハーベスティング",
+      "技術",
+      "センサ"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "新技術・先端技術",
+    "post_path": "posts/2026-01-25_energy-harvesting-introduction/"
+  },
+  {
     "id": "2026-01-25_adhoc-network-bluetooth-difference",
     "timestamp": "2026-01-25T07:54:21+09:00",
     "title": "アドホックネットワークとBluetoothの違い",
