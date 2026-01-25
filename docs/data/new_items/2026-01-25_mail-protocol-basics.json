@@ -1,0 +1,17 @@
+{
+  "id": "2026-01-25_mail-protocol-basics",
+  "timestamp": "2026-01-25T21:16:26+09:00",
+  "title": "メールプロトコルの基本知識",
+  "summary": "メールプロトコルの違いを整理し、MIME、S/MIME、POP3、IMAPの役割を解説します。試験対策にも役立つ内容です。",
+  "tags": [
+    "メール",
+    "プロトコル",
+    "MIME",
+    "S/MIME",
+    "POP3",
+    "IMAP"
+  ],
+  "category_lv1": "テクノロジ系",
+  "category_lv2": "基礎理論",
+  "post_path": "posts/2026-01-25_mail-protocol-basics/"
+}
