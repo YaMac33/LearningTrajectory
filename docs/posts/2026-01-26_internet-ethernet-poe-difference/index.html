@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>イーサネットとインターネットの違い - IT passport study map</title>
+  <meta name="description" content="イーサネットとインターネットの違い、およびLANケーブルで給電する技術「PoE」について解説。ネットワークの範囲や役割の違いを図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="イーサネットとインターネットの違い" />
+  <meta property="og:description" content="イーサネットとインターネットの違い、およびLANケーブルで給電する技術「PoE」について解説。ネットワークの範囲や役割の違いを図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ネットワーク階層図 */
+    .network-map {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      flex-wrap: wrap;
+    }
+    
+    /* LANエリア（イーサネット） */
+    .lan-area {
+      border: 2px dashed #0056b3;
+      background: #eef6ff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+    .area-label {
+      position: absolute;
+      top: -12px;
+      left: 15px;
+      background: #0056b3;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 2px 10px;
+      border-radius: 4px;
+    }
+    .device-group {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .device {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 4px;
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+      width: 60px;
+    }
+    .switch-icon {
+      background: #fff;
+      border: 2px solid #0056b3;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #0056b3;
+      display: inline-block;
+    }
+
+    /* WANエリア（インターネット） */
+    .wan-area {
+      border: 2px dashed #e67e22;
+      background: #fffaf0;
+      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      position: relative;
+      font-weight: bold;
+      color: #e67e22;
+    }
+    .wan-icon {
+      font-size: 2rem;
+      margin-bottom: 0.2rem;
+    }
+
+    /* ルータ */
+    .router-box {
+      background: #333;
+      color: #fff;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-weight: bold;
+      z-index: 2;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .connect-line {
+      height: 2px;
+      background: #999;
+      flex-grow: 1;
+      min-width: 20px;
+    }
+
+    /* PoEの図解 */
+    .poe-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+      max-width: 500px;
+    }
+    .poe-switch {
+      background: #fff;
+      border: 2px solid #333;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      width: 120px;
+    }
+    .poe-cable {
+      flex: 1;
+      height: 12px;
+      background: #ccc;
+      position: relative;
+      margin: 0 -2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    /* ケーブルの中身 */
+    .signal-flow {
+      width: 100%;
+      height: 4px;
+      background: repeating-linear-gradient(90deg, #0056b3 0, #0056b3 5px, transparent 5px, transparent 10px);
+      position: absolute;
+      top: 1px;
+    }
+    .power-flow {
+      width: 100%;
+      height: 4px;
+      background: #e67e22;
+      position: absolute;
+      bottom: 1px;
+    }
+    .cable-label {
+      position: absolute;
+      top: -20px;
+      font-size: 0.8rem;
+      color: #666;
+      white-space: nowrap;
+    }
+    
+    .poe-device {
+      background: #fff;
+      border: 2px solid #333;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      width: 120px;
+    }
+    .outlet-ng {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #666;
+      white-space: nowrap;
+    }
+    .outlet-icon {
+      font-size: 1.2rem;
+      color: #999;
+      text-decoration: line-through;
+      margin-right: 4px;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 30%;
+    }
+    .comparison-table td:nth-child(2) { background: #eef6ff; } /* Ethernet */
+    .comparison-table td:nth-child(3) { background: #fffaf0; } /* Internet */
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .network-map {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .connect-line {
+        width: 2px;
+        height: 30px;
+      }
+      .poe-diagram {
+        flex-direction: column;
+        gap: 3rem;
+      }
+      .poe-cable {
+        width: 12px;
+        height: 50px;
+        margin: -2px 0;
+      }
+      .signal-flow { width: 4px; height: 100%; top: auto; left: 1px; background: repeating-linear-gradient(0deg, #0056b3 0, #0056b3 5px, transparent 5px, transparent 10px); }
+      .power-flow { width: 4px; height: 100%; bottom: auto; right: 1px; }
+      .cable-label { top: 50%; left: 20px; transform: translateY(-50%); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-26">
+            2026.01.26 / テクノロジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">イーサネットとインターネットの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#イーサネット</li>
+            <li class="tag">#インターネット</li>
+            <li class="tag">#PoE</li>
+            <li class="tag">#通信規格</li>
+            <li class="tag">#ネットワーク</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「イーサネット」と「インターネット」。<br>
+        名前は似ていますが、前者は「家庭や会社の中（LAN）」の規格、後者は「世界中をつなぐ（WAN）」仕組みを指します。</p>
+        <p>さらに、イーサネットケーブルを使って電力も送ってしまう便利な技術「PoE」についても解説します。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          イーサネットは「近所の道（LAN内）」、インターネットは「世界中の道路網」。PoEは「通信線で電気も送る技術」。
+        </div>
+
+        <h2>1. 位置づけの違いを図解</h2>
+        <p>私たちが普段ネットを使うとき、手元のPCから世界のサーバまで、以下のようにバケツリレーでつながっています。</p>
+
+        <div class="diagram-section">
+          <div class="network-map">
+            
+            <!-- イーサネット（LAN） -->
+            <div class="lan-area">
+              <span class="area-label">イーサネット (LAN)</span>
+              <div class="device-group">
+                <div class="device">PC</div>
+                <div class="device">Printer</div>
+              </div>
+              <div style="margin-bottom:0.5rem;">│</div>
+              <div class="switch-icon">スイッチ</div>
+              <p style="font-size:0.8rem; color:#0056b3; margin-top:0.5rem;">
+                ここは MACアドレス で通信
+              </p>
+            </div>
+
+            <div class="connect-line"></div>
+
+            <!-- ルータ（境界） -->
+            <div class="router-box">
+              ルータ
+            </div>
+
+            <div class="connect-line"></div>
+
+            <!-- インターネット（WAN） -->
+            <div class="wan-area">
+              <span class="wan-icon">🌏</span>
+              インターネット
+              <span style="font-size:0.7rem; font-weight:normal; color:#666; margin-top:0.2rem;">
+                世界規模の網<br>IPアドレスで通信
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <h2>2. それぞれの特徴と比較</h2>
+        
+        <h3>イーサネット（Ethernet）</h3>
+        <p>現在、有線LANで最も標準的に使われている<strong>「通信規格（ルール）」</strong>の名前です。<br>
+        LANケーブルの形や、データの形式（フレーム）などを定めています。</p>
+        <ul>
+          <li><strong>範囲：</strong> 同一ネットワーク内（家の中、社内）。</li>
+          <li><strong>宛先：</strong> MACアドレスを使う。</li>
+          <li><strong>機器：</strong> スイッチングハブ、LANケーブル。</li>
+        </ul>
+
+        <h3>インターネット（Internet）</h3>
+        <p>世界中の無数のネットワークを、TCP/IPという共通ルールで相互接続した<strong>「巨大なネットワーク網」</strong>のことです。</p>
+        <ul>
+          <li><strong>範囲：</strong> 世界規模。</li>
+          <li><strong>宛先：</strong> IPアドレスを使う。</li>
+          <li><strong>機器：</strong> ルータ（ネットワーク同士をつなぐ）。</li>
+        </ul>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>イーサネット</th>
+              <th>インターネット</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>正体</strong></td>
+              <td>LANの通信規格</td>
+              <td>ネットワークの集合体</td>
+            </tr>
+            <tr>
+              <td><strong>範囲</strong></td>
+              <td>LAN内（足元）</td>
+              <td>世界中（全体）</td>
+            </tr>
+            <tr>
+              <td><strong>識別子</strong></td>
+              <td>MACアドレス</td>
+              <td>IPアドレス</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>3. PoE（Power over Ethernet）とは</h2>
+        <p>イーサネットの応用技術として、試験によく出るのが<strong>PoE（ピーオーイー）</strong>です。<br>
+        文字通り「イーサネットの上（over）に電力（Power）を乗せる」技術です。</p>
+
+        <div class="diagram-section">
+          <div class="poe-diagram">
+            
+            <div class="poe-switch">
+              PoE対応<br>スイッチ
+            </div>
+
+            <div class="poe-cable">
+              <span class="cable-label">LANケーブル 1本</span>
+              <div class="signal-flow"></div>
+              <div class="power-flow"></div>
+            </div>
+
+            <div class="poe-device">
+              <span style="display:block; margin-bottom:0.5rem;">📷 / 📞</span>
+              Webカメラ<br>IP電話
+              <div class="outlet-ng">
+                <span class="outlet-icon">🔌</span>電源不要
+              </div>
+            </div>
+
+          </div>
+          <p style="font-size:0.9rem; color:#666; margin-top:2rem;">
+            「通信データ（青）」と「電力（オレンジ）」を同時に送る！
+          </p>
+        </div>
+
+        <h3>PoEのメリットと用途</h3>
+        <p>コンセントがない場所でも、LANケーブルさえ届けば機器を動かせます。</p>
+        <ul>
+          <li><strong>天井や壁：</strong> 監視カメラ、無線LANアクセスポイント。</li>
+          <li><strong>デスク周り：</strong> IP電話（電源アダプタが邪魔にならない）。</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <ul>
+          <li><strong>イーサネット：</strong> LAN内の通信ルール（MACアドレス）。</li>
+          <li><strong>インターネット：</strong> 世界をつなぐ網（IPアドレス）。</li>
+          <li><strong>PoE：</strong> LANケーブルで電気も送る技術。配線スッキリ。</li>
+        </ul>
+        <p>「天井にある監視カメラ、電源コードが見当たらないな？」と思ったら、それはきっとPoEで動いています。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
