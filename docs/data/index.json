@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-26_ip-mac-arasu-no-chigai",
+    "timestamp": "2026-01-26T14:49:06+09:00",
+    "title": "IPアドレスとMACアドレスの違い",
+    "summary": "IPv4、IPv6、MACアドレスの違いを解説します。ネットワーク通信におけるそれぞれの役割を整理しました。",
+    "tags": [
+      "IPアドレス",
+      "MACアドレス",
+      "IPv4",
+      "IPv6",
+      "ネットワーク"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "ネットワーク",
+    "post_path": "posts/2026-01-26_ip-mac-arasu-no-chigai/"
+  },
+  {
     "id": "2026-01-26_sdn-no-kisoshiryo",
     "timestamp": "2026-01-26T14:29:33+09:00",
     "title": "SDNの基礎知識",
