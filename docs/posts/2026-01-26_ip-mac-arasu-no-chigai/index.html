@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>IPアドレスとMACアドレスの違い - IT passport study map</title>
+  <meta name="description" content="IPv4、IPv6、MACアドレスの違いを解説。ビット数や表記方法の規格比較と、ネットワーク通信におけるそれぞれの役割分担を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="IPアドレスとMACアドレスの違い" />
+  <meta property="og:description" content="IPv4、IPv6、MACアドレスの違いを解説。ビット数や表記方法の規格比較と、ネットワーク通信におけるそれぞれの役割分担を図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* アドレス規格カード */
+    .spec-cards {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .spec-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .spec-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bit-badge {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: bold;
+    }
+    /* IPv4 */
+    .c-v4 { border-top: 4px solid #e67e22; }
+    .b-v4 { background: #e67e22; }
+    /* IPv6 */
+    .c-v6 { border-top: 4px solid #d00; }
+    .b-v6 { background: #d00; }
+    /* MAC */
+    .c-mac { border-top: 4px solid #0056b3; }
+    .b-mac { background: #0056b3; }
+
+    .spec-detail {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .example-code {
+      background: #eee;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      display: block;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+
+    /* 通信フロー図 */
+    .comm-map {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      padding: 1rem;
+    }
+    
+    /* ネットワークエリア */
+    .net-area {
+      border: 2px dashed #999;
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    .area-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #999;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 10px;
+      border-radius: 4px;
+    }
+    
+    /* 機器 */
+    .device-box {
+      width: 100px;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 6px;
+      padding: 0.5rem;
+      text-align: center;
+      font-weight: bold;
+      position: absolute;
+      z-index: 2;
+    }
+    .pc1 { bottom: 20px; left: 20px; }
+    .pc2 { bottom: 20px; right: 20px; }
+    .router { top: -25px; left: 50%; transform: translateX(-50%); width: 140px; background: #333; color: #fff; }
+
+    /* 矢印 */
+    .arrow-lan {
+      position: absolute;
+      bottom: 40px;
+      left: 130px;
+      right: 130px;
+      height: 4px;
+      background: #0056b3; /* 青 */
+    }
+    .arrow-lan::after {
+      content: "MACで特定";
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #0056b3;
+      font-size: 0.8rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    
+    .arrow-wan {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      height: 40px;
+      width: 4px;
+      background: #27ae60; /* 緑 */
+      transform: translateX(-50%);
+    }
+    .arrow-wan::after {
+      content: "▲";
+      position: absolute;
+      top: -15px;
+      left: -6px;
+      color: #27ae60;
+      font-size: 1.5rem;
+    }
+    .wan-cloud {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3rem;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+    .hl-v4 { color: #e67e22; font-weight: bold; }
+    .hl-v6 { color: #d00; font-weight: bold; }
+    .hl-mac { color: #0056b3; font-weight: bold; }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .comm-map {
+        height: 300px;
+      }
+      .pc1 { left: 10px; width: 80px; font-size: 0.8rem; }
+      .pc2 { right: 10px; width: 80px; font-size: 0.8rem; }
+      .arrow-lan { left: 100px; right: 100px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-26">
+            2026.01.26 / テクノロジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">IPアドレスとMACアドレスの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#IPアドレス</li>
+            <li class="tag">#MACアドレス</li>
+            <li class="tag">#IPv4</li>
+            <li class="tag">#IPv6</li>
+            <li class="tag">#ネットワーク</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ネットワーク通信には、役割の異なる複数の「アドレス（番号）」が登場します。<br>
+        特に混同しやすい「IPv4」「IPv6」「MACアドレス」について、その規格上の違いと、通信における役割分担を整理します。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          IPアドレスは「目的地（論理的な住所）」、MACアドレスは「隣の機器（物理的な身分証）」を識別するために使われる。
+        </div>
+
+        <h2>1. 3つのアドレス規格比較</h2>
+        <p>まずは「見た目」と「桁数（ビット数）」の違いを押さえましょう。</p>
+
+        <div class="diagram-section">
+          <div class="spec-cards">
+            
+            <!-- IPv4 -->
+            <div class="spec-card c-v4">
+              <div class="spec-title">IPv4 <span class="bit-badge b-v4">32bit</span></div>
+              <div class="spec-detail">
+                現在の主流。<br>
+                <strong>10進数</strong>をドットで区切る。
+                <span class="example-code">192.168.1.1</span>
+              </div>
+            </div>
+
+            <!-- IPv6 -->
+            <div class="spec-card c-v6">
+              <div class="spec-title">IPv6 <span class="bit-badge b-v6">128bit</span></div>
+              <div class="spec-detail">
+                次世代規格（枯渇対策）。<br>
+                <strong>16進数</strong>をコロンで区切る。
+                <span class="example-code">2001:0db8:85a3::1</span>
+              </div>
+            </div>
+
+            <!-- MAC -->
+            <div class="spec-card c-mac">
+              <div class="spec-title">MAC <span class="bit-badge b-mac">48bit</span></div>
+              <div class="spec-detail">
+                機器固有の番号。<br>
+                <strong>16進数</strong>をコロン等で区切る。
+                <span class="example-code">00:1A:2B:3C:4D:5E</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <h3>まとめ表</h3>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>種類</th>
+              <th>ビット数</th>
+              <th>表記</th>
+              <th>変更</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>IPv4</strong></td>
+              <td>32ビット</td>
+              <td>10進数</td>
+              <td>可変（接続場所による）</td>
+            </tr>
+            <tr>
+              <td><strong>IPv6</strong></td>
+              <td>128ビット</td>
+              <td>16進数</td>
+              <td>可変</td>
+            </tr>
+            <tr>
+              <td><strong>MAC</strong></td>
+              <td>48ビット</td>
+              <td>16進数</td>
+              <td><strong>固定</strong>（原則不変）</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>2. 通信における役割分担（図解）</h2>
+        <p>なぜ2種類のアドレスが必要なのでしょうか？<br>
+        それは「最終目的地（IP）」と「次のバケツリレー相手（MAC）」を使い分けているからです。</p>
+
+        <div class="diagram-section">
+          <div class="comm-map">
+            
+            <div class="wan-cloud">☁️</div>
+            <div class="arrow-wan"></div>
+
+            <!-- ゲートウェイ（ルーター） -->
+            <div class="device-box router">
+              ルーター<br>
+              <span style="font-size:0.7rem; font-weight:normal;">(LANの出口)</span>
+            </div>
+
+            <div class="net-area">
+              <span class="area-label">LAN内（家庭・社内）</span>
+              
+              <div class="device-box pc1">
+                PC1<br>
+                <span style="font-size:0.7rem; font-weight:normal;">送信元</span>
+              </div>
+              
+              <!-- LAN内通信 -->
+              <div class="arrow-lan"></div>
+
+              <div class="device-box pc2">
+                PC2<br>
+                <span style="font-size:0.7rem; font-weight:normal;">宛先</span>
+              </div>
+            </div>
+
+          </div>
+          <p style="font-size:0.9rem; color:#666; margin-top:1rem;">
+            LAN内は「青（MAC）」で相手を特定し、<br>
+            外に出るときは「緑（ルーター）」が中継してインターネットへ。
+          </p>
+        </div>
+
+        <h3>通信フローの整理</h3>
+        <ol>
+          <li><strong>LAN内通信（PC1→PC2）：</strong>
+            <ul>
+              <li>「この部屋にいるPC2さん」を探すイメージ。</li>
+              <li><strong>MACアドレス</strong>を使って直接データを届けます。</li>
+            </ul>
+          </li>
+          <li><strong>インターネット通信（PC1→Web）：</strong>
+            <ul>
+              <li>「東京都の〇〇さん」に手紙を出すイメージ。</li>
+              <li>PC1はまず、LANの出口である<strong>ルーターのMACアドレス</strong>宛にデータを送ります。</li>
+              <li>ルーターが<strong>IPアドレス</strong>を見て、インターネット上の目的地まで転送します。</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h2>3. 覚え方のコツ</h2>
+        <p>試験や実務で迷わないためのイメージです。</p>
+        <ul>
+          <li><strong>IPアドレス ＝ 住所：</strong> 引っ越せば変わる。遠くまで荷物を届けるのに必要。</li>
+          <li><strong>MACアドレス ＝ 身分証（マイナンバー）：</strong> 生まれた時から変わらない。本人確認や、同じ部屋の中での特定に使う。</li>
+        </ul>
+
+        <h2>まとめ</h2>
+        <ul>
+          <li><strong>IPv4：</strong> 32ビット、10進数。「192.168...」</li>
+          <li><strong>IPv6：</strong> 128ビット、16進数。「2001:db8...」</li>
+          <li><strong>MAC：</strong> 48ビット、16進数、ハードウェア固有。「00:1A...」</li>
+        </ul>
+        <p>「LANの中はMAC、外に出たらIP」という基本の役割分担を押さえておきましょう。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
