@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-26_targeted-watering-attacks",
+    "timestamp": "2026-01-26T18:30:17+09:00",
+    "title": "標的型攻撃と水飲み場攻撃について",
+    "summary": "標的型攻撃と水飲み場攻撃の手法を解説します。各攻撃のアプローチや特徴を比較し、理解を深めましょう。",
+    "tags": [
+      "サイバー攻撃",
+      "標的型",
+      "水飲み場",
+      "セキュリティ",
+      "IT教育"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "セキュリティ",
+    "post_path": "posts/2026-01-26_targeted-watering-attacks/"
+  },
+  {
     "id": "2026-01-26_multi-core-turbo-boost",
     "timestamp": "2026-01-26T18:07:20+09:00",
     "title": "マルチコアとターボブーストの関係",
