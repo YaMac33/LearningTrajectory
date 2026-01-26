@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-26_terminal-device-difference",
+    "timestamp": "2026-01-26T11:53:19+09:00",
+    "title": "TERMINALとDEVICEの違い",
+    "summary": "ITパスポート試験における「TERMINAL」と「DEVICE」の違いを解説。端末全体と内部機能の関係を明確化します。",
+    "tags": [
+      "ITパスポート",
+      "ログ分析",
+      "TERMINAL",
+      "DEVICE",
+      "USER_AGENT"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "基礎理論",
+    "post_path": "posts/2026-01-26_terminal-device-difference/"
+  },
+  {
     "id": "2026-01-26_digital-forensics-introduction",
     "timestamp": "2026-01-26T08:11:45+09:00",
     "title": "デジタルフォレンジックス入門",
