@@ -1,5 +1,23 @@
 [
   {
+    "id": "2026-01-27_dwh-etl-bi-ryuui-zukai",
+    "timestamp": "2026-01-27T11:14:39+09:00",
+    "title": "DWH・ETL・BIの関係図解",
+    "summary": "データ活用基盤のDWH、ETL、BIの関係性を整理した図解です。各要素の役割を理解し、データ分析基盤の全体像を把握しましょう。",
+    "tags": [
+      "DWH",
+      "ETL",
+      "BI",
+      "データ分析",
+      "基盤",
+      "図解",
+      "プロセス"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "基礎理論",
+    "post_path": "posts/2026-01-27_dwh-etl-bi-ryuui-zukai/"
+  },
+  {
     "id": "2026-01-27_management-tools",
     "timestamp": "2026-01-27T11:09:18+09:00",
     "title": "ITパスポート試験における管理ツール",
