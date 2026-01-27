@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>管理ツール（HRM, CRM, SCM, ERP）- IT passport study map</title>
+  <meta name="description" content="ITパスポート試験で頻出する管理ツール（HRM, CRM, SCM, ERPなど）を総まとめ。「何を管理するか」という対象別に整理し、暗記のコツと全体像を図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="管理ツール（HRM, CRM, SCM, ERP）" />
+  <meta property="og:description" content="ITパスポート試験で頻出する管理ツール（HRM, CRM, SCM, ERPなど）を総まとめ。「何を管理するか」という対象別に整理し、暗記のコツと全体像を図解します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 全体構造図（SCM > ERP > 個別） */
+    .scope-map {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      padding: 1.5rem 0;
+    }
+    
+    /* SCM（最外枠） */
+    .box-scm {
+      border: 3px dashed #e67e22;
+      background: #fffaf0;
+      border-radius: 12px;
+      padding: 3rem 1.5rem 1.5rem;
+      position: relative;
+    }
+    .label-scm {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #e67e22;
+      color: #fff;
+      font-weight: bold;
+      padding: 4px 16px;
+      border-radius: 999px;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 左右の連携 */
+    .connection-row {
+      display: flex;
+      align-items: stretch;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* 左：サプライヤー側 */
+    .side-box {
+      flex: 1;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .box-srm {
+      background: #fff;
+      border: 2px solid #666;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      color: #666;
+    }
+
+    /* 中央：ERP（企業内） */
+    .box-erp {
+      flex: 2;
+      min-width: 220px;
+      border: 2px solid #0056b3;
+      background: #eef6ff;
+      border-radius: 8px;
+      padding: 2rem 1rem 1rem;
+      position: relative;
+      text-align: center;
+    }
+    .label-erp {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0056b3;
+      color: #fff;
+      font-size: 0.9rem;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .erp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .erp-item {
+      background: #fff;
+      border: 1px solid #0056b3;
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      color: #0056b3;
+      font-weight: bold;
+    }
+
+    /* 右：顧客側 */
+    .box-crm {
+      background: #fff;
+      border: 2px solid #27ae60;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    /* 矢印 */
+    .flow-arrow {
+      align-self: center;
+      color: #999;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    /* 暗記カードグリッド */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .memo-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-target {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+    .card-name {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #333;
+    }
+    /* 色アクセント */
+    .mc-hr { border-top: 4px solid #f39c12; }
+    .mc-cust { border-top: 4px solid #27ae60; }
+    .mc-sup { border-top: 4px solid #7f8c8d; }
+    .mc-mat { border-top: 4px solid #8e44ad; }
+    .mc-del { border-top: 4px solid #2980b9; }
+    .mc-corp { border-top: 4px solid #0056b3; }
+    .mc-all { border-top: 4px solid #e67e22; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+    .t-left { text-align: left; }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .connection-row {
+        flex-direction: column;
+      }
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-27">
+            2026.01.27 / マネジメント系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">管理ツール（HRM, CRM, SCM, ERP）</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#管理ツール</li>
+            <li class="tag">#試験対策</li>
+            <li class="tag">#覚え方</li>
+            <li class="tag">#SCM</li>
+            <li class="tag">#ERP</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ITパスポート試験には、アルファベット3文字の管理ツール（〇〇M、〇〇Pなど）が大量に出題されます。<br>
+        これらはバラバラに覚えるのではなく、<strong>「誰を（何を）管理するか」</strong>と<strong>「全体の中での位置づけ」</strong>で整理すると、混同せずに覚えられます。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          ERP（全社）を中心に、上流にSRM（仕入）、下流にCRM（顧客）があり、それら全体をつなぐのがSCM（供給網）。
+        </div>
+
+        <h2>1. 全体像の地図（位置関係で覚える）</h2>
+        <p>各ツールがどこを担当しているのか、図で整理しました。</p>
+
+        <div class="diagram-section">
+          <div class="scope-map">
+            
+            <div class="box-scm">
+              <span class="label-scm">SCM (サプライチェーン全体)</span>
+              
+              <div class="connection-row">
+                
+                <!-- サプライヤー側 -->
+                <div class="side-box">
+                  <div class="box-srm">
+                    SRM<br>
+                    <span style="font-size:0.8rem; font-weight:normal;">仕入先管理</span>
+                  </div>
+                </div>
+
+                <div class="flow-arrow">➡</div>
+
+                <!-- 企業内部 (ERP) -->
+                <div class="box-erp">
+                  <span class="label-erp">ERP (企業内統合)</span>
+                  <div class="erp-grid">
+                    <div class="erp-item">HRM (人)</div>
+                    <div class="erp-item">会計 (金)</div>
+                    <div class="erp-item">MRP (材料)</div>
+                    <div class="erp-item">DRP (配送)</div>
+                  </div>
+                </div>
+
+                <div class="flow-arrow">➡</div>
+
+                <!-- 顧客側 -->
+                <div class="side-box">
+                  <div class="box-crm">
+                    CRM / SFA<br>
+                    <span style="font-size:0.8rem; font-weight:normal;">顧客・営業</span>
+                  </div>
+                </div>
+
+              </div>
+              
+              <p style="text-align:center; font-size:0.85rem; color:#e67e22; margin-top:1.5rem;">
+                調達から販売まで、全体の流れを最適化するのが SCM
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <h2>2. 即答テクニック（対象 × ツール）</h2>
+        <p>試験では、問題文の中にある「管理対象キーワード」を見つけるだけで正解できます。</p>
+
+        <div class="diagram-section" style="background:transparent; border:none; padding:0;">
+          <div class="card-grid">
+            <div class="memo-card mc-hr">
+              <span class="card-target">人材・社員</span>
+              <span class="card-name">HRM</span>
+            </div>
+            <div class="memo-card mc-cust">
+              <span class="card-target">顧客・ファン</span>
+              <span class="card-name">CRM</span>
+            </div>
+            <div class="memo-card mc-cust">
+              <span class="card-target">営業活動</span>
+              <span class="card-name">SFA</span>
+            </div>
+            <div class="memo-card mc-sup">
+              <span class="card-target">仕入先・調達</span>
+              <span class="card-name">SRM</span>
+            </div>
+            <div class="memo-card mc-mat">
+              <span class="card-target">材料・資材</span>
+              <span class="card-name">MRP</span>
+            </div>
+            <div class="memo-card mc-del">
+              <span class="card-target">配送・出荷</span>
+              <span class="card-name">DRP</span>
+            </div>
+            <div class="memo-card mc-corp">
+              <span class="card-target">全社・経営資源</span>
+              <span class="card-name">ERP</span>
+            </div>
+            <div class="memo-card mc-all">
+              <span class="card-target">供給網・全体</span>
+              <span class="card-name">SCM</span>
+            </div>
+          </div>
+        </div>
+
+        <h2>3. 詳細リスト</h2>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>略語</th>
+              <th>正式名称 (Hint)</th>
+              <th class="t-left">役割・ポイント</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>HRM</strong></td>
+              <td>Human Resource</td>
+              <td class="t-left">人事管理。採用・育成・評価。</td>
+            </tr>
+            <tr>
+              <td><strong>CRM</strong></td>
+              <td>Customer</td>
+              <td class="t-left">顧客関係管理。満足度向上、購入履歴分析。</td>
+            </tr>
+            <tr>
+              <td><strong>SFA</strong></td>
+              <td>Sales Force</td>
+              <td class="t-left">営業支援。商談進捗、日報管理。</td>
+            </tr>
+            <tr>
+              <td><strong>SRM</strong></td>
+              <td>Supplier</td>
+              <td class="t-left">供給者管理。仕入先との連携強化。</td>
+            </tr>
+            <tr>
+              <td><strong>MRP</strong></td>
+              <td>Material</td>
+              <td class="t-left">資材所要量計画。いつ・どの材料が必要か計算。</td>
+            </tr>
+            <tr>
+              <td><strong>ERP</strong></td>
+              <td>Enterprise</td>
+              <td class="t-left">経営資源計画。ヒト・モノ・カネを一元管理。</td>
+            </tr>
+            <tr>
+              <td><strong>SCM</strong></td>
+              <td>Supply Chain</td>
+              <td class="t-left">供給連鎖管理。企業間をまたぐ全体の最適化。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>まとめ</h2>
+        <p>似たような略語が出たら、まずは「誰（何）の話か？」を特定しましょう。</p>
+        <ul>
+          <li><strong>人（社員）</strong>なら HRM</li>
+          <li><strong>客</strong>なら CRM</li>
+          <li><strong>会社全部</strong>なら ERP</li>
+          <li><strong>会社の外も含めた全体</strong>なら SCM</li>
+        </ul>
+        <p>この「視点のズームアウト」の感覚を持つと、迷わず正解を選べるようになります。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
