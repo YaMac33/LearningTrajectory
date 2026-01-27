@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>STPと4Pの整理法 - IT passport study map</title>
+  <meta name="description" content="マーケティングのSTPと4Pの関係性を解説。「戦略（頭）」と「施策（手足）」の役割分担や、一貫性を持たせるための考え方を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="STPと4Pの整理法" />
+  <meta property="og:description" content="マーケティングのSTPと4Pの関係性を解説。「戦略（頭）」と「施策（手足）」の役割分担や、一貫性を持たせるための考え方を図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 上流・下流の流れ図 */
+    .stream-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+    }
+    .stream-box {
+      width: 100%;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    /* STP（戦略） */
+    .box-stp {
+      background: #eef6ff;
+      border: 2px solid #0056b3;
+      color: #0056b3;
+      z-index: 2;
+    }
+    .stp-grid {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      font-weight: bold;
+    }
+    .stp-item {
+      background: #fff;
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid #0056b3;
+    }
+
+    /* 4P（施策） */
+    .box-4p {
+      background: #fffaf0;
+      border: 2px solid #e67e22;
+      color: #e67e22;
+      margin-top: 2rem;
+      z-index: 1;
+    }
+    .p4-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      font-weight: bold;
+    }
+    .p4-item {
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #e67e22;
+      font-size: 0.9rem;
+    }
+
+    /* つなぐ矢印 */
+    .big-arrow {
+      font-size: 2rem;
+      color: #999;
+      font-weight: bold;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
+
+    /* 対応関係のライン図 */
+    .mapping-diagram {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 450px;
+      position: relative;
+      padding: 1rem;
+    }
+    .col-left, .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      z-index: 2;
+    }
+    .map-item {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: bold;
+      text-align: center;
+      min-width: 100px;
+    }
+    .mi-stp { border-left: 4px solid #0056b3; }
+    .mi-4p { border-right: 4px solid #e67e22; }
+
+    /* 接続線（SVGの代わりにCSSで簡易表現） */
+    .connector-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .line-svg {
+      width: 100%;
+      height: 100%;
+    }
+    .line-path {
+      stroke: #ccc;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 25%;
+    }
+    .comparison-table td:nth-child(2) { background: #eef6ff; font-weight:bold; } /* STP */
+    .comparison-table td:nth-child(3) { background: #fffaf0; font-weight:bold; } /* 4P */
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .mapping-diagram {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+      .col-left, .col-right {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .connector-lines { display: none; } /* スマホでは線消す */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-27">
+            2026.01.27 / ストラテジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">STPと4Pの整理法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#マーケティング</li>
+            <li class="tag">#STP</li>
+            <li class="tag">#4P</li>
+            <li class="tag">#戦略</li>
+            <li class="tag">#施策</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>マーケティングにおいて、STP分析と4P（マーケティングミックス）は切っても切れない関係にあります。<br>
+        この2つは「どっちを先にやるの？」「どう繋がっているの？」という<strong>順序と整合性</strong>を理解することが最大のポイントです。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          STP（戦略）で「戦う場所」を決め、4P（戦術）で「戦う武器」を揃える。この順番（川上から川下へ）は絶対である。
+        </div>
+
+        <h2>1. 全体像：上流から下流へ</h2>
+        <p>マーケティング活動は、頭で考える「戦略フェーズ」から、実際に動く「実行フェーズ」へと流れます。</p>
+
+        <div class="diagram-section">
+          <div class="stream-flow">
+            
+            <!-- 上流：STP -->
+            <div class="stream-box box-stp">
+              <span style="font-weight:bold; font-size:1.1rem; display:block; margin-bottom:0.5rem;">
+                上流：戦略 (Strategy)
+              </span>
+              <div>誰に、どんな価値を届けるか決める</div>
+              <div class="stp-grid">
+                <div class="stp-item">S</div>
+                <div class="stp-item">T</div>
+                <div class="stp-item">P</div>
+              </div>
+            </div>
+
+            <div class="big-arrow">⬇</div>
+
+            <!-- 下流：4P -->
+            <div class="stream-box box-4p">
+              <span style="font-weight:bold; font-size:1.1rem; display:block; margin-bottom:0.5rem;">
+                下流：施策 (Tactics)
+              </span>
+              <div>具体的にどうやって売るか決める</div>
+              <div class="p4-grid">
+                <div class="p4-item">Product</div>
+                <div class="p4-item">Price</div>
+                <div class="p4-item">Place</div>
+                <div class="p4-item">Promotion</div>
+              </div>
+            </div>
+
+          </div>
+          <p style="font-size:0.9rem; color:#666; margin-top:1rem;">
+            この「STP → 4P」の流れが逆転することはありません。
+          </p>
+        </div>
+
+        <h2>2. 具体的な対応関係（整合性）</h2>
+        <p>STPで決めた内容が、4Pの各要素にどう反映されるかを見てみましょう。<br>
+        戦略が変われば、戦術（4P）もすべて変わります。</p>
+
+        <div class="diagram-section">
+          <div class="mapping-diagram">
+            <div class="connector-lines">
+              <svg class="line-svg">
+                <!-- S/T to Product -->
+                <path d="M 120 40 L 330 40" class="line-path" />
+                <!-- S/T to Price/Place -->
+                <path d="M 120 40 L 330 110" class="line-path" />
+                <!-- P to Promotion -->
+                <path d="M 120 180 L 330 180" class="line-path" />
+              </svg>
+            </div>
+
+            <div class="col-left">
+              <div class="map-item mi-stp">
+                S・T<br><span style="font-size:0.8rem; font-weight:normal;">誰を狙う？</span>
+              </div>
+              <div class="map-item mi-stp" style="margin-top:auto;">
+                P<br><span style="font-size:0.8rem; font-weight:normal;">何がウリ？</span>
+              </div>
+            </div>
+
+            <div class="col-right">
+              <div class="map-item mi-4p">
+                Product<br><span style="font-size:0.8rem; font-weight:normal;">機能・品質</span>
+              </div>
+              <div class="map-item mi-4p">
+                Price / Place<br><span style="font-size:0.8rem; font-weight:normal;">価格帯・販路</span>
+              </div>
+              <div class="map-item mi-4p">
+                Promotion<br><span style="font-size:0.8rem; font-weight:normal;">訴求メッセージ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>具体例：IT学習サービスの場合</h3>
+        <ul>
+          <li><strong>STP（戦略）：</strong> 「IT未経験の若手（S/T）」に、「とにかく分かりやすさ（P）」で勝負する。</li>
+          <li><strong>↓ これに合わせて4Pを決める</strong></li>
+          <li><strong>Product：</strong> 専門用語を使わない動画教材。</li>
+          <li><strong>Price：</strong> 若手でも出しやすい月額980円。</li>
+          <li><strong>Promotion：</strong> 「文系でも大丈夫！」という広告メッセージ。</li>
+        </ul>
+        <p>もしここで「上級者向けの難しい機能（Product）」を入れたり、「高額な法人プラン（Price）」にしたりすると、<strong>戦略と施策の不一致（チグハグ）</strong>が起きて失敗します。</p>
+
+        <h2>3. 比較まとめ</h2>
+        <p>試験対策として、両者の位置づけを整理します。</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>STP分析</th>
+              <th>4P（ミックス）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>位置づけ</strong></td>
+              <td>上流（戦略）</td>
+              <td>下流（戦術・施策）</td>
+            </tr>
+            <tr>
+              <td><strong>アクション</strong></td>
+              <td>考える・決める</td>
+              <td>作る・動かす</td>
+            </tr>
+            <tr>
+              <td><strong>決めること</strong></td>
+              <td>ターゲット、差別化</td>
+              <td>製品、価格、場所、販促</td>
+            </tr>
+            <tr>
+              <td><strong>別名</strong></td>
+              <td>マーケティング戦略</td>
+              <td>マーケティング・ミックス</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>まとめ</h2>
+        <p>この2つはセットで覚えるのが鉄則です。</p>
+        <ul>
+          <li><strong>STP：</strong> 戦う場所を決める（Where / Who）。</li>
+          <li><strong>4P：</strong> 戦う武器を揃える（How）。</li>
+        </ul>
+        <p>「まずSTPで方向性を決めてから、4Pで具体的なアクションに落とし込む」という手順を忘れないでください。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
