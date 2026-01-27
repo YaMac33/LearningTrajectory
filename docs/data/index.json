@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-27_nfv-sdn-iot-relationship",
+    "timestamp": "2026-01-27T10:33:24+09:00",
+    "title": "NFVとSDN、IoTの関係性",
+    "summary": "NFV、SDN、IoTの連携について解説します。それぞれの役割と関係性を整理した内容です。",
+    "tags": [
+      "NFV",
+      "SDN",
+      "IoT",
+      "ネットワーク",
+      "仮想化"
+    ],
+    "category_lv1": "テクノロジ系",
+    "category_lv2": "ネットワーク",
+    "post_path": "posts/2026-01-27_nfv-sdn-iot-relationship/"
+  },
+  {
     "id": "2026-01-27_inventory-cost-relation",
     "timestamp": "2026-01-27T06:53:08+09:00",
     "title": "棚卸高と売上原価の関係",
