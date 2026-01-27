@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>マーケティングのSTPフレームワーク - IT passport study map</title>
+  <meta name="description" content="STP（セグメンテーション・ターゲティング・ポジショニング）の流れと各ステップの役割を解説。市場を分け、狙い、立ち位置を決めるマーケティングの基本フレームワークを図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="マーケティングのSTPフレームワーク" />
+  <meta property="og:description" content="STP（セグメンテーション・ターゲティング・ポジショニング）の流れと各ステップの役割を解説。市場を分け、狙い、立ち位置を決めるマーケティングの基本フレームワークを図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* STPフロー図 */
+    .stp-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .flow-step {
+      background: #fff;
+      border: 2px solid #ccc;
+      padding: 1rem;
+      border-radius: 6px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .step-badge {
+      background: #333;
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      font-weight: bold;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+    .step-content {
+      flex: 1;
+    }
+    .step-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      display: block;
+      color: #333;
+    }
+    .step-desc {
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .arrow-down {
+      text-align: center;
+      color: #999;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: -0.4rem 0;
+    }
+
+    /* セグメンテーション・ターゲティング図 */
+    .market-visual {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .mv-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .market-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      width: 120px;
+      height: 120px;
+      border: 2px solid #333;
+      background: #fff;
+    }
+    .segment {
+      border: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #999;
+    }
+    /* ターゲティング用ハイライト */
+    .target-hit {
+      background: #e67e22;
+      color: #fff;
+      font-weight: bold;
+      border: 2px solid #d35400;
+    }
+
+    /* ポジショニングマップ */
+    .position-map {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      background: #fff;
+      border: 2px solid #333;
+    }
+    .axis-y {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: #ccc;
+    }
+    .axis-x {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background: #ccc;
+    }
+    .label-top { position: absolute; top: 5px; left: 55%; font-size: 0.7rem; color: #666; }
+    .label-bottom { position: absolute; bottom: 5px; left: 55%; font-size: 0.7rem; color: #666; }
+    .label-left { position: absolute; top: 40%; left: 5px; font-size: 0.7rem; color: #666; }
+    .label-right { position: absolute; top: 40%; right: 5px; font-size: 0.7rem; color: #666; }
+    
+    .dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .dot-us {
+      background: #0056b3;
+      top: 30%;
+      right: 30%;
+      box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.2);
+    }
+    .dot-competitor {
+      background: #999;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 20%;
+    }
+    .comparison-table td:nth-child(2) { font-weight:bold; }
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .market-visual {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-27">
+            2026.01.27 / ストラテジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">マーケティングのSTPフレームワーク</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#STP</li>
+            <li class="tag">#マーケティング</li>
+            <li class="tag">#戦略</li>
+            <li class="tag">#セグメンテーション</li>
+            <li class="tag">#ターゲティング</li>
+            <li class="tag">#ポジショニング</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>効果的なマーケティング戦略を立てるための基本フレームワーク、それが「STP分析」です。<br>
+        「誰に」「何を」「どう思わせるか」を、3つのステップで順を追って決めていきます。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          STPとは、市場を細分化（S）し、狙う相手を決め（T）、自社の立ち位置を明確にする（P）という一連のプロセス。
+        </div>
+
+        <h2>1. 全体像と順番（流れが重要）</h2>
+        <p>STPは以下の順番で行います。いきなり「立ち位置」を決めることはできません。</p>
+
+        <div class="diagram-section">
+          <div class="stp-flow">
+            
+            <div class="flow-step" style="border-color:#333;">
+              <div class="step-badge">S</div>
+              <div class="step-content">
+                <span class="step-title">Segmentation</span>
+                <span class="step-desc">セグメンテーション（市場を分ける）</span>
+              </div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="flow-step" style="border-color:#e67e22;">
+              <div class="step-badge" style="background:#e67e22;">T</div>
+              <div class="step-content">
+                <span class="step-title" style="color:#e67e22;">Targeting</span>
+                <span class="step-desc">ターゲティング（狙う相手を選ぶ）</span>
+              </div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="flow-step" style="border-color:#0056b3;">
+              <div class="step-badge" style="background:#0056b3;">P</div>
+              <div class="step-content">
+                <span class="step-title" style="color:#0056b3;">Positioning</span>
+                <span class="step-desc">ポジショニング（立ち位置を決める）</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <h2>2. 各ステップの解説</h2>
+
+        <h3>① Segmentation（セグメンテーション）</h3>
+        <p>市場全体を、似たようなニーズを持つグループ（セグメント）に切り分けます。<br>
+        切り口としては「地理（地域）」「人口統計（年齢・性別）」「心理（価値観）」「行動（頻度）」などが使われます。</p>
+
+        <h3>② Targeting（ターゲティング）</h3>
+        <p>分けたグループの中から、自社が勝負する「標的」を選びます。<br>
+        「市場規模は十分か？」「成長しているか？」「競合は強すぎないか？」などを基準に判断します。</p>
+
+        <div class="diagram-section" style="padding:1rem;">
+          <div class="market-visual">
+            <div class="mv-box">
+              <span style="font-weight:bold;">S: 分ける</span>
+              <div class="market-grid">
+                <div class="segment">A</div>
+                <div class="segment">B</div>
+                <div class="segment">C</div>
+                <div class="segment">D</div>
+              </div>
+            </div>
+            <div class="mv-box">
+              <span style="font-weight:bold; color:#e67e22;">T: 選ぶ</span>
+              <div class="market-grid" style="border-color:#e67e22;">
+                <div class="segment">A</div>
+                <div class="segment target-hit">Target</div>
+                <div class="segment">C</div>
+                <div class="segment">D</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>③ Positioning（ポジショニング）</h3>
+        <p>選んだターゲット市場の中で、「競合他社と何が違うか（差別化）」を明確にします。<br>
+        2軸のマトリクス（ポジショニングマップ）を使って、自社のユニークな立ち位置を定義します。</p>
+
+        <div class="diagram-section">
+          <div class="mv-box">
+            <span style="font-weight:bold; color:#0056b3;">P: 立ち位置</span>
+            <div class="position-map">
+              <div class="axis-y"></div>
+              <div class="axis-x"></div>
+              <span class="label-top">高品質</span>
+              <span class="label-bottom">低価格</span>
+              <span class="label-left">多機能</span>
+              <span class="label-right">シンプル</span>
+              
+              <div class="dot dot-us"></div>
+              <span style="position:absolute; top:20%; right:10%; font-size:0.8rem; color:#0056b3; font-weight:bold;">自社</span>
+              
+              <div class="dot dot-competitor" style="top:70%; left:30%;"></div>
+              <div class="dot dot-competitor" style="top:60%; right:20%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <h2>3. まとめ表（試験対策）</h2>
+        <p>ITパスポート試験では、それぞれの用語の意味と順序が問われます。</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>段階</th>
+              <th>英語</th>
+              <th>日本語</th>
+              <th>アクション</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>S</strong></td>
+              <td>Segmentation</td>
+              <td>セグメンテーション</td>
+              <td>市場を<strong>分ける</strong></td>
+            </tr>
+            <tr>
+              <td><strong>T</strong></td>
+              <td>Targeting</td>
+              <td>ターゲティング</td>
+              <td>標的を<strong>選ぶ</strong></td>
+            </tr>
+            <tr>
+              <td><strong>P</strong></td>
+              <td>Positioning</td>
+              <td>ポジショニング</td>
+              <td>立ち位置を<strong>決める</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>まとめ</h2>
+        <p>STPは「マーケティング戦略の基本手順」です。</p>
+        <ul>
+          <li><strong>S：</strong>分ける（切り分ける）</li>
+          <li><strong>T：</strong>絞る（狙いを定める）</li>
+          <li><strong>P：</strong>立つ（差別化する）</li>
+        </ul>
+        <p>この順番を間違えると、「誰に売りたいのか分からない」「競合に埋もれてしまう」商品になってしまいます。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
