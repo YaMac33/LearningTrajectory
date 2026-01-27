@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>NFV・SDN・IoTの関係 - IT passport study map</title>
+  <meta name="description" content="IoT、SDN、NFVの3つの技術がどのように連携しているかを解説。データ生成、通信制御、機能提供というそれぞれの役割分担を図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="NFV・SDN・IoTの関係" />
+  <meta property="og:description" content="IoT、SDN、NFVの3つの技術がどのように連携しているかを解説。データ生成、通信制御、機能提供というそれぞれの役割分担を図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 階層構造図 */
+    .architecture-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+    }
+    
+    /* IoT層 */
+    .layer-iot {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .layer-iot::before {
+      content: "IoT (データ発生源)";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #333;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .device-icons {
+      font-size: 1.5rem;
+      letter-spacing: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ネットワーク層（SDN/NFV） */
+    .layer-network {
+      background: #eef6ff;
+      border: 2px dashed #0056b3;
+      border-radius: 8px;
+      padding: 2rem 1rem 1rem;
+      display: flex;
+      gap: 1rem;
+      position: relative;
+    }
+    .layer-network::before {
+      content: "ネットワーク制御・機能";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #0056b3;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    
+    .box-sdn, .box-nfv {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #0056b3;
+      border-radius: 6px;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    .box-title {
+      font-weight: bold;
+      color: #0056b3;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .box-role {
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    /* インフラ層 */
+    .layer-infra {
+      background: #333;
+      color: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    /* 矢印 */
+    .flow-arrow {
+      text-align: center;
+      color: #999;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: -0.5rem 0;
+      z-index: 1;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 30%;
+    }
+    .comparison-table td:nth-child(2) { background: #f0f8ff; } /* SDN */
+    .comparison-table td:nth-child(3) { background: #fffaf0; } /* NFV */
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .layer-network {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-27">
+            2026.01.27 / テクノロジ系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">NFV・SDN・IoTの関係</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#NFV</li>
+            <li class="tag">#SDN</li>
+            <li class="tag">#IoT</li>
+            <li class="tag">#ネットワーク</li>
+            <li class="tag">#仮想化</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>近年、ネットワーク技術のキーワードとして頻出する「SDN」と「NFV」。そして、それらが支える「IoT」。<br>
+        これらは個別の技術ですが、セットで機能することで真価を発揮します。それぞれの役割と関係性を整理します。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          IoTが大量のデータを生み出し、SDNがその流れ（経路）を整理し、NFVが必要な機能（処理）をソフトウェアで提供する。
+        </div>
+
+        <h2>1. 全体像：3層構造で理解する</h2>
+        <p>これらの技術は、以下のような階層関係で連携しています。</p>
+
+        <div class="diagram-section">
+          <div class="architecture-stack">
+            
+            <!-- IoT -->
+            <div class="layer-iot">
+              <div class="device-icons">📷 🌡️ 🚗 🏭</div>
+              <strong>膨大なデータを生成・送信</strong><br>
+              <span style="font-size:0.85rem; color:#666;">（カメラ、センサー、車両、機器）</span>
+            </div>
+
+            <div class="flow-arrow">⬇ データ通信</div>
+
+            <!-- SDN / NFV -->
+            <div class="layer-network">
+              <div class="box-sdn">
+                <span class="box-title">SDN</span>
+                <span class="box-role">
+                  <strong>「通信の制御」</strong><br>
+                  経路制御、優先制御(QoS)<br>
+                  (どこに流すか)
+                </span>
+              </div>
+              <div class="box-nfv">
+                <span class="box-title">NFV</span>
+                <span class="box-role">
+                  <strong>「機能の提供」</strong><br>
+                  ファイアウォール、負荷分散<br>
+                  (何をするか)
+                </span>
+              </div>
+            </div>
+
+            <div class="flow-arrow">⬇ 仮想化</div>
+
+            <!-- インフラ -->
+            <div class="layer-infra">
+              <strong>汎用ハードウェア基盤</strong><br>
+              （クラウド / データセンター / 仮想サーバ）
+            </div>
+
+          </div>
+        </div>
+
+        <h2>2. 各用語の役割定義</h2>
+
+        <h3>IoT（Internet of Things）</h3>
+        <p><strong>「データを生む存在」</strong>です。<br>
+        現実世界のあらゆるモノがネットにつながり、リアルタイムで膨大なデータを送信し続けます。この大量トラフィックをさばくために、柔軟なネットワークが必要になります。</p>
+
+        <h3>SDN（Software-Defined Networking）</h3>
+        <p><strong>「ネットワークの頭脳（経路係）」</strong>です。<br>
+        「このデータはこっちのサーバへ」「緊急の通信は優先する」といった通信の交通整理を、物理配線を変えずにソフトウェアで行います。</p>
+
+        <h3>NFV（Network Functions Virtualization）</h3>
+        <p><strong>「ネットワーク機能の仮想化（道具係）」</strong>です。<br>
+        これまで専用機器（高い箱）が必要だったルーター、ファイアウォール、ロードバランサなどの機能を、汎用サーバ上のソフトウェアとして実現します。</p>
+
+        <h2>3. SDNとNFVの違い（試験対策）</h2>
+        <p>この2つは非常に相性が良く、同時に使われることが多いですが、定義は明確に異なります。</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>SDN</th>
+              <th>NFV</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>フルスペル</strong></td>
+              <td>Software-Defined<br>Networking</td>
+              <td>Network Functions<br>Virtualization</td>
+            </tr>
+            <tr>
+              <td><strong>主役</strong></td>
+              <td>ネットワーク全体</td>
+              <td>個々のネットワーク機器</td>
+            </tr>
+            <tr>
+              <td><strong>役割</strong></td>
+              <td><strong>構成・経路</strong>を制御する</td>
+              <td><strong>専用機器の機能</strong>をソフト化する</td>
+            </tr>
+            <tr>
+              <td><strong>具体例</strong></td>
+              <td>経路切替、帯域制御</td>
+              <td>仮想FW、仮想ルーター</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>まとめ</h2>
+        <p>それぞれの役割を一言で表すと以下のようになります。</p>
+        <ul>
+          <li><strong>IoT：</strong> お客さん（データを送ってくる）</li>
+          <li><strong>SDN：</strong> 交通誘導員（どこへ行くか案内する）</li>
+          <li><strong>NFV：</strong> サービスカウンター（必要な処理をしてくれる）</li>
+        </ul>
+        <p>これらが組み合わさることで、大量のIoTデータを柔軟かつ低コストに処理できるインフラが実現しています。</p>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
