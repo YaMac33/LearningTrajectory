@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>DFDとPDMの違い - IT passport study map</title>
+  <meta name="description" content="DFD（データフロー図）とPDM（プレシデンスダイアグラム法）の違いを解説。「データの流れ」と「作業の順序」という目的の違いを図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DFDとPDMの違い" />
+  <meta property="og:description" content="DFD（データフロー図）とPDM（プレシデンスダイアグラム法）の違いを解説。「データの流れ」と「作業の順序」という目的の違いを図解で整理します。" />
+  
+  <!-- Assets: 記事は docs/posts/<id>/index.html → ../../ 固定 -->
+  <link rel="stylesheet" href="../../assets/styles.css" />
+
+  <!-- GEN: EXTRA_CSS（図解・補助CSS） -->
+  <style>
+    /* 共通図解コンテナ */
+    .diagram-section {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 対比図 */
+    .vs-diagram {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .vs-box {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .vs-title {
+      font-weight: bold;
+      margin-bottom: 1rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+    .bg-dfd { background-color: #0056b3; }
+    .bg-pdm { background-color: #e67e22; }
+
+    /* DFD (Data Flow Diagram) */
+    .dfd-canvas {
+      position: relative;
+      width: 220px;
+      height: 180px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .dfd-entity { /* 外部実体：四角 */
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 60px;
+      height: 30px;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    .dfd-process { /* 処理：丸 */
+      position: absolute;
+      top: 60px;
+      left: 80px;
+      width: 60px;
+      height: 60px;
+      border: 2px solid #333;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      background: #eef6ff;
+    }
+    .dfd-store { /* データストア：二重線 */
+      position: absolute;
+      bottom: 20px;
+      right: 10px;
+      width: 80px;
+      height: 30px;
+      border-top: 2px solid #333;
+      border-bottom: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+    }
+    .dfd-arrow {
+      position: absolute;
+      background: #0056b3;
+      height: 2px;
+    }
+    /* 矢印配置 */
+    .da-1 { top: 25px; left: 70px; width: 40px; transform: rotate(45deg); }
+    .da-2 { top: 90px; left: 140px; width: 40px; transform: rotate(45deg); }
+    .da-head {
+      position: absolute;
+      right: 0;
+      top: -3px;
+      border-left: 6px solid #0056b3;
+      border-top: 3px solid transparent;
+      border-bottom: 3px solid transparent;
+    }
+
+    /* PDM (Precedence Diagram Method) */
+    .pdm-canvas {
+      position: relative;
+      width: 220px;
+      height: 180px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .pdm-node {
+      position: absolute;
+      width: 60px;
+      height: 40px;
+      border: 2px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      background: #fffaf0;
+    }
+    .pn-a { top: 20px; left: 20px; }
+    .pn-b { top: 70px; left: 100px; }
+    .pn-c { top: 120px; left: 20px; }
+    .pdm-arrow {
+      position: absolute;
+      background: #e67e22;
+      height: 2px;
+    }
+    /* 矢印配置 */
+    .pa-1 { top: 50px; left: 60px; width: 40px; transform: rotate(45deg); transform-origin: left; }
+    .pa-2 { top: 130px; left: 80px; width: 40px; transform: rotate(-45deg); transform-origin: left; }
+    .pa-head {
+      position: absolute;
+      right: 0;
+      top: -3px;
+      border-left: 6px solid #e67e22;
+      border-top: 3px solid transparent;
+      border-bottom: 3px solid transparent;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 25%;
+    }
+    .comparison-table td:nth-child(2) { background: #eef6ff; font-weight:bold; } /* DFD */
+    .comparison-table td:nth-child(3) { background: #fffaf0; font-weight:bold; } /* PDM */
+
+    /* ポイント強調 */
+    .key-point {
+      background-color: #f4f4f4;
+      border-left: 4px solid #333;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+    .key-point strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1em;
+    }
+
+    /* レスポンシブ */
+    @media (max-width: 600px) {
+      .vs-diagram {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="site-header">
+      <a href="../../index.html" class="site-title">IT passport study map</a>
+      <nav class="site-nav">
+        <ul>
+          <li><a href="../../index.html">Back to List</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <article class="article-content">
+        <header class="article-header">
+          <!-- GEN: POST_META -->
+          <time class="post-meta" datetime="2026-01-27">
+            2026.01.27 / マネジメント系
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DFDとPDMの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">#DFD</li>
+            <li class="tag">#PDM</li>
+            <li class="tag">#データフロー</li>
+            <li class="tag">#プロジェクト管理</li>
+            <li class="tag">#図解</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「矢印でつながれた図」という意味では似ているDFDとPDM。<br>
+        しかし、一方は「システム設計」の道具で、もう一方は「スケジュール管理」の道具です。</p>
+        <p>試験で混同しないよう、それぞれの図が「何を流しているのか」に注目して整理します。</p>
+
+        <div class="key-point">
+          <strong>1行要約</strong><br>
+          DFDは「情報の流れ（What）」を表す地図、PDMは「作業の順番（When）」を表す工程表。
+        </div>
+
+        <h2>1. 見た目と役割の違い</h2>
+        <p>まずは図の形と、矢印の意味するものを比較しましょう。</p>
+
+        <div class="diagram-section">
+          <div class="vs-diagram">
+            
+            <!-- DFD -->
+            <div class="vs-box">
+              <span class="vs-title bg-dfd">DFD</span>
+              <div class="dfd-canvas">
+                <div class="dfd-entity">利用者</div>
+                <div class="dfd-arrow da-1"><div class="da-head"></div></div>
+                <div class="dfd-process">受注処理</div>
+                <div class="dfd-arrow da-2"><div class="da-head"></div></div>
+                <div class="dfd-store">注文DB</div>
+              </div>
+              <p style="font-size:0.9rem; margin-top:0.5rem;">
+                <strong>データの流れ</strong><br>
+                <span style="font-size:0.8rem; color:#666;">（時間の概念なし）</span>
+              </p>
+            </div>
+
+            <!-- PDM -->
+            <div class="vs-box">
+              <span class="vs-title bg-pdm">PDM</span>
+              <div class="pdm-canvas">
+                <div class="pdm-node pn-a">設計</div>
+                <div class="pdm-arrow pa-1"><div class="pa-head"></div></div>
+                <div class="pdm-node pn-b">製造</div>
+                <div class="pdm-arrow pa-2"><div class="pa-head"></div></div>
+                <div class="pdm-node pn-c">テスト</div>
+              </div>
+              <p style="font-size:0.9rem; margin-top:0.5rem;">
+                <strong>作業の順序</strong><br>
+                <span style="font-size:0.8rem; color:#666;">（時間が流れる）</span>
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <h2>2. DFD（Data Flow Diagram）</h2>
+        <p>システム開発の「要件定義」や「設計」で使われます。<br>
+        「データがどこから来て、どう加工され、どこへ行くか」を可視化します。</p>
+
+        <h3>DFDの4つの記号（試験頻出）</h3>
+        <ul>
+          <li><strong>○ 処理（Process）：</strong> データを加工・変換する機能。</li>
+          <li><strong>□ 外部実体（Entity）：</strong> データの発生源や提出先（人や他システム）。</li>
+          <li><strong>＝ データストア（Data Store）：</strong> ファイルやデータベースなど、データの保管場所。</li>
+          <li><strong>→ データフロー（Data Flow）：</strong> データの移動。</li>
+        </ul>
+        <p><strong>注意点：</strong> DFDには「処理の順番」や「時間」の概念はありません。</p>
+
+        <h2>3. プレシデンスダイアグラム法（PDM）</h2>
+        <p>プロジェクトの「工程管理」で使われます。<br>
+        「この作業が終わらないと次は始められない」といった<strong>依存関係</strong>を整理します。</p>
+
+        <h3>PDMの特徴</h3>
+        <ul>
+          <li><strong>□ アクティビティ（Activity）：</strong> 1つの作業単位。</li>
+          <li><strong>→ 依存関係（Dependency）：</strong> 作業の順序。</li>
+        </ul>
+        <p>これを使ってクリティカルパス（最長経路）を分析します。</p>
+
+        <h2>4. 比較まとめ</h2>
+        <p>ITパスポート試験で正解を選ぶためのポイントです。</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>DFD</th>
+              <th>PDM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>フルスペル</strong></td>
+              <td>Data Flow<br>Diagram</td>
+              <td>Precedence<br>Diagram Method</td>
+            </tr>
+            <tr>
+              <td><strong>表すもの</strong></td>
+              <td>データの流れ</td>
+              <td>作業の順序</td>
+            </tr>
+            <tr>
+              <td><strong>使う場面</strong></td>
+              <td>要件定義・設計</td>
+              <td>工程管理</td>
+            </tr>
+            <tr>
+              <td><strong>時間の概念</strong></td>
+              <td>なし</td>
+              <td>あり</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>5. 試験での判別テクニック</h2>
+        <p>問題文を見て、自分に問いかけましょう。</p>
+        <div class="key-point">
+          <strong>「これはデータが動く話か？ 作業が進む話か？」</strong>
+          <ul>
+            <li>データ・情報・処理 → <strong>DFD</strong></li>
+            <li>作業・工程・順序・依存 → <strong>PDM</strong></li>
+          </ul>
+        </div>
+
+        <h2>まとめ</h2>
+        <ul>
+          <li><strong>DFD：</strong> 「中身（データ）」を理解するための地図。</li>
+          <li><strong>PDM：</strong> 「進め方（スケジュール）」を管理するための地図。</li>
+        </ul>
+
+        <!-- GEN: REFERENCES -->
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> IT passport study map. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- GEN: EXTRA_JS -->
+  <script>
+    // 共通：年表示
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
