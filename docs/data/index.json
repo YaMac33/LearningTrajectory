@@ -1,5 +1,21 @@
 [
   {
+    "id": "2026-01-27_pert-cpm-pdm-chigai",
+    "timestamp": "2026-01-27T19:01:41+09:00",
+    "title": "PERT・CPM・PDMの違い解説",
+    "summary": "プロジェクト管理手法であるPERT、CPM、PDMの役割を整理します。各手法の特性を理解することでスケジュール管理が容易になります。",
+    "tags": [
+      "工程管理",
+      "PERT",
+      "CPM",
+      "PDM",
+      "ITパスポート"
+    ],
+    "category_lv1": "マネジメント系",
+    "category_lv2": "プロジェクトマネジメント",
+    "post_path": "posts/2026-01-27_pert-cpm-pdm-chigai/"
+  },
+  {
     "id": "2026-01-27_pdmの基礎",
     "timestamp": "2026-01-27T18:56:07+09:00",
     "title": "プレシデンスダイアグラム法の基礎",
