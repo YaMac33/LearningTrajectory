@@ -1,0 +1,16 @@
+{
+  "id": "2026-01-27_devops-no-kihon-kaisetsu",
+  "timestamp": "2026-01-27T12:04:20+09:00",
+  "title": "DevOpsの基本解説",
+  "summary": "DevOpsは開発と運用の連携を促進し、システム提供を迅速化する手法です。自動化や文化の変革が重要な要素となります。",
+  "tags": [
+    "DevOps",
+    "ITパスポート",
+    "自動化",
+    "CI/CD",
+    "システム運用"
+  ],
+  "category_lv1": "マネジメント系",
+  "category_lv2": "サービスマネジメント",
+  "post_path": "posts/2026-01-27_devops-no-kihon-kaisetsu/"
+}
