@@ -16,44 +16,44 @@
     </header>
 
     <main>
-      <div class="search-wrap">
-        <input
-          type="text"
-          id="searchInput"
-          class="search-input"
-          placeholder="Search posts (title / summary / tags)"
-          aria-label="Search posts"
-        />
-      </div>
+  <div class="search-wrap">
+    <input
+      type="text"
+      id="searchInput"
+      class="search-input"
+      placeholder="Search posts (title / summary / tags)"
+      aria-label="Search posts"
+    />
+  </div>
 
-      <ul class="post-list" id="postList">
-        <li id="loadingState" class="post-item">
-          <article>
-            <time class="post-meta">Loading...</time>
-            <h2 class="post-title">Loading posts</h2>
-            <p class="post-excerpt">Please wait.</p>
-          </article>
-        </li>
-      </ul>
+  <!-- 🔽 ツリー俯瞰エリア -->
+  <section class="category-tree">
+    <div class="category-tree__header">
+      <h2 class="category-tree__title">Category Map</h2>
+      <span class="category-tree__hint">クリックして絞り込み</span>
+    </div>
+    <div id="categoryTree"></div>
+  </section>
 
-      <div id="noResults" style="display:none;">No posts found</div>
+  <!-- 🔽 記事一覧（JSで描画） -->
+  <ul class="post-list" id="postList">
+    <li id="loadingState" class="post-item">
+      <article>
+        <time class="post-meta">Loading...</time>
+        <h2 class="post-title">Loading posts</h2>
+        <p class="post-excerpt">Please wait.</p>
+      </article>
+    </li>
+  </ul>
 
-      <div id="loadError" style="display:none;">
-        Failed to load index.json
-        <div id="loadErrorMsg"></div>
-      </div>
+  <div id="noResults" style="display:none;">No posts found</div>
 
-      <section class="category-tree">
-       <div class="category-tree__header">
-        <h2 class="category-tree__title">Category Map</h2>
-        <span class="category-tree__hint">クリックして絞り込み</span>
-       </div>
-      <div id="categoryTree"></div>
-     </section>
+  <div id="loadError" style="display:none;">
+    Failed to load index.json
+    <div id="loadErrorMsg"></div>
+  </div>
+</main>
 
-     <ul id="postList" class="post-list"></ul>
-
-    </main>
 
     <footer class="site-footer">
       <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
