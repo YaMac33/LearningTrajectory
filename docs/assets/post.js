@@ -44,16 +44,15 @@
 
   // 問い合わせフォーム（事前入力URL）
   const CONTACT_FORM_BASE =
-  "https://docs.google.com/forms/d/e/XXXXXXXX/viewform";
+  "https://docs.google.com/forms/d/e/1FAIpQLSfm8p6se9jxdtNQDq2u_dlYmuISoNXNf-V7NQeLzf0247ln-w/viewform";
 
-  const PAGE_URL_ENTRY_ID = "entry.1234567890";
+  const PAGE_URL_ENTRY_ID = "entry.871328730";
 
   const contactLink = document.getElementById("contactLink");
   if (contactLink) {
   const pageUrl = location.href;
-  const url =
+  contactLink.href =
     `${CONTACT_FORM_BASE}?${PAGE_URL_ENTRY_ID}=` +
     encodeURIComponent(pageUrl);
-  contactLink.href = url;
-  }
+ }
 })();
