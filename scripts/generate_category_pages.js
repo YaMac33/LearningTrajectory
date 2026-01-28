@@ -14,6 +14,13 @@ function renderCategoryIndexHtml(category) {
   return `<!DOCTYPE html>
 <html lang="ja">
 <head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-MQ9ZB4LYWP');
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Learning Trajectory - ${esc}</title>
