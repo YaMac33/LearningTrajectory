@@ -1,0 +1,25 @@
+{
+  "id": "awscp-1234",
+  "category": "awscp",
+  "timestamp": "2026-01-29T07:58:00+09:00",
+  "post_path": "awscp/posts/2026-01-29-awscp-1234/",
+  "meta": {
+    "title": "S3完全ガイド - Minimalist Blog",
+    "summary": "AWS S3の基本から応用まで解説し、最適な利用法を学べます。S3の概念や基本構造、バケットやオブジェクトについて詳しく紹介します。",
+    "tags": [
+      "AWS",
+      "S3",
+      "ストレージ",
+      "クラウド",
+      "データ管理",
+      "バケット",
+      "オブジェクト"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3)"
+    ],
+    "dr": "2026-01-29_s3-complete-guide",
+    "status": "public"
+  }
+}
