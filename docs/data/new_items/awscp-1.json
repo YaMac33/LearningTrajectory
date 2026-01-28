@@ -1,25 +1,24 @@
 {
   "id": "awscp-1",
   "category": "awscp",
-  "timestamp": "2026-01-29T07:40:05+09:00",
+  "timestamp": "2026-01-29T08:26:09+09:00",
   "post_path": "awscp/posts/2026-01-29-awscp-1/",
   "meta": {
-    "title": "AWS Cloud Practitionerの主要サービス",
-    "summary": "AWS Cloud Practitioner向けに、主要なAWSサービスと責任共有モデルを概説します。サービスの役割や課金の仕組みを理解することが重要です。",
+    "title": "CloudFrontの全貌と利用法",
+    "summary": "CloudFrontはS3と連携し、高速で安全なコンテンツ配信を実現します。この内容では、CloudFrontの役割やS3との関係について解説します。",
     "tags": [
-      "AWS",
-      "Cloud Practitioner",
-      "EC2",
+      "CloudFront",
       "S3",
-      "IAM",
-      "VPC",
-      "責任共有モデル"
+      "CDN",
+      "キャッシュ",
+      "AWS",
+      "セキュリティ"
     ],
     "taxonomy": [
       "AWSのコアサービス",
       "コンピューティング(EC2/Lambda)"
     ],
-    "dr": "2026-01-29_aws-cloud-practitioner-services",
+    "dr": "2026-01-29_cloudfront-s3-cdn-利用法",
     "status": "public"
   }
 }
