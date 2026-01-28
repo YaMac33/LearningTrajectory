@@ -1,0 +1,25 @@
+{
+  "id": "awscp-1",
+  "category": "awscp",
+  "timestamp": "2026-01-28T22:39:10+09:00",
+  "post_path": "awscp/posts/2026-01-28-awscp-1/",
+  "meta": {
+    "title": "AWS Cloud Practitionerの基本概念",
+    "summary": "AWS Cloud Practitioner向けに、主要なサービスと責任共有モデルを解説します。クラウドの特徴やサービスごとの役割を理解することが重要です。",
+    "tags": [
+      "AWS",
+      "クラウド",
+      "サービス",
+      "責任共有",
+      "EC2",
+      "S3",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "クラウドの概念"
+    ],
+    "dr": "2026-01-28_aws-cloud-practitioner-basics",
+    "status": "public"
+  }
+}
