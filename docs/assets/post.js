@@ -41,4 +41,19 @@
     nextEl.textContent = `次：${next.title || "次の記事"} →`;
     nextEl.style.display = "";
   }
+
+  // 問い合わせフォーム（事前入力URL）
+  const CONTACT_FORM_BASE =
+  "https://docs.google.com/forms/d/e/XXXXXXXX/viewform";
+
+  const PAGE_URL_ENTRY_ID = "entry.1234567890";
+
+  const contactLink = document.getElementById("contactLink");
+  if (contactLink) {
+  const pageUrl = location.href;
+  const url =
+    `${CONTACT_FORM_BASE}?${PAGE_URL_ENTRY_ID}=` +
+    encodeURIComponent(pageUrl);
+  contactLink.href = url;
+  }
 })();
