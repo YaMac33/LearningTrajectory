@@ -1,0 +1,24 @@
+[
+  {
+    "id": "blog-12345",
+    "category": "blog",
+    "timestamp": "2026-01-28T22:48:41+09:00",
+    "title": "学習記録の仕組み作りと効果",
+    "summary": "記録する仕組みを先に作ることで学習が続きやすくなったことに気づきました。具体的な方法や気を付ける点をまとめています。",
+    "tags": [
+      "学習",
+      "記録",
+      "仕組み",
+      "Googleフォーム",
+      "スプレッドシート",
+      "GitHub Pages"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": "2026-01-28_learning-recording-system",
+    "status": "public",
+    "post_path": "blog/posts/2026-01-28-blog-12345/"
+  }
+]

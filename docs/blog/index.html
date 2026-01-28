@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learning Trajectory - blog</title>
+  <meta name="description" content="Category: blog">
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body data-category="blog" data-root-prefix="../">
+  <div class="container">
+    <header class="site-header">
+      <a href="../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <main>
+      <div class="search-wrap">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search posts (title / summary / tags)"
+          aria-label="Search posts"
+        />
+      </div>
+
+      <section class="category-tree">
+        <div class="category-tree__header">
+          <h2 class="category-tree__title">Category Map</h2>
+          <span class="category-tree__hint">クリックして絞り込み</span>
+        </div>
+        <div id="categoryTree"></div>
+      </section>
+
+      <ul class="post-list" id="postList">
+        <li id="loadingState" class="post-item">
+          <article>
+            <time class="post-meta">Loading...</time>
+            <h2 class="post-title">Loading posts</h2>
+            <p class="post-excerpt">Please wait.</p>
+          </article>
+        </li>
+      </ul>
+
+      <div id="noResults" style="display:none;">No posts found</div>
+
+      <div id="loadError" style="display:none;">
+        Failed to load index.json
+        <div id="loadErrorMsg"></div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script src="../assets/app.js"></script>
+</body>
+</html>
