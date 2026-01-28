@@ -28,11 +28,15 @@ jobs:
       - name: Build index.json
         run: node scripts/build_index.js
 
-      # 2) new_items → category shortcuts
+      # 2) docs/data/index.json → docs/<category>/index.html
+      - name: Generate category top pages
+        run: node scripts/generate_category_pages.js
+
+      # 3) new_items → category shortcuts
       - name: Generate category shortcuts
         run: node scripts/generate_shortcuts.js
 
-      # 3) 変更があればコミット＆push
+      # 4) 変更があればコミット＆push
       - name: Commit & push if changed
         run: |
           git config user.name "github-actions[bot]"
