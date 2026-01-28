@@ -45,25 +45,6 @@
     "post_path": "awscp/posts/2026-01-28-awscp-1/"
   },
   {
-    "id": "itpassport-p3w6z1f7q9r8",
-    "category": "itpassport",
-    "timestamp": "2026-01-28T21:52:55+09:00",
-    "title": "情報セキュリティの基本概念",
-    "summary": "情報セキュリティの基礎知識はITパスポート試験で重要です。基本的な脅威や対策を理解することが求められます。",
-    "tags": [
-      "情報セキュリティ",
-      "ITパスポート",
-      "脅威",
-      "対策",
-      "基本",
-      "知識"
-    ],
-    "taxonomy": [],
-    "dr": null,
-    "status": "public",
-    "post_path": "itpassport/posts/2026-01-28-itpassport-p3w6z1f7q9r8/"
-  },
-  {
     "id": "awscp-a1b2c3d4e5f6g7h8i9j0",
     "category": "awscp",
     "timestamp": "2026-01-28T20:11:58+09:00",
@@ -83,25 +64,5 @@
     "dr": null,
     "status": "public",
     "post_path": "awscp/posts/2026-01-28-awscp-a1b2c3d4e5f6g7h8i9j0/"
-  },
-  {
-    "id": "itpassport-1a2b3c4d5e6f",
-    "category": "itpassport",
-    "timestamp": "2026-01-28T19:54:53+09:00",
-    "title": "DevOpsの基本解説",
-    "summary": "DevOpsは開発と運用の連携を深め、効率化を図る手法です。CI/CDやIaCの概念を通じて、そのメリットを解説します。",
-    "tags": [
-      "DevOps",
-      "ITパスポート",
-      "自動化",
-      "CI/CD",
-      "システム運用"
-    ],
-    "taxonomy": [
-      "マネジメント系"
-    ],
-    "dr": null,
-    "status": "public",
-    "post_path": "itpassport/posts/2026-01-28-itpassport-1a2b3c4d5e6f/"
   }
 ]
