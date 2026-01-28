@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- (0) Google Tag (Must be first in head) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-MQ9ZB4LYWP');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3完全ガイド - Minimalist Blog</title>
+    <link rel="stylesheet" href="../../../assets/styles.css">
+</head>
+<body>
+    <!-- (1) Post Nav (Must be directly under body) -->
+    <nav class="post-nav">
+        <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+        <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <div class="container">
+        <header class="site-header">
+            <div class="site-title">Minimalist Blog</div>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="../../../index.html">HOME</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <article>
+            <header class="article-header">
+                <time class="post-meta">2026/01/29 / AWS</time>
+                <h1 class="article-title">S3完全ガイド</h1>
+                <ul class="tag-list">
+                    <li class="tag">#AWS</li>
+                    <li class="tag">#S3</li>
+                    <li class="tag">#ストレージ</li>
+                    <li class="tag">#クラウド</li>
+                    <li class="tag">#データ管理</li>
+                </ul>
+            </header>
+
+            <div class="article-content">
+                <p>AWS S3の基礎から応用まで、構造や特徴を解説。最適な利用法を学べます。</p>
+                
+                <p>S3はAWS全体の考え方が一気に見えるサービスなので、ここをちゃんと理解すると後が楽です。本記事では、概念 → 構造 → 使われ方 → 注意点の順で解説していきます。</p>
+
+                <h2>① S3って何？</h2>
+                <p><strong>S3（Simple Storage Service）</strong>は、「ファイルを置くための超堅牢な倉庫」です。</p>
+                <ul>
+                    <li>サーバーは意識しない（サーバーレス）</li>
+                    <li>容量無制限</li>
+                    <li>99.999999999%（イレブンナイン）の耐久性</li>
+                </ul>
+
+                <h2>② S3の基本構造（超重要）</h2>
+                <p>全体像は以下のようになっています。</p>
+<pre>
+AWS
+└─ S3
+   └─ バケット（Bucket）
+      └─ オブジェクト（Object）
+         ├─ データ（ファイル本体）
+         └─ メタデータ
+</pre>
+
+                <h3>実体イメージ</h3>
+                <p>バケットを「フォルダみたいな最上位の箱」とイメージしてください。</p>
+<pre>
+バケット
+├─ index.html
+├─ image.png
+└─ docs/2026-01-29/sample.pdf
+</pre>
+                <blockquote>
+                    ⚠️ <strong>実は「フォルダ」は存在しません</strong><br>
+                    <code>docs/2026-01-29/</code> はあくまで「キー（文字列）」の一部です。コンソール上ではフォルダ風に見えていますが、実際はフラットな構造です。
+                </blockquote>
+
+                <h2>③ バケットとは？</h2>
+                <p>バケットには以下の特徴があります。</p>
+                <ul>
+                    <li>名前は世界で一意である必要がある</li>
+                    <li>特定のリージョンに紐づく</li>
+                </ul>
+<pre>
+[ バケット ]
+図：東京リージョン (ap-northeast-1)
+└─ my-study-site-bucket
+</pre>
+                <p>バケット名はURLの一部になるため、世界中で名前が被ることは許されません。</p>
+                <p>例：<code>https://my-study-site-bucket.s3.amazonaws.com/index.html</code></p>
+
+                <h2>④ オブジェクトとは？</h2>
+                <p>オブジェクトはS3に保存されるファイル単位のことです。</p>
+<pre>
+オブジェクト
+├─ Key（パス）
+├─ Body（中身）
+└─ Metadata（属性）
+</pre>
+                <p><strong>具体例：</strong></p>
+                <ul>
+                    <li><strong>Key:</strong> <code>docs/2026-01-29/what-is-s3.html</code></li>
+                    <li><strong>Body:</strong> <code>&lt;html&gt;...&lt;/html&gt;</code></li>
+                    <li><strong>Metadata:</strong> Content-Type: text/html, サイズ, 更新日時 など</li>
+                </ul>
+                <p>👉 <strong>S3 = Key-Valueストレージ</strong><br>
+                「ファイルパスっぽい文字列（Key）」に対して「ファイル本体（Value）」が紐づく仕組みです。</p>
+
+                <h2>⑤ アクセスの仕組み（権限が超重要）</h2>
+                <p>S3へのアクセス制御には、代表的なものが4つあります。</p>
+                <ul>
+                    <li><strong>IAMポリシー</strong>（「誰が」操作できるか）</li>
+                    <li><strong>バケットポリシー</strong>（「どこに」誰が入れるか）</li>
+                    <li><strong>ACL</strong>（昔の方式・現在は非推奨）</li>
+                    <li><strong>パブリックアクセスブロック</strong>（誤公開を防ぐ機能）</li>
+                </ul>
+<pre>
+[ ユーザー / サービス ]
+        |
+      (IAM)
+        |
+[ バケットポリシー ]
+        |
+       S3
+</pre>
+
+                <h2>⑥ 静的WebサイトとしてのS3</h2>
+                <p>S3はWebサーバーとしても機能しますが、以下の理由からCloudFrontと組み合わせるのが「王道」です。</p>
+                <ul>
+                    <li>S3単体ではHTTPS化ができない</li>
+                    <li>独自ドメインが使いにくい</li>
+                </ul>
+<pre>
+ユーザー
+  ↓
+CloudFront（CDN・HTTPS化）
+  ↓
+S3（オリジン・index.html）
+</pre>
+
+                <h2>⑦ バージョニング（地味に神機能）</h2>
+                <p>同じキー（ファイル名）で上書き保存した際に、過去のバージョンを残す機能です。</p>
+<pre>
+同じキー
+├─ v1 index.html
+├─ v2 index.html
+└─ v3 index.html
+</pre>
+                <ul>
+                    <li>上書きしても過去版が残るため、誤削除の保険になる</li>
+                    <li>GitHub Pagesのような運用と相性が良い</li>
+                </ul>
+
+                <h2>⑧ ストレージクラス（料金と用途）</h2>
+                <p>データの利用頻度に合わせて、最適な「クラス」を選ぶことでコストを最適化できます。</p>
+<pre>
+よく使う ←──────────→ ほぼ使わない
+高い                         安い
+
+S3 Standard .......... 頻繁なアクセス（静的サイトなど）
+Intelligent-Tiering .. 自動で階層移動（迷ったらこれ）
+Standard-IA .......... たまにアクセス
+Glacier Instant ...... すぐ取り出せるアーカイブ
+Glacier Flexible ..... 取り出しに時間がかかる
+Glacier Deep Archive . 激安・取り出し超遅い
+</pre>
+                <p>👉 静的Webサイトなら、ほぼ <strong>Standard</strong> か <strong>Intelligent-Tiering</strong> を選びます。</p>
+
+                <h2>⑨ S3は「単体」より「部品」</h2>
+                <p>Webアプリケーションの構成において、S3は「最終成果物を置く場所」や「APIの結果を保存する場所」として機能します。</p>
+<pre>
+Googleフォーム
+   ↓
+スプレッドシート
+   ↓
+ GAS
+   ↓
+ API Gateway
+   ↓
+ Lambda
+   ↓
+S3（サイト本体・HTML）
+   ↓
+CloudFront
+</pre>
+
+                <h2>⑩ よくある勘違い（超重要）</h2>
+                <ul>
+                    <li>❌ S3 = サーバー <br>⭕ S3 = 置き場</li>
+                    <li>❌ PHPやNode.jsが動く <br>⭕ HTML/CSS/JSのみ（静的ファイルのみ）</li>
+                    <li>❌ フォルダがある <br>⭕ 文字列キーによるシミュレーション</li>
+                </ul>
+
+                <h2>まとめ</h2>
+                <p>S3は<strong>「世界一丈夫なファイル置き場」</strong>であり、AWSにおいてはあらゆるデータの着地点として使われる中核サービスです。</p>
+
+                <!-- (2) Contact Link -->
+                <div style="margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                    <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+                </div>
+            </div>
+        </article>
+        
+        <footer class="site-footer">
+            <p>&copy; Minimalist Blog</p>
+        </footer>
+    </div>
+
+    <!-- (3) External Script (Must be at the end of body) -->
+    <script src="../../../assets/post.js"></script>
+</body>
+</html>
