@@ -1,97 +1,269 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AWS Cloud Practitioner向け：主要サービスと責任共有モデル</title>
-  <link rel="stylesheet" href="../../../assets/styles.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudFrontの全貌と利用法</title>
+<link rel="stylesheet" href="../../../assets/styles.css">
 </head>
-<body data-category="awscp">
+<body>
 <nav class="post-nav">
+  <a class="post-nav__home" href="../../../index.html">HOME</a>
   <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
   <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
 </nav>
 
 <div class="container">
   <header class="article-header">
-    <h1 class="article-title">AWS Cloud Practitioner向け：主要サービスと責任共有モデル</h1>
-    <time class="post-meta">2026/01/29</time>
+    <time class="post-meta">2026-01-29</time>
+    <h1 class="article-title">CloudFrontの全貌と利用法</h1>
+    <ul class="tag-list">
+      <li class="tag">CloudFront</li>
+      <li class="tag">S3</li>
+      <li class="tag">CDN</li>
+      <li class="tag">キャッシュ</li>
+      <li class="tag">AWS</li>
+      <li class="tag">セキュリティ</li>
+    </ul>
   </header>
 
-  <div class="article-content">
-    <p>
-      AWS Cloud Practitioner（AWS認定クラウドプラクティショナー）では、
-      「クラウドの基本概念」「主要サービスの役割」「セキュリティの考え方」を
-      ざっくり説明できるレベルが求められます。本ページでは、頻出のサービスと
-      責任共有モデル（Shared Responsibility Model）をまとめます。
-    </p>
+  <main class="article-content">
+    <p>CloudFrontはS3と連携し、高速で安全な配信を実現します。今回は①正体 → ②仕組み → ③構成 → ④S3との関係 → ⑤よくある誤解を、図解を交えて解説します。</p>
 
-    <h2>1. クラウドの基本：オンデマンドと従量課金</h2>
+    <h2>① CloudFrontって何？</h2>
+    <p>一言でいうと<strong>「世界中に配置された高速配信係」</strong>です。<br>正式にはAWSのCDN（Content Delivery Network）と呼ばれます。</p>
+
+    <h3>CDNって何？</h3>
+    <p>CDNとは「コンテンツ配信網」のことです。</p>
+    <h4>CDNなし（遅い）</h4>
     <ul>
-      <li><strong>オンデマンド</strong>：必要なときに必要な分だけ利用する</li>
-      <li><strong>従量課金</strong>：使った分だけ支払う（初期投資を抑えやすい）</li>
-      <li><strong>スケール</strong>：需要に応じて増減できる（スケールアウト/イン）</li>
+      <li>日本のユーザー</li>
+      <li>↓</li>
+      <li>アメリカのサーバー</li>
+      <li>↓</li>
+      <li>データ取得（物理的距離があるため遅い）</li>
     </ul>
 
-    <h2>2. 主要サービスの役割（頻出）</h2>
-
-    <h3>コンピューティング：EC2 / Lambda</h3>
+    <h4>CDNあり（速い）</h4>
     <ul>
-      <li><strong>Amazon EC2</strong>：仮想サーバー。OSやミドルウェアを自由に構成できる</li>
-      <li><strong>AWS Lambda</strong>：サーバーレス実行。イベントをきっかけにコードを実行する</li>
+      <li>日本のユーザー</li>
+      <li>↓</li>
+      <li>東京の配信拠点（キャッシュ）</li>
+      <li>↓</li>
+      <li>即レス（物理的に近いため速い）</li>
+    </ul>
+    <p>👉 <strong>CloudFrontはこの配信拠点を世界中に持っています。</strong></p>
+
+    <h2>② CloudFrontの全体構造（超重要）</h2>
+    <p>基本的なデータの流れは以下の通りです。</p>
+    <ol>
+      <li>ユーザー</li>
+      <li>↓</li>
+      <li>CloudFront（世界中のエッジ）</li>
+      <li>↓</li>
+      <li>オリジン（S3 / ALB / API Gateway）</li>
+    </ol>
+
+    <p>世界規模で見ると以下のようなイメージになります。</p>
+    <div style="background-color: var(--code-bg); padding: 1.5rem; border-radius: 4px; margin: 1.5rem 0;">
+      <p><strong>アメリカ</strong><br>[Edge]</p>
+      <p>　|<br><strong>日本</strong> → [Edge] → <strong>S3（東京）</strong><br>　|</p>
+      <p><strong>欧州</strong><br>[Edge]</p>
+    </div>
+    <ul>
+      <li><strong>Edge（エッジ）</strong>：配信拠点</li>
+      <li><strong>Origin（オリジン）</strong>：元データの置き場</li>
     </ul>
 
-    <h3>ストレージ：S3 / EBS</h3>
+    <h2>③ CloudFrontの役割を一言で</h2>
+    <p><strong>CloudFront = キャッシュ ＋ 配信制御</strong></p>
+    <p>具体的にやっていること：</p>
     <ul>
-      <li><strong>Amazon S3</strong>：オブジェクトストレージ。高耐久・バックアップや静的サイトに便利</li>
-      <li><strong>Amazon EBS</strong>：EC2に接続するブロックストレージ。OSディスクなどに使う</li>
+      <li>ファイルを一時保存（キャッシュ）</li>
+      <li>近い拠点から配信</li>
+      <li>HTTPS対応</li>
+      <li>独自ドメイン対応</li>
+      <li>アクセス制御</li>
     </ul>
 
-    <h3>データベース：RDS / DynamoDB</h3>
+    <h2>④ CloudFrontとS3の関係（王道パターン）</h2>
+    <h3>静的サイト構成（超定番）</h3>
+    <p>ブラウザ ↓(HTTPS) CloudFront ↓ S3（HTML / CSS / JS）</p>
+
+    <h3>なぜS3単体じゃダメ？</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>機能</th>
+          <th>S3単体</th>
+          <th>CloudFrontあり</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>HTTPS</td>
+          <td>❌</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td>独自ドメイン</td>
+          <td>❌</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td>高速配信</td>
+          <td>△</td>
+          <td>◎</td>
+        </tr>
+        <tr>
+          <td>アクセス制御</td>
+          <td>△</td>
+          <td>◎</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>👉 <strong>本番運用ではS3とCloudFrontの組み合わせはほぼ必須です。</strong></p>
+
+    <h2>⑤ キャッシュの仕組み（ここが肝）</h2>
+    <h3>初回アクセス</h3>
+    <ol>
+      <li>ユーザー</li>
+      <li>↓</li>
+      <li>CloudFront（キャッシュなし）</li>
+      <li>↓</li>
+      <li>S3</li>
+      <li>↓</li>
+      <li>データ取得＆CloudFrontに保存</li>
+    </ol>
+
+    <h3>2回目以降</h3>
+    <ol>
+      <li>ユーザー</li>
+      <li>↓</li>
+      <li>CloudFront（キャッシュあり）</li>
+      <li>↓</li>
+      <li>即返却（S3へは取りに行かない）</li>
+    </ol>
+    <p>👉 <strong>S3の負荷も料金も下がります。</strong></p>
+
+    <h2>⑥ キャッシュ制御（TTL）</h2>
+    <p>TTL = キャッシュ保持時間のことです。</p>
     <ul>
-      <li><strong>Amazon RDS</strong>：マネージドRDB。MySQLなどを運用負荷少なく使える</li>
-      <li><strong>Amazon DynamoDB</strong>：マネージドNoSQL。高速・スケーラブルなキー値型DB</li>
+      <li><strong>index.html</strong>
+        <ul><li>TTL 10秒 → すぐ更新反映したい</li></ul>
+      </li>
+      <li><strong>画像・JS・CSS</strong>
+        <ul><li>TTL 1日 → あまり変更されないので長くキャッシュ</li></ul>
+      </li>
+    </ul>
+    <p>実務では、HTMLは短めに、静的アセットは長めに設定するのが一般的です。</p>
+
+    <h2>⑦ キャッシュ削除（Invalidation）</h2>
+    <p>更新したのに反映されない！という時は、CloudFrontのキャッシュを強制削除（Invalidation）します。</p>
+    <ol>
+      <li>CloudFront</li>
+      <li>↓</li>
+      <li><strong>Invalidate（無効化）を実行</strong></li>
+      <li>↓</li>
+      <li>次のアクセスでS3から最新データを再取得</li>
+    </ol>
+    <p>👉 以前言及されていた「CloudFront Invalidation」はまさにこの操作のことです。</p>
+
+    <h2>⑧ オリジンはS3だけじゃない</h2>
+    <p>CloudFrontの接続先（オリジン）はS3以外も指定可能です。</p>
+    <ul>
+      <li>CloudFront
+        <ul>
+          <li>↓</li>
+          <li>オリジン
+            <ul>
+              <li>S3（静的ファイル）</li>
+              <li>ALB（Webアプリ）</li>
+              <li>EC2</li>
+              <li>API Gateway（API）</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <h3>動的＋静的混在例</h3>
+    <ul>
+      <li><code>/index.html</code> → <strong>S3</strong>へ振り分け</li>
+      <li><code>/api/*</code> → <strong>API Gateway</strong>へ振り分け</li>
+    </ul>
+    <p>👉 URLパスによって接続先を振り分けることが可能です。</p>
+
+    <h2>⑨ セキュリティ面（強い）</h2>
+    <h3>代表機能</h3>
+    <ul>
+      <li>HTTPS（証明書管理）</li>
+      <li>OAI / OAC（S3への直接アクセスを禁止し、CloudFront経由のみ許可）</li>
+      <li>IP制限</li>
+      <li>WAF連携</li>
+      <li>署名付きURL</li>
     </ul>
 
-    <h3>ネットワーク：VPC / CloudFront</h3>
+    <h3>S3直アクセス遮断（超重要）</h3>
     <ul>
-      <li><strong>Amazon VPC</strong>：AWS内に論理的なネットワーク空間を作る（サブネット等）</li>
-      <li><strong>Amazon CloudFront</strong>：CDN。コンテンツをエッジで配信し高速化する</li>
+      <li>ユーザー ❌→ S3（直接は拒否）</li>
+      <li>ユーザー → CloudFront → S3（許可）</li>
+    </ul>
+    <p>👉 <strong>CloudFront経由以外は拒否するのが王道の設定です。</strong></p>
+
+    <h2>⑩ 料金の考え方（ざっくり）</h2>
+    <p>課金される主な要素：</p>
+    <ul>
+      <li>転送量（外向き）</li>
+      <li>リクエスト数</li>
+      <li>Invalidation（大量に行う場合）</li>
+    </ul>
+    <p>しかし実際は、<strong>S3から直接配信するよりも安くなることも多く</strong>、個人サイトや学習用途の規模であれば誤差の範囲であることがほとんどです。</p>
+
+    <h2>⑪ S3 + CloudFront = GitHub Pages超え？</h2>
+    <h3>GitHub Pages</h3>
+    <ul>
+      <li>簡単</li>
+      <li>拡張しにくい</li>
     </ul>
 
-    <h2>3. 責任共有モデル（Shared Responsibility Model）</h2>
-    <p>
-      AWSでは「クラウドのセキュリティはAWSと利用者で分担する」という考え方を取ります。
-      よくある誤解は「AWSを使えば全部AWSが守ってくれる」です。実際は利用者側にも責任があります。
-    </p>
-
-    <h3>AWSの責任（セキュリティ “of” the cloud）</h3>
+    <h3>S3 + CloudFront</h3>
     <ul>
-      <li>データセンターの物理セキュリティ</li>
-      <li>ハードウェア、ネットワーク基盤の保護</li>
-      <li>マネージドサービスの基盤部分（例：RDSのOS管理の一部など）</li>
+      <li>高速</li>
+      <li>拡張自由</li>
+      <li>API連携が可能</li>
+      <li>将来スケール可能</li>
+    </ul>
+    <p>👉 <strong>「フォーム→API→S3→CloudFront」という構想は、完全にプロの設計です。</strong></p>
+
+    <h2>⑫ よくある誤解</h2>
+    <ul>
+      <li>❌ CloudFront = サーバー
+        <ul><li>⭕ 配信・キャッシュ</li></ul>
+      </li>
+      <li>❌ CloudFrontにファイルを置く
+        <ul><li>⭕ S3などに置く</li></ul>
+      </li>
+      <li>❌ 設定難しそう
+        <ul><li>⭕ 最初だけ（慣れると楽です）</li></ul>
+      </li>
     </ul>
 
-    <h3>利用者の責任（セキュリティ “in” the cloud）</h3>
-    <ul>
-      <li><strong>IAM設定</strong>（最小権限、MFA、ロールの適切な利用）</li>
-      <li><strong>データ保護</strong>（暗号化、バックアップ、公開範囲の管理）</li>
-      <li><strong>OS/アプリの運用</strong>（EC2のパッチ適用、設定ミス防止など）</li>
-      <li>ログ監視（CloudTrail/CloudWatch等の活用）</li>
-    </ul>
-
-    <h2>4. まとめ</h2>
-    <p>
-      AWS CPでは、サービスの細かい設定よりも「それぞれの役割」「課金の考え方」
-      「責任共有モデル」を説明できることが重要です。まずはEC2/S3/IAM/VPCの
-      関係を押さえ、次にRDSやCloudFrontなど周辺サービスへ広げると理解しやすいです。
-    </p>
+    <h2>まとめ</h2>
+    <p>CloudFrontは「速い・安全・HTTPS」を担当し、S3は「データ置き場」に徹する。この役割分担が基本です。</p>
+    <div style="background-color: var(--code-bg); padding: 1.5rem; border-radius: 4px; text-align: center;">
+      <p>ユーザー</p>
+      <p>↓</p>
+      <p><strong>CloudFront</strong><br>（速い・安全・HTTPS）</p>
+      <p>↓</p>
+      <p><strong>S3</strong><br>（データ置き場）</p>
+    </div>
 
     <p style="margin-top: 2rem;">
       <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
     </p>
-  </div>
+
+  </main>
 </div>
 
 <script src="../../../assets/post.js"></script>
