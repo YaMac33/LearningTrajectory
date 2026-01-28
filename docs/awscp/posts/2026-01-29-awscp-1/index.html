@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Cloud Practitioner向け：主要サービスと責任共有モデル</title>
+  <link rel="stylesheet" href="../../../assets/styles.css">
+</head>
+<body data-category="awscp">
+<nav class="post-nav">
+  <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+  <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+</nav>
+
+<div class="container">
+  <header class="article-header">
+    <h1 class="article-title">AWS Cloud Practitioner向け：主要サービスと責任共有モデル</h1>
+    <time class="post-meta">2026/01/29</time>
+  </header>
+
+  <div class="article-content">
+    <p>
+      AWS Cloud Practitioner（AWS認定クラウドプラクティショナー）では、
+      「クラウドの基本概念」「主要サービスの役割」「セキュリティの考え方」を
+      ざっくり説明できるレベルが求められます。本ページでは、頻出のサービスと
+      責任共有モデル（Shared Responsibility Model）をまとめます。
+    </p>
+
+    <h2>1. クラウドの基本：オンデマンドと従量課金</h2>
+    <ul>
+      <li><strong>オンデマンド</strong>：必要なときに必要な分だけ利用する</li>
+      <li><strong>従量課金</strong>：使った分だけ支払う（初期投資を抑えやすい）</li>
+      <li><strong>スケール</strong>：需要に応じて増減できる（スケールアウト/イン）</li>
+    </ul>
+
+    <h2>2. 主要サービスの役割（頻出）</h2>
+
+    <h3>コンピューティング：EC2 / Lambda</h3>
+    <ul>
+      <li><strong>Amazon EC2</strong>：仮想サーバー。OSやミドルウェアを自由に構成できる</li>
+      <li><strong>AWS Lambda</strong>：サーバーレス実行。イベントをきっかけにコードを実行する</li>
+    </ul>
+
+    <h3>ストレージ：S3 / EBS</h3>
+    <ul>
+      <li><strong>Amazon S3</strong>：オブジェクトストレージ。高耐久・バックアップや静的サイトに便利</li>
+      <li><strong>Amazon EBS</strong>：EC2に接続するブロックストレージ。OSディスクなどに使う</li>
+    </ul>
+
+    <h3>データベース：RDS / DynamoDB</h3>
+    <ul>
+      <li><strong>Amazon RDS</strong>：マネージドRDB。MySQLなどを運用負荷少なく使える</li>
+      <li><strong>Amazon DynamoDB</strong>：マネージドNoSQL。高速・スケーラブルなキー値型DB</li>
+    </ul>
+
+    <h3>ネットワーク：VPC / CloudFront</h3>
+    <ul>
+      <li><strong>Amazon VPC</strong>：AWS内に論理的なネットワーク空間を作る（サブネット等）</li>
+      <li><strong>Amazon CloudFront</strong>：CDN。コンテンツをエッジで配信し高速化する</li>
+    </ul>
+
+    <h2>3. 責任共有モデル（Shared Responsibility Model）</h2>
+    <p>
+      AWSでは「クラウドのセキュリティはAWSと利用者で分担する」という考え方を取ります。
+      よくある誤解は「AWSを使えば全部AWSが守ってくれる」です。実際は利用者側にも責任があります。
+    </p>
+
+    <h3>AWSの責任（セキュリティ “of” the cloud）</h3>
+    <ul>
+      <li>データセンターの物理セキュリティ</li>
+      <li>ハードウェア、ネットワーク基盤の保護</li>
+      <li>マネージドサービスの基盤部分（例：RDSのOS管理の一部など）</li>
+    </ul>
+
+    <h3>利用者の責任（セキュリティ “in” the cloud）</h3>
+    <ul>
+      <li><strong>IAM設定</strong>（最小権限、MFA、ロールの適切な利用）</li>
+      <li><strong>データ保護</strong>（暗号化、バックアップ、公開範囲の管理）</li>
+      <li><strong>OS/アプリの運用</strong>（EC2のパッチ適用、設定ミス防止など）</li>
+      <li>ログ監視（CloudTrail/CloudWatch等の活用）</li>
+    </ul>
+
+    <h2>4. まとめ</h2>
+    <p>
+      AWS CPでは、サービスの細かい設定よりも「それぞれの役割」「課金の考え方」
+      「責任共有モデル」を説明できることが重要です。まずはEC2/S3/IAM/VPCの
+      関係を押さえ、次にRDSやCloudFrontなど周辺サービスへ広げると理解しやすいです。
+    </p>
+
+    <p style="margin-top: 2rem;">
+      <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+    </p>
+  </div>
+</div>
+
+<script src="../../../assets/post.js"></script>
+</body>
+</html>
