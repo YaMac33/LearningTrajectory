@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Route 53の基本理解 | Learning Trajectory</title>
+    <link rel="stylesheet" href="../../../assets/styles.css">
+    <style>
+        /* 記事内図解用スタイル（既存デザインに影響しない範囲で追加） */
+        .diagram-box {
+            background-color: var(--code-bg);
+            border: 1px solid var(--line-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: var(--font-sans);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .diagram-title {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        .flow-step {
+            background: #fff;
+            border: 2px solid var(--text-main);
+            color: var(--text-main);
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+        .concept-card {
+            background: #fff;
+            border: 1px solid var(--line-color);
+            padding: 1.5rem;
+            border-radius: 6px;
+        }
+        .concept-card strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        /* テキスト図（pre）の調整 */
+        pre.text-diagram {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font-family: var(--font-mono);
+            line-height: 1.4;
+            text-align: center;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--text-main);
+        }
+        .text-diagram-wrapper {
+            background: var(--code-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="site-header">
+            <div class="site-title"><a href="../../../index.html">Learning Trajectory</a></div>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="../../../index.html">Home</a></li>
+                    <li><a href="../../../index.html#categories">Categories</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <article class="article-content">
+                <header class="article-header">
+                    <time class="post-meta">2026-01-29 / AWS</time>
+                    <h1 class="article-title">AWS Route 53の基本理解</h1>
+                    <ul class="tag-list" style="justify-content: center; margin-bottom: 0;">
+                        <li class="tag">#AWS</li>
+                        <li class="tag">#Route 53</li>
+                        <li class="tag">#DNS</li>
+                        <li class="tag">#CloudFront</li>
+                        <li class="tag">#ホストゾーン</li>
+                    </ul>
+                </header>
+
+                <p>Route 53はDNSサービスで、AWSリソースへの道案内役です。効率的なルーティングポリシーを実現します。</p>
+                <p>Route 53は、S3・CloudFront・リージョン理解の最後のピースです。ここが分かると<strong>「AWSで“公開する”とは何か」</strong>が完成します。</p>
+
+                <h2>1. Route 53とは？</h2>
+                <p>一言で言うと、以下の通りです。</p>
+                <blockquote>
+                    <p><strong>インターネットの住所案内所（DNS）</strong><br>
+                    正式名称は <strong>Amazon Route 53</strong> ＝ AWSの DNS（名前解決）サービス</p>
+                </blockquote>
+
+                <h3>DNSをざっくり理解する</h3>
+                <div class="diagram-box">
+                    <div class="flow-container">
+                        <div class="flow-step">人間：example.com</div>
+                        <div class="flow-arrow">↓ DNSが翻訳 ↓</div>
+                        <div class="flow-step">機械：IPアドレス (192.0.2.1)</div>
+                    </div>
+                </div>
+
+                <h2>2. Route 53がやっていること（全体像）</h2>
+                <p>ブラウザが「example.comってどこ？」と尋ねると、Route 53が「ここだよ」とCloudFrontやALB、EC2の場所を教えます。</p>
+
+                <div class="text-diagram-wrapper">
+<pre class="text-diagram">
+[ User (Browser) ]
+      |
+      | 1. "example.com" はどこ？
+      v
+[ Route 53 (DNS) ]
+      |
+      | 2. "ここだよ" (IPアドレス / CloudFront)
+      v
+[ AWS Service (CloudFront / ALB / EC2) ]
+</pre>
+                </div>
+
+                <ul>
+                    <li><strong>Route 53は通信を中継しない</strong>：データの通り道ではありません。</li>
+                    <li><strong>行き先を教えるだけ</strong>：あくまで案内係です。</li>
+                </ul>
+
+                <h2>3. ドメインとRoute 53の関係</h2>
+                <h3>① ドメイン取得</h3>
+                <p><code>example.com</code> などのドメインは、Route 53で取得しても良いですし、お名前.comなどの他社で取得して持ち込むことも可能です。</p>
+
+                <h3>② ホストゾーン（超重要）</h3>
+                <p>ホストゾーンとは、<strong>ドメインの設定台帳</strong>のことです。</p>
+                <div class="diagram-box">
+                    <span class="diagram-title">ホストゾーンの構造</span>
+                    <div class="concept-grid">
+                        <div class="concept-card" style="text-align: center; border: 2px solid var(--text-main);">
+                            <strong>example.com (ホストゾーン)</strong>
+                            <div style="margin-top: 1rem; text-align: left; font-family: var(--font-mono); font-size: 0.9em; color: var(--text-sub);">
+                                ├─ A レコード<br>
+                                ├─ AAAA レコード<br>
+                                ├─ CNAME<br>
+                                └─ ALIAS
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>Route 53を利用するということは、実質的に「ホストゾーンを管理する」ことと同義です。</p>
+
+                <h2>4. DNSレコードの種類</h2>
+                <p>覚えておくべき最重要なレコードは以下の3つです。</p>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <strong>Aレコード</strong>
+                        <p><code>example.com</code> → <code>1.2.3.4</code></p>
+                        <p style="font-size: 0.9em; color: var(--text-sub);">IPアドレスを直接指定します。</p>
+                    </div>
+                    <div class="concept-card">
+                        <strong>CNAME</strong>
+                        <p><code>www.example.com</code> → <code>xxx.cloudfront.net</code></p>
+                        <p style="font-size: 0.9em; color: var(--text-sub);">別名を指定します。ただし、ルートドメイン（example.com）では使えません。</p>
+                    </div>
+                    <div class="concept-card" style="border-color: var(--text-main); background: #fcfcfc;">
+                        <strong>ALIAS（AWS独自・神）</strong>
+                        <p><code>example.com</code> → <code>CloudFront</code></p>
+                        <p style="font-size: 0.9em; color: var(--text-sub);">IP不要、ルートドメインOK、料金も効率的。AWS内ではこれ一択です。</p>
+                    </div>
+                </div>
+
+                <h2>5. Route 53 × CloudFront（王道構成）</h2>
+                <p>GitHub Pagesを“AWS流に進化”させた、静的サイトホスティングの完成形構成です。</p>
+
+                <div class="text-diagram-wrapper">
+<pre class="text-diagram">
+ユーザー
+  ↓  (1) https://example.com
+  ↓
+Route 53 (DNS)
+  ↓  (2) CloudFrontへ行けと指示
+  ↓
+CloudFront (HTTPS / キャッシュ)
+  ↓  (3) コンテンツ取得
+  ↓
+S3 (静的サイト本体)
+</pre>
+                </div>
+
+                <h2>6. ルーティングポリシー（Route 53の真骨頂）</h2>
+                <p>Route 53は単なる名簿ではなく、「どこに飛ばすか」を賢く決めることができます。</p>
+
+                <ul>
+                    <li><strong>シンプルルーティング</strong>：普通のサイト。<code>example.com</code> → <code>CloudFront</code></li>
+                    <li><strong>加重ルーティング</strong>：東京80%、大阪20%のように振り分け。カナリアリリースや検証用に使います。</li>
+                    <li><strong>レイテンシーベース</strong>：ユーザーに近いリージョンへ誘導（日本ユーザー→東京、米国ユーザー→米国）。</li>
+                    <li><strong>フェイルオーバー（超重要）</strong>：通常は東京、障害時は大阪へ切り替え。DNSレベルでの冗長化を実現します。</li>
+                </ul>
+
+                <div class="diagram-box">
+                    <span class="diagram-title">フェイルオーバーの仕組み</span>
+                    <div class="flow-container" style="flex-direction: row; justify-content: center; gap: 2rem;">
+                        <div class="flow-step" style="background: #e6f7ff;">Primary<br>(東京)</div>
+                        <div class="flow-step" style="background: #fff0f0;">Secondary<br>(大阪)</div>
+                    </div>
+                    <p style="margin-top: 1rem; font-size: 0.9em;">Route 53が障害を検知すると、自動的にSecondaryへ切り替わります。</p>
+                </div>
+
+                <h2>7. ヘルスチェック</h2>
+                <p>Route 53は定期監視（ヘルスチェック）を行い、サーバーが落ちていないかを確認します。</p>
+                <div class="text-diagram-wrapper">
+<pre class="text-diagram">
+監視システム (Route 53)
+   ↓
+[ 落ちた？ ]
+   ↓
+ YESなら別リージョンへ誘導
+</pre>
+                </div>
+                <p>CloudFrontとRoute 53を組み合わせることで、非常に強力な可用性を手に入れることができます。</p>
+
+                <h2>8. Route 53は「グローバルサービス」</h2>
+                <p>これは非常に重要なポイントです。S3はリージョン（地域）ごとのサービスですが、Route 53は世界共通です。</p>
+                <ul>
+                    <li>IAM：グローバル</li>
+                    <li>CloudFront：グローバル</li>
+                    <li><strong>Route 53：グローバル</strong></li>
+                    <li>S3：リージョン（東京、大阪など）</li>
+                </ul>
+                <p>Route 53自体が世界中に分散されているため、特定のリージョンで障害が起きても、DNSの名前解決自体は止まりません。</p>
+
+                <h2>9. 料金感と誤解</h2>
+                <h3>料金感（安心ポイント）</h3>
+                <p>ホストゾーンは月数十円〜、DNSクエリも激安です。個人・学習用途では誤差レベルの金額で収まります。</p>
+
+                <h3>よくある誤解</h3>
+                <ul>
+                    <li>❌ Route 53 = サーバーではありません。</li>
+                    <li>⭕ <strong>あくまで「案内係」です。</strong></li>
+                    <li>❌ 通信を速くする機能ではありません。</li>
+                    <li>⭕ <strong>それはCloudFrontの役目です。</strong></li>
+                    <li>❌ 常に触るものではありません。</li>
+                    <li>⭕ <strong>最初だけ設定すれば、後は放置でOKです。</strong></li>
+                </ul>
+
+                <h2>まとめ</h2>
+                <p><strong>Route 53は「どの入口から、どのAWSリソースに入るか」を決める司令塔である。</strong></p>
+                <p>これで、S3（ストレージ）、CloudFront（配信）、Route 53（名前解決）の3点セットが揃いました。</p>
+
+                <!-- ナビゲーションと問い合わせ -->
+                <div style="margin-top: 4rem; display: flex; justify-content: space-between; border-top: 1px solid var(--line-color); padding-top: 2rem;">
+                    <a id="prevPost" href="#" style="display: none;">&larr; Previous Post</a>
+                    <a id="nextPost" href="#" style="display: none;">Next Post &rarr;</a>
+                </div>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <a id="contactLink" href="#" target="_blank" rel="noopener noreferrer" class="read-more">この記事について問い合わせる</a>
+                </div>
+            </article>
+        </main>
+
+        <footer class="site-footer">
+            <p>&copy; 2026 Learning Trajectory. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <div id="scroll-progress"></div>
+
+    <script src="../../../assets/post.js"></script>
+    <script>
+        // シンプルなスクロールプログレスバー（app.js相当の簡易版）
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        });
+    </script>
+</body>
+</html>
