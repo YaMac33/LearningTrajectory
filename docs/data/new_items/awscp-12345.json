@@ -1,23 +1,25 @@
 {
   "id": "awscp-12345",
   "category": "awscp",
-  "timestamp": "2026-01-29T12:50:26+09:00",
+  "timestamp": "2026-01-29T18:55:47+09:00",
   "post_path": "awscp/posts/2026-01-29-awscp-12345/",
   "meta": {
-    "title": "AWS Route 53の基本理解",
-    "summary": "Route 53はAWSのDNSサービスで、AWSリソースへのアクセスを管理します。効率的なルーティングポリシーを実現し、ドメインと密接に関連しています。",
+    "title": "RDSの概要と特徴",
+    "summary": "RDSはAWSが提供するマネージドなリレーショナルデータベースサービスです。運用負荷を軽減し、開発者がアプリケーションに集中できるようサポートします。",
     "tags": [
+      "RDS",
       "AWS",
-      "Route 53",
-      "DNS",
-      "CloudFront",
-      "ホストゾーン"
+      "データベース",
+      "リレーショナル",
+      "マネージド",
+      "可用性",
+      "運用"
     ],
     "taxonomy": [
       "AWSのコアサービス",
-      "ネットワーク(VPC/Route53)"
+      "データベース(RDS/DynamoDB)"
     ],
-    "dr": "2026-01-29_aws-route-53-basic-understanding",
+    "dr": "2026-01-29_rds-overview",
     "status": "public"
   }
 }
