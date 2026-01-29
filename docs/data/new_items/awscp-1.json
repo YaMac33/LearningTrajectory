@@ -1,24 +1,23 @@
 {
   "id": "awscp-1",
   "category": "awscp",
-  "timestamp": "2026-01-29T08:26:09+09:00",
+  "timestamp": "2026-01-29T12:34:44+09:00",
   "post_path": "awscp/posts/2026-01-29-awscp-1/",
   "meta": {
-    "title": "CloudFrontの全貌と利用法",
-    "summary": "CloudFrontはS3と連携し、高速で安全なコンテンツ配信を実現します。この内容では、CloudFrontの役割やS3との関係について解説します。",
+    "title": "AWSリージョンの理解",
+    "summary": "AWSのリージョンとAZの概念について詳しく解説します。これにより、サービスの選択に役立つ知識を得ることができます。",
     "tags": [
-      "CloudFront",
-      "S3",
-      "CDN",
-      "キャッシュ",
       "AWS",
-      "セキュリティ"
+      "リージョン",
+      "AZ",
+      "クラウド",
+      "インフラ"
     ],
     "taxonomy": [
       "AWSのコアサービス",
-      "コンピューティング(EC2/Lambda)"
+      "ネットワーク(VPC/Route53)"
     ],
-    "dr": "2026-01-29_cloudfront-s3-cdn-利用法",
+    "dr": "2026-01-29_aws-region-understanding",
     "status": "public"
   }
 }
