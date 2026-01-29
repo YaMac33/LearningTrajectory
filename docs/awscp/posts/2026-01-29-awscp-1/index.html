@@ -1,271 +1,345 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CloudFrontの全貌と利用法</title>
-<link rel="stylesheet" href="../../../assets/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWSリージョンの理解</title>
+    <link rel="stylesheet" href="../../../assets/styles.css">
+    <style>
+        /* 記事固有の図解用スタイル */
+        .diagram-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        
+        .diagram-label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
+        /* 階層構造図 */
+        .hierarchy-box {
+            border: 2px solid var(--line-color);
+            background: #fff;
+            padding: 1rem;
+            border-radius: 6px;
+            position: relative;
+        }
+        .hierarchy-box.region {
+            border-color: var(--text-main);
+        }
+        .hierarchy-box.az {
+            border: 1px dashed var(--text-sub);
+            margin: 0.5rem;
+            background: #fafafa;
+        }
+        .hierarchy-box.dc {
+            background: var(--code-bg);
+            border: 1px solid var(--line-color);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .az-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        /* 比較テーブル風 */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .comparison-item {
+            padding: 1rem;
+            border: 1px solid var(--line-color);
+            border-radius: 6px;
+        }
+        .comparison-header {
+            font-weight: bold;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        /* 矢印フロー */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+        .flow-step {
+            padding: 0.8rem 1.2rem;
+            border: 1px solid var(--text-main);
+            border-radius: 4px;
+            background: #fff;
+            font-weight: 600;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--text-sub);
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 600px) {
+            .az-container {
+                flex-direction: column;
+            }
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            .flow-diagram {
+                flex-direction: column;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
 </head>
-<body>
-<nav class="post-nav">
-  <a class="post-nav__home" href="../../../index.html">HOME</a>
-  <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
-  <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
-</nav>
+<body data-category="aws" data-root-prefix="../../../">
 
-<div class="container">
-  <header class="article-header">
-    <time class="post-meta">2026-01-29</time>
-    <h1 class="article-title">CloudFrontの全貌と利用法</h1>
-    <ul class="tag-list">
-      <li class="tag">CloudFront</li>
-      <li class="tag">S3</li>
-      <li class="tag">CDN</li>
-      <li class="tag">キャッシュ</li>
-      <li class="tag">AWS</li>
-      <li class="tag">セキュリティ</li>
-    </ul>
-  </header>
+    <div class="container">
+        <header class="site-header">
+            <div class="site-title">
+                <a href="../../../index.html">My Tech Blog</a>
+            </div>
+            <nav class="site-nav">
+                <ul>
+                    <li><a href="../../../index.html">Home</a></li>
+                    <li><a href="#contactLink" id="contactLink">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
 
-  <main class="article-content">
-    <p>CloudFrontはS3と連携し、高速で安全な配信を実現します。今回は①正体 → ②仕組み → ③構成 → ④S3との関係 → ⑤よくある誤解を、図解を交えて解説します。</p>
+        <main>
+            <article class="article-content">
+                <header class="article-header">
+                    <time class="post-meta">2026/01/29 / AWS</time>
+                    <h1 class="article-title">AWSリージョンの理解</h1>
+                    <ul class="tag-list">
+                        <li class="tag">#AWS</li>
+                        <li class="tag">#リージョン</li>
+                        <li class="tag">#AZ</li>
+                        <li class="tag">#クラウド</li>
+                        <li class="tag">#インフラ</li>
+                    </ul>
+                </header>
 
-    <h2>① CloudFrontって何？</h2>
-    <p>一言でいうと<strong>「世界中に配置された高速配信係」</strong>です。<br>正式にはAWSのCDN（Content Delivery Network）と呼ばれます。</p>
+                <p>AWSのリージョンとAZの概念を詳しく解説し、サービス選びに役立つ情報を提供します。</p>
+                <p>リージョンはAWSの設計思想そのものです。ここを理解すると<strong>「なぜこの構成になるのか」</strong>が一気に腹落ちします。今回は、正体・内部構造・設計の考え方を図解中心に解説していきます。</p>
 
-    <h3>CDNって何？</h3>
-    <p>CDNとは「コンテンツ配信網」のことです。</p>
-    <h4>CDNなし（遅い）</h4>
-    <ul>
-      <li>日本のユーザー</li>
-      <li>↓</li>
-      <li>アメリカのサーバー</li>
-      <li>↓</li>
-      <li>データ取得（物理的距離があるため遅い）</li>
-    </ul>
+                <h2>1. リージョンとは何か</h2>
+                <p>一言でいうと、AWSのデータセンター群がまとまった<strong>「地理的な単位」</strong>のことです。</p>
+                <ul>
+                    <li>例：東京リージョン（<code>ap-northeast-1</code>）</li>
+                    <li>例：米国東部リージョン（<code>us-east-1</code>）</li>
+                </ul>
+                <p>AWSを利用する際は、データを「どの国・どの場所」に置くかをリージョンで明示的に選択します。</p>
 
-    <h4>CDNあり（速い）</h4>
-    <ul>
-      <li>日本のユーザー</li>
-      <li>↓</li>
-      <li>東京の配信拠点（キャッシュ）</li>
-      <li>↓</li>
-      <li>即レス（物理的に近いため速い）</li>
-    </ul>
-    <p>👉 <strong>CloudFrontはこの配信拠点を世界中に持っています。</strong></p>
+                <h2>2. リージョンの内部構造（重要）</h2>
+                <p>よくある誤解として「リージョン ＝ 1つの巨大なデータセンター」と思われがちですが、それは間違いです。正しい構造は以下のようになっています。</p>
 
-    <h2>② CloudFrontの全体構造（超重要）</h2>
-    <p>基本的なデータの流れは以下の通りです。</p>
-    <ol>
-      <li>ユーザー</li>
-      <li>↓</li>
-      <li>CloudFront（世界中のエッジ）</li>
-      <li>↓</li>
-      <li>オリジン（S3 / ALB / API Gateway）</li>
-    </ol>
+                <div class="diagram-container">
+                    <div class="diagram-label">図：リージョンの物理的構造</div>
+                    <div class="hierarchy-box region">
+                        <strong>東京リージョン (Region)</strong>
+                        <p style="font-size:0.9rem; color:var(--text-sub); margin-bottom:1rem;">地理的に離れた複数のAZで構成</p>
+                        
+                        <div class="az-container">
+                            <div class="hierarchy-box az">
+                                <strong>AZ-a</strong>
+                                <div class="hierarchy-box dc">独立したデータセンター</div>
+                            </div>
+                            <div class="hierarchy-box az">
+                                <strong>AZ-c</strong>
+                                <div class="hierarchy-box dc">独立したデータセンター</div>
+                            </div>
+                            <div class="hierarchy-box az">
+                                <strong>AZ-d</strong>
+                                <div class="hierarchy-box dc">独立したデータセンター</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <p>世界規模で見ると以下のようなイメージになります。</p>
-    <div style="background-color: var(--code-bg); padding: 1.5rem; border-radius: 4px; margin: 1.5rem 0;">
-      <p><strong>アメリカ</strong><br>[Edge]</p>
-      <p>　|<br><strong>日本</strong> → [Edge] → <strong>S3（東京）</strong><br>　|</p>
-      <p><strong>欧州</strong><br>[Edge]</p>
-    </div>
-    <ul>
-      <li><strong>Edge（エッジ）</strong>：配信拠点</li>
-      <li><strong>Origin（オリジン）</strong>：元データの置き場</li>
-    </ul>
+                <p><strong>AZ（Availability Zone）</strong>同士は、数km〜数十km離れた場所に建設されており、それぞれが独立した電源・空調・ネットワークを持っています。</p>
+                <ul>
+                    <li>物理的に場所が別れている</li>
+                    <li>電源供給元が別れている（停電対策）</li>
+                    <li>互いに高速回線でつながっている</li>
+                </ul>
 
-    <h2>③ CloudFrontの役割を一言で</h2>
-    <p><strong>CloudFront = キャッシュ ＋ 配信制御</strong></p>
-    <p>具体的にやっていること：</p>
-    <ul>
-      <li>ファイルを一時保存（キャッシュ）</li>
-      <li>近い拠点から配信</li>
-      <li>HTTPS対応</li>
-      <li>独自ドメイン対応</li>
-      <li>アクセス制御</li>
-    </ul>
+                <h2>3. AZ（アベイラビリティゾーン）の目的</h2>
+                <p>なぜわざわざ場所を分けているのでしょうか？目的は<strong>「1拠点が死んでも、サービスを止めない」</strong>ためです。</p>
+                <p>地震、火災、停電、あるいは工事ミスなどで1つのデータセンターがダウンしても、別のAZが生きていればシステムは稼働し続けられます。</p>
 
-    <h2>④ CloudFrontとS3の関係（王道パターン）</h2>
-    <h3>静的サイト構成（超定番）</h3>
-    <p>ブラウザ ↓(HTTPS) CloudFront ↓ S3（HTML / CSS / JS）</p>
+                <div class="diagram-container">
+                    <div class="diagram-label">図：障害時の挙動比較</div>
+                    <div class="comparison-grid">
+                        <div class="comparison-item">
+                            <div class="comparison-header">AZなし（単一DC）の場合</div>
+                            <div style="text-align:center; color:red; font-weight:bold;">
+                                ❌ サービス停止
+                            </div>
+                            <p style="font-size:0.9rem; margin-top:0.5rem;">DCが被災すると、復旧まで全停止。</p>
+                        </div>
+                        <div class="comparison-item">
+                            <div class="comparison-header">マルチAZ構成の場合</div>
+                            <div style="text-align:center; color:green; font-weight:bold;">
+                                ✅ サービス継続
+                            </div>
+                            <p style="font-size:0.9rem; margin-top:0.5rem;">AZ-Aがダウンしても、AZ-Bがリクエストを処理。</p>
+                        </div>
+                    </div>
+                </div>
 
-    <h3>なぜS3単体じゃダメ？</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>機能</th>
-          <th>S3単体</th>
-          <th>CloudFrontあり</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>HTTPS</td>
-          <td>❌</td>
-          <td>✅</td>
-        </tr>
-        <tr>
-          <td>独自ドメイン</td>
-          <td>❌</td>
-          <td>✅</td>
-        </tr>
-        <tr>
-          <td>高速配信</td>
-          <td>△</td>
-          <td>◎</td>
-        </tr>
-        <tr>
-          <td>アクセス制御</td>
-          <td>△</td>
-          <td>◎</td>
-        </tr>
-      </tbody>
-    </table>
-    <p>👉 <strong>本番運用ではS3とCloudFrontの組み合わせはほぼ必須です。</strong></p>
+                <p>これが、AWSが「落ちにくい（高可用性）」と言われる物理的な理由です。</p>
 
-    <h2>⑤ キャッシュの仕組み（ここが肝）</h2>
-    <h3>初回アクセス</h3>
-    <ol>
-      <li>ユーザー</li>
-      <li>↓</li>
-      <li>CloudFront（キャッシュなし）</li>
-      <li>↓</li>
-      <li>S3</li>
-      <li>↓</li>
-      <li>データ取得＆CloudFrontに保存</li>
-    </ol>
+                <h2>4. リージョンが分かれている4つの理由</h2>
+                <p>世界中にリージョンが存在する理由は主に4つあります。</p>
 
-    <h3>2回目以降</h3>
-    <ol>
-      <li>ユーザー</li>
-      <li>↓</li>
-      <li>CloudFront（キャッシュあり）</li>
-      <li>↓</li>
-      <li>即返却（S3へは取りに行かない）</li>
-    </ol>
-    <p>👉 <strong>S3の負荷も料金も下がります。</strong></p>
+                <h3>① レイテンシ（遅延）の最小化</h3>
+                <p>物理的な距離は通信速度に直結します。日本のユーザー向けのサービスなら、日本にあるリージョンを使うのが最も高速です。</p>
+                <ul>
+                    <li>日本ユーザー → 東京リージョン：<strong>速い</strong></li>
+                    <li>日本ユーザー → 米国リージョン：<strong>遅い</strong></li>
+                </ul>
 
-    <h2>⑥ キャッシュ制御（TTL）</h2>
-    <p>TTL = キャッシュ保持時間のことです。</p>
-    <ul>
-      <li><strong>index.html</strong>
-        <ul><li>TTL 10秒 → すぐ更新反映したい</li></ul>
-      </li>
-      <li><strong>画像・JS・CSS</strong>
-        <ul><li>TTL 1日 → あまり変更されないので長くキャッシュ</li></ul>
-      </li>
-    </ul>
-    <p>実務では、HTMLは短めに、静的アセットは長めに設定するのが一般的です。</p>
+                <h3>② 法律・規制（データレジデンシー）</h3>
+                <p>特に個人情報や公共系のデータにおいて、「国内にデータを保管しなければならない」という法律や規定がある場合があります。リージョンを選択することは、法令対応そのものです。</p>
 
-    <h2>⑦ キャッシュ削除（Invalidation）</h2>
-    <p>更新したのに反映されない！という時は、CloudFrontのキャッシュを強制削除（Invalidation）します。</p>
-    <ol>
-      <li>CloudFront</li>
-      <li>↓</li>
-      <li><strong>Invalidate（無効化）を実行</strong></li>
-      <li>↓</li>
-      <li>次のアクセスでS3から最新データを再取得</li>
-    </ol>
-    <p>👉 以前言及されていた「CloudFront Invalidation」はまさにこの操作のことです。</p>
+                <h3>③ 障害の影響範囲を限定</h3>
+                <p>AWS全体で大規模な障害が起きることは稀ですが、リージョン単位での障害は起こり得ます。「東京リージョンで障害発生」していても、「大阪リージョン」や「米国リージョン」は正常に稼働している、というふうに影響範囲が切り離されています。</p>
 
-    <h2>⑧ オリジンはS3だけじゃない</h2>
-    <p>CloudFrontの接続先（オリジン）はS3以外も指定可能です。</p>
-    <ul>
-      <li>CloudFront
-        <ul>
-          <li>↓</li>
-          <li>オリジン
-            <ul>
-              <li>S3（静的ファイル）</li>
-              <li>ALB（Webアプリ）</li>
-              <li>EC2</li>
-              <li>API Gateway（API）</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <h3>動的＋静的混在例</h3>
-    <ul>
-      <li><code>/index.html</code> → <strong>S3</strong>へ振り分け</li>
-      <li><code>/api/*</code> → <strong>API Gateway</strong>へ振り分け</li>
-    </ul>
-    <p>👉 URLパスによって接続先を振り分けることが可能です。</p>
+                <h3>④ サービス・料金の違い</h3>
+                <p>最新のサービスは米国（us-east-1等）から順次リリースされることが多く、リージョンによって使える機能に差があります。また、電気代や土地代の違いにより、リージョンごとに利用料金も微妙に異なります。</p>
 
-    <h2>⑨ セキュリティ面（強い）</h2>
-    <h3>代表機能</h3>
-    <ul>
-      <li>HTTPS（証明書管理）</li>
-      <li>OAI / OAC（S3への直接アクセスを禁止し、CloudFront経由のみ許可）</li>
-      <li>IP制限</li>
-      <li>WAF連携</li>
-      <li>署名付きURL</li>
-    </ul>
+                <h2>5. リージョンサービスとグローバルサービス</h2>
+                <p>ここが混乱しやすいポイントですが、AWSのサービスには「リージョンを選ぶもの」と「選ばない（共通の）もの」があります。</p>
 
-    <h3>S3直アクセス遮断（超重要）</h3>
-    <ul>
-      <li>ユーザー ❌→ S3（直接は拒否）</li>
-      <li>ユーザー → CloudFront → S3（許可）</li>
-    </ul>
-    <p>👉 <strong>CloudFront経由以外は拒否するのが王道の設定です。</strong></p>
+                <div class="diagram-container">
+                    <div class="diagram-label">サービスの分類</div>
+                    <table style="width:100%; border-collapse:collapse;">
+                        <tr style="border-bottom:1px solid var(--line-color);">
+                            <th style="text-align:left; padding:0.5rem;">分類</th>
+                            <th style="text-align:left; padding:0.5rem;">主なサービス</th>
+                            <th style="text-align:left; padding:0.5rem;">特徴</th>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--line-color);">
+                            <td style="padding:0.5rem;"><strong>リージョンサービス</strong></td>
+                            <td style="padding:0.5rem;">EC2, S3, RDS, Lambda</td>
+                            <td style="padding:0.5rem;">作成時にリージョンを選択する。データはそのリージョン内に留まる。</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:0.5rem;"><strong>グローバルサービス</strong></td>
+                            <td style="padding:0.5rem;">IAM, CloudFront, Route53</td>
+                            <td style="padding:0.5rem;">リージョンの概念がない（または全世界共通）。コンソール画面でもリージョン選択が不要。</td>
+                        </tr>
+                    </table>
+                </div>
 
-    <h2>⑩ 料金の考え方（ざっくり）</h2>
-    <p>課金される主な要素：</p>
-    <ul>
-      <li>転送量（外向き）</li>
-      <li>リクエスト数</li>
-      <li>Invalidation（大量に行う場合）</li>
-    </ul>
-    <p>しかし実際は、<strong>S3から直接配信するよりも安くなることも多く</strong>、個人サイトや学習用途の規模であれば誤差の範囲であることがほとんどです。</p>
+                <h2>6. CloudFrontとリージョンの関係</h2>
+                <p>Webサイトを配信する場合によくある「CloudFront + S3」の構成における関係性は以下のようになります。</p>
 
-    <h2>⑪ S3 + CloudFront = GitHub Pages超え？</h2>
-    <h3>GitHub Pages</h3>
-    <ul>
-      <li>簡単</li>
-      <li>拡張しにくい</li>
-    </ul>
+                <div class="diagram-container">
+                    <div class="diagram-label">図：ユーザーアクセスの流れ</div>
+                    <div class="flow-diagram">
+                        <div class="flow-step">ユーザー</div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step" style="background:#f0f8ff; border-color:#007bff;">
+                            CloudFront<br>
+                            <span style="font-size:0.8rem; font-weight:normal;">(エッジロケーション：世界中)</span>
+                        </div>
+                        <div class="flow-arrow">↓</div>
+                        <div class="flow-step" style="background:#fff0f5; border-color:#d63384;">
+                            S3 オリジン<br>
+                            <span style="font-size:0.8rem; font-weight:normal;">(東京リージョンで固定)</span>
+                        </div>
+                    </div>
+                </div>
 
-    <h3>S3 + CloudFront</h3>
-    <ul>
-      <li>高速</li>
-      <li>拡張自由</li>
-      <li>API連携が可能</li>
-      <li>将来スケール可能</li>
-    </ul>
-    <p>👉 <strong>「フォーム→API→S3→CloudFront」という構想は、完全にプロの設計です。</strong></p>
+                <p>CloudFrontは「グローバル」、S3は「リージョン」です。これらを組み合わせることで、データを特定リージョンで管理しつつ、配信は世界中のエッジから高速に行うことができます。</p>
 
-    <h2>⑫ よくある誤解</h2>
-    <ul>
-      <li>❌ CloudFront = サーバー
-        <ul><li>⭕ 配信・キャッシュ</li></ul>
-      </li>
-      <li>❌ CloudFrontにファイルを置く
-        <ul><li>⭕ S3などに置く</li></ul>
-      </li>
-      <li>❌ 設定難しそう
-        <ul><li>⭕ 最初だけ（慣れると楽です）</li></ul>
-      </li>
-    </ul>
+                <h2>7. S3とAZの自動分散</h2>
+                <p>S3のバケットは「東京リージョン」のようにリージョン単位で作成しますが、内部的には<strong>自動的に3つ以上のAZにデータがコピー</strong>されています。</p>
+                <pre>S3バケット（東京リージョン）
+ ├─ AZ-A にデータ保存
+ ├─ AZ-B にコピー
+ └─ AZ-C にコピー</pre>
+                <p>ユーザーがAZを意識しなくても、S3に置くだけで高い耐久性が確保されるのはこの仕組みのおかげです。</p>
 
-    <h2>まとめ</h2>
-    <p>CloudFrontは「速い・安全・HTTPS」を担当し、S3は「データ置き場」に徹する。この役割分担が基本です。</p>
-    <div style="background-color: var(--code-bg); padding: 1.5rem; border-radius: 4px; text-align: center;">
-      <p>ユーザー</p>
-      <p>↓</p>
-      <p><strong>CloudFront</strong><br>（速い・安全・HTTPS）</p>
-      <p>↓</p>
-      <p><strong>S3</strong><br>（データ置き場）</p>
+                <h2>8. マルチリージョン構成（発展）</h2>
+                <p>さらに可用性を高める場合、国をまたいだ構成（マルチリージョン）をとることもあります。</p>
+                <ul>
+                    <li><strong>日本：</strong>東京リージョン（本番稼働）</li>
+                    <li><strong>海外：</strong>米国リージョン（バックアップ・災害対策用）</li>
+                </ul>
+                <p>CloudFrontやRoute53を利用して、ユーザーを最寄りのリージョンへ誘導したり、東京リージョンがダウンした際に自動的に海外リージョンへ切り替えたりすることが可能です。</p>
+
+                <h2>9. 学習・個人開発でのおすすめ</h2>
+                <p>学習目的や個人のポートフォリオサイトであれば、以下の構成を推奨します。</p>
+                <ul>
+                    <li><strong>リージョン：</strong>東京（ap-northeast-1）</li>
+                </ul>
+                <p><strong>理由：</strong><br>物理的に近いためコンソールの操作や通信が速く、日本語の技術情報も圧倒的に多いためです。</p>
+
+                <h2>10. よくある誤解と正解まとめ</h2>
+                <ul>
+                    <li>❌ <strong>リージョン = 国</strong><br>
+                        ⭕ 国に近いですが、厳密には「AWSのインフラが設置されている地理的エリア」です（米国には複数のリージョンがあります）。</li>
+                    <li>❌ <strong>AZ = バックアップ</strong><br>
+                        ⭕ AZは「常時稼働」を前提とした冗長化の単位です。バックアップ（スナップショット等）とは目的が異なります。</li>
+                    <li>❌ <strong>CloudFrontもリージョンを選ぶ</strong><br>
+                        ⭕ CloudFrontはグローバルサービスなので、リージョン選択はありません。</li>
+                </ul>
+
+                <h2>まとめ</h2>
+                <div class="diagram-container">
+<pre style="background:transparent; padding:0; margin:0; font-family:var(--font-mono);">
+AWS
+ ├─ グローバルサービス
+ │   ├─ IAM（権限管理）
+ │   └─ CloudFront（CDN）
+ │
+ └─ リージョン（例：東京、大阪、バージニア）
+     └─ AZ（アベイラビリティゾーン）× 複数
+         │  ・物理的に独立
+         │  ・高速回線で接続
+         │
+         └─ 実データ・サーバー（EC2, RDS, etc）
+</pre>
+                </div>
+
+                <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--line-color); display: flex; justify-content: space-between;">
+                    <a href="#" id="prevPost" style="display: none;">← 前の記事</a>
+                    <a href="#" id="nextPost" style="display: none;">次の記事 →</a>
+                </div>
+
+            </article>
+        </main>
+
+        <footer class="site-footer">
+            <p>&copy; <span id="year">2026</span> My Tech Blog. All rights reserved.</p>
+        </footer>
     </div>
 
-    <p style="margin-top: 2rem;">
-      <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
-    </p>
-
-  </main>
-</div>
-
-<script src="../../../assets/post.js"></script>
+    <script src="../../../assets/app.js"></script>
+    <script src="../../../assets/post.js"></script>
 </body>
 </html>
