@@ -1,345 +1,281 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWSリージョンの理解</title>
-    <link rel="stylesheet" href="../../../assets/styles.css">
-    <style>
-        /* 記事固有の図解用スタイル */
-        .diagram-container {
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background-color: var(--code-bg);
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-        
-        .diagram-label {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 0.5rem;
-            text-align: center;
-            font-family: var(--font-mono);
-        }
-
-        /* 階層構造図 */
-        .hierarchy-box {
-            border: 2px solid var(--line-color);
-            background: #fff;
-            padding: 1rem;
-            border-radius: 6px;
-            position: relative;
-        }
-        .hierarchy-box.region {
-            border-color: var(--text-main);
-        }
-        .hierarchy-box.az {
-            border: 1px dashed var(--text-sub);
-            margin: 0.5rem;
-            background: #fafafa;
-        }
-        .hierarchy-box.dc {
-            background: var(--code-bg);
-            border: 1px solid var(--line-color);
-            padding: 0.5rem;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        .az-container {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        /* 比較テーブル風 */
-        .comparison-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        .comparison-item {
-            padding: 1rem;
-            border: 1px solid var(--line-color);
-            border-radius: 6px;
-        }
-        .comparison-header {
-            font-weight: bold;
-            border-bottom: 1px solid var(--line-color);
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
-        
-        /* 矢印フロー */
-        .flow-diagram {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            text-align: center;
-        }
-        .flow-step {
-            padding: 0.8rem 1.2rem;
-            border: 1px solid var(--text-main);
-            border-radius: 4px;
-            background: #fff;
-            font-weight: 600;
-        }
-        .flow-arrow {
-            font-size: 1.5rem;
-            color: var(--text-sub);
-        }
-
-        /* レスポンシブ対応 */
-        @media (max-width: 600px) {
-            .az-container {
-                flex-direction: column;
-            }
-            .comparison-grid {
-                grid-template-columns: 1fr;
-            }
-            .flow-diagram {
-                flex-direction: column;
-            }
-            .flow-arrow {
-                transform: rotate(90deg);
-            }
-        }
-    </style>
+<!-- Google tag (fixed) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- GEN: META（生成時に置換） -->
+<title>Learning Trajectory | IAM（アイデンティティ管理）</title>
+<meta name="description" content="IAM（Identity and Access Management）は「誰が・何を・どこまでAWSでできるか」を厳密に制御する仕組みです。AWSを利用する上で最も基本的かつ重要なセキュリティサービスについて解説します。" />
+<meta name="robots" content="index,follow" />
+<!-- Optional: OGP（不要なら空でOK） -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="IAM（アイデンティティ管理）" />
+<meta property="og:description" content="IAM（Identity and Access Management）は「誰が・何を・どこまでAWSでできるか」を厳密に制御する仕組みです。AWSを利用する上で最も基本的かつ重要なセキュリティサービスについて解説します。" />
+<!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+<link rel="stylesheet" href="../../../assets/styles.css" />
+<!-- 図解用追加CSS -->
+<style>
+.iam-diagram {
+display: flex;
+flex-direction: column;
+gap: 2rem;
+margin: 2rem 0;
+padding: 1.5rem;
+background-color: #f9f9f9;
+border-radius: 8px;
+border: 1px solid #e0e0e0;
+}
+.diagram-row {
+display: flex;
+align-items: center;
+justify-content: center;
+flex-wrap: wrap;
+gap: 0.5rem;
+}
+.d-box {
+border: 2px solid #333;
+background: #fff;
+padding: 0.8rem 1.2rem;
+border-radius: 6px;
+font-weight: bold;
+min-width: 100px;
+text-align: center;
+box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+.d-box.resource {
+border-style: dashed;
+background: #eef;
+}
+.d-box.policy {
+border-color: #d9534f;
+color: #d9534f;
+}
+.d-arrow {
+font-size: 1.2rem;
+color: #666;
+padding: 0 0.5rem;
+}
+.d-label {
+font-size: 0.8rem;
+color: #666;
+margin-top: 0.2rem;
+text-align: center;
+}
+/* テーブル用スタイル補正 */
+.compare-table {
+width: 100%;
+border-collapse: collapse;
+margin: 1.5rem 0;
+}
+.compare-table th, .compare-table td {
+border: 1px solid #e0e0e0;
+padding: 0.75rem;
+text-align: left;
+}
+.compare-table th {
+background-color: #f4f4f4;
+font-weight: bold;
+}
+.check-list {
+list-style: none;
+padding-left: 0;
+}
+.check-list li {
+margin-bottom: 0.8rem;
+padding-left: 1.5em;
+text-indent: -1.5em;
+}
+</style>
 </head>
-<body data-category="aws" data-root-prefix="../../../">
+<body>
+<div class="container">
+<header class="site-header">
+  <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+</header>
 
-    <div class="container">
-        <header class="site-header">
-            <div class="site-title">
-                <a href="../../../index.html">My Tech Blog</a>
-            </div>
-            <nav class="site-nav">
-                <ul>
-                    <li><a href="../../../index.html">Home</a></li>
-                    <li><a href="#contactLink" id="contactLink">Contact</a></li>
-                </ul>
-            </nav>
-        </header>
+<!-- 固定：前後ナビ（JS制御） -->
+<nav class="post-nav">
+  <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+  <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+</nav>
 
-        <main>
-            <article class="article-content">
-                <header class="article-header">
-                    <time class="post-meta">2026/01/29 / AWS</time>
-                    <h1 class="article-title">AWSリージョンの理解</h1>
-                    <ul class="tag-list">
-                        <li class="tag">#AWS</li>
-                        <li class="tag">#リージョン</li>
-                        <li class="tag">#AZ</li>
-                        <li class="tag">#クラウド</li>
-                        <li class="tag">#インフラ</li>
-                    </ul>
-                </header>
+<main>
+  <article class="article-content">
 
-                <p>AWSのリージョンとAZの概念を詳しく解説し、サービス選びに役立つ情報を提供します。</p>
-                <p>リージョンはAWSの設計思想そのものです。ここを理解すると<strong>「なぜこの構成になるのか」</strong>が一気に腹落ちします。今回は、正体・内部構造・設計の考え方を図解中心に解説していきます。</p>
+    <header class="article-header">
+      <!-- GEN: POST META -->
+      <time class="post-meta" datetime="2026-01-29">
+        2026.01.29
+      </time>
 
-                <h2>1. リージョンとは何か</h2>
-                <p>一言でいうと、AWSのデータセンター群がまとまった<strong>「地理的な単位」</strong>のことです。</p>
-                <ul>
-                    <li>例：東京リージョン（<code>ap-northeast-1</code>）</li>
-                    <li>例：米国東部リージョン（<code>us-east-1</code>）</li>
-                </ul>
-                <p>AWSを利用する際は、データを「どの国・どの場所」に置くかをリージョンで明示的に選択します。</p>
+      <!-- GEN: TITLE -->
+      <h1 class="article-title">IAM（アイデンティティ管理）</h1>
 
-                <h2>2. リージョンの内部構造（重要）</h2>
-                <p>よくある誤解として「リージョン ＝ 1つの巨大なデータセンター」と思われがちですが、それは間違いです。正しい構造は以下のようになっています。</p>
+      <!-- GEN: TAGS -->
+      <ul class="tag-list">
+        <li class="tag">IAM</li>
+        <li class="tag">AWS</li>
+        <li class="tag">アクセス管理</li>
+        <li class="tag">セキュリティ</li>
+        <li class="tag">ポリシー</li>
+      </ul>
+    </header>
 
-                <div class="diagram-container">
-                    <div class="diagram-label">図：リージョンの物理的構造</div>
-                    <div class="hierarchy-box region">
-                        <strong>東京リージョン (Region)</strong>
-                        <p style="font-size:0.9rem; color:var(--text-sub); margin-bottom:1rem;">地理的に離れた複数のAZで構成</p>
-                        
-                        <div class="az-container">
-                            <div class="hierarchy-box az">
-                                <strong>AZ-a</strong>
-                                <div class="hierarchy-box dc">独立したデータセンター</div>
-                            </div>
-                            <div class="hierarchy-box az">
-                                <strong>AZ-c</strong>
-                                <div class="hierarchy-box dc">独立したデータセンター</div>
-                            </div>
-                            <div class="hierarchy-box az">
-                                <strong>AZ-d</strong>
-                                <div class="hierarchy-box dc">独立したデータセンター</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- GEN: BODY -->
+    <p>IAM（Identity and Access Management）は、AWSを利用する上で最も基本的かつ重要なサービスです。一言で言えば、<strong>「誰が・何を・どこまでAWSでできるか」を厳密に制御する仕組み</strong>です。</p>
 
-                <p><strong>AZ（Availability Zone）</strong>同士は、数km〜数十km離れた場所に建設されており、それぞれが独立した電源・空調・ネットワークを持っています。</p>
-                <ul>
-                    <li>物理的に場所が別れている</li>
-                    <li>電源供給元が別れている（停電対策）</li>
-                    <li>互いに高速回線でつながっている</li>
-                </ul>
+<h2>1. IAMとは何か</h2>
+<ul>
+<li><strong>認証・認可の管理：</strong> Amazon Web Services（AWS）上での「誰が（認証）」、「何をしてもよいか（認可）」を管理します。</li>
+<li><strong>アクセス制御：</strong> AWSリソースへのアクセスを、ユーザー、役割、ポリシーを用いてきめ細かく制御します。</li>
+<li><strong>グローバルサービス：</strong> IAMはリージョン（東京、バージニアなど）に依存せず、AWSアカウント全体で共通の設定として機能します。</li>
+</ul>
+<h2>2. IAMで管理する3つの主役（重要）</h2>
+<p>IAMを理解するためには、以下の3つの要素（プリンシパル）を区別することが重要です。</p>
+<h3>① ユーザー（User）</h3>
+<ul>
+<li><strong>人やシステムを表すアカウント：</strong> 特定の人物やアプリケーションに紐づくIDです。</li>
+<li><strong>操作の主体：</strong> マネジメントコンソールへのログインや、API操作を行う主体となります。</li>
+<li><strong>運用のポイント：</strong> 本番環境の運用では、個人ごとのIAMユーザーを直接使わず、後述する「ロール」を使用することも一般的です。</li>
+</ul>
+<h3>② グループ（Group）</h3>
+<ul>
+<li><strong>ユーザーの集合：</strong> 複数のIAMユーザーをまとめる箱です。</li>
+<li><strong>権限の一括管理：</strong> 「Adminグループ」「ReadOnlyグループ」のように役割ごとにグループを作り、そこに権限（ポリシー）を付与することで、管理の手間を減らします。</li>
+</ul>
+<h3>③ ロール（Role）【試験頻出】</h3>
+<ul>
+<li><strong>一時的な権限の帽子：</strong> ユーザーやAWSサービスが「一時的に」かぶることができる役割です。</li>
+<li><strong>資格情報を持たない：</strong> 固定のパスワードやアクセスキーを持ちません。</li>
+<li><strong>主な用途：</strong>
+<ul>
+<li><strong>EC2 → S3：</strong> EC2インスタンスがS3バケットのファイルを読み書きする場合。</li>
+<li><strong>Lambda → DynamoDB：</strong> Lambda関数がデータベースを操作する場合。</li>
+<li><strong>クロスアカウントアクセス：</strong> 他のAWSアカウントから自社環境へアクセスさせる場合。</li>
+</ul>
+</li>
+</ul>
+<h2>3. ポリシー（Policy）とは</h2>
+<p>ポリシーはIAMの心臓部であり、「何を許可し、何を拒否するか」を定義したルールセットです。通常はJSON形式で記述されます。</p>
+<h3>ポリシーの基本構造</h3>
+<ul>
+<li><strong>Effect：</strong> <code>Allow</code>（許可） または <code>Deny</code>（拒否）</li>
+<li><strong>Action：</strong> 具体的に何をするか（例：<code>s3:GetObject</code> ならファイルの取得）</li>
+<li><strong>Resource：</strong> どのリソースに対して行うか（例：特定のS3バケット）</li>
+</ul>
+<blockquote>
+<p><strong>重要ルール：</strong> AWSの権限評価では、<strong>「明示的なDeny（拒否）」が最優先</strong>されます。AllowがあってもDenyがあれば拒否されます。</p>
+</blockquote>
+<h2>4. IAMの全体像</h2>
+<p>IAMの各要素がどのように連携してAWSリソースへのアクセスを制御しているか、概念図で整理します。</p>
+<div class="iam-diagram">
+<div class="diagram-row">
+<div class="d-box">ユーザー
+<small>(User)</small></div>
+<div class="d-arrow">↓<div class="d-label">所属</div></div>
+<div class="d-box">グループ
+<small>(Group)</small></div>
+<div class="d-arrow">→<div class="d-label">付与</div></div>
+<div class="d-box policy">ポリシー
+<small>(Policy)</small></div>
+<div class="d-arrow">→<div class="d-label">制御</div></div>
+<div class="d-box resource">AWSリソース
+<small>(S3, EC2など)</small></div>
+</div>
+<div class="diagram-row" style="margin-top:1rem; border-top:1px dashed #ccc; padding-top:1rem;">
+<div style="font-size:0.9rem; color:#666; margin-right:1rem;">※ロールの場合</div>
+<div class="d-box">ロール
+<small>(Role)</small></div>
+<div class="d-arrow">→<div class="d-label">紐付け</div></div>
+<div class="d-box policy">ポリシー
+<small>(Policy)</small></div>
+<div class="d-arrow">→<div class="d-label">一時的アクセス</div></div>
+<div class="d-box resource">AWSリソース</div>
+</div>
+</div>
+<h2>5. ユーザー vs ロール（試験対策）</h2>
+<p>AWS認定試験で頻出の「ユーザー」と「ロール」の違いを比較表にまとめました。AWSのベストプラクティスは<strong>「可能な限りロール（一時的な認証情報）を使うこと」</strong>です。</p>
+<table class="compare-table">
+<thead>
+<tr>
+<th>観点</th>
+<th>ユーザー (User)</th>
+<th>ロール (Role)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>主体</strong></td>
+<td>人・固定のアカウント</td>
+<td>一時的な役割・権限セット</td>
+</tr>
+<tr>
+<td><strong>資格情報</strong></td>
+<td>あり（パスワード / アクセスキー）</td>
+<td>なし（一時的なトークンが発行される）</td>
+</tr>
+<tr>
+<td><strong>主な用途</strong></td>
+<td>管理者、開発者のログイン</td>
+<td>EC2、Lambda、外部連携</td>
+</tr>
+<tr>
+<td><strong>セキュリティ</strong></td>
+<td>キー漏洩のリスクが常にある</td>
+<td>時間が来ると無効になるため安全性が高い</td>
+</tr>
+</tbody>
+</table>
+<h2>6. ルートユーザー（Root User）【要注意】</h2>
+<p>AWSアカウントを作成した最初に存在するユーザーを「ルートユーザー」と呼びます。これは全能の神のような権限を持っています。</p>
+<ul>
+<li><strong>IAMでは制限不可：</strong> IAMポリシーでルートユーザーの権限を制限することはできません。</li>
+<li><strong>原則封印：</strong> 普段の操作には絶対に使用せず、緊急時や請求関連の操作のみに使用します。</li>
+</ul>
+<h3>必須のセキュリティ対策</h3>
+<ol>
+<li><strong>MFA（多要素認証）の有効化：</strong> スマホアプリやハードウェアトークンを設定する。</li>
+<li><strong>アクセスキーを作らない：</strong> プログラムからの操作に使わない。</li>
+</ol>
+<h2>7. AWS CP試験でのひっかけポイント</h2>
+<p>Cloud Practitioner試験などでよく問われる間違いやすいポイントです。</p>
+<ul class="check-list">
+<li>❌ <strong>IAMはリージョンごとのサービスである</strong>
 
-                <h2>3. AZ（アベイラビリティゾーン）の目的</h2>
-                <p>なぜわざわざ場所を分けているのでしょうか？目的は<strong>「1拠点が死んでも、サービスを止めない」</strong>ためです。</p>
-                <p>地震、火災、停電、あるいは工事ミスなどで1つのデータセンターがダウンしても、別のAZが生きていればシステムは稼働し続けられます。</p>
+→ ⭕ <strong>グローバルサービス</strong>です。設定は全リージョンに反映されます。</li>
+<li>❌ <strong>EC2インスタンスの中にIAMユーザーのアクセスキーを保存してアクセスする</strong>
 
-                <div class="diagram-container">
-                    <div class="diagram-label">図：障害時の挙動比較</div>
-                    <div class="comparison-grid">
-                        <div class="comparison-item">
-                            <div class="comparison-header">AZなし（単一DC）の場合</div>
-                            <div style="text-align:center; color:red; font-weight:bold;">
-                                ❌ サービス停止
-                            </div>
-                            <p style="font-size:0.9rem; margin-top:0.5rem;">DCが被災すると、復旧まで全停止。</p>
-                        </div>
-                        <div class="comparison-item">
-                            <div class="comparison-header">マルチAZ構成の場合</div>
-                            <div style="text-align:center; color:green; font-weight:bold;">
-                                ✅ サービス継続
-                            </div>
-                            <p style="font-size:0.9rem; margin-top:0.5rem;">AZ-Aがダウンしても、AZ-Bがリクエストを処理。</p>
-                        </div>
-                    </div>
-                </div>
+→ ⭕ <strong>IAMロール</strong>をEC2に割り当ててアクセスします（キーを置くのはNG）。</li>
+<li>❌ <strong>権限がないのは「Allow」の設定がないからだけである</strong>
 
-                <p>これが、AWSが「落ちにくい（高可用性）」と言われる物理的な理由です。</p>
+→ ⭕ 「Allowがない（暗黙の拒否）」場合もありますが、<strong>「明示的なDeny」</strong>がある場合は、どんなに強い権限があっても拒否されます。</li>
+</ul>
+<h2>8. まとめ</h2>
+<p>IAMを一言で覚えるなら、<strong>AWSの「入館証（認証）＋職務権限表（認可）」</strong>です。セキュリティの要となるサービスですので、まずは「ユーザー・グループ・ロール・ポリシー」の4つの関係性をしっかり押さえておきましょう。</p>
+    <!-- 問い合わせ（固定） -->
+    <p class="article-contact">
+      <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+    </p>
 
-                <h2>4. リージョンが分かれている4つの理由</h2>
-                <p>世界中にリージョンが存在する理由は主に4つあります。</p>
+    <!-- GEN: REFERENCES（不要なら空） -->
+    
 
-                <h3>① レイテンシ（遅延）の最小化</h3>
-                <p>物理的な距離は通信速度に直結します。日本のユーザー向けのサービスなら、日本にあるリージョンを使うのが最も高速です。</p>
-                <ul>
-                    <li>日本ユーザー → 東京リージョン：<strong>速い</strong></li>
-                    <li>日本ユーザー → 米国リージョン：<strong>遅い</strong></li>
-                </ul>
+  </article>
+</main>
 
-                <h3>② 法律・規制（データレジデンシー）</h3>
-                <p>特に個人情報や公共系のデータにおいて、「国内にデータを保管しなければならない」という法律や規定がある場合があります。リージョンを選択することは、法令対応そのものです。</p>
+<footer class="site-footer">
+  <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+</footer>
 
-                <h3>③ 障害の影響範囲を限定</h3>
-                <p>AWS全体で大規模な障害が起きることは稀ですが、リージョン単位での障害は起こり得ます。「東京リージョンで障害発生」していても、「大阪リージョン」や「米国リージョン」は正常に稼働している、というふうに影響範囲が切り離されています。</p>
-
-                <h3>④ サービス・料金の違い</h3>
-                <p>最新のサービスは米国（us-east-1等）から順次リリースされることが多く、リージョンによって使える機能に差があります。また、電気代や土地代の違いにより、リージョンごとに利用料金も微妙に異なります。</p>
-
-                <h2>5. リージョンサービスとグローバルサービス</h2>
-                <p>ここが混乱しやすいポイントですが、AWSのサービスには「リージョンを選ぶもの」と「選ばない（共通の）もの」があります。</p>
-
-                <div class="diagram-container">
-                    <div class="diagram-label">サービスの分類</div>
-                    <table style="width:100%; border-collapse:collapse;">
-                        <tr style="border-bottom:1px solid var(--line-color);">
-                            <th style="text-align:left; padding:0.5rem;">分類</th>
-                            <th style="text-align:left; padding:0.5rem;">主なサービス</th>
-                            <th style="text-align:left; padding:0.5rem;">特徴</th>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--line-color);">
-                            <td style="padding:0.5rem;"><strong>リージョンサービス</strong></td>
-                            <td style="padding:0.5rem;">EC2, S3, RDS, Lambda</td>
-                            <td style="padding:0.5rem;">作成時にリージョンを選択する。データはそのリージョン内に留まる。</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:0.5rem;"><strong>グローバルサービス</strong></td>
-                            <td style="padding:0.5rem;">IAM, CloudFront, Route53</td>
-                            <td style="padding:0.5rem;">リージョンの概念がない（または全世界共通）。コンソール画面でもリージョン選択が不要。</td>
-                        </tr>
-                    </table>
-                </div>
-
-                <h2>6. CloudFrontとリージョンの関係</h2>
-                <p>Webサイトを配信する場合によくある「CloudFront + S3」の構成における関係性は以下のようになります。</p>
-
-                <div class="diagram-container">
-                    <div class="diagram-label">図：ユーザーアクセスの流れ</div>
-                    <div class="flow-diagram">
-                        <div class="flow-step">ユーザー</div>
-                        <div class="flow-arrow">↓</div>
-                        <div class="flow-step" style="background:#f0f8ff; border-color:#007bff;">
-                            CloudFront<br>
-                            <span style="font-size:0.8rem; font-weight:normal;">(エッジロケーション：世界中)</span>
-                        </div>
-                        <div class="flow-arrow">↓</div>
-                        <div class="flow-step" style="background:#fff0f5; border-color:#d63384;">
-                            S3 オリジン<br>
-                            <span style="font-size:0.8rem; font-weight:normal;">(東京リージョンで固定)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <p>CloudFrontは「グローバル」、S3は「リージョン」です。これらを組み合わせることで、データを特定リージョンで管理しつつ、配信は世界中のエッジから高速に行うことができます。</p>
-
-                <h2>7. S3とAZの自動分散</h2>
-                <p>S3のバケットは「東京リージョン」のようにリージョン単位で作成しますが、内部的には<strong>自動的に3つ以上のAZにデータがコピー</strong>されています。</p>
-                <pre>S3バケット（東京リージョン）
- ├─ AZ-A にデータ保存
- ├─ AZ-B にコピー
- └─ AZ-C にコピー</pre>
-                <p>ユーザーがAZを意識しなくても、S3に置くだけで高い耐久性が確保されるのはこの仕組みのおかげです。</p>
-
-                <h2>8. マルチリージョン構成（発展）</h2>
-                <p>さらに可用性を高める場合、国をまたいだ構成（マルチリージョン）をとることもあります。</p>
-                <ul>
-                    <li><strong>日本：</strong>東京リージョン（本番稼働）</li>
-                    <li><strong>海外：</strong>米国リージョン（バックアップ・災害対策用）</li>
-                </ul>
-                <p>CloudFrontやRoute53を利用して、ユーザーを最寄りのリージョンへ誘導したり、東京リージョンがダウンした際に自動的に海外リージョンへ切り替えたりすることが可能です。</p>
-
-                <h2>9. 学習・個人開発でのおすすめ</h2>
-                <p>学習目的や個人のポートフォリオサイトであれば、以下の構成を推奨します。</p>
-                <ul>
-                    <li><strong>リージョン：</strong>東京（ap-northeast-1）</li>
-                </ul>
-                <p><strong>理由：</strong><br>物理的に近いためコンソールの操作や通信が速く、日本語の技術情報も圧倒的に多いためです。</p>
-
-                <h2>10. よくある誤解と正解まとめ</h2>
-                <ul>
-                    <li>❌ <strong>リージョン = 国</strong><br>
-                        ⭕ 国に近いですが、厳密には「AWSのインフラが設置されている地理的エリア」です（米国には複数のリージョンがあります）。</li>
-                    <li>❌ <strong>AZ = バックアップ</strong><br>
-                        ⭕ AZは「常時稼働」を前提とした冗長化の単位です。バックアップ（スナップショット等）とは目的が異なります。</li>
-                    <li>❌ <strong>CloudFrontもリージョンを選ぶ</strong><br>
-                        ⭕ CloudFrontはグローバルサービスなので、リージョン選択はありません。</li>
-                </ul>
-
-                <h2>まとめ</h2>
-                <div class="diagram-container">
-<pre style="background:transparent; padding:0; margin:0; font-family:var(--font-mono);">
-AWS
- ├─ グローバルサービス
- │   ├─ IAM（権限管理）
- │   └─ CloudFront（CDN）
- │
- └─ リージョン（例：東京、大阪、バージニア）
-     └─ AZ（アベイラビリティゾーン）× 複数
-         │  ・物理的に独立
-         │  ・高速回線で接続
-         │
-         └─ 実データ・サーバー（EC2, RDS, etc）
-</pre>
-                </div>
-
-                <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--line-color); display: flex; justify-content: space-between;">
-                    <a href="#" id="prevPost" style="display: none;">← 前の記事</a>
-                    <a href="#" id="nextPost" style="display: none;">次の記事 →</a>
-                </div>
-
-            </article>
-        </main>
-
-        <footer class="site-footer">
-            <p>&copy; <span id="year">2026</span> My Tech Blog. All rights reserved.</p>
-        </footer>
-    </div>
-
-    <script src="../../../assets/app.js"></script>
-    <script src="../../../assets/post.js"></script>
+</div>
+<!-- 記事用JS（前後リンク・問い合わせURL） -->
+<script src="../../../assets/post.js"></script>
+<!-- 共通：年表示 -->
+<script>
+const y = document.getElementById("year");
+if (y) y.textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
