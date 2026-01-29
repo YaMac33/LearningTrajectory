@@ -1,5 +1,26 @@
 [
   {
+    "id": "blog-1",
+    "category": "blog",
+    "timestamp": "2026-01-29T20:27:43+09:00",
+    "title": "AIを使った学習の変革",
+    "summary": "AIを活用した学習の効率性とそのメカニズムを解説します。情報探索から理解への移動が主なポイントです。",
+    "tags": [
+      "AI",
+      "学習",
+      "効率",
+      "独学",
+      "教育"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": "2026-01-29_ai-gakushu-henkaku",
+    "status": "public",
+    "post_path": "blog/posts/2026-01-29-blog-1/"
+  },
+  {
     "id": "awscp-12345",
     "category": "awscp",
     "timestamp": "2026-01-29T18:55:47+09:00",
@@ -42,5 +63,71 @@
     "dr": "2026-01-29_iam-identity-management",
     "status": "public",
     "post_path": "awscp/posts/2026-01-29-awscp-1/"
+  },
+  {
+    "id": "awscp-1234",
+    "category": "awscp",
+    "timestamp": "2026-01-29T07:58:00+09:00",
+    "title": "S3完全ガイド - Minimalist Blog",
+    "summary": "AWS S3の基本から応用まで解説し、最適な利用法を学べます。S3の概念や基本構造、バケットやオブジェクトについて詳しく紹介します。",
+    "tags": [
+      "AWS",
+      "S3",
+      "ストレージ",
+      "クラウド",
+      "データ管理",
+      "バケット",
+      "オブジェクト"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3)"
+    ],
+    "dr": "2026-01-29_s3-complete-guide",
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-29-awscp-1234/"
+  },
+  {
+    "id": "blog-12345",
+    "category": "blog",
+    "timestamp": "2026-01-28T22:48:41+09:00",
+    "title": "学習記録の仕組み作りと効果",
+    "summary": "記録する仕組みを先に作ることで学習が続きやすくなったことに気づきました。具体的な方法や気を付ける点をまとめています。",
+    "tags": [
+      "学習",
+      "記録",
+      "仕組み",
+      "Googleフォーム",
+      "スプレッドシート",
+      "GitHub Pages"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": "2026-01-28_learning-recording-system",
+    "status": "public",
+    "post_path": "blog/posts/2026-01-28-blog-12345/"
+  },
+  {
+    "id": "awscp-a1b2c3d4e5f6g7h8i9j0",
+    "category": "awscp",
+    "timestamp": "2026-01-28T20:11:58+09:00",
+    "title": "AWSの主要サービス概要",
+    "summary": "AWSはクラウドコンピューティングサービスを提供するプラットフォームです。EC2、S3、IAMなどの主要サービスについて説明します。",
+    "tags": [
+      "AWS",
+      "クラウド",
+      "サービス",
+      "EC2",
+      "S3",
+      "IAM",
+      "アクセス管理",
+      "ストレージ"
+    ],
+    "taxonomy": [],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-28-awscp-a1b2c3d4e5f6g7h8i9j0/"
   }
 ]
