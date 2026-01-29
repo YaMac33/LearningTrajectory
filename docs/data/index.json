@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-1",
+    "category": "awscp",
+    "timestamp": "2026-01-29T18:42:55+09:00",
+    "title": "IAM（アイデンティティ管理）の全容",
+    "summary": "IAMはAWSでのアクセス制御を厳密に管理するためのセキュリティサービスです。ユーザーやロールの管理、ポリシーの設定を通じて、安全な環境を構築します。",
+    "tags": [
+      "IAM",
+      "AWS",
+      "アクセス管理",
+      "セキュリティ",
+      "ポリシー"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "IAMと認証認可"
+    ],
+    "dr": "2026-01-29_iam-identity-management",
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-29-awscp-1/"
+  },
+  {
     "id": "awscp-12345",
     "category": "awscp",
     "timestamp": "2026-01-29T12:50:26+09:00",
@@ -19,27 +40,6 @@
     "dr": "2026-01-29_aws-route-53-basic-understanding",
     "status": "public",
     "post_path": "awscp/posts/2026-01-29-awscp-12345/"
-  },
-  {
-    "id": "awscp-1",
-    "category": "awscp",
-    "timestamp": "2026-01-29T12:34:44+09:00",
-    "title": "AWSリージョンの理解",
-    "summary": "AWSのリージョンとAZの概念について詳しく解説します。これにより、サービスの選択に役立つ知識を得ることができます。",
-    "tags": [
-      "AWS",
-      "リージョン",
-      "AZ",
-      "クラウド",
-      "インフラ"
-    ],
-    "taxonomy": [
-      "AWSのコアサービス",
-      "ネットワーク(VPC/Route53)"
-    ],
-    "dr": "2026-01-29_aws-region-understanding",
-    "status": "public",
-    "post_path": "awscp/posts/2026-01-29-awscp-1/"
   },
   {
     "id": "awscp-1234",
