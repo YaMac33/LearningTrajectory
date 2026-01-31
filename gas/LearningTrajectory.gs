@@ -1,53 +1,37 @@
 /**
  * LearningTrajectory.gs
  * --------------------------------
- * フル版（安全な行固定・単段トリガー / 新仕様対応）
+ * フル版（行固定・単段トリガー / 責務整理後）
  *
- * 新仕様の流れ:
- * 1) フォーム送信（onFormSubmitFromSheet）
- *    - 入力 html から OpenAI（Responses API + json_schema strict）で meta_json を生成
- *      - meta_json: title/summary/tags/taxonomy/dr/status/openai_id 等
- *    - category（固定リスト）はフォーム側で入力済み（AI分類しない）
- *    - id = `${category}-${openai_id}` を生成
- *    - slug = `${YYYY-MM-DD}-${id}` を生成
- *    - 同じ行に id/slug/meta_json を書き込み
- *    - 「この行」をキューに積み、1分後に GitHub へ push する時間トリガーを作成
+ * 流れ:
+ * 1) フォーム送信
+ *   - category はフォーム入力を正とする
+ *   - html から OpenAI で最小メタ生成
+ *     - openai_id（意味のある英語スラッグ）
+ *     - title / summary / tags
+ *     - taxonomy（awscp の場合のみ / [lv1, lv2]）
+ *   - id = `${category}-${openai_id}`
+ *   - slug = `${YYYY-MM-DD}-${id}`
+ *   - meta_json に OpenAI 由来情報のみ保存
  *
- * 2) 1分後（pushQueuedRowToGitHub）
- *    - キュー先頭の「同じ行」を処理（ズレない）
- *    - 記事HTMLを docs/<category>/posts/<slug>/index.html に push
- *    - 差分メタを docs/data/new_items/<id>.json に push
- *      （GitHub Actions 側で docs/data/index.json（横断）等を再生成する想定）
+ * 2) GitHub push
+ *   - 記事HTML: docs/<category>/posts/<slug>/index.html
+ *   - 差分JSON: docs/data/new_items/<id>.json
  *
- * 重要:
- * - lastRowは使わず、常に「イベントで確定した行番号(row)」を保持して処理するのでズレない
+ * 前提:
+ * - OPENAI_API_KEY / GITHUB_TOKEN 等は Script Properties
  *
- * 前提（Script Properties に保存）:
- * - OPENAI_API_KEY
- * - GITHUB_TOKEN
- * - GH_OWNER
- * - GH_REPO
- * - GH_BRANCH（任意、未設定なら main）
- *
- * 初回のみ実行:
- * - setupTriggers()
- * （任意）setupGitHubRepoConfig() で GH_OWNER/GH_REPO/GH_BRANCH を保存
- *
- * スプレッドシートのヘッダ（1行目）:
- * timestamp,category,html,id,slug,meta_json
+ * シートヘッダ:
+ * timestamp, category, html, id, slug, meta_json
  */
 
 // =====================
 // 設定
 // =====================
-
-// 対象シート（空ならアクティブシート。固定したいなら例: "フォームの回答 1"）
-const SHEET_NAME = "";
-
-// OpenAI
+const SHEET_NAME = "sheets";
 const OPENAI_MODEL = "gpt-4o-mini";
 
-// 列名（ヘッダ行に必要）
+// 列
 const COL_TIMESTAMP = "timestamp";
 const COL_CATEGORY  = "category";
 const COL_HTML      = "html";
@@ -55,50 +39,26 @@ const COL_ID        = "id";
 const COL_SLUG      = "slug";
 const COL_META_JSON = "meta_json";
 
-// GitHub 保存先
-// 記事HTML: docs/<category>/posts/<slug>/index.html
+// GitHub
 const DOCS_BASE_PATH = "docs";
+const NEW_ITEMS_DIR  = "docs/data/new_items";
 
-// 差分メタ置き場（Actions が index.json / トップ等の再生成に利用）
-const NEW_ITEMS_DIR = "docs/data/new_items";
-
-// キュー（Script Properties）
+// キュー
 const PUSH_QUEUE_KEY = "PENDING_PUSH_QUEUE_JSON";
 
-// meta_json のデフォルト
+// meta_json 初期
 const DEFAULT_META = {
   title: "",
   summary: "",
   tags: [],
-  taxonomy: [],
-  dr: null,
-  status: "public"
+  taxonomy: [] // awscp のみ [lv1, lv2]
 };
 
-const ALLOWED_STATUS = new Set(["public", "draft", "private"]);
-
 // =====================
-// 初回のみ実行（任意）
-// GitHub repo情報を Script Properties に保存
-// =====================
-function setupGitHubRepoConfig() {
-  const props = PropertiesService.getScriptProperties();
-  props.setProperties({
-    GH_OWNER: "",
-    GH_REPO: "",
-    GH_BRANCH: "main"
-  });
-  Logger.log("GitHub repo config saved to Script Properties.");
-}
-
-// =====================
-// 初回のみ実行
-// インストール型 onFormSubmit トリガー作成
+// トリガーセットアップ
 // =====================
 function setupTriggers() {
   const ss = SpreadsheetApp.getActive();
-
-  // 既存の同名トリガーが増殖しないように掃除
   ScriptApp.getProjectTriggers()
     .filter(t => t.getHandlerFunction() === "onFormSubmitFromSheet")
     .forEach(t => ScriptApp.deleteTrigger(t));
@@ -107,12 +67,10 @@ function setupTriggers() {
     .forSpreadsheet(ss)
     .onFormSubmit()
     .create();
-
-  Logger.log("Installed onFormSubmit trigger created.");
 }
 
 // =====================
-// 1) フォーム送信トリガー
+// 1) フォーム送信
 // =====================
 function onFormSubmitFromSheet(e) {
   const lock = LockService.getScriptLock();
@@ -120,64 +78,51 @@ function onFormSubmitFromSheet(e) {
 
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = getTargetSheet_(ss, SHEET_NAME);
+    const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) throw new Error("Sheet not found");
 
-    const row = e?.range?.getRow?.() || sheet.getLastRow();
-    if (row <= 1) return; // header
+    const row = e?.range?.getRow?.();
+    if (!row || row <= 1) return;
 
-    const colIndex = getColIndexFromSheet_(sheet);
-
-    // 必須列
+    const idx = getColIndex_(sheet);
     for (const c of [COL_TIMESTAMP, COL_CATEGORY, COL_HTML, COL_ID, COL_SLUG, COL_META_JSON]) {
-      if (!colIndex[c]) throw new Error(`Missing column header: ${c}`);
+      if (!idx[c]) throw new Error(`Missing column: ${c}`);
     }
 
-    const timestamp = sheet.getRange(row, colIndex[COL_TIMESTAMP]).getValue();
-    const category  = String(sheet.getRange(row, colIndex[COL_CATEGORY]).getValue() || "").trim();
-    const html      = String(sheet.getRange(row, colIndex[COL_HTML]).getValue() || "");
+    const timestamp = sheet.getRange(row, idx[COL_TIMESTAMP]).getValue();
+    const category  = String(sheet.getRange(row, idx[COL_CATEGORY]).getValue() || "").trim();
+    const html      = String(sheet.getRange(row, idx[COL_HTML]).getValue() || "");
 
-    // category / html が空なら何もしない
-    if (!category) throw new Error("category is empty");
+    if (!category) throw new Error("category empty");
     if (!html.trim()) return;
 
-    // 二重実行ガード（id が埋まってたらスキップ）
-    const existingId = String(sheet.getRange(row, colIndex[COL_ID]).getValue() || "").trim();
-    if (existingId) {
-      // 既にメタ生成済みでも push はしたい…なら、ここは消してOK
-      return;
-    }
+    const existingId = String(sheet.getRange(row, idx[COL_ID]).getValue() || "").trim();
+    if (existingId) return;
 
-    // OpenAIで meta_json を生成
-    const out = generateMetaFromHtml_(html, timestamp);
+    const dateStr = toDateYYYYMMDD_(timestamp);
 
-    // id / slug を生成
-    const dateStr = toDateYYYYMMDD_(timestamp) || Utilities.formatDate(new Date(), "Asia/Tokyo", "yyyy-MM-dd");
-    const openaiId = normalizeOpenAiId_(out.openai_id);
-    if (!openaiId) throw new Error("openai_id is empty (invalid)");
+    // OpenAI
+    const ai = generateMetaFromHtml_(html, category, dateStr);
+
+    const openaiId = normalizeOpenAiId_(ai.openai_id);
+    if (!openaiId) throw new Error("invalid openai_id");
 
     const id = `${category}-${openaiId}`;
     const slug = `${dateStr}-${id}`;
 
-    // meta_json を組み立て（スキーマ外のキーが返ってもここで正規化）
-    const metaObj = {
-      title: (out.title ?? "").toString().trim(),
-      summary: (out.summary ?? "").toString().trim(),
-      tags: normalizeTags_(out.tags),
-      taxonomy: normalizeStringArray_(out.taxonomy),
-      dr: out.dr ?? null,
-      status: normalizeStatus_(out.status)
+    const meta = {
+      title: (ai.title ?? "").toString().trim(),
+      summary: (ai.summary ?? "").toString().trim(),
+      tags: normalizeTags_(ai.tags),
+      taxonomy: Array.isArray(ai.taxonomy) ? ai.taxonomy.slice(0, 2) : []
     };
 
-    // 書き込み
-    sheet.getRange(row, colIndex[COL_ID]).setValue(id);
-    sheet.getRange(row, colIndex[COL_SLUG]).setValue(slug);
-    sheet.getRange(row, colIndex[COL_META_JSON]).setValue(JSON.stringify(metaObj));
+    sheet.getRange(row, idx[COL_ID]).setValue(id);
+    sheet.getRange(row, idx[COL_SLUG]).setValue(slug);
+    sheet.getRange(row, idx[COL_META_JSON]).setValue(JSON.stringify(meta));
 
-    // 1分後 push を予約（行固定）
     enqueueJob_(PUSH_QUEUE_KEY, ss.getId(), sheet.getSheetId(), row);
 
-    // 1分後に実行（時間主導トリガー）
     ScriptApp.newTrigger("pushQueuedRowToGitHub")
       .timeBased()
       .after(60 * 1000)
@@ -189,7 +134,7 @@ function onFormSubmitFromSheet(e) {
 }
 
 // =====================
-// 2) 1分後：記事HTML + 差分メタをGitHubへpush
+// 2) GitHub push
 // =====================
 function pushQueuedRowToGitHub() {
   const lock = LockService.getScriptLock();
@@ -202,45 +147,38 @@ function pushQueuedRowToGitHub() {
     if (!job) return;
 
     const ss = SpreadsheetApp.openById(job.ssId);
-    const sheet = getSheetById_(ss, job.sheetId);
-    if (!sheet) throw new Error("Target sheet not found");
+    const sheet = ss.getSheets().find(s => s.getSheetId() === job.sheetId);
+    if (!sheet) throw new Error("Sheet not found");
 
-    const colIndex = getColIndexFromSheet_(sheet);
-
-    // 必須列
+    const idx = getColIndex_(sheet);
     for (const c of [COL_TIMESTAMP, COL_CATEGORY, COL_HTML, COL_ID, COL_SLUG, COL_META_JSON]) {
-      if (!colIndex[c]) throw new Error(`Missing column header: ${c}`);
+      if (!idx[c]) throw new Error(`Missing column: ${c}`);
     }
 
-    const timestamp = sheet.getRange(job.row, colIndex[COL_TIMESTAMP]).getValue();
-    const category  = String(sheet.getRange(job.row, colIndex[COL_CATEGORY]).getValue() || "").trim();
-    const html      = String(sheet.getRange(job.row, colIndex[COL_HTML]).getValue() || "");
-    const id        = String(sheet.getRange(job.row, colIndex[COL_ID]).getValue() || "").trim();
-    const slug      = String(sheet.getRange(job.row, colIndex[COL_SLUG]).getValue() || "").trim();
-    const metaJson  = String(sheet.getRange(job.row, colIndex[COL_META_JSON]).getValue() || "").trim();
+    const timestamp = sheet.getRange(job.row, idx[COL_TIMESTAMP]).getValue();
+    const category  = String(sheet.getRange(job.row, idx[COL_CATEGORY]).getValue() || "").trim();
+    const html      = String(sheet.getRange(job.row, idx[COL_HTML]).getValue() || "");
+    const id        = String(sheet.getRange(job.row, idx[COL_ID]).getValue() || "").trim();
+    const slug      = String(sheet.getRange(job.row, idx[COL_SLUG]).getValue() || "").trim();
+    const metaJson  = String(sheet.getRange(job.row, idx[COL_META_JSON]).getValue() || "").trim();
 
-    if (!category) throw new Error("category is empty");
-    if (!html.trim()) throw new Error("html is empty");
-    if (!id) throw new Error("id is empty");
-    if (!slug) throw new Error("slug is empty");
+    if (!category) throw new Error("category empty");
+    if (!html.trim()) throw new Error("html empty");
+    if (!id) throw new Error("id empty");
+    if (!slug) throw new Error("slug empty");
 
-    // meta_json parse（壊れてても最低限は動かすなら try/catchでDEFAULTに落とす）
     let meta = { ...DEFAULT_META };
     if (metaJson) {
       try {
-        const parsed = JSON.parse(metaJson);
-        meta = { ...meta, ...parsed };
+        meta = { ...meta, ...JSON.parse(metaJson) };
       } catch (e) {
         throw new Error(`meta_json parse error: ${e.message}`);
       }
     }
 
-    // 1) 記事HTML push
-    const articlePath = buildArticlePath_(category, slug);
+    const articlePath = `${DOCS_BASE_PATH}/${category}/posts/${slug}/index.html`;
     pushTextToGitHubPath_(articlePath, html);
-    Logger.log(`Pushed article to GitHub: ${articlePath} (row=${job.row})`);
 
-    // 2) 差分メタ push（Actionsが index/index.html を再生成）
     const newItem = {
       id,
       category,
@@ -250,17 +188,15 @@ function pushQueuedRowToGitHub() {
         title: (meta.title ?? "").toString().trim(),
         summary: (meta.summary ?? "").toString().trim(),
         tags: normalizeTags_(meta.tags),
-        taxonomy: normalizeStringArray_(meta.taxonomy),
-        dr: meta.dr ?? null,
-        status: normalizeStatus_(meta.status)
+        taxonomy: Array.isArray(meta.taxonomy) ? meta.taxonomy.slice(0, 2) : []
       }
     };
 
-    const metaPath = `${NEW_ITEMS_DIR}/${id}.json`;
-    pushTextToGitHubPath_(metaPath, JSON.stringify(newItem, null, 2));
-    Logger.log(`Pushed new_item meta to GitHub: ${metaPath} (row=${job.row})`);
+    pushTextToGitHubPath_(
+      `${NEW_ITEMS_DIR}/${id}.json`,
+      JSON.stringify(newItem, null, 2)
+    );
 
-    // 残りがあれば、もう一度1分後に回す
     if (peekQueueLength_(PUSH_QUEUE_KEY) > 0) {
       ScriptApp.newTrigger("pushQueuedRowToGitHub")
         .timeBased()
@@ -274,14 +210,177 @@ function pushQueuedRowToGitHub() {
 }
 
 // =====================
-// OpenAI メタ生成（Responses API + json_schema strict）
+// OpenAI プロンプト定義
 // =====================
-function generateMetaFromHtml_(html, timestamp) {
+function getPromptAwscp_(html, dateStr) {
+  return [
+    "あなたは AWS Certified Cloud Practitioner（AWS-CP）対策記事の",
+    "メタデータを生成する専門AIです。",
+    "",
+    "以下の HTML 本文を読み、指定された JSON スキーマに",
+    "厳密に一致する JSON のみを出力してください。",
+    "",
+    "────────────────────",
+    "■ 絶対ルール",
+    "────────────────────",
+    "- 出力は JSON のみ（説明文禁止）",
+    "- JSON スキーマ外のキーは禁止",
+    "- required フィールドはすべて必須",
+    "- 推測で分類しない（本文根拠ベース）",
+    "",
+    "────────────────────",
+    "■ フィールド定義",
+    "────────────────────",
+    "",
+    "【openai_id】",
+    "- 英小文字・数字・ハイフンのみ",
+    "- 記事テーマを要約した英語スラッグ",
+    "- 2〜6語程度、意味が分かる短さ",
+    "",
+    "【title】",
+    "- 日本語",
+    "- AWS-CP 学習用として端的に",
+    "- 30文字前後",
+    "",
+    "【summary】",
+    "- 日本語",
+    "- 1〜2文",
+    "- 試験観点で何が理解できるかを書く",
+    "",
+    "【tags】",
+    "- 3〜8個",
+    "- AWSサービス名 / 試験用語を優先",
+    "- 短い名詞のみ",
+    "",
+    "【taxonomy】",
+    "- 次の固定リストから必ず lv1 / lv2 を1つずつ選ぶ",
+    "",
+    "■ category_lv1",
+    "- クラウドの概念",
+    "- AWSのコアサービス",
+    "- セキュリティとコンプライアンス",
+    "- 料金とサポート",
+    "- アーキテクチャと設計原則",
+    "",
+    "■ category_lv2",
+    "（lv1 に対応するもののみ選択）",
+    "",
+    "クラウドの概念:",
+    "  クラウドの特徴, 責任共有モデル, グローバルインフラ概要,",
+    "  可用性と耐障害性, IaaS/PaaS/SaaS",
+    "",
+    "AWSのコアサービス:",
+    "  コンピューティング(EC2/Lambda),",
+    "  ストレージ(S3/EBS),",
+    "  データベース(RDS/DynamoDB),",
+    "  ネットワーク(VPC/Route53),",
+    "  管理と監視(CloudWatch/CloudTrail)",
+    "",
+    "セキュリティとコンプライアンス:",
+    "  IAMと認証認可, 暗号化(KMS), ログと監査,",
+    "  セキュリティ設計の基本, コンプライアンス概要",
+    "",
+    "料金とサポート:",
+    "  料金モデル, コスト最適化, 請求と予算,",
+    "  サポートプラン, Trusted Advisor",
+    "",
+    "アーキテクチャと設計原則:",
+    "  Well-Architected, スケーラビリティ, 高可用性設計,",
+    "  パフォーマンス効率, 信頼性と運用性",
+    "",
+    "【dr】",
+    `- 必ず "${dateStr}_" で始める`,
+    "- 形式: YYYY-MM-DD_<slug>",
+    "- slug は openai_id と同じルール",
+    "",
+    "【status】",
+    "- 原則 public",
+    "",
+    "────────────────────",
+    "■ 入力HTML",
+    "────────────────────",
+    html
+  ].join("\n");
+}
+
+function getPromptBlog_(html, dateStr) {
+  return [
+    "あなたは「Learning Trajectory」の blog / journal 用",
+    "メタデータ生成AIです。",
+    "",
+    "このカテゴリは学習・試験対策ではありません。",
+    "思考メモ・雑記・アイデアログを扱います。",
+    "",
+    "以下の HTML 本文を読み、",
+    "指定された JSON スキーマに厳密一致する JSON のみを出力してください。",
+    "",
+    "────────────────────",
+    "■ 絶対ルール",
+    "────────────────────",
+    "- 出力は JSON のみ（説明禁止）",
+    "- スキーマ外キー禁止",
+    "- required フィールド必須",
+    "- 専門分野に寄せない",
+    "",
+    "────────────────────",
+    "■ フィールド定義",
+    "────────────────────",
+    "",
+    "【openai_id】",
+    "- 英小文字・数字・ハイフンのみ",
+    "- 1〜4語の短い英語",
+    "- 雰囲気が分かれば十分",
+    "",
+    "【title】",
+    "- 日本語",
+    "- 日記・メモとして自然",
+    "- 20〜30文字",
+    "",
+    "【summary】",
+    "- 日本語",
+    "- 1文のみ",
+    "",
+    "【tags】",
+    "- 0〜5個まで",
+    "- 思いつかなければ空配列でよい",
+    "",
+    "【taxonomy】",
+    "- 必ず次の固定値のみを返す",
+    '["journal","note"]',
+    "",
+    "【dr】",
+    `- 必ず "${dateStr}_" で始める`,
+    "- 形式: YYYY-MM-DD_<slug>",
+    "- slug は openai_id と同じルール",
+    "",
+    "【status】",
+    "- 原則 public",
+    "",
+    "────────────────────",
+    "■ 入力HTML",
+    "────────────────────",
+    html
+  ].join("\n");
+}
+
+// =====================
+// OpenAI メタ生成
+// =====================
+function generateMetaFromHtml_(html, category, dateStr) {
   const apiKey = PropertiesService.getScriptProperties().getProperty("OPENAI_API_KEY");
-  if (!apiKey) throw new Error("Script property OPENAI_API_KEY is not set");
+  if (!apiKey) throw new Error("OPENAI_API_KEY missing");
 
-  const dateStr = toDateYYYYMMDD_(timestamp) || Utilities.formatDate(new Date(), "Asia/Tokyo", "yyyy-MM-dd");
+  let userPrompt;
+  if (category === "awscp") {
+    userPrompt = getPromptAwscp_(html, dateStr);
+  } else if (category === "blog") {
+    userPrompt = getPromptBlog_(html, dateStr);
+  } else {
+    throw new Error(`Unsupported category: ${category}`);
+  }
 
+  // schema は「両カテゴリ共通の最大集合」
+  // 重要: required は properties の全キーを含める必要がある（Responses API json_schema strict の仕様）
   const schema = {
     type: "object",
     additionalProperties: false,
@@ -291,70 +390,16 @@ function generateMetaFromHtml_(html, timestamp) {
       summary:   { type: "string" },
       tags:      { type: "array", items: { type: "string" } },
       taxonomy:  { type: "array", items: { type: "string" } },
-      dr:        { type: ["number", "string", "null"] },
+      dr:        { type: "string" },
       status:    { type: "string" }
     },
     required: ["openai_id", "title", "summary", "tags", "taxonomy", "dr", "status"]
   };
 
-  const userPrompt = [
-  "次のHTMLから、title/summary/tags/dr/category_lv1/category_lv2 を作ってください。",
-  "",
-  "【必須ルール】",
-  "- 出力は必ずJSONスキーマに厳密準拠（余計なキー禁止）",
-  "- title: 内容を端的に（30文字目安・日本語）",
-  "- summary: 1〜2文（日本語）",
-  "- tags: 3〜8個。短い名詞。重複/曖昧語（例: その他/メモ/雑記）は避ける",
-  "- 分類は本文中に出てくるAWSサービス名・キーワードを根拠に決める（推測でねじ曲げない）",
-  "",
-  "【AWS Certified Cloud Practitioner（AWS-CP）カテゴリ分類（必須）】",
-  "- category_lv1 は次から必ず1つ選ぶ：",
-  "  - クラウドの概念",
-  "  - AWSのコアサービス",
-  "  - セキュリティとコンプライアンス",
-  "  - 料金とサポート",
-  "  - アーキテクチャと設計原則",
-  "",
-  "- category_lv2 は、選んだ category_lv1 に対応する中から必ず1つ選ぶ：",
-  "",
-  "  ■ クラウドの概念:",
-  "    クラウドの特徴, 責任共有モデル, グローバルインフラ概要, 可用性と耐障害性, 導入パターン(IaaS/PaaS/SaaS)",
-  "",
-  "  ■ AWSのコアサービス:",
-  "    コンピューティング(EC2/Lambda), ストレージ(S3/EBS), データベース(RDS/DynamoDB),",
-  "    ネットワーク(VPC/Route53), 管理と監視(CloudWatch/CloudTrail)",
-  "",
-  "  ■ セキュリティとコンプライアンス:",
-  "    IAMと認証認可, 暗号化(KMS), ログと監査, セキュリティ設計の基本, コンプライアンス概要",
-  "",
-  "  ■ 料金とサポート:",
-  "    料金モデル, コスト最適化, 請求と予算(Billing/Budgets), サポートプラン, Trusted Advisorの概要",
-  "",
-  "  ■ アーキテクチャと設計原則:",
-  "    Well-Architected, スケーラビリティ, 高可用性設計, パフォーマンス効率, 信頼性と運用性",
-  "",
-  "【分類のコツ（迷ったときの判断基準）】",
-  "- EC2 / Lambda / S3 / RDS / DynamoDB / VPC / Route53 など具体サービス中心 → AWSのコアサービス",
-  "- IAM / KMS / 暗号化 / 監査 / CloudTrail / セキュリティ責任 → セキュリティとコンプライアンス",
-  "- 料金 / 請求 / コスト最適化 / サポート / Trusted Advisor → 料金とサポート",
-  "- クラウドのメリット / 責任共有 / リージョン / AZ → クラウドの概念",
-  "- Well-Architected / 可用性設計 / スケール設計 / 運用設計 → アーキテクチャと設計原則",
-  "",
-  "【dr（ディレクトリ名）ルール：最重要】",
-  `- dr は必ず "${dateStr}_" で始める（この日付部分は固定で変更禁止）`,
-  "- dr の形式: YYYY-MM-DD_<slug>（返すのはフォルダ名のみ。'docs/' や末尾スラッシュは禁止）",
-  "- <slug> は英小文字/数字/ハイフンのみ（[a-z0-9-]）",
-  "- 2〜6語くらいをハイフンで連結し、意味が分かる短さにする",
-  "- 禁止: 空白、アンダースコア、記号、絵文字、連続ハイフン、末尾ハイフン",
-  "",
-  "HTML:",
-  html
-].join("\n");
-
   const payload = {
     model: OPENAI_MODEL,
     input: [
-      { role: "system", content: "You extract metadata from HTML. Output MUST follow the provided JSON schema." },
+      { role: "system", content: "You must output JSON strictly following the schema." },
       { role: "user", content: userPrompt }
     ],
     text: {
@@ -373,38 +418,178 @@ function generateMetaFromHtml_(html, timestamp) {
 
   const code = res.getResponseCode();
   const body = res.getContentText();
-  if (code < 200 || code >= 300) throw new Error(`OpenAI API error (${code}): ${body}`);
+  if (code < 200 || code >= 300) {
+    throw new Error(body);
+  }
 
   const json = JSON.parse(body);
   const text = extractOutputText_(json);
   const parsed = JSON.parse(text);
 
-  // 念のため軽く正規化（tagsが文字列で返った場合など）
-  if (parsed.tags && typeof parsed.tags === "string") {
-    parsed.tags = parsed.tags.split(",").map(s => s.trim()).filter(Boolean);
-  }
-  if (!Array.isArray(parsed.taxonomy)) {
-    parsed.taxonomy = [];
-  }
+  // 念のため正規化（壊れても落とさない）
+  parsed.openai_id = (parsed.openai_id ?? "").toString();
+  parsed.title     = (parsed.title ?? "").toString();
+  parsed.summary   = (parsed.summary ?? "").toString();
+  parsed.tags      = normalizeTags_(parsed.tags);
+  parsed.taxonomy  = Array.isArray(parsed.taxonomy) ? parsed.taxonomy.map(x => (x ?? "").toString().trim()).filter(Boolean) : [];
+  parsed.dr        = (parsed.dr ?? "").toString();
+  parsed.status    = (parsed.status ?? "public").toString();
 
   return parsed;
 }
 
+// =====================
+// Responses API の output_text 抽出
+// =====================
 function extractOutputText_(responseJson) {
   const out = responseJson.output || [];
   for (const item of out) {
     if (item?.type === "message" && Array.isArray(item.content)) {
       for (const c of item.content) {
-        if (c?.type === "output_text" && typeof c.text === "string") return c.text;
+        if (c?.type === "output_text" && typeof c.text === "string") {
+          return c.text;
+        }
       }
     }
   }
-  if (typeof responseJson.output_text === "string") return responseJson.output_text;
-  throw new Error("No output_text found in response");
+  if (typeof responseJson.output_text === "string") {
+    return responseJson.output_text;
+  }
+  throw new Error("No output_text found in OpenAI response");
 }
 
 // =====================
-// GitHub: 文章 push（任意パス）
+// ユーティリティ
+// =====================
+function getColIndex_(sheet) {
+  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const idx = {};
+  header.forEach((h, i) => {
+    const key = String(h || "").trim();
+    if (key) idx[key] = i + 1; // 1-based
+  });
+  return idx;
+}
+
+function normalizeOpenAiId_(s) {
+  const v = String(s || "").toLowerCase().trim();
+  if (!/^[a-z0-9-]{1,40}$/.test(v)) return "";
+  if (/--/.test(v) || v.endsWith("-")) return "";
+  return v;
+}
+
+function normalizeTags_(tags) {
+  if (!Array.isArray(tags)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const t of tags) {
+    const v = String(t || "").trim();
+    if (!v) continue;
+    const k = v.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(v);
+  }
+  return out;
+}
+
+function toDateYYYYMMDD_(v) {
+  const d = (v instanceof Date) ? v : new Date(v);
+  if (isNaN(d.getTime())) return Utilities.formatDate(new Date(), "Asia/Tokyo", "yyyy-MM-dd");
+  return Utilities.formatDate(d, "Asia/Tokyo", "yyyy-MM-dd");
+}
+
+function normalizeTimestamp_(v) {
+  const d = (v instanceof Date) ? v : new Date(v);
+  if (isNaN(d.getTime())) return String(v || "");
+  // Apps Script の XXX は環境によって出ないことがあるので +09:00 固定で整形
+  const ymd = Utilities.formatDate(d, "Asia/Tokyo", "yyyy-MM-dd");
+  const hms = Utilities.formatDate(d, "Asia/Tokyo", "HH:mm:ss");
+  return `${ymd}T${hms}+09:00`;
+}
+
+// =====================
+// キュー管理（Script Properties）
+// =====================
+function enqueueJob_(key, ssId, sheetId, row) {
+  const props = PropertiesService.getScriptProperties();
+  const json = props.getProperty(key);
+
+  let queue = [];
+  if (json) {
+    try { queue = JSON.parse(json) || []; } catch (e) { queue = []; }
+  }
+
+  queue.push({ ssId, sheetId, row, queuedAt: new Date().toISOString() });
+  props.setProperty(key, JSON.stringify(queue));
+}
+
+function dequeueJob_(key) {
+  const props = PropertiesService.getScriptProperties();
+  const json = props.getProperty(key);
+  if (!json) return null;
+
+  let queue;
+  try { queue = JSON.parse(json) || []; }
+  catch (e) {
+    props.deleteProperty(key);
+    return null;
+  }
+
+  if (!Array.isArray(queue) || queue.length === 0) {
+    props.deleteProperty(key);
+    return null;
+  }
+
+  const job = queue.shift();
+  if (queue.length > 0) props.setProperty(key, JSON.stringify(queue));
+  else props.deleteProperty(key);
+
+  return job;
+}
+
+function peekQueueLength_(key) {
+  const props = PropertiesService.getScriptProperties();
+  const json = props.getProperty(key);
+  if (!json) return 0;
+  try {
+    const q = JSON.parse(json) || [];
+    return Array.isArray(q) ? q.length : 0;
+  } catch (e) {
+    return 0;
+  }
+}
+
+// =====================
+// 時間トリガー掃除（増殖防止）
+// =====================
+function cleanupTimeTriggers_(handlerName) {
+  ScriptApp.getProjectTriggers()
+    .filter(t =>
+      t.getHandlerFunction() === handlerName &&
+      t.getEventType() === ScriptApp.EventType.CLOCK
+    )
+    .forEach(t => ScriptApp.deleteTrigger(t));
+}
+
+// =====================
+// GitHub 設定取得
+// =====================
+function getGitHubConfig_() {
+  const props = PropertiesService.getScriptProperties();
+  const owner  = props.getProperty("GH_OWNER");
+  const repo   = props.getProperty("GH_REPO");
+  const branch = props.getProperty("GH_BRANCH") || "main";
+  const token  = props.getProperty("GITHUB_TOKEN");
+
+  if (!owner || !repo) throw new Error("GitHub repo config missing (GH_OWNER / GH_REPO)");
+  if (!token) throw new Error("GITHUB_TOKEN missing");
+
+  return { owner, repo, branch, token };
+}
+
+// =====================
+// GitHub: 任意パスにテキストを push
 // =====================
 function pushTextToGitHubPath_(path, contentText) {
   const conf = getGitHubConfig_();
@@ -412,7 +597,7 @@ function pushTextToGitHubPath_(path, contentText) {
     `https://api.github.com/repos/${conf.owner}/${conf.repo}/contents/` +
     encodeURIComponent(path).replace(/%2F/g, "/");
 
-  // 既存 sha 取得
+  // 既存 sha を取得（なければ新規作成）
   const getRes = UrlFetchApp.fetch(`${baseUrl}?ref=${encodeURIComponent(conf.branch)}`, {
     method: "get",
     headers: {
@@ -453,195 +638,4 @@ function pushTextToGitHubPath_(path, contentText) {
   if (putCode < 200 || putCode >= 300) {
     throw new Error(`GitHub PUT error (${putCode}): ${putRes.getContentText()}`);
   }
-}
-
-function getGitHubConfig_() {
-  const props = PropertiesService.getScriptProperties();
-  const owner  = props.getProperty("GH_OWNER");
-  const repo   = props.getProperty("GH_REPO");
-  const branch = props.getProperty("GH_BRANCH") || "main";
-  const token  = props.getProperty("GITHUB_TOKEN");
-
-  if (!owner || !repo) throw new Error("GitHub repo config not set (GH_OWNER/GH_REPO)");
-  if (!token) throw new Error("GITHUB_TOKEN is not set");
-
-  return { owner, repo, branch, token };
-}
-
-// =====================
-// パス生成
-// =====================
-function buildArticlePath_(category, slug) {
-  // docs/<category>/posts/<slug>/index.html
-  return `${DOCS_BASE_PATH}/${category}/posts/${slug}/index.html`;
-}
-
-// =====================
-// キュー（Script Propertiesに配列JSONで保持）
-// =====================
-function enqueueJob_(key, ssId, sheetId, row) {
-  const props = PropertiesService.getScriptProperties();
-  const json = props.getProperty(key);
-
-  let queue = [];
-  if (json) {
-    try { queue = JSON.parse(json) || []; } catch (e) { queue = []; }
-  }
-
-  queue.push({ ssId, sheetId, row, queuedAt: new Date().toISOString() });
-  props.setProperty(key, JSON.stringify(queue));
-}
-
-function dequeueJob_(key) {
-  const props = PropertiesService.getScriptProperties();
-  const json = props.getProperty(key);
-  if (!json) return null;
-
-  let queue = [];
-  try { queue = JSON.parse(json) || []; } catch (e) {
-    props.deleteProperty(key);
-    return null;
-  }
-  if (queue.length === 0) {
-    props.deleteProperty(key);
-    return null;
-  }
-
-  const job = queue.shift();
-  if (queue.length > 0) props.setProperty(key, JSON.stringify(queue));
-  else props.deleteProperty(key);
-
-  return job;
-}
-
-function peekQueueLength_(key) {
-  const props = PropertiesService.getScriptProperties();
-  const json = props.getProperty(key);
-  if (!json) return 0;
-  try {
-    const q = JSON.parse(json) || [];
-    return Array.isArray(q) ? q.length : 0;
-  } catch (e) {
-    return 0;
-  }
-}
-
-// =====================
-// トリガー掃除（増殖防止）
-// =====================
-function cleanupTimeTriggers_(handlerName) {
-  ScriptApp.getProjectTriggers()
-    .filter(t => t.getHandlerFunction() === handlerName && t.getEventType() === ScriptApp.EventType.CLOCK)
-    .forEach(t => ScriptApp.deleteTrigger(t));
-}
-
-// =====================
-// シート/列ユーティリティ
-// =====================
-function getTargetSheet_(ss, sheetName) {
-  return sheetName ? ss.getSheetByName(sheetName) : ss.getActiveSheet();
-}
-
-function getSheetById_(ss, sheetId) {
-  return ss.getSheets().find(s => s.getSheetId() === sheetId) || null;
-}
-
-function getColIndexFromSheet_(sheet) {
-  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const idx = {};
-  header.forEach((name, i) => {
-    const key = String(name || "").trim();
-    if (key) idx[key] = i + 1; // 1-based
-  });
-  return idx;
-}
-
-// =====================
-// 正規化ユーティリティ
-// =====================
-
-function normalizeStatus_(status) {
-  const s = (status ?? "public").toString().trim().toLowerCase();
-  return ALLOWED_STATUS.has(s) ? s : "public";
-}
-
-function normalizeTags_(tags) {
-  // tags が "a,b,c" の文字列で来ても対応
-  if (Array.isArray(tags)) return normalizeStringArray_(tags);
-  if (typeof tags === "string") return splitTags_(tags);
-  return [];
-}
-
-function normalizeStringArray_(v) {
-  if (!Array.isArray(v)) return [];
-  return v.map(x => (x ?? "").toString().trim()).filter(Boolean);
-}
-
-function normalizeOpenAiId_(s) {
-  const v = (s ?? "").toString().trim().toLowerCase();
-  // [a-z0-9-] のみ、連続ハイフン禁止、末尾ハイフン禁止
-  if (!v) return "";
-  if (!/^[a-z0-9-]+$/.test(v)) return "";
-  if (/--/.test(v)) return "";
-  if (/-$/.test(v)) return "";
-  return v;
-}
-
-// tags は「カンマ区切り」想定だが、スペース/改行混じりでも最低限拾う
-function splitTags_(s) {
-  if (!s) return [];
-  const normalized = String(s)
-    .replace(/\u3000/g, " ")      // 全角スペース→半角
-    .replace(/[\r\n]+/g, " ")
-    .replace(/[、]/g, ",")
-    .trim();
-
-  // まずカンマ優先
-  let parts = normalized.split(",").map(x => x.trim()).filter(Boolean);
-
-  // カンマが無さそうなら空白分割も許容
-  if (parts.length <= 1 && /\s/.test(normalized)) {
-    parts = normalized.split(/\s+/).map(x => x.trim()).filter(Boolean);
-  }
-
-  // 重複除去（小文字キー）
-  const seen = new Set();
-  const out = [];
-  for (const p of parts) {
-    const k = p.toLowerCase();
-    if (seen.has(k)) continue;
-    seen.add(k);
-    out.push(p);
-  }
-  return out;
-}
-
-function toDateYYYYMMDD_(v) {
-  if (v instanceof Date && !isNaN(v.getTime())) {
-    return Utilities.formatDate(v, "Asia/Tokyo", "yyyy-MM-dd");
-  }
-  const s = String(v || "").trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-  return "";
-}
-
-// timestamp を ISOっぽく揃える（Dateでも文字列でもOK）
-function normalizeTimestamp_(v) {
-  const tz = "Asia/Tokyo";
-  if (v instanceof Date && !isNaN(v.getTime())) {
-    const ymd = Utilities.formatDate(v, tz, "yyyy-MM-dd");
-    const hms = Utilities.formatDate(v, tz, "HH:mm:ss");
-    return `${ymd}T${hms}+09:00`;
-  }
-  const s = String(v || "").trim();
-
-  // 例: 2026/01/18 15:36:22 → 2026-01-18T15:36:22+09:00
-  const m = s.match(/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?/);
-  if (m) {
-    const sec = m[6] ? m[6] : "00";
-    return `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${sec}+09:00`;
-  }
-
-  // 既に ISO っぽいならそのまま
-  return s;
 }
