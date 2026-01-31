@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DNSとRoute 53の違い</title>
+  <meta name="description" content="一般的なDNSとAmazon Route 53の最大の違いとは？「ただの電話帳」と「敏腕コンシェルジュ」の違いに例え、フェイルオーバーやエイリアスレコードなど、試験頻出の重要機能を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DNSとRoute 53の違い" />
+  <meta property="og:description" content="一般的なDNSとAmazon Route 53の最大の違いとは？「ただの電話帳」と「敏腕コンシェルジュ」の違いに例え、フェイルオーバーやエイリアスレコードなど、試験頻出の重要機能を解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 対比図 */
+    .comparison-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      width: 100%;
+    }
+    .role-card {
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 280px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .role-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .role-icon {
+      font-size: 2.5rem;
+      margin: 1rem 0;
+    }
+    .role-desc {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: left;
+    }
+    .role-aws {
+      border-color: #d86613;
+    }
+    .role-aws .role-title {
+      color: #d86613;
+    }
+
+    /* フェイルオーバー図 */
+    .failover-diagram {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+    .r53-box {
+      border: 2px solid #d86613;
+      background: #fff;
+      padding: 0.8rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      color: #333;
+    }
+    .server-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .server-box {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      text-align: center;
+      position: relative;
+    }
+    .server-dead {
+      border-color: #d9534f;
+      background-color: #fff5f5;
+      color: #d9534f;
+      text-decoration: line-through;
+    }
+    .server-dead::after {
+      content: "🔥";
+      position: absolute;
+      right: 10px;
+      top: 5px;
+      text-decoration: none;
+    }
+    .path-arrow {
+      font-size: 1.2rem;
+      color: #999;
+      text-align: right;
+    }
+    .path-active {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .path-blocked {
+      color: #d9534f;
+      text-decoration: line-through;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DNSとRoute 53の違い</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">DNS</li>
+            <li class="tag">Route 53</li>
+            <li class="tag">AWS</li>
+            <li class="tag">エイリアスレコード</li>
+            <li class="tag">フェイルオーバー</li>
+            <li class="tag">ネットワーク</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「ドメインをIPアドレスに変換する」という基本機能において、一般的なDNSとAWSのAmazon Route 53は何が違うのでしょうか？ その違いを一言で表すと以下のようになります。</p>
+
+<div class="diagram-container">
+  <div class="comparison-wrapper">
+    <div class="role-card">
+      <span class="role-title">一般的なDNS</span>
+      <div class="role-icon">📒</div>
+      <div class="role-desc">
+        <strong>ただの「電話帳」</strong><br>
+        聞かれた番号を教えるだけ。<br>
+        相手が留守でも故障中でも、機械的に番号を案内する。
+      </div>
+    </div>
+    <div class="role-card role-aws">
+      <span class="role-title">Amazon Route 53</span>
+      <div class="role-icon">🤵</div>
+      <div class="role-desc">
+        <strong>敏腕コンシェルジュ</strong><br>
+        相手の状況（故障・混雑）を見て、最適な番号を案内する。<br>
+        AWSサービスとの連携が得意。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>1. 最大の違い：「サーバーが死んでいる時」の対応</h2>
+<p>一般的なDNSでは、案内先のサーバーが故障していても、それを知らずにユーザーを案内してしまい、結果としてエラー画面が表示されます。</p>
+<p>一方、Route 53は<strong>ヘルスチェック（監視）機能</strong>を持っています。「サーバーAは応答がない（故障）だから、予備のサーバーBへ案内しよう」という自動切り替えが可能です。これを<strong>DNSフェイルオーバー</strong>と呼びます。</p>
+
+<div class="diagram-container">
+  <div style="font-size:0.9rem; margin-bottom:1rem; font-weight:bold;">Route 53のフェイルオーバー動作</div>
+  <div class="failover-diagram">
+    <div class="r53-box">
+      Route 53<br>
+      <span style="font-size:0.7rem; font-weight:normal;">(コンシェルジュ)</span>
+    </div>
+    
+    <div class="server-stack">
+      <div class="path-arrow path-blocked">❌ 検知 ➔</div>
+      <div class="path-arrow path-active">✅ 迂回 ➔</div>
+    </div>
+    
+    <div class="server-stack">
+      <div class="server-box server-dead">メインサーバー</div>
+      <div class="server-box">予備サーバー</div>
+    </div>
+  </div>
+</div>
+
+<h2>2. AWS専用の必殺技「エイリアスレコード」</h2>
+<p>AWSのELB（ロードバランサー）やS3で静的サイトを公開する場合、IPアドレスは固定されず変動することがあります。一般的なDNSではこれに対応するのが大変ですが、Route 53には専用の解決策があります。</p>
+
+<ul>
+<li><strong>一般的なDNSの悩み：</strong> IPが変わる相手には「CNAME」を使うが、ドメイン直下（Zone Apex）には使えない制約があったり、名前解決が遅くなったり、有料だったりする。</li>
+<li><strong>Route 53のエイリアスレコード：</strong> 「このドメインはあのELBと紐付ける！」と指定するだけで、内部的にIP変動に自動追従します。<strong>高速で、かつ無料</strong>です。</li>
+</ul>
+
+<h2>3. 世界規模の「賢い振り分け」</h2>
+<p>Route 53は、AWSのグローバルネットワークを利用して、高度なルーティングを行います。安いDNSサービスにはない機能です。</p>
+<ul>
+<li><strong>レイテンシー・ルーティング：</strong> 「ユーザーから見て一番遅延が少ない（近い）サーバー」へ案内する。</li>
+<li><strong>ジオロケーション・ルーティング：</strong> 「日本からのアクセスは東京のサーバーへ、アメリカからはUSのサーバーへ」といった場所ごとの振り分け。</li>
+</ul>
+
+<h2>4. まとめ：比較表</h2>
+<p>試験や設計で迷った時の比較ポイントです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>機能</th>
+      <th>一般的なDNS</th>
+      <th>Amazon Route 53</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>役割</strong></td>
+      <td>名前解決のみ</td>
+      <td>名前解決 ＋ <strong>トラフィック管理</strong></td>
+    </tr>
+    <tr>
+      <td><strong>サーバー故障時</strong></td>
+      <td>故障したIPを教え続ける<br><small>(エラーになる)</small></td>
+      <td><strong>自動で正常なサーバーへ切り替え</strong><br><small>(ヘルスチェック)</small></td>
+    </tr>
+    <tr>
+      <td><strong>AWS連携</strong></td>
+      <td>手動設定が必要</td>
+      <td><strong>エイリアスレコード</strong>でELB/S3と簡単接続</td>
+    </tr>
+    <tr>
+      <td><strong>SLA (稼働率)</strong></td>
+      <td>99.9%〜程度</td>
+      <td class="highlight-cell">100% (AWS唯一)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. 試験での判断基準</h2>
+<p>AWS認定試験で「どのサービスを使うべきか？」と問われた時のキーワードです。</p>
+<ul class="check-list">
+<li><strong>「ドメインを取得したい」「名前解決をしたい」</strong><br>→ Route 53</li>
+<li><strong>「ELBのIPが変わっても大丈夫なようにドメインを設定したい」</strong><br>→ Route 53のエイリアスレコード</li>
+<li><strong>「サーバー故障時に自動で切り替えたい（DR対策）」</strong><br>→ Route 53のフェイルオーバー</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
