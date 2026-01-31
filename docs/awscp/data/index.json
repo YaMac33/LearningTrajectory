@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-responsibility-model",
+    "category": "awscp",
+    "timestamp": "2026-02-01T08:24:27+09:00",
+    "title": "AWSの責任共有モデル解説",
+    "summary": "AWS資格試験で重要な責任共有モデルを解説し、AWSとユーザーの役割分担を理解します。",
+    "tags": [
+      "AWS",
+      "資格試験",
+      "責任共有モデル",
+      "クラウド",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-aws-responsibility-model/"
+  },
+  {
     "id": "awscp-nat-gateway-one-way",
     "category": "awscp",
     "timestamp": "2026-02-01T06:47:11+09:00",
