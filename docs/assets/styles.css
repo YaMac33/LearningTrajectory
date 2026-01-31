@@ -510,3 +510,55 @@ a:hover{ opacity: .92; }
   background: #f9fafb;
   border-color: #d1d5db;
 }
+
+/* =========================
+   Contact CTA (common)
+========================= */
+
+/* 中央寄せラッパー（トップ・記事共通） */
+.contact-cta,
+.article-contact {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+/* ボタン本体（完全共通） */
+.contact-cta__link,
+#contactLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border, #e5e7eb);
+  background: #ffffff;
+
+  font-size: 15px;
+  font-weight: 800;
+  color: #111827;
+  text-decoration: none;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.05s ease;
+}
+
+.contact-cta__link:hover,
+#contactLink:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.contact-cta__link:active,
+#contactLink:active {
+  transform: translateY(1px);
+}
+
+.contact-cta__link:focus-visible,
+#contactLink:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+}
