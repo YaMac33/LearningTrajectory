@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-auto-scaling-introduction",
+    "category": "awscp",
+    "timestamp": "2026-01-31T16:24:29+09:00",
+    "title": "AWSのオートスケーリング入門",
+    "summary": "オートスケーリングは、負荷に応じてEC2の台数を自動調整し、コスト最適化を図る機能です。試験での重要なスケーリング用語を理解できます。",
+    "tags": [
+      "Auto Scaling",
+      "EC2",
+      "クラウド",
+      "コスト最適化",
+      "AWS"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-31-awscp-aws-auto-scaling-introduction/"
+  },
+  {
     "id": "awscp-aws-ec2-exam-preparation",
     "category": "awscp",
     "timestamp": "2026-01-31T15:58:19+09:00",
