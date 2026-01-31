@@ -1,0 +1,22 @@
+{
+  "id": "awscp-dns-route-53-differences",
+  "category": "awscp",
+  "timestamp": "2026-01-31T21:32:35+09:00",
+  "post_path": "awscp/posts/2026-01-31-awscp-dns-route-53-differences/",
+  "meta": {
+    "title": "DNSとRoute 53の違いを理解する",
+    "summary": "一般的なDNSとAmazon Route 53の違いを明確にし、試験に出る重要機能を解説します。特にフェイルオーバーやエイリアスレコードの理解が深まります。",
+    "tags": [
+      "DNS",
+      "Route 53",
+      "AWS",
+      "エイリアスレコード",
+      "フェイルオーバー",
+      "ネットワーク"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
