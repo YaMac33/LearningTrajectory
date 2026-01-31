@@ -411,107 +411,6 @@ a:hover{ opacity: .92; }
 }
 
 /* =========================
-   Contact button
-========================= */
-#contactLink{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 14px 0 0;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #fff;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 700;
-  color: #111827;
-  transition: background .15s ease, border-color .15s ease, transform .05s ease;
-}
-
-#contactLink::before{
-  content: "✉";
-  font-size: 14px;
-  line-height: 1;
-  opacity: .9;
-}
-
-#contactLink:hover{
-  background: #f9fafb;
-  border-color: #d1d5db;
-}
-
-#contactLink:active{
-  transform: translateY(1px);
-}
-
-#contactLink:focus-visible{
-  outline: 3px solid rgba(59, 130, 246, 0.35);
-  outline-offset: 2px;
-}
-
-/* =========================
-   Responsive
-========================= */
-@media (max-width: 640px) {
-  /* 問い合わせボタン */
-  #contactLink {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* =========================
-   Contact section (top)
-========================= */
-.contact-cta{
-  margin-top: 14px;
-  padding: 16px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-
-.contact-cta__title{
-  margin: 0 0 6px;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.contact-cta__desc{
-  margin: 0 0 12px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.contact-cta__link{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #fff;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 800;
-  color: #111827;
-}
-
-.contact-cta__link::before{
-  content: "✉";
-  font-size: 14px;
-  line-height: 1;
-  opacity: .9;
-}
-
-.contact-cta__link:hover{
-  background: #f9fafb;
-  border-color: #d1d5db;
-}
-
-/* =========================
    Contact CTA (common)
 ========================= */
 
@@ -532,7 +431,7 @@ a:hover{ opacity: .92; }
 
   padding: 12px 18px;
   border-radius: 14px;
-  border: 1px solid var(--border, #e5e7eb);
+  border: 1px solid var(--border);
   background: #ffffff;
 
   font-size: 15px;
@@ -561,4 +460,13 @@ a:hover{ opacity: .92; }
 #contactLink:focus-visible {
   outline: 3px solid rgba(59, 130, 246, 0.35);
   outline-offset: 2px;
+}
+
+/* スマホでも自然に */
+@media (max-width: 640px) {
+  .contact-cta__link,
+  #contactLink {
+    width: 100%;
+    max-width: 420px;
+  }
 }
