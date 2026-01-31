@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-ec2-exam-preparation",
+    "category": "awscp",
+    "timestamp": "2026-01-31T15:58:19+09:00",
+    "title": "EC2試験対策のポイント",
+    "summary": "AWSクラウドプラクティショナー試験において、EC2の構成要素、セキュリティグループの理解、料金プランの選択肢について深く学ぶことができます。",
+    "tags": [
+      "AWS",
+      "EC2",
+      "試験対策",
+      "セキュリティ",
+      "料金プラン"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-31-awscp-aws-ec2-exam-preparation/"
+  },
+  {
     "id": "awscp-aws-basic-services-introduction",
     "category": "awscp",
     "timestamp": "2026-01-31T14:37:12+09:00",
