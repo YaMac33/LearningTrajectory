@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Route 53の解説</title>
+  <meta name="description" content="Route 53はDNS機能とグローバルなルーティングを提供し、最適なリージョンにユーザーを案内します。ELBとの違いや、SLA100%の信頼性について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Route 53の解説" />
+  <meta property="og:description" content="Route 53はDNS機能とグローバルなルーティングを提供し、最適なリージョンにユーザーを案内します。ELBとの違いや、SLA100%の信頼性について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* グローバル階層図 */
+    .global-arch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+    .users-world {
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .r53-box {
+      background: #e6e6fa; /* 薄紫 (Route53イメージ) */
+      border: 2px solid #6f42c1;
+      color: #333;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      width: 80%;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    .r53-box::before {
+      content: "★ グローバル司令塔";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #6f42c1;
+      color: #fff;
+      padding: 2px 10px;
+      font-size: 0.8rem;
+      border-radius: 10px;
+    }
+    .regions-wrapper {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .region-box {
+      flex: 1;
+      border: 2px solid #ccc;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 200px;
+      position: relative;
+    }
+    .region-flag {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #fff;
+      padding: 0 5px;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .elb-mini {
+      background: #007bff;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin: 1rem 0 0.5rem;
+      width: 80%;
+      text-align: center;
+    }
+    .ec2-group {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .ec2-mini {
+      border: 1px solid #d86613;
+      color: #d86613;
+      padding: 0.3rem;
+      font-size: 0.75rem;
+      border-radius: 3px;
+      background: #fff5eb;
+    }
+    
+    .routing-arrow {
+      position: absolute;
+      top: -25px;
+      font-size: 1.5rem;
+      color: #6f42c1;
+    }
+
+    /* ルーティングポリシー表 */
+    .policy-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    .policy-table th, .policy-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .policy-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 25%;
+      color: #333;
+    }
+    .tag-important {
+      background: #d9534f;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    /* ELB vs Route53 比較 */
+    .vs-container {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .vs-card {
+      flex: 1;
+      min-width: 240px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .vs-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .vs-desc {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .vs-scope {
+      background: #eee;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Route 53の解説</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Route 53</li>
+            <li class="tag">DNS</li>
+            <li class="tag">AWS</li>
+            <li class="tag">グローバルルーティング</li>
+            <li class="tag">インフラ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「ELBは地域マネージャー」という話を前回の記事で解説しましたが、今回はそのさらに上に立つ<strong>Amazon Route 53（ルートフィフティスリー）</strong>について解説します。</p>
+
+<h2>1. Route 53 とは？</h2>
+<p>一言で言うと、<strong>「インターネットの電話帳（DNS）」兼「グローバルな司令塔」</strong>です。</p>
+<ul>
+<li><strong>DNS（ドメインネームシステム）機能：</strong> 人間が使うURL（例: amazon.co.jp）を、コンピュータが理解できるIPアドレス（例: 52.119.x.x）に翻訳するサービスです。</li>
+<li><strong>グローバルな司令塔機能：</strong> 世界中のユーザーを、<strong>「どこの国のリージョン」</strong>に案内するかを瞬時に判断して振り分けます。</li>
+</ul>
+
+<h2>2. 図解：AWSの階層構造（完全版）</h2>
+<p>これで、AWSのネットワーク階層がすべて繋がります。それぞれの役割分担を理解しましょう。</p>
+<ul class="check-list">
+<li><strong>Route 53：</strong> 世界レベル（国ごとの振り分け）</li>
+<li><strong>ELB：</strong> 地域レベル（サーバーごとの振り分け）</li>
+<li><strong>EC2：</strong> 現場レベル（実際の処理）</li>
+</ul>
+
+<div class="diagram-container">
+  <div class="global-arch">
+    <div class="users-world">世界中のユーザー 🌎</div>
+    <div style="font-size:0.8rem; color:#666; margin-bottom:0.5rem;">↓ どこに繋げばいい？ (www.example.com)</div>
+    
+    <div class="r53-box">
+      Amazon Route 53 (DNS)<br>
+      <span style="font-weight:normal; font-size:0.9rem;">「君は日本にいるね？ じゃあ東京へ」</span>
+    </div>
+    
+    <div class="regions-wrapper">
+      <div class="region-box">
+        <span class="region-flag">🇯🇵 東京リージョン</span>
+        <div class="routing-arrow" style="left:50%; margin-left:-10px;">↙</div>
+        
+        <div class="elb-mini">ELB (地域Mgr)</div>
+        <div class="ec2-group">
+          <div class="ec2-mini">EC2</div>
+          <div class="ec2-mini">EC2</div>
+        </div>
+      </div>
+      
+      <div class="region-box">
+        <span class="region-flag">🇺🇸 バージニア北部</span>
+        <div class="routing-arrow" style="left:50%; margin-left:-10px;">↘</div>
+        
+        <div class="elb-mini">ELB (地域Mgr)</div>
+        <div class="ec2-group">
+          <div class="ec2-mini">EC2</div>
+          <div class="ec2-mini">EC2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. Route 53の「賢いルーティング（振り分け）」</h2>
+<p>Route 53がただの電話帳と違うのは、<strong>「状況に合わせて案内先を変えられる（ルーティングポリシー）」</strong>点です。試験によく出る4つを紹介します。</p>
+
+<table class="policy-table">
+  <thead>
+    <tr>
+      <th>ルーティングの種類</th>
+      <th>どんな動き？</th>
+      <th>向いている用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>シンプル</strong></td>
+      <td>普通にIPアドレスを教えるだけ。</td>
+      <td>1つのサーバーしかない単純な構成。</td>
+    </tr>
+    <tr>
+      <td><strong>レイテンシー</strong><span class="tag-important">重要</span></td>
+      <td>ユーザーから見て<strong>「一番遅延が少ない（近い）」</strong>リージョンに案内する。</td>
+      <td>グローバル展開するWebサービス（日本人は東京へ、米国人は米国へ）。</td>
+    </tr>
+    <tr>
+      <td><strong>フェイルオーバー</strong><span class="tag-important">重要</span></td>
+      <td>メインの場所（東京）が<strong>故障したら</strong>、予備の場所（大阪）に切り替える。</td>
+      <td>DR（災害復旧）対策。</td>
+    </tr>
+    <tr>
+      <td><strong>位置情報</strong><br><small>(ジオロケーション)</small></td>
+      <td>ユーザーの<strong>「場所（国・地域）」</strong>に基づいて案内先を変える。</td>
+      <td>著作権管理（日本限定コンテンツなど）や言語対応。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. ELB と Route 53 の違い（試験のひっかけ対策）</h2>
+<p>「負荷分散」という言葉が出ると、どっちを選べばいいか迷うことがあります。以下の基準で選んでください。</p>
+
+<div class="diagram-container">
+  <div class="vs-container">
+    <div class="vs-card">
+      <span class="vs-title" style="color:#007bff;">ELB</span>
+      <p class="vs-desc">サーバーが混雑しているから分散したい。<br>サーバーが故障したから切り離したい。</p>
+      <div class="vs-scope">範囲：リージョン内</div>
+    </div>
+    <div class="vs-card">
+      <span class="vs-title" style="color:#6f42c1;">Route 53</span>
+      <p class="vs-desc">東京リージョンが全滅したから大阪へ。<br>海外ユーザーの表示速度を上げたい。</p>
+      <div class="vs-scope">範囲：リージョン間（世界）</div>
+    </div>
+  </div>
+</div>
+
+<h2>5. おまけ：Route 53のすごいところ</h2>
+<p>AWSのサービスにはSLA（稼働率保証）がありますが、Route 53のSLAは<strong>「100%」</strong>です。「絶対に止まりません」と言い切っている、AWSの中で唯一のサービスです。これは、DNSが止まるとインターネット上のサービスへのアクセス手段が断たれてしまうため、極めて高い信頼性が設計されているからです。</p>
+<p>これで、以下の流れが完璧に理解できたことになります。</p>
+<ol>
+<li><strong>Route 53</strong> が世界中からアクセスを受け付け、最適なリージョンへ案内する。</li>
+<li><strong>ELB</strong> がそのリージョン内で、健康なEC2へ仕事を振る。</li>
+<li><strong>EC2</strong> が処理をして、データはEBSやRDSに保存する。</li>
+</ol>
+<p>ここまでくれば、インフラ周りの主要キャストはコンプリートです。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
