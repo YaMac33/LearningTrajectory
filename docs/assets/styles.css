@@ -638,3 +638,25 @@ a:hover {
     width: 100%;
   }
 }
+
+/* =========================
+   Contact section (top)
+========================= */
+
+.contact-section {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.contact-section__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.contact-section__desc {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 1.25rem;
+}
