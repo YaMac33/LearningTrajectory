@@ -1,0 +1,21 @@
+{
+  "id": "awscp-amazon-route-53-explanation",
+  "category": "awscp",
+  "timestamp": "2026-01-31T21:27:07+09:00",
+  "post_path": "awscp/posts/2026-01-31-awscp-amazon-route-53-explanation/",
+  "meta": {
+    "title": "AWS Certified Cloud Practitioner対策: Route 53解説",
+    "summary": "AWSのリソースをどう最適に振り分けるかが理解でき、Route 53の重要な機能と役割を把握することができます。",
+    "tags": [
+      "Route 53",
+      "DNS",
+      "AWS",
+      "グローバルルーティング",
+      "インフラ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
