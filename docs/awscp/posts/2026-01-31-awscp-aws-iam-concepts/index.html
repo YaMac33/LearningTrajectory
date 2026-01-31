@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS IAMの基本概念</title>
+  <meta name="description" content="AWS IAMは、認証と認可の管理を行い、セキュリティを確保します。役割や鉄の掟も解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS IAMの基本概念" />
+  <meta property="og:description" content="AWS IAMは、認証と認可の管理を行い、セキュリティを確保します。役割や鉄の掟も解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 権限付与フロー図 */
+    .auth-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .box-policy {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      text-align: center;
+      position: relative;
+    }
+    .box-policy::before {
+      content: "📄";
+      margin-right: 0.5rem;
+    }
+    .box-group {
+      border: 2px dashed #007bff;
+      background: #e6f2ff;
+      padding: 1.5rem 2rem;
+      border-radius: 8px;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    .group-label {
+      color: #007bff;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .users-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .box-user {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .arrow-down {
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    /* IAMロール図 */
+    .role-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .ec2-with-hat {
+      position: relative;
+      border: 2px solid #d86613;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #fff;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    .hat-icon {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      background: #fff;
+      line-height: 1;
+    }
+    .s3-target {
+      border: 2px solid #24882c;
+      padding: 1rem 1.5rem;
+      border-radius: 6px;
+      background: #fff;
+      color: #24882c;
+      font-weight: bold;
+    }
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+    .warning-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .warning-list li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5em;
+      text-indent: -1.5em;
+      color: #d9534f;
+    }
+    .warning-list li::before {
+      content: "⚠";
+      margin-right: 0.5em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS IAMの基本概念</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">IAM</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">管理</li>
+            <li class="tag">クラウド</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSを「城」に例えるなら、<strong>IAM（アイアム：Identity and Access Management）は、城門に立つ「門番」であり、城内の「通行手形発行所」</strong>です。ここを適当に済ませると、せっかく作った最強のインフラも、ハッカーに乗っ取られて終わりです。試験でも実務でも最重要項目です。</p>
+
+<h2>1. IAMの役割：認証と認可</h2>
+<p>IAMは大きく分けて2つの仕事をします。</p>
+<ul>
+<li><strong>認証 (Authentication):</strong> 「あなたは誰？」を確認する（ログイン）。</li>
+<li><strong>認可 (Authorization):</strong> 「あなたは何をしていい人？」を確認する（権限）。</li>
+</ul>
+
+<h2>2. IAMの「登場人物」4選</h2>
+<p>IAMの概念は、一般的な「会社組織」に当てはめると一発で理解できます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>IAMの用語</th>
+      <th>会社の用語</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>IAM ユーザー</strong></td>
+      <td>社員</td>
+      <td>個人に発行されるID。「Aさん」「Bさん」。</td>
+    </tr>
+    <tr>
+      <td><strong>IAM グループ</strong></td>
+      <td>部署</td>
+      <td>「営業部」「開発部」。ユーザーをまとめて管理する箱。</td>
+    </tr>
+    <tr>
+      <td><strong>IAM ポリシー</strong></td>
+      <td>辞令・就業規則</td>
+      <td>「S3を見てよし」「EC2を消してよし」という許可証（ルールブック）。</td>
+    </tr>
+    <tr>
+      <td><strong>IAM ロール</strong></td>
+      <td>帽子・腕章</td>
+      <td>「工事作業員」のような役割（帽子）。これを被っている間だけ、その権限を使える。人だけでなく、EC2などの機械も被れる。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 図解：権限を与える仕組み</h2>
+<p>AWSでは、「ユーザー」に直接「ポリシー（許可証）」を渡すこともできますが、人数が増えると管理が大変です。基本は<strong>「グループにポリシーを貼り付け、そこにユーザーを入れる」</strong>という運用をします。</p>
+
+<div class="diagram-container">
+  <div class="auth-flow">
+    <div class="box-policy">IAM ポリシー (S3フルアクセス許可)</div>
+    <div class="arrow-down">↓ 貼り付け (アタッチ)</div>
+    <div class="box-group">
+      <span class="group-label">📁 IAM グループ (開発チーム)</span>
+      <div class="users-wrapper">
+        <div class="box-user">👤 Aさん</div>
+        <div class="box-user">👤 Bさん</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.9rem; margin-top:1rem;">Result: AさんもBさんも、S3を自由に触れるようになります。</p>
+</div>
+
+<h2>4. 試験の最難関「IAM ロール」とは？</h2>
+<p>「ユーザー」と「ロール」の違いが試験でよく問われます。</p>
+<ul>
+<li><strong>IAM ユーザー：</strong> 「Aさん」という特定の人のための永続的なID。パスワードを持つ。</li>
+<li><strong>IAM ロール：</strong> 特定の人に紐付かない<strong>「一時的な権限の貸し出し」</strong>。パスワードはない。</li>
+</ul>
+
+<h3>いつ使うの？（試験に出る2大パターン）</h3>
+
+<h4>① EC2インスタンスに権限を与えたい時</h4>
+<p>EC2上のプログラムがS3のデータを読みたい時、EC2の中にIDとパスワード（アクセスキー）を保存するのはセキュリティ的に最悪です（流出リスクがあるため）。代わりに、EC2に<strong>「S3閲覧ロール（帽子）」</strong>を被せます。</p>
+
+<div class="diagram-container">
+  <div class="role-diagram">
+    <div class="ec2-with-hat">
+      <div class="hat-icon">🤠</div>
+      <strong>EC2</strong><br>(サーバー)
+    </div>
+    <div class="arrow-right">➡ アクセスOK!</div>
+    <div class="s3-target">S3</div>
+  </div>
+  <p style="font-size:0.9rem;">EC2は「帽子」をかぶっている間だけ、S3への通行手形を持てます。</p>
+</div>
+
+<h4>② 別のアカウントの人が一時的に操作したい時</h4>
+<p>「関連会社のCさんに、今日だけ作業を手伝ってほしい」という時、CさんにIDを発行するのではなく、「作業用ロール」を作って、それを被ってもらいます（スイッチロールと言います）。</p>
+
+<h2>5. 試験に出る「3つの鉄の掟」</h2>
+<p>AWSのセキュリティ問題は、以下の思想に基づいて正解を選べば9割当たります。</p>
+
+<ul class="warning-list">
+<li><strong>① ルートユーザーは封印せよ</strong><br>
+ルートユーザーはAWSアカウントを作った時の「神」アカウントです。何でもできるし、消せます。最初に管理者用の「IAMユーザー」を作ったら、ルートユーザーは金庫にしまって二度と使わないのが正解です。</li>
+<li><strong>② MFA（多要素認証）を有効化せよ</strong><br>
+パスワードだけでは漏洩します。「スマホアプリのワンタイムパスワード」などを組み合わせるMFAを、特にルートユーザーには絶対に設定します。</li>
+<li><strong>③ 最小権限の原則 (Least Privilege)</strong><br>
+「その作業に必要な最低限の権限だけを与えること」です。S3を見るだけのバイト君に、EC2を削除する権限を与えてはいけません。試験で「全権限（AdministratorAccess）」を与える選択肢は、基本的に不正解です。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>IAMユーザー</strong> = 社員ID</li>
+<li><strong>IAMグループ</strong> = 部署</li>
+<li><strong>IAMポリシー</strong> = 許可証（JSON形式）</li>
+<li><strong>IAMロール</strong> = EC2などの機械や、一時的な利用者に貸す「帽子」</li>
+</ul>
+<p>これで、AWSという城の中に入るためのルール（IAM）が分かりました。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
