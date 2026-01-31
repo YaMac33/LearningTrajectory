@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ELBとリージョン・AZの関係</title>
+  <meta name="description" content="ELBは「リージョンまたぎ」の負荷分散ができるのか？EC2とELBの「活動範囲」の違いを、住所（都道府県・市区町村）に例えて体系的に整理・解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ELBとリージョン・AZの関係" />
+  <meta property="og:description" content="ELBは「リージョンまたぎ」の負荷分散ができるのか？EC2とELBの「活動範囲」の違いを、住所（都道府県・市区町村）に例えて体系的に整理・解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 階層構造図 */
+    .hierarchy-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    .box-region {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      position: relative;
+    }
+    .label-region {
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      background: #fff;
+      padding: 0 5px;
+      font-weight: bold;
+      color: #333;
+    }
+    .box-az {
+      border: 2px dashed #007bff;
+      background: #e6f7ff;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      position: relative;
+    }
+    .label-az {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #e6f7ff;
+      padding: 0 5px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #007bff;
+    }
+    .box-dc {
+      border: 1px solid #999;
+      background: #fff;
+      padding: 0.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      color: #666;
+    }
+
+    /* マルチAZ構成図 */
+    .multi-az-diagram {
+      border: 2px solid #333; /* Region Border */
+      padding: 2rem 1rem;
+      border-radius: 8px;
+      position: relative;
+      background: #fff;
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .region-tag {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #333;
+      color: #fff;
+      padding: 0.3rem 1rem;
+      font-size: 0.8rem;
+      border-bottom-right-radius: 8px;
+    }
+    .elb-bar {
+      width: 80%;
+      background: #007bff; /* ELB Blue */
+      color: #fff;
+      padding: 0.8rem;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    .az-container {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      gap: 1rem;
+    }
+    .az-zone {
+      flex: 1;
+      border: 2px dashed #999;
+      background: #fdfdfd;
+      padding: 1rem 0.5rem;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .az-name {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    .ec2-instance {
+      border: 2px solid #d86613;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: #333;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .flow-arrow {
+      color: #007bff;
+      font-size: 1.5rem;
+      margin-bottom: -0.5rem;
+      z-index: 5;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 25%;
+    }
+
+    /* 誤解ポイント */
+    .misconception-box {
+      border: 2px solid #d9534f;
+      background-color: #fff5f5;
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+    .misconception-title {
+      font-weight: bold;
+      color: #d9534f;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ELBとリージョン・AZの関係</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">ELB</li>
+            <li class="tag">EC2</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">負荷分散</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「ELBは負荷分散をしてくれる」という知識はあっても、「どの範囲まで分散できるのか？」という境界線を曖昧にしていると、試験や設計で躓きます。特に<strong>「ELBはリージョンをまたいで分散できるか？」</strong>という問いは、AWSの基本構造を理解しているかを試す良問です。</p>
+<p>結論から言うと、<strong>「ELBは『AZ（アベイラビリティーゾーン）』には分散するが、『リージョン』またぎの分散はできない」</strong>が正解です。この「できないこと」と「できること」の境界線を、住所に例えて体系的に解説します。</p>
+
+<h2>1. まずは「場所」の階層を理解する</h2>
+<p>AWSの物理的な場所は、大きい順に「リージョン」「AZ」「データセンター」という入れ子構造になっています。これを住所に例えるとスッキリ理解できます。</p>
+
+<div class="diagram-container">
+  <div class="hierarchy-wrapper">
+    <div class="box-region">
+      <span class="label-region">リージョン（都道府県）</span>
+      <p style="font-size:0.9rem; margin-bottom:0.5rem;">例：東京リージョン</p>
+      
+      <div class="box-az">
+        <span class="label-az">AZ（市区町村）</span>
+        <p style="font-size:0.8rem; margin-bottom:0.5rem;">例：AZ-a（千代田区）</p>
+        <div class="box-dc">データセンター（建物）</div>
+      </div>
+      
+      <div class="box-az">
+        <span class="label-az">AZ（市区町村）</span>
+        <p style="font-size:0.8rem; margin-bottom:0.5rem;">例：AZ-c（港区）</p>
+        <div class="box-dc">データセンター（建物）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>リージョン (Region)：</strong> 国や地域レベルの場所。互いに完全に独立しています。</li>
+<li><strong>アベイラビリティーゾーン (AZ)：</strong> リージョン内にある、物理的に離れた（数十km）拠点群。それぞれが別の電源・災害リスクを持っています。</li>
+<li><strong>データセンター：</strong> 実際の建物。1つのAZは1つ以上のデータセンターで構成されています。</li>
+</ul>
+
+<h2>2. EC2とELBの「活動範囲」の違い</h2>
+<p>試験の最重要ポイントは、<strong>「そのサービスは、どの範囲に住んでいるのか？」</strong>という視点です。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>活動範囲</th>
+      <th>イメージ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>EC2</strong><br>(サーバー)</td>
+      <td><strong>特定のAZの中だけ</strong></td>
+      <td>
+        「引きこもり」。<br>
+        一度千代田区(AZ-a)に住んだら、港区(AZ-c)には出られない。引っ越し不可（作り直し）。
+      </td>
+    </tr>
+    <tr>
+      <td><strong>ELB</strong><br>(ロードバランサー)</td>
+      <td><strong>リージョン全体</strong></td>
+      <td>
+        「地域マネージャー」。<br>
+        東京リージョン内なら、千代田区にも港区にも指示が出せる。
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 図解：マルチAZ構成（試験の鉄板構成）</h2>
+<p>「EC2は1つのAZでしか生きられない」という弱点を、「ELBが複数のAZを束ねる」ことでカバーします。これを<strong>「マルチAZ（Multi-AZ）」</strong>と呼びます。</p>
+
+<div class="diagram-container">
+  <div class="multi-az-diagram">
+    <div class="region-tag">AWS 東京リージョン</div>
+    
+    <div style="font-size:0.8rem; color:#666;">ユーザーからのアクセス ↓</div>
+    
+    <div class="elb-bar">ELB (地域マネージャー)</div>
+    
+    <div style="display:flex; width:100%; justify-content:space-around;">
+      <div class="flow-arrow">↙</div>
+      <div class="flow-arrow">↘</div>
+    </div>
+    
+    <div class="az-container">
+      <div class="az-zone">
+        <span class="az-name">AZ-a (千代田区)</span>
+        <div class="ec2-instance">EC2 (A)</div>
+      </div>
+      
+      <div class="az-zone">
+        <span class="az-name">AZ-c (港区)</span>
+        <div class="ec2-instance">EC2 (B)</div>
+      </div>
+    </div>
+    <p style="font-size:0.85rem; color:#666; text-align:center; margin-top:0.5rem;">
+      ※片方のAZが停電しても、ELBが生きている方のAZにだけアクセスを流すため止まらない。
+    </p>
+  </div>
+</div>
+
+<h2>4. 誤解ポイントの整理</h2>
+<p>最初の「ELBはリージョンまたぎができるか？」という問いに戻ります。</p>
+
+<div class="diagram-container" style="align-items:stretch;">
+  <div class="misconception-box">
+    <span class="misconception-title">❌ よくある誤解</span>
+    <p>「ELBが、東京リージョンと大阪リージョンに振り分ける」</p>
+    <p style="font-size:0.9rem; color:#666;">→ <strong>間違いです。</strong> ELBはあくまで「東京リージョン専属」のマネージャーです。大阪の部下（EC2）には指示が出せません。</p>
+  </div>
+  
+  <div style="border:2px solid #28a745; background:#f0fff4; padding:1.5rem; border-radius:8px; margin-top:1rem;">
+    <span style="font-weight:bold; color:#28a745; display:block; margin-bottom:0.5rem;">⭕ 正解</span>
+    <p>「ELBが、東京リージョン内の<strong>AZ-aとAZ-cに振り分ける</strong>」</p>
+    <p style="font-size:0.9rem; color:#666;">→ これを「クロスゾーン負荷分散」と呼びます。</p>
+  </div>
+</div>
+
+<p>※もし本当に「東京と大阪（リージョン間）」で振り分けたい場合は、ELBの上司にあたる<strong>「Amazon Route 53（DNS）」</strong>という別のサービスを使います。</p>
+
+<h2>5. まとめ</h2>
+<p>リージョン、AZ、各サービスの関係性は以下のように覚えましょう。</p>
+<ul>
+<li><strong>EC2：</strong> 1つのAZから出られない（リスク共有）。</li>
+<li><strong>ELB：</strong> リージョン内ならどのAZにも顔が利く（リスク分散の司令塔）。</li>
+<li><strong>マルチAZ：</strong> 卵を一つのカゴに盛らないための基本構成。</li>
+</ul>
+<p>この「住所の階層」と「活動範囲」のイメージが掴めれば、AWSのインフラ設計問題はかなりクリアに見えるようになります。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
