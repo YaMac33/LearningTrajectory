@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | GitHubの公開リポジトリのリスク</title>
+  <meta name="description" content="GitHubでのHTML公開に潜む設計思想のリスクとは？技術的な観点と、設計思想やノウハウが「丸見え」になることによる副次的なリスク、そして公開すべき内容の線引きについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="GitHubの公開リポジトリのリスク" />
+  <meta property="og:description" content="GitHubでのHTML公開に潜む設計思想のリスクとは？技術的な観点と、設計思想やノウハウが「丸見え」になることによる副次的なリスク、そして公開すべき内容の線引きについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* リスクレベル図解 */
+    .risk-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .risk-level-box {
+      display: flex;
+      align-items: stretch;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+      border: 1px solid #ddd;
+      background: #fff;
+    }
+    .risk-label {
+      flex: 0 0 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .risk-content {
+      padding: 0.8rem 1rem;
+      font-size: 0.95rem;
+      flex: 1;
+    }
+    .bg-green { background-color: #28a745; }
+    .bg-yellow { background-color: #f0ad4e; }
+    .bg-red { background-color: #d9534f; }
+
+    /* OK/NG線引きリスト */
+    .boundary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 600px) {
+      .boundary-grid { grid-template-columns: 1fr; }
+    }
+    .boundary-card {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      background: #fff;
+    }
+    .boundary-card.ok { border-color: #28a745; }
+    .boundary-card.ng { border-color: #d9534f; }
+    
+    .card-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 1rem;
+      text-align: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #eee;
+    }
+    .ok .card-title { color: #28a745; }
+    .ng .card-title { color: #d9534f; }
+
+    .icon-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .icon-list li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5em;
+      text-indent: -1.5em;
+      font-size: 0.9rem;
+    }
+    .ok .icon-list li::before { content: "✔ "; color: #28a745; font-weight:bold; }
+    .ng .icon-list li::before { content: "✖ "; color: #d9534f; font-weight:bold; }
+
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-30">
+            2026.01.30
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">GitHubの公開リポジトリのリスク</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">GitHub</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">公開リポジトリ</li>
+            <li class="tag">HTML</li>
+            <li class="tag">リスク管理</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>GitHub PagesなどでWebサイトを公開する場合、「リポジトリが誰でも見られる状態（Public）」であることに不安を覚える人は少なくありません。「HTMLコードが見えてしまうこと」自体にリスクはあるのでしょうか？結論から言えば、秘密情報が含まれていない限り致命的なリスクはありませんが、<strong>「設計思想が丸見えになる」という副次的なリスク</strong>は存在します。</p>
+
+<h2>1. HTMLコードが見えること自体は「Webの仕様」</h2>
+<p>まず前提として、GitHub Pagesに限らず、Web上で公開されている全てのWebサイトは、ブラウザの機能（「ページのソースを表示」など）を使えばHTML、CSS、JavaScriptを誰でも閲覧可能です。</p>
+<ul>
+<li><strong>HTML/CSS：</strong> デザインや構造の定義であり、隠すものではありません。</li>
+<li><strong>JavaScript：</strong> クライアントサイドで動くプログラムも、仕組み上すべて閲覧可能です。</li>
+</ul>
+<p>したがって、「コードが見えること」自体はセキュリティ事故ではありません。</p>
+
+<h2>2. 本当のリスクは「何を含めてしまったか」</h2>
+<p>危険なのは公開状態そのものではなく、<strong>「公開すべきでない情報を、うっかりコードに含めてしまうこと」</strong>です。</p>
+
+<div class="risk-container">
+  <div class="risk-level-box">
+    <div class="risk-label bg-green">安全</div>
+    <div class="risk-content">
+      <strong>静的HTML・CSS・デザイン</strong><br>
+      Webサイトとして表示される情報そのもの。公開されても問題ない。
+    </div>
+  </div>
+  <div class="risk-level-box">
+    <div class="risk-label bg-yellow">注意</div>
+    <div class="risk-content">
+      <strong>設計思想・コメント・TODO</strong><br>
+      「どう作ったか」のノウハウや、将来の実装予定（攻撃のヒント）が見える。
+    </div>
+  </div>
+  <div class="risk-level-box">
+    <div class="risk-label bg-red">危険</div>
+    <div class="risk-content">
+      <strong>APIキー・パスワード・個人情報</strong><br>
+      ソースコードへの直書きは厳禁。リポジトリ履歴にも残るため即アウト。
+    </div>
+  </div>
+</div>
+
+<h2>3. 実務的・運用的な「見られるリスク」</h2>
+<p>セキュリティ事故にならなくても、リポジトリが公開されていることによる「実務上のリスク（影響）」は考慮する必要があります。</p>
+
+<h3>① サイト構成・設計思想の流出</h3>
+<p>リポジトリごと公開するということは、単にWebページが見えるだけでなく、その裏側の「仕組み」まで公開することを意味します。</p>
+<ul>
+<li><strong>ディレクトリ構成：</strong> どのようにファイルを管理しているか。</li>
+<li><strong>更新フロー：</strong> GASなどの外部ツールからどのようにデータを流し込んでいるか。</li>
+<li><strong>学習履歴：</strong> commitログから、どのような試行錯誤を経てそのコードに至ったか。</li>
+</ul>
+<p>これにより、サイトの構造を真似されたり、コードを無断で流用されたりする可能性は高まります。また、技術的なアプローチに対して第三者から（良くも悪くも）評価を受ける対象となります。</p>
+
+<h3>② 攻撃のヒントを与える可能性</h3>
+<p>コード内のコメントアウトやTODOリストに、「将来ここに認証機能を入れる予定」「ここは仮実装」といった記述があると、悪意ある攻撃者に「どこが脆そうか」というヒントを与えることになります。Pages自体にはサーバー側の実行権限がないため直接的な攻撃は難しいですが、情報は少ないに越したことはありません。</p>
+
+<h2>4. それでも公開するメリット</h2>
+<p>上記のリスクを踏まえた上で、学習記録やポートフォリオとしてリポジトリを公開することには大きなメリットがあります。</p>
+<ul class="check-list">
+<li><strong>知識の再利用：</strong> 過去の自分がどう書いたか、いつでも参照できる資産になる。</li>
+<li><strong>「考え方」の証明：</strong> 成果物だけでなく、コミットログを通じて「どのように課題を解決したか」というプロセスを提示できる（採用面接などで有利）。</li>
+<li><strong>AIとの協働実例：</strong> AIを活用してどのようにコードを生成・管理しているかという、新しい時代のエンジニアリングスキルを示せる。</li>
+</ul>
+
+<h2>5. 現実的な線引き（おすすめの運用）</h2>
+<p>「全て隠す」か「全てさらけ出す」かの二択ではありません。以下のような線引きで運用するのが現実的かつ安全です。</p>
+
+<div class="risk-container">
+  <div class="boundary-grid">
+    <div class="boundary-card ok">
+      <span class="card-title">公開してOK</span>
+      <ul class="icon-list">
+        <li>生成された静的HTMLファイル</li>
+        <li>CSSなどのデザインリソース</li>
+        <li>学習のメモや解説記事</li>
+        <li>自動生成を行うスクリプト（認証情報抜き）</li>
+      </ul>
+    </div>
+    <div class="boundary-card ng">
+      <span class="card-title">非公開 or 分離推奨</span>
+      <ul class="icon-list">
+        <li>外部サービスのAPIキー</li>
+        <li>データベースの接続情報</li>
+        <li>個人情報が含まれる生データ</li>
+        <li>セキュリティに関わる設定ファイル</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h2>6. まとめ</h2>
+<p>HTMLが見えること自体はリスクではありません。リスクになるのは<strong>「見せたくない思想や権限を、うっかり一緒に出してしまうこと」</strong>です。「成果物は公開し、権限周りは分離する」という原則を守れば、リポジトリ公開はあなたのエンジニアとしての信頼性を高める強力な武器になります。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
