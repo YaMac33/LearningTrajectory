@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSの責任共有モデル解説</title>
+  <meta name="description" content="AWS資格試験で最も重要な「責任共有モデル」を大家さんと入居者の関係に例えて解説。Security 'of' the Cloudと'in' the Cloudの違いや、サービスごとの責任範囲の変化を学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSの責任共有モデル解説" />
+  <meta property="og:description" content="AWS資格試験で最も重要な「責任共有モデル」を大家さんと入居者の関係に例えて解説。Security 'of' the Cloudと'in' the Cloudの違いや、サービスごとの責任範囲の変化を学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 責任共有モデル図 */
+    .shared-model-box {
+      border: 2px solid #333;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .user-responsibility {
+      background-color: #e6f7ff;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: #0050b3;
+      border-bottom: 2px dashed #999;
+    }
+    .aws-responsibility {
+      background-color: #fff7e6;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: #d46b08;
+    }
+    .role-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .role-desc {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    .role-keyword {
+      display: inline-block;
+      background: rgba(255,255,255,0.6);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+    /* サービス別責任範囲グラフ */
+    .comparison-chart {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 300px;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      padding: 1rem 0;
+    }
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+    }
+    .chart-label {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      height: 40px;
+    }
+    .bar-stack {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .bar-user {
+      background-color: #69c0ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #003a8c;
+      font-weight: bold;
+      font-size: 0.85rem;
+      transition: flex 0.3s;
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+    }
+    .bar-aws {
+      background-color: #ffc069;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #873800;
+      font-weight: bold;
+      font-size: 0.85rem;
+      flex-grow: 1;
+    }
+    
+    /* クイズリスト */
+    .quiz-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      width: 100%;
+    }
+    .quiz-item {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .quiz-q {
+      font-weight: bold;
+      flex: 1;
+      min-width: 200px;
+    }
+    .quiz-a {
+      font-weight: bold;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    .ans-aws {
+      background-color: #fff7e6;
+      color: #d46b08;
+      border: 1px solid #d46b08;
+    }
+    .ans-user {
+      background-color: #e6f7ff;
+      color: #0050b3;
+      border: 1px solid #0050b3;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSの責任共有モデル解説</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">資格試験</li>
+            <li class="tag">責任共有モデル</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">セキュリティ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS資格試験で最も失点してはいけない（そして実務でも最も大事な）概念、「責任共有モデル」について解説します。これまでEC2やIAMなど個別の技術を見てきましたが、ここで<strong>「AWSとあなた（ユーザー）の役割分担」</strong>をはっきりさせます。</p>
+<p>一言で言うと、<strong>「賃貸マンションの管理」</strong>と同じです。</p>
+<ul>
+<li><strong>大家さん（AWS）：</strong> 建物の耐震構造、オートロック、エレベーターの点検までは責任を持ちます。</li>
+<li><strong>入居者（あなた）：</strong> 自分の部屋の鍵かけ、部屋の中の火の始末、招待する客の管理は、あなたの責任です。</li>
+</ul>
+
+<h2>1. 鉄の掟：この2つを暗記してください</h2>
+<p>試験では、以下のフレーズがそのまま出ます。「Of」と「In」の違いを意識してください。</p>
+
+<div class="diagram-container">
+  <div class="shared-model-box">
+    <div class="user-responsibility">
+      <span class="role-title">👤 ユーザーの責任 (入居者)</span>
+      <span class="role-desc">データ、設定、OSパッチ、暗号化</span>
+      <br>
+      <span class="role-keyword">Security IN the Cloud</span>
+    </div>
+    <div class="aws-responsibility">
+      <span class="role-title">🛡️ AWSの責任 (大家さん)</span>
+      <span class="role-desc">ハードウェア、物理施設、ネットワーク、ハイパーバイザー</span>
+      <br>
+      <span class="role-keyword">Security OF the Cloud</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. 具体的な線引き（試験に出る分類）</h2>
+<p>どこまでがAWSで、どこからが自分か。この境界線を問う問題が必ず出ます。</p>
+
+<h3>🛡️ AWSの責任範囲（大家さん）</h3>
+<p>ユーザーが物理的に触れない部分は、すべてAWSの責任です。</p>
+<ul class="check-list">
+<li><strong>物理セキュリティ：</strong> データセンターへの侵入防止、監視カメラ、警備員。</li>
+<li><strong>ハードウェア：</strong> サーバー、ストレージ機器の故障対応、廃棄処理（HDDの物理破壊など）。</li>
+<li><strong>グローバルインフラ：</strong> リージョン、AZ、エッジロケーションの維持管理。</li>
+<li><strong>ハイパーバイザー：</strong> 物理サーバー上で仮想マシン（EC2）を動かすための土台ソフト。</li>
+</ul>
+
+<h3>👤 ユーザーの責任範囲（入居者）</h3>
+<p>AWSから渡された「後のこと」は、すべてあなたの責任です。</p>
+<ul class="check-list">
+<li><strong>顧客データ：</strong> データの暗号化、バックアップ。（AWSは中身を勝手に見ません）</li>
+<li><strong>プラットフォーム等の設定：</strong> OSのパッチ適用（Windows Updateなど）、ファイアウォール（セキュリティグループ）の設定。</li>
+<li><strong>アクセス管理：</strong> IAMユーザーの作成、パスワードの強度設定、MFAの有効化。</li>
+</ul>
+
+<h2>3. 【超重要】サービスによって責任範囲が「動く」</h2>
+<p>ここが試験のひっかけポイントです。「EC2」を使うか、「RDS」を使うか、「S3」を使うかで、ユーザーがやるべき作業（責任）の量が変わります。</p>
+
+<div class="diagram-container">
+  <div class="comparison-chart">
+    <div class="chart-col">
+      <div class="chart-label">EC2<br><small>(IaaS)</small></div>
+      <div class="bar-stack">
+        <div class="bar-user" style="flex: 6;">ユーザー負担<br>大</div>
+        <div class="bar-aws" style="flex: 4;">AWS</div>
+      </div>
+    </div>
+    <div class="chart-col">
+      <div class="chart-label">RDS<br><small>(Managed)</small></div>
+      <div class="bar-stack">
+        <div class="bar-user" style="flex: 3;">中</div>
+        <div class="bar-aws" style="flex: 7;">AWS<br>(OS管理含む)</div>
+      </div>
+    </div>
+    <div class="chart-col">
+      <div class="chart-label">S3<br><small>(SaaS的)</small></div>
+      <div class="bar-stack">
+        <div class="bar-user" style="flex: 1.5;">小</div>
+        <div class="bar-aws" style="flex: 8.5;">AWS<br>(ほぼ全管理)</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.9rem; color:#666;">※ 右に行くほどAWSがやってくれる範囲が増える（＝ユーザーは楽になる）</p>
+</div>
+
+<h3>パターンの違い</h3>
+<ul>
+<li><strong>EC2 (IaaS)：</strong> OSの更新（パッチ当て）は<strong>「ユーザーの責任」</strong>です。自由度は高いですが管理が大変です。</li>
+<li><strong>RDS (マネージド)：</strong> OSの更新は<strong>「AWSの責任」</strong>になります。面倒な作業をAWSに押し付けられます。</li>
+<li><strong>S3 (抽象化サービス)：</strong> サーバーのOSなんて意識しません。ユーザーは「データの管理と暗号化」だけに集中します。</li>
+</ul>
+
+<h2>4. 試験でよく出る「どっちの責任？」クイズ</h2>
+<p>これらが即答できれば合格レベルです。</p>
+
+<div class="quiz-list">
+  <div class="quiz-item">
+    <div class="quiz-q">Q1. 故障した物理ディスクの交換は？</div>
+    <div class="quiz-a ans-aws">AWSの責任</div>
+  </div>
+  <div class="quiz-item">
+    <div class="quiz-q">Q2. EC2上のゲストOSのパッチ適用は？</div>
+    <div class="quiz-a ans-user">ユーザーの責任</div>
+  </div>
+  <div class="quiz-item">
+    <div class="quiz-q">Q3. S3に保存したデータの暗号化設定は？</div>
+    <div class="quiz-a ans-user">ユーザーの責任</div>
+  </div>
+  <div class="quiz-item">
+    <div class="quiz-q">Q4. データセンターの入館管理は？</div>
+    <div class="quiz-a ans-aws">AWSの責任</div>
+  </div>
+  <div class="quiz-item">
+    <div class="quiz-q">Q5. IAMパスワードのポリシー設定は？</div>
+    <div class="quiz-a ans-user">ユーザーの責任</div>
+  </div>
+</div>
+
+<h2>5. まとめ</h2>
+<p>「ハードウェアや建物、インフラ自体が壊れたらAWSの責任」、「設定ミス、パスワード流出、OSの更新忘れでハッキングされたらユーザーの責任」と覚えましょう。このモデルを理解していれば、AWSが提供するセキュリティツールが「誰のために」「何を守るために」あるのかが明確になります。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
