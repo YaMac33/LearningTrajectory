@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "awscp-aws-basic-services-introduction",
+    "category": "awscp",
+    "timestamp": "2026-01-31T14:37:12+09:00",
+    "title": "AWS基本サービスの重要性と役割",
+    "summary": "AWSの基本サービスであるEC2、S3、RDSの特徴を理解し、各サービスの役割を明確にすることで、AWS認定試験への対策が可能になります。",
+    "tags": [
+      "AWS",
+      "EC2",
+      "S3",
+      "RDS",
+      "クラウド",
+      "サービス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-31-awscp-aws-basic-services-introduction/"
+  }
+]
