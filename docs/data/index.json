@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-nat-gateway-one-way",
+    "category": "awscp",
+    "timestamp": "2026-02-01T06:47:11+09:00",
+    "title": "NATゲートウェイの一方通行の仕組み",
+    "summary": "NATゲートウェイは「中からは出れるが、外からは入れない」を実現します。この仕組みの詳細を把握することで、ネットワークのセキュリティが理解できます。",
+    "tags": [
+      "NAT",
+      "ネットワーク",
+      "セキュリティ",
+      "データ通信",
+      "仕組み"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-nat-gateway-one-way/"
+  },
+  {
     "id": "awscp-vpc-subnet-understanding",
     "category": "awscp",
     "timestamp": "2026-01-31T21:48:11+09:00",
