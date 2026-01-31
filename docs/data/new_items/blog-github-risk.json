@@ -1,0 +1,15 @@
+{
+  "id": "blog-github-risk",
+  "category": "blog",
+  "timestamp": "2026-01-31T14:23:24+09:00",
+  "post_path": "blog/posts/2026-01-31-blog-github-risk/",
+  "meta": {
+    "title": "GitHub公開リポジトリの考察",
+    "summary": "GitHubでの公開に伴うリスクについて考察します。",
+    "tags": [],
+    "taxonomy": [
+      "journal",
+      "note"
+    ]
+  }
+}
