@@ -660,3 +660,27 @@ a:hover {
   color: #4b5563;
   margin-bottom: 1.25rem;
 }
+
+/* =========================
+   Contact CTA (Top page)
+========================= */
+.contact-cta {
+  margin: 3rem auto 1rem;
+  text-align: center;
+}
+
+.contact-cta__link {
+  display: inline-block;
+  padding: 0.6em 1.2em;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.contact-cta__link:hover {
+  background-color: #f5f5f5;
+  border-color: #999;
+}
