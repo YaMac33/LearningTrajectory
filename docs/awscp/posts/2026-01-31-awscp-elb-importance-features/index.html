@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ELBの重要性と特徴</title>
+  <meta name="description" content="ELBはアクセスを均等に分配し、故障したサーバーを排除することで高可用性を提供します。ALBとNLBの違いや、試験頻出のヘルスチェック機能について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ELBの重要性と特徴" />
+  <meta property="og:description" content="ELBはアクセスを均等に分配し、故障したサーバーを排除することで高可用性を提供します。ALBとNLBの違いや、試験頻出のヘルスチェック機能について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ELB振り分け図 */
+    .elb-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .users-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .user-icon {
+      font-size: 0.8rem;
+      text-align: center;
+      background: #eee;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+    .elb-box {
+      background: #007bff;
+      color: #fff;
+      padding: 1rem 3rem;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .elb-box::after {
+      content: "受付係";
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      color: #007bff;
+      font-weight: bold;
+    }
+    .arrow-down {
+      font-size: 1.5rem;
+      color: #999;
+      line-height: 1;
+    }
+    .distribution-arrows {
+      display: flex;
+      gap: 2rem;
+      width: 100%;
+      justify-content: space-around;
+      color: #999;
+      font-size: 1.2rem;
+    }
+    .ec2-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      width: 100%;
+    }
+    .ec2-box {
+      border: 2px solid #d86613; /* EC2 Orange */
+      background: #fff;
+      padding: 0.8rem;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      flex: 1;
+      max-width: 100px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+
+    /* ヘルスチェック図 */
+    .health-check-wrapper {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      border: 2px dashed #aaa;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .status-ok {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .status-ng {
+      color: #d9534f;
+      font-weight: bold;
+      text-decoration: line-through;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      width: 20%;
+      white-space: nowrap;
+    }
+    .highlight-cell {
+      background-color: #e6f7ff;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+    
+    /* 吹き出し（解説用） */
+    .bubble {
+      position: relative;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ELBの重要性と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">ELB</li>
+            <li class="tag">AWS</li>
+            <li class="tag">負荷分散</li>
+            <li class="tag">可用性</li>
+            <li class="tag">Auto Scaling</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>VPCでネットワークの土台ができ、Auto Scalingでサーバーの数を自動調整できるようになりました。ここで欠かせないのが、増減するサーバーたちを束ねる<strong>「ELB (Elastic Load Balancing)」</strong>です。</p>
+
+<h2>1. ELB（ロードバランサー）とは？</h2>
+<p>一言で言うと、<strong>「アクセスを均等に振り分ける『優秀な受付係』」</strong>です。もしELBがないと、ユーザーはどのEC2（サーバー）にアクセスすればいいかわかりません。ELBが窓口になることで、裏側にEC2が1台いようが100台いようが、ユーザーは気にせずアクセスできます。</p>
+
+<h2>2. 図解：ELBの仕事</h2>
+<p>ELBは、インターネットからのリクエストを一身に受け止め、背後のEC2インスタンスたちにトランプを配るように仕事を配ります。</p>
+
+<div class="diagram-container">
+  <div class="elb-flow">
+    <div class="users-group">
+      <div class="user-icon">User A</div>
+      <div class="user-icon">User B</div>
+      <div class="user-icon">User C</div>
+    </div>
+    
+    <div style="font-size:0.8rem; color:#666; margin-top:0.5rem;">↓ みんなここへアクセス (DNS名)</div>
+    
+    <div class="elb-box">ELB</div>
+    
+    <div style="font-size:0.8rem; color:#666; margin-top:0.5rem;">↓ 均等に振り分け</div>
+    
+    <div class="distribution-arrows">
+      <span>↙</span> <span>↓</span> <span>↘</span>
+    </div>
+    
+    <div class="ec2-group">
+      <div class="ec2-box">EC2 A</div>
+      <div class="ec2-box">EC2 B</div>
+      <div class="ec2-box">EC2 C</div>
+    </div>
+  </div>
+</div>
+
+<h2>3. 試験に出る「ヘルスチェック」機能</h2>
+<p>ELBには、ただ振り分けるだけでなく、「サボっている（故障した）サーバーを見抜く」という超重要な機能があります。これを<strong>ヘルスチェック</strong>と言います。</p>
+
+<h3>仕組みと挙動</h3>
+<ul class="check-list">
+<li><strong>監視：</strong> ELBは定期的に、配下のEC2に「生きてる？（Ping）」と話しかけます。</li>
+<li><strong>故障検知：</strong> 返事がない（エラーが返る）EC2を見つけると、ELBは<strong>「そこに仕事を振るのをやめます」</strong>。</li>
+<li><strong>復旧：</strong> 直って返事が来るようになれば、また仕事を振り始めます。</li>
+</ul>
+
+<div class="diagram-container">
+  <div class="health-check-wrapper">
+    <div style="font-weight:bold;">ELB</div>
+    <div style="font-size:1.5rem;">👀</div>
+    <div>
+      <div>EC2 A: <span class="status-ok">正常 (仕事振る)</span></div>
+      <div>EC2 B: <span class="status-ng">故障 (無視する)</span> ✖</div>
+      <div>EC2 C: <span class="status-ok">正常 (仕事振る)</span></div>
+    </div>
+  </div>
+  <div class="bubble">
+    <strong>試験の鉄板問題：</strong><br>
+    「一部のEC2が故障したが、ユーザーはエラー画面を見ることなくサービスを利用し続けられた。なぜか？」<br>
+    → 答え：<strong>ELBがヘルスチェックで故障したEC2を切り離したから。</strong><br>
+    （この機能を「耐障害性の向上」と呼びます）
+  </div>
+</div>
+
+<h2>4. ELBの種類（ALBとNLBの違い）</h2>
+<p>試験では、主に以下の2種類の使い分けが問われます。ITパスポートでやった「OSI参照モデル」の知識が少しだけ役立ちます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>種類</th>
+      <th>正式名称</th>
+      <th>特徴・用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="highlight-cell">ALB</td>
+      <td>Application<br>Load Balancer</td>
+      <td>
+        <strong>第7層（アプリケーション層）</strong>で動作。<br>
+        リクエストの中身（URLなど）を見て振り分け先を変えられる「賢い」タイプ。<br>
+        <small>用途：Webサイト、マイクロサービス</small>
+      </td>
+    </tr>
+    <tr>
+      <td class="highlight-cell">NLB</td>
+      <td>Network<br>Load Balancer</td>
+      <td>
+        <strong>第4層（トランスポート層）</strong>で動作。<br>
+        中身は見ないが、とにかく処理が<strong>爆速</strong>。固定IPアドレスが使える。<br>
+        <small>用途：ゲーム、金融など遅延が許されない通信</small>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>※ CLB (Classic) は旧世代、GLB (Gateway) はセキュリティアプライアンス用です。まずはALBとNLBを押さえましょう。</p>
+
+<h2>5. まとめ：ELBの3つのメリット</h2>
+<p>ELBを導入することで得られるメリットは以下の3点に集約されます。</p>
+<ol>
+<li><strong>負荷分散：</strong> 特定のサーバーだけ忙しくなるのを防ぐ。</li>
+<li><strong>高可用性：</strong> 故障したサーバーを自動で避ける（ヘルスチェック）。</li>
+<li><strong>スケーラビリティ：</strong> Auto Scalingと連携し、サーバーが増えても自動で検知して仕事を振る。</li>
+</ol>
+<p>これで、「ネットワーク（VPC）」「サーバー（EC2）」「ストレージ（S3/EBS）」「DB（RDS）」「負荷分散（ELB）」「自動化（Auto Scaling）」と、インフラの主要キャストがほぼ揃いました。ここまでの知識があれば、AWS上で「落ちないWebサイト」を作る構成図が頭に浮かぶはずです。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
