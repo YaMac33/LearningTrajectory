@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSのオートスケーリング入門</title>
+  <meta name="description" content="オートスケーリングは負荷に応じてEC2台数を自動調整し、コスト最適化を実現する機能です。ELBとの連携や、試験頻出の水平スケーリングと垂直スケーリングの違いについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSのオートスケーリング入門" />
+  <meta property="og:description" content="オートスケーリングは負荷に応じてEC2台数を自動調整し、コスト最適化を実現する機能です。ELBとの連携や、試験頻出の水平スケーリングと垂直スケーリングの違いについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* ASG構成図 */
+    .arch-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .box-elb {
+      background: #333;
+      color: #fff;
+      padding: 0.8rem 2rem;
+      border-radius: 4px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .arrow-down {
+      font-size: 1.5rem;
+      color: #666;
+      line-height: 1;
+    }
+    .group-asg {
+      border: 2px dashed #d86613; /* EC2 Orange */
+      background: #fff5eb;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .group-asg::before {
+      content: "Auto Scaling グループ";
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      background: #fff5eb;
+      padding: 0 5px;
+      font-size: 0.85rem;
+      color: #d86613;
+      font-weight: bold;
+    }
+    .box-ec2 {
+      border: 2px solid #d86613;
+      background: #fff;
+      padding: 0.8rem;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #333;
+      min-width: 80px;
+      text-align: center;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .box-cw {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 1rem;
+      position: relative;
+    }
+    .monitor-line {
+      border-left: 2px dotted #555;
+      height: 30px;
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .monitor-line::after {
+      content: "監視";
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      transform: translateY(-50%);
+      font-size: 0.75rem;
+      color: #555;
+      background: #f9f9f9;
+    }
+
+    /* 水平・垂直比較 */
+    .scale-compare {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .compare-card {
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+      padding: 1rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+    }
+    .compare-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+      display: block;
+    }
+    .car-icon {
+      font-size: 1.5rem;
+      margin: 0.5rem;
+    }
+    .scale-ok { color: #28a745; font-weight: bold; }
+    .scale-warn { color: #d9534f; font-weight: bold; }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSのオートスケーリング入門</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Auto Scaling</li>
+            <li class="tag">EC2</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">コスト最適化</li>
+            <li class="tag">AWS</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon EC2 Auto Scaling（オートスケーリング）は、クラウドならではの「伸縮自在（エラスティック）」な性質を最も象徴する機能です。サーバーの台数を自動調整することで、機会損失の回避とコスト削減を同時に実現します。</p>
+
+<h2>1. オートスケーリングとは？</h2>
+<p>一言で言えば、<strong>「アクセス数（負荷）に合わせて、EC2の台数を自動で増やしたり減らしたりする機能」</strong>です。</p>
+<ul>
+<li><strong>混んでいる時（スケールアウト）：</strong> サーバーを勝手に増やして、ダウンしないように処理能力を高めます。</li>
+<li><strong>空いている時（スケールイン）：</strong> サーバーを勝手に減らして、無駄な料金を節約します。</li>
+</ul>
+<p>これは「居酒屋のシフト管理」に例えると分かりやすいでしょう。</p>
+<blockquote>
+<p><strong>金曜の夜（アクセス増）：</strong> バイトを急いで3人呼んで対応する。<br>
+<strong>平日の閑散時（アクセス減）：</strong> 「もう上がっていいよ」と早上がりさせて人件費を抑える。</p>
+</blockquote>
+<p>これを人間が判断するのではなく、システムが自動で行うのがオートスケーリングです。</p>
+
+<h2>2. 仕組みの図解（ELBとの連携）</h2>
+<p>オートスケーリングは単独ではなく、通常は<strong>ELB（ロードバランサー）</strong>とセットで使用されます。増えたサーバーにアクセスを振り分ける「司令塔」が必要だからです。</p>
+
+<div class="diagram-container">
+  <div class="arch-wrapper">
+    <div style="text-align:center; font-size:0.9rem; margin-bottom:0.5rem;">ユーザーからのアクセス</div>
+    <div class="arrow-down">↓</div>
+    
+    <div class="box-elb">ELB (司令塔)</div>
+    <div class="arrow-down">↓</div>
+    
+    <div class="group-asg">
+      <div class="box-ec2">EC2</div>
+      <div class="box-ec2">EC2</div>
+      <div class="box-ec2" style="border-style:dashed; color:#d86613; background:#fff;">＋追加<br>EC2</div>
+    </div>
+    
+    <div class="box-cw">
+      <div class="monitor-line"></div>
+      <strong>CloudWatch (監視)</strong><br>
+      <span style="font-size:0.8rem; color:#d9534f;">「CPU使用率80%超え！追加して！」</span>
+    </div>
+  </div>
+</div>
+
+<h2>3. 試験に出る「スケーリング」の用語</h2>
+<p>試験では「サーバーを増やすこと」を専門用語で何と呼ぶか、その違いが問われます。オートスケーリングは<strong>「水平スケーリング」</strong>が基本です。</p>
+
+<div class="diagram-container">
+  <div class="scale-compare">
+    <div class="compare-card">
+      <span class="compare-title scale-ok">① 水平スケーリング<br>(Scale Out / In)</span>
+      <div class="car-icon">🚗 🚗 🚗</div>
+      <p style="font-size:0.9rem; text-align:left;">
+        <strong>やり方：</strong> 台数を増やす<br>
+        <strong>メリット：</strong> 無停止で拡張可能<br>
+        <strong>イメージ：</strong> 軽自動車をもう一台呼んでくる。<br>
+        <span style="font-size:0.8rem; color:#666;">※AWSの推奨パターン</span>
+      </p>
+    </div>
+    <div class="compare-card">
+      <span class="compare-title scale-warn">② 垂直スケーリング<br>(Scale Up / Down)</span>
+      <div class="car-icon">🏎️💨</div>
+      <p style="font-size:0.9rem; text-align:left;">
+        <strong>やり方：</strong> スペック(CPU等)を上げる<br>
+        <strong>デメリット：</strong> 再起動(停止)が必要<br>
+        <strong>イメージ：</strong> エンジンをフェラーリのものに積み替える（大変）。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>4. 試験でのひっかけポイント</h2>
+<p>クラウドプラクティショナー試験などでよく問われるポイントです。</p>
+<ul class="check-list">
+<li><strong>予測スケーリング：</strong> 「CPUが上がったら」という反応だけでなく、過去のデータから「明日の12時は混むはず」と予測して事前に増やすことも可能です。</li>
+<li><strong>ヘルスチェック（自己修復）：</strong> 負荷対策だけでなく、<strong>「故障したEC2を自動で捨てて、新品を作り直す」</strong>機能もあります。これによりシステムの健康状態が保たれます。</li>
+</ul>
+
+<h2>5. まとめ</h2>
+<p>オートスケーリングによって、「必要な時に、必要な分だけ」リソースを使うことが可能になります。これがクラウドの最大のメリットである<strong>「コスト最適化」</strong>に繋がります。</p>
+<p>ここまでで「EC2（サーバー）」「EBS（保存）」「ELB（負荷分散）」「Auto Scaling（自動伸縮）」が揃いました。次はこれらを管理するセキュリティの要、IAMについて学ぶとAWSの全体像が見えてきます。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
