@@ -1,0 +1,21 @@
+{
+  "id": "awscp-vpc-subnet-understanding",
+  "category": "awscp",
+  "timestamp": "2026-01-31T21:48:11+09:00",
+  "post_path": "awscp/posts/2026-01-31-awscp-vpc-subnet-understanding/",
+  "meta": {
+    "title": "AWSのVPCとサブネットの理解",
+    "summary": "AWSのネットワーク設計におけるVPCとサブネットの基本を理解し、セキュリティとアクセスの仕組みを学ぶことができます。",
+    "tags": [
+      "AWS",
+      "VPC",
+      "サブネット",
+      "インフラ設計",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ]
+  }
+}
