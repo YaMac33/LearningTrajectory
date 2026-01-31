@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-elb-region-az-relationship",
+    "category": "awscp",
+    "timestamp": "2026-01-31T21:08:11+09:00",
+    "title": "ELBとリージョン・AZの関係解説",
+    "summary": "ELBがリージョンをまたいで分散できない理由と、EC2との活動範囲の違いを理解することができます。",
+    "tags": [
+      "AWS",
+      "ELB",
+      "EC2",
+      "クラウド",
+      "負荷分散"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-31-awscp-elb-region-az-relationship/"
+  },
+  {
     "id": "awscp-elb-importance-features",
     "category": "awscp",
     "timestamp": "2026-01-31T20:51:39+09:00",
