@@ -1,0 +1,21 @@
+{
+  "id": "awscp-elb-importance-features",
+  "category": "awscp",
+  "timestamp": "2026-01-31T20:51:39+09:00",
+  "post_path": "awscp/posts/2026-01-31-awscp-elb-importance-features/",
+  "meta": {
+    "title": "ELBの重要性と特徴を学ぶ",
+    "summary": "ELBはアクセスを均等に分配し、高可用性を実現します。ALBとNLBの違いや、試験頻出のヘルスチェック機能を理解します。",
+    "tags": [
+      "ELB",
+      "AWS",
+      "負荷分散",
+      "可用性",
+      "Auto Scaling"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
