@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | EC2試験対策のポイント</title>
+  <meta name="description" content="AWSクラウドプラクティショナー試験の主役であるEC2について、インスタンスとEBSの分離、セキュリティグループの挙動、そして最重要の4つの料金プランまで、合格に必要なポイントを深掘り解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EC2試験対策のポイント" />
+  <meta property="og:description" content="AWSクラウドプラクティショナー試験の主役であるEC2について、インスタンスとEBSの分離、セキュリティグループの挙動、そして最重要の4つの料金プランまで、合格に必要なポイントを深掘り解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 解剖図 */
+    .anatomy-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .component-box {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      width: 180px;
+      text-align: center;
+      position: relative;
+    }
+    .component-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 0.3rem;
+    }
+    .inner-parts {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .part {
+      background: #eee;
+      padding: 0.3rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+    .connection-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #666;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+    .connection-arrow {
+      font-size: 1.2rem;
+    }
+
+    /* セキュリティグループ図 */
+    .sg-diagram {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    .actor {
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .sg-wall {
+      background: #333;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: center;
+      position: relative;
+    }
+    .sg-wall::before {
+      content: "セキュリティグループ";
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+      color: #aaa;
+    }
+    .sg-rule {
+      background: #fff;
+      color: #333;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      border-radius: 2px;
+      margin: 0.2rem 0;
+    }
+    .arrow-ok { color: #28a745; font-weight: bold; }
+    .arrow-ng { color: #d9534f; font-weight: bold; }
+
+    /* 料金表 */
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .pricing-table th, .pricing-table td {
+      border: 1px solid #ddd;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .pricing-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .highlight-cell {
+      background-color: #e6f7ff;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+    .warning-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .warning-list li {
+      margin-bottom: 0.5rem;
+      padding-left: 1.5em;
+      text-indent: -1.5em;
+      color: #d9534f;
+    }
+    .warning-list li::before {
+      content: "⚠";
+      margin-right: 0.5em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EC2試験対策のポイント</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">EC2</li>
+            <li class="tag">試験対策</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">料金プラン</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSクラウドプラクティショナー試験の「主役」であるAmazon EC2について、試験に出るポイント（構成要素・セキュリティ・料金）を深掘りして解説します。EC2は単なる「パソコン」ではなく、いくつかのパーツが組み合わさってできています。これを分解して理解するのが合格への近道です。</p>
+
+<h2>1. EC2の解剖図（インスタンスとEBS）</h2>
+<p>試験で最も重要なのは、<strong>「計算する場所（EC2）」と「保存する場所（EBS）」が別々である</strong>という点です。自宅のPCならハードディスクは本体の中に内蔵されていますが、AWSでは「外付けHDD」をネットワーク経由で接続して使います。</p>
+
+<div class="diagram-container">
+  <div class="anatomy-wrapper">
+    <div class="component-box">
+      <span class="component-title">EC2 (脳みそ)</span>
+      <div class="inner-parts">
+        <div class="part">CPU (計算能力)</div>
+        <div class="part">メモリ (作業机)</div>
+        <div class="part">OS (Windows等)</div>
+      </div>
+    </div>
+    
+    <div class="connection-line">
+      <span>接続</span>
+      <span class="connection-arrow">⟺</span>
+      <span>ネットワーク</span>
+    </div>
+
+    <div class="component-box" style="border-style:dashed;">
+      <span class="component-title">EBS (記憶装置)</span>
+      <div class="inner-parts">
+        <div class="part">データ</div>
+        <div class="part">OSファイル</div>
+        <div class="part" style="background:#fff; border:1px solid #ccc;">外付けHDD</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>試験のひっかけポイント</h3>
+<ul class="warning-list">
+<li><strong>EC2を「停止（ストップ）」しても、データはEBSに残ります（消えません）。</strong></li>
+<li><strong>EC2を「削除（ターミネート）」すると、設定によってはEBSも一緒に消えることがあります。</strong></li>
+<li><strong>インスタンスストア：</strong> EC2に「内蔵」されている一時的な保存領域もありますが、これはEC2を停止するとデータが消えます。「消えては困るデータはEBSへ、一時的なデータはインスタンスストアへ」という使い分けが問われます。</li>
+</ul>
+
+<h2>2. EC2を守る門番「セキュリティグループ」</h2>
+<p>EC2を作っただけでは、世界中の誰からもアクセスできてしまい危険です。そこで、インスタンスの周りに<strong>「セキュリティグループ」という仮想ファイアウォール</strong>を設置します。</p>
+
+<div class="diagram-container">
+  <div class="sg-diagram">
+    <div class="actor">
+      <div style="color:#d9534f; font-weight:bold;">攻撃者 ⚡️</div>
+      <div class="arrow-ng">↓ ブロック</div>
+    </div>
+    <div class="sg-wall" rowspan="2">
+      <div class="sg-rule">あなたのPC (許可) ✅</div>
+      <div class="sg-rule">Web閲覧者 (許可) ✅</div>
+    </div>
+    <div class="actor" rowspan="2">
+      <div class="arrow-ok">→ 通過</div>
+      <div style="border:2px solid #333; padding:0.5rem; border-radius:4px; margin-top:0.5rem; background:#fff;">EC2</div>
+    </div>
+    
+    <div class="actor">
+      <div style="color:#28a745; font-weight:bold;">あなた 💻</div>
+      <div class="arrow-ok">↑ 許可</div>
+    </div>
+  </div>
+</div>
+
+<h3>試験の重要ポイント</h3>
+<ul class="check-list">
+<li><strong>インスタンス単位：</strong> セキュリティグループは、サブネット単位ではなく「EC2インスタンスごと」に設定します。</li>
+<li><strong>ホワイトリスト方式：</strong> デフォルトでは「すべての通信を拒否」しています。「許可する通信（ポート番号やIPアドレス）」だけをリストに書きます。</li>
+<li><strong>ステートフル：</strong> 入ってくる通信（インバウンド）を許可すれば、それに対する戻りの通信（アウトバウンド）も自動的に許可されます。</li>
+</ul>
+
+<h2>3. EC2の「購入オプション」（料金プラン）</h2>
+<p>ここが一番の暗記ポイントです。「どうやって借りるか」で値段が劇的に変わります。以下の4つを必ず覚えてください。</p>
+
+<table class="pricing-table">
+  <thead>
+    <tr>
+      <th>プラン名</th>
+      <th>特徴</th>
+      <th>向いている用途</th>
+      <th>割引率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>オンデマンド</strong></td>
+      <td>契約なし。いつでも始めていつでも辞められる従量課金。</td>
+      <td>初めての利用、短期開発、スパイク（急増）対応。</td>
+      <td>定価</td>
+    </tr>
+    <tr>
+      <td><strong>リザーブド (RI)</strong></td>
+      <td>1年または3年の長期契約を結ぶ。</td>
+      <td>24時間ずっと稼働するDBや社内システム。</td>
+      <td>最大72%</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell">Savings Plans</td>
+      <td>「1時間あたり〇〇ドル使う」と金額をコミットする契約。RIより柔軟。</td>
+      <td>構成が変わる可能性がある長期利用。</td>
+      <td>最大72%</td>
+    </tr>
+    <tr>
+      <td><strong>スポット</strong></td>
+      <td>AWSの余剰リソースを借りる。AWSの都合で中断されることがある。</td>
+      <td>中断されてもやり直せる計算、テスト、バッチ処理。</td>
+      <td>最大90%<br><small>(最安)</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>試験での合言葉</h3>
+<ul class="check-list">
+<li><strong>「定常的なワークロード（ずっと動かす）」</strong> → リザーブド か Savings Plans</li>
+<li><strong>「中断に強い」「とにかく安く」</strong> → スポットインスタンス</li>
+<li><strong>「スパイク（突発的なアクセス）がある」</strong> → オンデマンド</li>
+</ul>
+
+<h2>4. まとめ</h2>
+<p>EC2は「インスタンス＋EBS」の組み合わせであること、セキュリティグループで守ること、そして用途に合わせて料金プランを選ぶこと。この3点を理解していれば、試験のEC2関連問題の多くに対応できます。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
