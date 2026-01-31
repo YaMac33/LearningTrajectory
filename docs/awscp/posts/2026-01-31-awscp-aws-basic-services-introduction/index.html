@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS基本サービスの紹介</title>
+  <meta name="description" content="AWSの「三種の神器」とも言えるEC2、S3、RDSの特徴と役割を解説。ITパスポートの知識と紐付けながら、試験で頻出の基本構成を学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS基本サービスの紹介" />
+  <meta property="og:description" content="AWSの「三種の神器」とも言えるEC2、S3、RDSの特徴と役割を解説。ITパスポートの知識と紐付けながら、試験で頻出の基本構成を学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .diagram-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #555;
+      width: 100%;
+      text-align: center;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 0.5rem;
+    }
+
+    /* サービスボックス共通 */
+    .svc-box {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 120px;
+      position: relative;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .svc-ec2 { border-color: #d86613; color: #d86613; font-weight: bold; }
+    .svc-s3 { border-color: #24882c; color: #24882c; font-weight: bold; }
+    .svc-rds { border-color: #2a5caa; color: #2a5caa; font-weight: bold; }
+    
+    .svc-label {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+    }
+    .svc-desc {
+      font-size: 0.75rem;
+      color: #666;
+      font-weight: normal;
+    }
+
+    /* フローレイアウト */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .arrow-down {
+      font-size: 1.2rem;
+      color: #888;
+      margin: 0.5rem 0;
+    }
+    .arrow-right {
+      font-size: 1.2rem;
+      color: #888;
+    }
+
+    /* 内部構造表現 */
+    .internal-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 0.5rem;
+    }
+    .stack-item {
+      border: 1px solid #ccc;
+      background: #eee;
+      padding: 2px 5px;
+      font-size: 0.7rem;
+      color: #333;
+      border-radius: 2px;
+    }
+    .stack-managed {
+      background: #eef;
+      border-color: #aac;
+      color: #2a5caa;
+    }
+
+    /* 3種連携図 */
+    .architecture-diagram {
+      display: grid;
+      grid-template-areas: 
+        "ec2 arrow1 s3"
+        "ec2 arrow2 rds";
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .area-ec2 { grid-area: ec2; }
+    .area-s3 { grid-area: s3; }
+    .area-rds { grid-area: rds; }
+    .area-arrow1 { grid-area: arrow1; text-align: center; font-size: 0.8rem; color: #666; }
+    .area-arrow2 { grid-area: arrow2; text-align: center; font-size: 0.8rem; color: #666; }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS基本サービスの紹介</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">EC2</li>
+            <li class="tag">S3</li>
+            <li class="tag">RDS</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">サービス</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSには200以上のサービスがありますが、その中でも「三種の神器」とも言える基本サービスがあります。これらはITパスポートなどで学ぶ一般的なIT知識と紐付けるとイメージしやすくなります。まずはこの3つを完璧に押さえましょう。</p>
+
+<h2>1. Amazon EC2（イーシーツー）</h2>
+<p>EC2は、<strong>「クラウド上の仮想サーバー（パソコン）」</strong>です。自分のPCの代わりに、インターネット上にWindowsやLinuxのPCを借りて、そこでプログラムを動かす場所と考えれば分かりやすいでしょう。</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">EC2のイメージ：仮想のレンタルPC</div>
+  <div class="flow-row">
+    <div style="text-align:center;">
+      <div class="svc-box" style="border:1px dashed #999;">あなたのPC</div>
+      <div class="arrow-down">↓ リモート接続</div>
+      <div class="svc-box svc-ec2">
+        <span class="svc-label">Amazon EC2</span>
+        <div class="internal-stack">
+          <span class="stack-item">アプリケーション</span>
+          <span class="stack-item">OS (Windows / Linux)</span>
+          <span class="stack-item">CPU / メモリ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>役割：</strong> 自由に使えるコンピューティングリソース（計算能力）。</li>
+<li><strong>試験ポイント：</strong> サーバーの電源管理や、OSのアップデート（パッチ当て）は<strong>「利用者の責任」</strong>で行います。AWSはハードウェアのみ管理します。</li>
+</ul>
+
+<h2>2. Amazon S3（エススリー）</h2>
+<p>S3は、<strong>「容量無制限のデータ保管庫」</strong>です。PCに繋がっているハードディスクではなく、インターネット上に独立して存在する巨大な「物置」です。GoogleドライブやDropboxの「システム用」のようなものとイメージしてください。</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">S3のイメージ：巨大なファイル倉庫</div>
+  <div class="flow-row">
+    <div style="text-align:center;">
+      <div style="display:inline-block; margin:0 10px;">スマホ</div>
+      <div style="display:inline-block; margin:0 10px;">PC</div>
+    </div>
+  </div>
+  <div class="arrow-down">↓ インターネット (HTTP/HTTPS)</div>
+  <div class="svc-box svc-s3">
+    <span class="svc-label">Amazon S3</span>
+    <span class="svc-desc">バケット（入れ物）</span>
+    <div class="flow-row" style="margin-top:0.5rem; gap:0.5rem;">
+      <span class="stack-item">画像.jpg</span>
+      <span class="stack-item">動画.mp4</span>
+      <span class="stack-item">ログ.txt</span>
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>役割：</strong> 画像、動画、ログファイルなどを「オブジェクト」として保存します。</li>
+<li><strong>試験ポイント：</strong> 容量は<strong>無制限</strong>（使った分だけ課金）です。Webサイトの静的コンテンツ（画像など）置き場として頻繁に使われます。</li>
+</ul>
+
+<h2>3. Amazon RDS（アールディーエス）</h2>
+<p>RDSは、<strong>「面倒な管理をAWSがやってくれるSQLデータベース」</strong>です。EC2の中に自分でDBソフトをインストールすることも可能ですが、バックアップや設定が大変です。RDSはその「面倒な作業」をAWSが肩代わりしてくれます。</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">RDSのイメージ：管理お任せDB</div>
+  <div class="flow-row">
+    <div class="svc-box svc-ec2" style="font-size:0.8rem; min-width:80px;">アプリ<br>(EC2など)</div>
+    <div class="arrow-right">→ SQL命令</div>
+    <div class="svc-box svc-rds">
+      <span class="svc-label">Amazon RDS</span>
+      <div class="internal-stack">
+        <span class="stack-item">DBエンジン (MySQL等)</span>
+        <span class="stack-managed">自動バックアップ</span>
+        <span class="stack-managed">パッチ適用・自動復旧</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>役割：</strong> 構造化データの管理（SQLを使用）。</li>
+<li><strong>試験ポイント：</strong> <strong>「マネージドサービス」</strong>の代表例です。利用者は「データの中身」の管理に集中し、インフラ運用はAWSに任せます。</li>
+</ul>
+
+<h2>4. この3つはどう連携する？</h2>
+<p>実際のシステム開発やAWS認定試験では、この3つを組み合わせた構成が頻出です。例えば「ショッピングサイト」を作る場合、以下のような役割分担が鉄板パターンとなります。</p>
+
+<div class="diagram-container">
+  <div class="architecture-diagram">
+    <div class="area-ec2 svc-box svc-ec2">
+      <span class="svc-label">EC2</span>
+      <span class="svc-desc">Webサイトの<br>プログラム（レジ係）</span>
+    </div>
+    
+    <div class="area-arrow1">画像を保存 ➔</div>
+    <div class="area-s3 svc-box svc-s3">
+      <span class="svc-label">S3</span>
+      <span class="svc-desc">商品写真（商品棚）</span>
+    </div>
+
+    <div class="area-arrow2">注文履歴を保存 ➔</div>
+    <div class="area-rds svc-box svc-rds">
+      <span class="svc-label">RDS</span>
+      <span class="svc-desc">顧客リスト（帳簿）</span>
+    </div>
+  </div>
+</div>
+
+<p>このように、「処理はEC2」「ファイルはS3」「データはRDS」という役割分担をイメージできれば、AWSの基礎的なアーキテクチャは理解できたと言えます。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
