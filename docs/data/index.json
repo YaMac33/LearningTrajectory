@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-iam-concepts",
+    "category": "awscp",
+    "timestamp": "2026-01-31T21:37:38+09:00",
+    "title": "AWS IAMの基本概念を理解しよう",
+    "summary": "AWS IAMの役割や基本用語を理解し、認証と認可の仕組みを学ぶことで、試験対策に役立ちます。",
+    "tags": [
+      "AWS",
+      "IAM",
+      "セキュリティ",
+      "管理",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-01-31-awscp-aws-iam-concepts/"
+  },
+  {
     "id": "awscp-dns-route-53-differences",
     "category": "awscp",
     "timestamp": "2026-01-31T21:32:35+09:00",
