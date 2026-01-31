@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | NATゲートウェイの一方通行の仕組み</title>
+  <meta name="description" content="NATゲートウェイがなぜ「中からは出れるが、外からは入れない」のか。IPアドレスの書き換えと変換テーブル（NAPT）の挙動を図解で徹底解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="NATゲートウェイの一方通行の仕組み" />
+  <meta property="og:description" content="NATゲートウェイがなぜ「中からは出れるが、外からは入れない」のか。IPアドレスの書き換えと変換テーブル（NAPT）の挙動を図解で徹底解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 登場人物とパケット */
+    .network-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      align-items: center;
+    }
+    .actor-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .actor-box {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+      min-width: 100px;
+    }
+    .actor-nat {
+      border-color: #007bff;
+      background-color: #e6f2ff;
+    }
+    .actor-hacker {
+      border-color: #d9534f;
+      color: #d9534f;
+    }
+    
+    /* パケット表現 */
+    .packet {
+      border: 1px solid #999;
+      background: #fff;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      text-align: left;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+      margin: 0.5rem 0;
+      position: relative;
+    }
+    .packet-label {
+      position: absolute;
+      top: -8px;
+      right: 5px;
+      background: #eee;
+      padding: 0 4px;
+      font-size: 0.7rem;
+      border-radius: 2px;
+    }
+    .addr-line {
+      display: block;
+      margin-bottom: 2px;
+    }
+    .addr-src { color: #007bff; }
+    .addr-dst { color: #d9534f; }
+    
+    /* 変換テーブル */
+    .napt-table {
+      border: 2px solid #555;
+      background: #fffee0;
+      padding: 0.8rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .table-title {
+      font-weight: bold;
+      border-bottom: 1px dashed #999;
+      padding-bottom: 0.3rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .table-row {
+      font-family: monospace;
+      color: #333;
+    }
+
+    /* 矢印 */
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+      text-align: center;
+    }
+    .arrow-left {
+      font-size: 1.5rem;
+      color: #999;
+      text-align: center;
+    }
+    
+    /* 攻撃ブロック */
+    .block-mark {
+      color: #d9534f;
+      font-weight: bold;
+      font-size: 2rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">NATゲートウェイの一方通行の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">NAT</li>
+            <li class="tag">ネットワーク</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">データ通信</li>
+            <li class="tag">仕組み</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>NATゲートウェイの「一方通行（中からは出れるが、外からは入れない）」という挙動は、セキュリティにおいて非常に重要です。一言で言えば、<strong>「自分から話しかけた相手の返事だけを通し、知らない人からの話しかけは無視する」</strong>という仕組みです。</p>
+<p>これを実現している技術的な裏側である<strong>「変換テーブル（NAPTテーブル）」</strong>と、パケットの書き換え処理について、マンションの「コンシェルジュ（管理人）」に例えて図解します。</p>
+
+<h2>1. 登場人物とIPアドレス</h2>
+<p>仕組みを理解するために、以下のIPアドレスを設定します。</p>
+<ul>
+<li><strong>Aさん（Private EC2）：</strong> <code>10.0.0.5</code> （内線番号。外からは見えない）</li>
+<li><strong>NAT GW（Public）：</strong> <code>203.0.113.1</code> （代表電話番号。外から見える）</li>
+<li><strong>Google先生：</strong> <code>8.8.8.8</code> （インターネット上のサーバー）</li>
+<li><strong>ハッカー：</strong> <code>6.6.6.6</code> （攻撃者）</li>
+</ul>
+
+<h2>2. 「中→外」の通信（リクエスト）</h2>
+<p>Aさんが「Google先生、データをください」と依頼する時の流れです。</p>
+
+<div class="diagram-container">
+  <div class="network-flow">
+    <div class="actor-col">
+      <div class="actor-box">Aさん<br><small>10.0.0.5</small></div>
+      <div class="packet">
+        <span class="packet-label">手紙①</span>
+        <span class="addr-line addr-src">From: 10.0.0.5</span>
+        <span class="addr-line addr-dst">To: 8.8.8.8</span>
+      </div>
+    </div>
+    
+    <div class="arrow-right">➡ 依頼</div>
+
+    <div class="actor-col">
+      <div class="actor-box actor-nat">NAT GW<br><small>203.0.113.1</small></div>
+    </div>
+  </div>
+
+  <div class="napt-table">
+    <span class="table-title">📝 NATのメモ帳 (変換テーブル)</span>
+    <div class="table-row">"10.0.0.5 が 8.8.8.8 と話してる"</div>
+    <div class="table-row" style="font-size:0.8rem; color:#666;">(ポート番号 12345 を使用)</div>
+  </div>
+
+  <div class="network-flow">
+    <div class="actor-col">
+      <div class="actor-box actor-nat">NAT GW<br><small>203.0.113.1</small></div>
+      <div class="packet">
+        <span class="packet-label">手紙② (書換)</span>
+        <span class="addr-line addr-src">From: 203.0.113.1</span>
+        <span class="addr-line addr-dst">To: 8.8.8.8</span>
+      </div>
+    </div>
+
+    <div class="arrow-right">➡ 送信</div>
+
+    <div class="actor-col">
+      <div class="actor-box">Google<br><small>8.8.8.8</small></div>
+    </div>
+  </div>
+</div>
+<p><strong>ポイント：</strong> NATゲートウェイは手紙の「送信元」を自分の住所に書き換え、同時に「誰の依頼か」をメモ帳（テーブル）に残します。</p>
+
+<h2>3. 「外→中」の戻り通信（返信）</h2>
+<p>Google先生からの返事が戻ってくる時の流れです。</p>
+
+<div class="diagram-container">
+  <div class="network-flow">
+    <div class="actor-col">
+      <div class="actor-box">Google<br><small>8.8.8.8</small></div>
+    </div>
+
+    <div class="arrow-left">返信 ⬅</div>
+
+    <div class="actor-col">
+      <div class="actor-box actor-nat">NAT GW<br><small>203.0.113.1</small></div>
+      <div class="packet">
+        <span class="packet-label">手紙③</span>
+        <span class="addr-line addr-src">From: 8.8.8.8</span>
+        <span class="addr-line addr-dst">To: 203.0.113.1</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="napt-table">
+    <span class="table-title">📝 NATのメモ帳を確認</span>
+    <div class="table-row">"お、これはさっきのAさん宛の返事だな"</div>
+    <div class="table-row" style="color:#28a745; font-weight:bold;">→ 転送OK ✅</div>
+  </div>
+
+  <div class="network-flow">
+    <div class="actor-col">
+      <div class="actor-box actor-nat">NAT GW</div>
+    </div>
+    
+    <div class="arrow-left">転送 ⬅</div>
+    
+    <div class="actor-col">
+      <div class="actor-box">Aさん<br><small>10.0.0.5</small></div>
+      <div class="packet">
+        <span class="packet-label">手紙④ (戻し)</span>
+        <span class="addr-line addr-src">From: 8.8.8.8</span>
+        <span class="addr-line addr-dst">To: 10.0.0.5</span>
+      </div>
+    </div>
+  </div>
+</div>
+<p><strong>ポイント：</strong> NATは届いた返信をメモ帳と照合し、Aさん宛だと分かったので宛先を書き戻して転送します。</p>
+
+<h2>4. なぜ攻撃（外→中）は防げるのか？</h2>
+<p>ハッカーがいきなりNATゲートウェイに攻撃パケットを送ってきた場合です。</p>
+
+<div class="diagram-container">
+  <div class="network-flow">
+    <div class="actor-col">
+      <div class="actor-box actor-hacker">ハッカー<br><small>6.6.6.6</small></div>
+      <div class="packet" style="border-color:#d9534f;">
+        <span class="packet-label">攻撃手紙</span>
+        <span class="addr-line addr-src">From: 6.6.6.6</span>
+        <span class="addr-line addr-dst">To: 203.0.113.1</span>
+      </div>
+    </div>
+
+    <div class="arrow-right" style="color:#d9534f;">➡ 攻撃</div>
+
+    <div class="actor-col">
+      <div class="actor-box actor-nat">NAT GW</div>
+    </div>
+  </div>
+
+  <div class="napt-table">
+    <span class="table-title">📝 NATのメモ帳を確認</span>
+    <div class="table-row">"ん？ 6.6.6.6 なんて知らないぞ"</div>
+    <div class="table-row">"内部の誰も話しかけてない"</div>
+    <div class="table-row" style="color:#d9534f; font-weight:bold;">→ 転送先不明 ❌</div>
+  </div>
+  
+  <div class="block-mark">🗑️ 破棄</div>
+</div>
+<p><strong>ポイント：</strong> NATはメモ帳に載っていない（内部からリクエストしていない）通信が来ても、<strong>「誰に転送していいか分からない」ため、その場で破棄</strong>します。AさんのIPアドレス（10.0.0.5）への転送ルールが存在しないため、物理的に届きません。</p>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>行き（Outbound）：</strong> NATが送信元を「自分」に書き換え、「誰の依頼か」をテーブルに記録する。</li>
+<li><strong>帰り（Inbound）：</strong> テーブルに記録がある「返信」だけを、元の依頼者に転送する。</li>
+<li><strong>攻撃（Unsolicited）：</strong> テーブルに記録がない通信は、転送先が不明なので破棄される。</li>
+</ul>
+<p>これがNATゲートウェイが「マジックミラー」や「一方通行」と呼ばれる具体的な仕組み（NAPT：Network Address Port Translation）です。この仕組みのおかげで、プライベートサブネットは安全に守られています。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
