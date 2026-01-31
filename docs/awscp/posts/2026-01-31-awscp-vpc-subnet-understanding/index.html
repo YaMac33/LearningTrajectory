@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | VPCとサブネットの理解</title>
+  <meta name="description" content="AWSのVPCとサブネットを「土地開発」に例えて解説。パブリックとプライベートの違い、NATゲートウェイの役割など、インフラ設計の基礎を学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="VPCとサブネットの理解" />
+  <meta property="og:description" content="AWSのVPCとサブネットを「土地開発」に例えて解説。パブリックとプライベートの違い、NATゲートウェイの役割など、インフラ設計の基礎を学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* VPC構成図 */
+    .vpc-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 550px;
+    }
+    .internet-cloud {
+      background: #eef;
+      border: 2px cloud #ccc;
+      padding: 0.5rem 2rem;
+      border-radius: 20px;
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .vpc-area {
+      border: 3px solid #888;
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      position: relative;
+      background: #fff;
+    }
+    .vpc-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #fff;
+      padding: 0 10px;
+      font-weight: bold;
+      color: #555;
+    }
+    .igw-gate {
+      border: 2px solid #333;
+      background: #fff;
+      width: 120px;
+      text-align: center;
+      padding: 0.3rem;
+      margin: -2.3rem auto 1rem auto; /* VPC枠線の上に配置 */
+      font-weight: bold;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .az-area {
+      border: 2px dashed #aaa;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      background: #fafafa;
+      position: relative;
+    }
+    .az-label {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .subnet-box {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .subnet-box.public {
+      background-color: #e6f7ff;
+      border-color: #91d5ff;
+    }
+    .subnet-box.private {
+      background-color: #fff7e6;
+      border-color: #ffd591;
+    }
+    .subnet-label {
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .resource-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .resource-box {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      text-align: center;
+      min-width: 80px;
+      font-weight: bold;
+    }
+    .res-ec2 { border-color: #d86613; color: #d86613; }
+    .res-rds { border-color: #2a5caa; color: #2a5caa; }
+    .res-nat { border-color: #666; color: #666; border-style: dashed;}
+
+    .arrow-down {
+      font-size: 1.5rem;
+      color: #aaa;
+      text-align: center;
+      line-height: 1;
+      margin: 0.2rem 0;
+    }
+
+    /* 土地開発の比喩 */
+    .analogy-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    .analogy-table th, .analogy-table td {
+      border: 1px solid #ddd;
+      padding: 0.8rem;
+      text-align: left;
+    }
+    .analogy-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-01-31">
+            2026.01.31
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">VPCとサブネットの理解</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">VPC</li>
+            <li class="tag">サブネット</li>
+            <li class="tag">インフラ設計</li>
+            <li class="tag">クラウド</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSのネットワーク設計で最もつまずきやすく、かつ最も重要なのが「VPC」と「サブネット」です。ここを理解すると、「なぜWebサイトが表示されるのか」「なぜ安全なのか」が手に取るように分かるようになります。今回は<strong>「土地開発（不動産）」</strong>に例えて解説します。</p>
+
+<h2>1. VPC（Virtual Private Cloud）：あなたが買った「土地」</h2>
+<p>VPCとは、AWSという広大な大陸の中に、あなたがフェンスで囲って購入した<strong>「私有地」</strong>です。</p>
+<ul>
+<li><strong>ルール：</strong> この土地の中はあなたの自由です。どんな建物を建てても、どんな道路を引いても構いません。許可なく他人は入ってこられません（完全なプライベート空間）。</li>
+<li><strong>範囲：</strong> 1つのリージョン（例：東京）全体にまたがって作られます。</li>
+</ul>
+
+<h2>2. サブネット：土地を区切った「区画」</h2>
+<p>広大な土地（VPC）にいきなり建物を建てると管理しにくいため、道路を引いていくつかのブロックに分けます。これをサブネットと呼びます。</p>
+<p><strong>試験に出る重要ルール：</strong><br>
+VPCはリージョン全体に広がりますが、サブネットは<strong>「1つのAZ（アベイラビリティーゾーン）の中」</strong>に作らなければなりません。AZをまたぐ区画は作れません。</p>
+
+<h2>3. 「パブリック」と「プライベート」の決定的違い</h2>
+<p>土地を区画整理する際、そのエリアを「誰向けにするか」を決めます。</p>
+
+<h3>① パブリックサブネット（表の顔）</h3>
+<ul>
+<li><strong>役割：</strong> 外部（インターネット）からお客さんが来るエリア。お店の「店舗スペース」です。</li>
+<li><strong>置くもの：</strong> Webサーバー（EC2）、ロードバランサー（ELB）。</li>
+<li><strong>条件：</strong> <strong>インターネットゲートウェイ（IGW）</strong>という「正門」への地図（ルートテーブル）を持っています。</li>
+</ul>
+
+<h3>② プライベートサブネット（裏の顔）</h3>
+<ul>
+<li><strong>役割：</strong> 外部から隠したい、重要なものを置くエリア。お店の「金庫室」や「事務室」です。</li>
+<li><strong>置くもの：</strong> データベース（RDS）、社外秘の処理サーバー。</li>
+<li><strong>条件：</strong> インターネットへの出口（IGW）と直接繋がっていません。</li>
+</ul>
+
+<h2>4. 構成図（データの流れ）</h2>
+<p>インターネットからユーザーがアクセスし、Webサーバーを経由して奥のデータベースへ繋がる流れを図解します。</p>
+
+<div class="diagram-container">
+  <div class="vpc-diagram">
+    <div class="internet-cloud">インターネットの世界 🌐</div>
+    <div class="arrow-down">↓ 1. アクセス</div>
+    
+    <div class="vpc-area">
+      <div class="vpc-label">VPC (私有地)</div>
+      <div class="igw-gate">IGW (正門) 🚪</div>
+
+      <div class="az-area">
+        <div class="az-label">Availability Zone-a</div>
+
+        <!-- Public -->
+        <div class="subnet-box public">
+          <div class="subnet-label">
+            <span>パブリックサブネット ☀️</span>
+            <small>接客エリア</small>
+          </div>
+          <div class="resource-wrapper">
+            <div class="resource-box res-ec2">EC2<br>(Web)</div>
+            <div class="resource-box res-nat">NAT GW<br>(代理人)</div>
+          </div>
+        </div>
+
+        <div class="arrow-down" style="font-size:1.2rem;">↓ 2. データ取得</div>
+
+        <!-- Private -->
+        <div class="subnet-box private">
+          <div class="subnet-label">
+            <span>プライベートサブネット 🔒</span>
+            <small>関係者以外立入禁止</small>
+          </div>
+          <div class="resource-wrapper">
+            <div class="resource-box res-rds">RDS<br>(DB)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>5. 試験の難所：「NATゲートウェイ」とは？</h2>
+<p>ここで一つ問題が発生します。「プライベートサブネットにあるRDS（金庫番）も、OSアップデートのためにネットからファイルを落としたい時はどうする？」<br>
+直接インターネットに繋ぐと、外から侵入されるリスクが発生してしまいます。そこで登場するのが<strong>NAT（ナット）ゲートウェイ</strong>です。</p>
+<ul>
+<li><strong>役割：</strong> 「中から外へ」の通信だけを通して、「外から中へ」の通信はブロックするマジックミラーのような装置です。</li>
+<li><strong>配置場所：</strong> 必ず<strong>「パブリックサブネット」</strong>に置きます。</li>
+<li><strong>データの流れ：</strong> RDS → NATゲートウェイ（パブリックにある代理人） → インターネット</li>
+</ul>
+
+<h2>6. まとめ：VPC攻略の合言葉</h2>
+<p>用語と不動産のたとえをセットで覚えておきましょう。</p>
+
+<table class="analogy-table">
+  <tr>
+    <th>用語</th>
+    <th>たとえ</th>
+  </tr>
+  <tr>
+    <td><strong>VPC</strong></td>
+    <td>リージョンに作る「私有地」</td>
+  </tr>
+  <tr>
+    <td><strong>サブネット</strong></td>
+    <td>AZに作る「区画」</td>
+  </tr>
+  <tr>
+    <td><strong>IGW</strong></td>
+    <td>インターネットへの「正門」</td>
+  </tr>
+  <tr>
+    <td><strong>ルートテーブル</strong></td>
+    <td>どこへ行くか決める「地図」</td>
+  </tr>
+  <tr>
+    <td><strong>NAT GW</strong></td>
+    <td>外に出るための「代理人」</td>
+  </tr>
+</table>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
