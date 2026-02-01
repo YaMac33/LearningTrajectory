@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-rekognition-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-02T08:30:41+09:00",
+    "title": "AWS-CP対策：Amazon Rekognitionの概要",
+    "summary": "Amazon Rekognitionは、画像や動画を解析するAIサービスで、高速で物体検出や顔認証が行えます。試験に頻出の機能を理解することで、実践的な活用が可能です。",
+    "tags": [
+      "AI",
+      "Amazon Rekognition",
+      "画像分析",
+      "顔認証",
+      "PPE検出"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-rekognition-overview/"
+  },
+  {
     "id": "awscp-ses-sns-difference",
     "category": "awscp",
     "timestamp": "2026-02-02T08:28:26+09:00",
