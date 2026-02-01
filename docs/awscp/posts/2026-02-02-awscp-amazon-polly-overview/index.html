@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Pollyの概要と活用法</title>
+  <meta name="description" content="Amazon Pollyはテキストを自然な声で読み上げるAIサービスです。SSMLによる抑揚の調整や、Transcribe・Lexとの役割の違いなど、試験頻出ポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Pollyの概要と活用法" />
+  <meta property="og:description" content="Amazon Pollyはテキストを自然な声で読み上げるAIサービスです。SSMLによる抑揚の調整や、Transcribe・Lexとの役割の違いなど、試験頻出ポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* AIサービス比較（人体メタファー） */
+    .ai-body-parts {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .part-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .part-transcribe { border-top: 4px solid #2a5caa; } /* Blue */
+    .part-polly { border-top: 4px solid #d63384; } /* Pink */
+    .part-lex { border-top: 4px solid #d86613; } /* Orange */
+
+    .part-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .part-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+    .part-service {
+      font-size: 0.85rem;
+      color: #666;
+      font-weight: bold;
+      margin-bottom: 0.8rem;
+      display: block;
+    }
+    .part-desc {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* SSMLコード風表示 */
+    .ssml-box {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 1.5rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      line-height: 1.6;
+    }
+    .tag { color: #e06c75; }
+    .attr { color: #d19a66; }
+    .val { color: #98c379; }
+    .text { color: #abb2bf; }
+
+    /* レキシコン解説 */
+    .lexicon-flow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #fff;
+      padding: 1rem;
+      border: 1px dashed #999;
+      border-radius: 8px;
+    }
+    .bad-read { color: #d9534f; text-decoration: line-through; }
+    .good-read { color: #28a745; font-weight: bold; }
+    .arrow-right { font-size: 1.2rem; color: #999; }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff0f6; /* Polly Pink light */
+      font-weight: bold;
+      color: #d63384;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #d63384;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Pollyの概要と活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Amazon Polly</li>
+            <li class="tag">Text-to-Speech</li>
+            <li class="tag">AI</li>
+            <li class="tag">音声合成</li>
+            <li class="tag">SSML</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon Polly（ポリー）は、AWSが提供する「テキスト読み上げ（Text-to-Speech）」</strong>サービスです。一言で言うと、<strong>「あなたの文章を、人間のような自然な声で読み上げてくれる『AIの口』」</strong>です。先ほど学んだ Amazon Transcribe（耳：文字起こし） の正反対の動きをするサービスと覚えると完璧です。</p>
+
+<h2>1. Amazon Polly とは？</h2>
+<p>ブログ記事、ニュース、ドキュメントなどの「テキストデータ」を渡すと、それを瞬時に「音声データ（MP3など）」に変換して返してくれます。</p>
+<ul>
+<li><strong>特徴：</strong> 昔のロボットのような「ワレワレハ…」という声ではなく、息継ぎや抑揚まで再現した<strong>「超リアルな肉声（Neural Text-to-Speech）」</strong>を作れます。</li>
+<li><strong>多言語対応：</strong> 日本語はもちろん、英語、スペイン語など数十カ国の言語と、男性・女性・子供など多数の声色から選べます。</li>
+</ul>
+
+<h2>2. 試験に出る「3つの専門用語」</h2>
+<p>Pollyを使いこなすための機能として、以下のキーワードが頻出です。</p>
+
+<h3>① SSML (Speech Synthesis Markup Language)</h3>
+<p>Pollyに「ただ読むだけじゃなくて、感情を込めて！」と指示出しをするための<strong>「台本（マークアップ言語）」</strong>です。HTMLタグのような書き方で、細かい演出ができます。</p>
+
+<div class="diagram-container">
+  <div class="ssml-box">
+    <span class="tag">&lt;speak&gt;</span><br>
+    &nbsp;&nbsp;こんにちは。<br>
+    &nbsp;&nbsp;<span class="tag">&lt;break</span> <span class="attr">time</span>=<span class="val">"3s"</span><span class="tag">/&gt;</span> <span style="color:#666;">&lt;!-- 3秒の間 --&gt;</span><br>
+    &nbsp;&nbsp;<span class="tag">&lt;amazon:effect</span> <span class="attr">name</span>=<span class="val">"whispered"</span><span class="tag">&gt;</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;ここは秘密の話だよ。<br>
+    &nbsp;&nbsp;<span class="tag">&lt;/amazon:effect&gt;</span> <span style="color:#666;">&lt;!-- ささやき声 --&gt;</span><br>
+    <span class="tag">&lt;/speak&gt;</span>
+  </div>
+</div>
+<ul class="check-list">
+<li><strong>試験対策：</strong> 「読み上げの速度を変えたい」「ささやかせたい」「息継ぎを入れたい」と言われたら <strong>SSML</strong> です。</li>
+</ul>
+
+<h3>② レキシコン (Custom Lexicons)</h3>
+<p>Pollyが読み方を間違えそうな、<strong>「特殊な単語の辞書」</strong>です。</p>
+
+<div class="diagram-container">
+  <div class="lexicon-flow">
+    <div>
+      入力：<strong>AWS</strong>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div>
+      <div class="bad-read">× アウズ</div>
+      <div class="good-read">○ エーダブリューエス</div>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; margin-top:0.5rem; text-align:center;">辞書に登録することで、社内用語や略語を正しく読ませます。</p>
+</div>
+
+<h3>③ スピーチマーク (Speech Marks) / ビゼーム (Visemes)</h3>
+<p>音声と一緒に、「今、口をどう動かしているか」というメタデータも受け取れる機能です。</p>
+<ul>
+<li><strong>用途：</strong> CGキャラクター（アバター）の口を、音声に合わせてパクパクさせたい時（リップシンク）に使います。</li>
+<li><strong>試験対策：</strong> 「アニメーションの顔の動きを音声と同期させたい」と言われたらこれです。</li>
+</ul>
+
+<h2>3. AIサービス「耳・口・脳」の最終確認</h2>
+<p>これまで学んだ3つのAIサービスを整理しましょう。試験ではこの違いが問われます。</p>
+
+<div class="diagram-container">
+  <div class="ai-body-parts">
+    <!-- 耳 -->
+    <div class="part-card part-transcribe">
+      <span class="part-icon">👂</span>
+      <span class="part-title">耳</span>
+      <span class="part-service">Amazon Transcribe</span>
+      <p class="part-desc">
+        <strong>文字起こし</strong><br>
+        音声ファイル ➡ テキスト
+      </p>
+    </div>
+
+    <!-- 口 -->
+    <div class="part-card part-polly">
+      <span class="part-icon">👄</span>
+      <span class="part-title">口</span>
+      <span class="part-service">Amazon Polly</span>
+      <p class="part-desc">
+        <strong>読み上げ</strong><br>
+        テキスト ➡ 音声ファイル
+      </p>
+    </div>
+
+    <!-- 脳 -->
+    <div class="part-card part-lex">
+      <span class="part-icon">🧠</span>
+      <span class="part-title">脳</span>
+      <span class="part-service">Amazon Lex</span>
+      <p class="part-desc">
+        <strong>会話・理解</strong><br>
+        チャットボット ➡ 意図を理解
+      </p>
+    </div>
+  </div>
+</div>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>機能</th>
+      <th>データの流れ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Amazon Transcribe</td>
+      <td>Speech-to-Text</td>
+      <td>音声 ➡ テキスト</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell">Amazon Polly</td>
+      <td>Text-to-Speech</td>
+      <td>テキスト ➡ 音声</td>
+    </tr>
+    <tr>
+      <td>Amazon Lex</td>
+      <td>Chatbot</td>
+      <td>対話 ➡ 処理実行</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 具体的な活用シナリオ</h2>
+<ul class="check-list">
+<li><strong>コンテンツ作成：</strong> 「ブログを書いたので、通勤中に聞けるようにオーディオブック化（MP3化）したい」</li>
+<li><strong>アクセシビリティ：</strong> 「視覚障害のある方向けに、Webサイトのニュースを自動で読み上げたい」</li>
+<li><strong>電話応対 (Amazon Connect連携)：</strong> 電話口で「ご予約ですね」と流暢に喋っているのは、実はPolly（ニューラル音声）です。</li>
+</ul>
+
+<h2>5. まとめ</h2>
+<p>Pollyは、単に文字を読むだけでなく、SSMLを使うことで「感情」や「間」を表現できる強力な音声合成サービスです。Transcribe（文字起こし）と対にして覚えておけば、試験で迷うことはありません。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
