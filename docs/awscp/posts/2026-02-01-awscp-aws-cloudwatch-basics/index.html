@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS CloudWatchの基本機能</title>
+  <meta name="description" content="AWSの健康診断医であるCloudWatchについて解説。3大機能（メトリクス・ログ・アラーム）の仕組みと、混同しやすいCloudTrailとの決定的な違いを整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS CloudWatchの基本機能" />
+  <meta property="og:description" content="AWSの健康診断医であるCloudWatchについて解説。3大機能（メトリクス・ログ・アラーム）の仕組みと、混同しやすいCloudTrailとの決定的な違いを整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 監視フロー図 */
+    .monitoring-flow {
+      display: grid;
+      grid-template-areas: 
+        "target arrow1 cw arrow2 action"
+        "target arrow1 cw arrow2 .";
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 700px;
+    }
+    .flow-box {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      position: relative;
+    }
+    .box-target {
+      grid-area: target;
+      border-color: #d86613; /* EC2 color */
+    }
+    .box-cw {
+      grid-area: cw;
+      border-color: #d63384; /* CloudWatch color ish */
+      background: #fff0f6;
+    }
+    .box-action {
+      grid-area: action;
+      border-color: #28a745;
+    }
+    
+    .arrow-right {
+      color: #666;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .arrow-label {
+      font-size: 0.75rem;
+      color: #666;
+      display: block;
+      margin-bottom: -5px;
+    }
+
+    /* アクション分岐 */
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+    .action-item {
+      background: #eee;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+    }
+    .action-item::before {
+      content: "⚡";
+      margin-right: 0.3rem;
+    }
+
+    /* CloudWatch vs CloudTrail 比較 */
+    .compare-container {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .compare-card {
+      flex: 1;
+      min-width: 280px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .card-role {
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+      width: 100%;
+      text-align: center;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: left;
+      width: 100%;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff0f6; /* CW highlight */
+      font-weight: bold;
+    }
+
+    /* メトリクス例 */
+    .metrics-list {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+    .metric-badge {
+      background: #eee;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      border: 1px solid #ddd;
+    }
+    .metric-custom {
+      background: #fff3cd;
+      border-color: #ffeeba;
+      color: #856404;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS CloudWatchの基本機能</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">CloudWatch</li>
+            <li class="tag">監視</li>
+            <li class="tag">メトリクス</li>
+            <li class="tag">ログ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>これまでEC2やRDSなど様々なサービスを学んできましたが、それらが「元気に動いているか」をどうやって知ればよいでしょうか？ <strong>Amazon CloudWatch（クラウドウォッチ）</strong>は、まさにAWS環境の<strong>「健康診断医」兼「監視カメラ」</strong>です。</p>
+
+<h2>1. CloudWatchの3大機能</h2>
+<p>CloudWatchは何でも監視できますが、基本となるのは以下の3つの機能です。</p>
+
+<h3>① メトリクス（Metrics）：数値で見る</h3>
+<p>「CPU使用率」「ネットワーク通信量」などの数値データをグラフ化して監視します。</p>
+<div class="metrics-list">
+  <span class="metric-badge">CPU使用率 (標準)</span>
+  <span class="metric-badge">ディスク読込 (標準)</span>
+  <span class="metric-badge">ネットワーク (標準)</span>
+  <span class="metric-badge metric-custom">⚠ メモリ使用率 (カスタム)</span>
+</div>
+<blockquote>
+<p><strong>試験の超頻出ポイント：</strong><br>
+EC2の<strong>「メモリ使用率」</strong>は、標準では取得できません（AWS側からはOS内部のメモリが見えないため）。これを見るには、EC2内部にエージェントを入れて「カスタムメトリクス」として送信する必要があります。</p>
+</blockquote>
+
+<h3>② ログ（Logs）：文字で見る</h3>
+<p>アプリケーションが出すエラーログや、システムログを収集・保存します。サーバーにSSHでログインしなくても、AWSの管理画面からログを確認できるようになります。</p>
+
+<h3>③ アラーム（Alarms）：異常を知らせる</h3>
+<p>「メトリクス」が特定のラインを超えたら、自動でアクションを起こします。これが運用の自動化の鍵です。</p>
+
+<h2>2. 図解：監視からアクションまでの流れ</h2>
+<p>「異常検知 → 自動対応」の流れは、CloudWatchの真骨頂です。この連携フローをイメージできるようにしましょう。</p>
+
+<div class="diagram-container">
+  <div class="monitoring-flow">
+    <!-- EC2 -->
+    <div class="box-target" style="grid-area: target;">
+      EC2<br>
+      <small>(監視対象)</small>
+    </div>
+    
+    <!-- Arrow 1 -->
+    <div style="grid-area: arrow1;">
+      <span class="arrow-label">データ送信📡</span>
+      <div class="arrow-right">➡</div>
+    </div>
+    
+    <!-- CloudWatch -->
+    <div class="box-cw" style="grid-area: cw;">
+      <strong>CloudWatch</strong>
+      <div style="margin-top:0.5rem; font-size:0.85rem; border-top:1px solid #d63384; padding-top:0.3rem;">
+        📈 メトリクス<br>
+        <span style="color:#d9534f;">"CPU 90%!!"</span>
+      </div>
+    </div>
+    
+    <!-- Arrow 2 -->
+    <div style="grid-area: arrow2;">
+      <span class="arrow-label">アラーム発動🔔</span>
+      <div class="arrow-right">➡</div>
+    </div>
+    
+    <!-- Action -->
+    <div class="box-action" style="grid-area: action;">
+      <strong>アクション実行</strong>
+      <div class="action-group" style="margin-top:0.5rem;">
+        <div class="action-item">📩 メール通知 (SNS)</div>
+        <div class="action-item">🤖 Auto Scaling (サーバー追加)</div>
+        <div class="action-item">🔄 EC2再起動</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. 試験の鬼門：「CloudWatch」vs「CloudTrail」</h2>
+<p>AWS認定試験で最も混同しやすいのが、この2つのサービスです。どちらも「監視・記録」系ですが、目的が全く違います。</p>
+
+<div class="diagram-container">
+  <div class="compare-container">
+    <div class="compare-card">
+      <div class="card-icon">🩺</div>
+      <div class="card-title">CloudWatch</div>
+      <div class="card-role">健康監視</div>
+      <div class="card-desc">
+        <ul class="check-list">
+          <li><strong>Watch = 見る (Monitoring)</strong></li>
+          <li>「今、サボってないか？」</li>
+          <li>CPU、メモリ、エラー数</li>
+          <li>キーワード：<strong>「パフォーマンス」「リソース使用率」</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="compare-card">
+      <div class="card-icon">🐾</div>
+      <div class="card-title">CloudTrail</div>
+      <div class="card-role">犯人捜し (監査)</div>
+      <div class="card-desc">
+        <ul class="check-list">
+          <li><strong>Trail = 足跡 (Auditing)</strong></li>
+          <li>「誰が、いつ、何をした？」</li>
+          <li>API操作履歴、ログイン履歴</li>
+          <li>キーワード：<strong>「誰が」「コンプライアンス」「監査」</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>4. EventBridge (旧 CloudWatch Events)</h2>
+<p>CloudWatchの一部から独立して進化したサービスもセットで覚えましょう。</p>
+<ul>
+<li><strong>役割：</strong> AWS内で起きた「変化（イベント）」をトリガーに、自動処理を行う。</li>
+<li><strong>例：</strong>
+<ul>
+<li>「EC2が『停止』状態になったら、Slackに通知を送る」</li>
+<li>「毎日深夜1時に、Lambdaを動かしてバックアップを取る（スケジュール実行）」</li>
+</ul>
+</li>
+</ul>
+
+<h2>5. まとめ</h2>
+<p>CloudWatchはシステムの<strong>「バイタルサイン（脈拍・体温）」</strong>を測る道具です。</p>
+<ul class="check-list">
+<li><strong>メトリクス：</strong> CPUなどの数値をグラフ化。</li>
+<li><strong>アラーム：</strong> 異常値が出たらメール通知やオートスケーリングを作動。</li>
+<li><strong>対比：</strong> 性能監視はCloudWatch、操作履歴（監査）はCloudTrail。</li>
+</ul>
+<p>これで、システムを「作る（EC2/RDS）」「繋ぐ（VPC/ELB）」「守る（IAM/SG）」に続き、「診る（CloudWatch）」ことができるようになりました。運用フェーズで最も重要なサービスですので、しっかり区別しておきましょう。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
