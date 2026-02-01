@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSウェル・アーキテクテッド入門</title>
+  <meta name="description" content="AWS Well-Architected Frameworkの6つの柱を解説。最強のシステムを構築するための設計図と評価基準、そして設計原則について学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSウェル・アーキテクテッド入門" />
+  <meta property="og:description" content="AWS Well-Architected Frameworkの6つの柱を解説。最強のシステムを構築するための設計図と評価基準、そして設計原則について学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 6つの柱グリッド */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+    }
+    .pillar-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 5px solid #666;
+    }
+    .pillar-ops { border-left-color: #e67e22; }
+    .pillar-sec { border-left-color: #e74c3c; }
+    .pillar-rel { border-left-color: #3498db; }
+    .pillar-perf { border-left-color: #9b59b6; }
+    .pillar-cost { border-left-color: #2ecc71; }
+    .pillar-sus { border-left-color: #1abc9c; }
+
+    .pillar-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .pillar-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #333;
+    }
+    .pillar-keyword {
+      font-size: 0.85rem;
+      color: #666;
+      background: #f0f0f0;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-right: 0.3rem;
+      display: inline-block;
+      margin-bottom: 0.3rem;
+    }
+    .pillar-desc {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+
+    /* 設計原則リスト */
+    .principle-box {
+      width: 100%;
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .principle-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed #eee;
+    }
+    .principle-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .p-head {
+      font-weight: bold;
+      color: #d86613; /* AWS Orange */
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSウェル・アーキテクテッド入門</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Well-Architected</li>
+            <li class="tag">フレームワーク</li>
+            <li class="tag">設計原則</li>
+            <li class="tag">クラウド</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>これまで数多くのAWSサービス（EC2, S3, RDSなど）を学んできましたが、これらはあくまで「武器」や「材料」に過ぎません。良い材料を持っていても、<strong>「どう配置し、どう組み合わせれば、最強の城（システム）になるか？」</strong>を知らなければ意味がありません。</p>
+<p>そのための「設計図」や「評価基準」となるのが、<strong>AWS Well-Architected Framework（ウェル・アーキテクテッド・フレームワーク）</strong>です。試験では「この行動は、どの柱に基づいているか？」という問題が頻出します。</p>
+
+<h2>1. 6つの柱（The 6 Pillars）</h2>
+<p>このフレームワークは、6つの視点（柱）で構成されています。それぞれの目的とキーワードを整理しましょう。</p>
+
+<div class="diagram-container">
+  <div class="pillars-grid">
+    <!-- 1. 運用上の優秀性 -->
+    <div class="pillar-card pillar-ops">
+      <span class="pillar-icon">⚙️</span>
+      <span class="pillar-title">1. 運用上の優秀性<br><small>(Operational Excellence)</small></span>
+      <div>
+        <span class="pillar-keyword">自動化</span>
+        <span class="pillar-keyword">IaC</span>
+        <span class="pillar-keyword">失敗から学ぶ</span>
+      </div>
+      <p class="pillar-desc">
+        システムを運用・監視し、改善し続ける能力。<br>
+        <strong>行動例：</strong> CloudFormationでインフラをコード化する。小さな変更を頻繁に行う。
+      </p>
+    </div>
+
+    <!-- 2. セキュリティ -->
+    <div class="pillar-card pillar-sec">
+      <span class="pillar-icon">🛡️</span>
+      <span class="pillar-title">2. セキュリティ<br><small>(Security)</small></span>
+      <div>
+        <span class="pillar-keyword">多層防御</span>
+        <span class="pillar-keyword">最小権限</span>
+        <span class="pillar-keyword">データ保護</span>
+      </div>
+      <p class="pillar-desc">
+        情報やシステムを保護する能力。<br>
+        <strong>行動例：</strong> IAMで権限を絞る。S3の暗号化を有効にする。CloudTrailでログを取る。
+      </p>
+    </div>
+
+    <!-- 3. 信頼性 -->
+    <div class="pillar-card pillar-rel">
+      <span class="pillar-icon">🔄</span>
+      <span class="pillar-title">3. 信頼性<br><small>(Reliability)</small></span>
+      <div>
+        <span class="pillar-keyword">復旧</span>
+        <span class="pillar-keyword">冗長化</span>
+        <span class="pillar-keyword">スケーリング</span>
+      </div>
+      <p class="pillar-desc">
+        障害から自動復旧し、サービスを止めない能力。「すべては壊れる」が前提。<br>
+        <strong>行動例：</strong> マルチAZ配置。Auto Scaling。復旧手順のテスト。
+      </p>
+    </div>
+
+    <!-- 4. パフォーマンス効率 -->
+    <div class="pillar-card pillar-perf">
+      <span class="pillar-icon">🚀</span>
+      <span class="pillar-title">4. パフォーマンス効率<br><small>(Performance Efficiency)</small></span>
+      <div>
+        <span class="pillar-keyword">サーバーレス</span>
+        <span class="pillar-keyword">適材適所</span>
+      </div>
+      <p class="pillar-desc">
+        リソースを無駄なく効率的に使う能力。<br>
+        <strong>行動例：</strong> CloudFrontで配信を高速化。Lambdaを使ってサーバー管理をなくす。
+      </p>
+    </div>
+
+    <!-- 5. コスト最適化 -->
+    <div class="pillar-card pillar-cost">
+      <span class="pillar-icon">💰</span>
+      <span class="pillar-title">5. コスト最適化<br><small>(Cost Optimization)</small></span>
+      <div>
+        <span class="pillar-keyword">支出把握</span>
+        <span class="pillar-keyword">需要と供給</span>
+      </div>
+      <p class="pillar-desc">
+        無駄な出費を削り、コストを最小化する能力。<br>
+        <strong>行動例：</strong> Cost Explorerで分析。スポットインスタンスの利用。未使用リソースの削除。
+      </p>
+    </div>
+
+    <!-- 6. サステナビリティ -->
+    <div class="pillar-card pillar-sus">
+      <span class="pillar-icon">🌱</span>
+      <span class="pillar-title">6. サステナビリティ<br><small>(Sustainability)</small></span>
+      <div>
+        <span class="pillar-keyword">省エネ</span>
+        <span class="pillar-keyword">カーボンフットプリント</span>
+      </div>
+      <p class="pillar-desc">
+        環境負荷（エネルギー消費）を最小限にする能力。<br>
+        <strong>行動例：</strong> 省電力なAWS Gravitonプロセッサの採用。不要データの削除。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>2. 一般的な設計原則</h2>
+<p>6つの柱全体に通じる、AWS設計における「心構え」です。試験の選択肢で頻出のフレーズです。</p>
+
+<div class="diagram-container">
+  <div class="principle-box">
+    <div class="principle-item">
+      <span class="p-head">🛑 キャパシティの推測をやめる (Stop guessing capacity)</span>
+      「たぶんサーバーは3台くらい必要かな？」という勘をやめ、Auto Scalingで需要に合わせて自動追従させます。
+    </div>
+    <div class="principle-item">
+      <span class="p-head">🧪 本番規模でテストする (Test systems at production scale)</span>
+      クラウドなら本番と同じ環境を一瞬で作れます。テスト時だけ本番相当の環境を用意し、終わったら消すことで低コストに実現できます。
+    </div>
+    <div class="principle-item">
+      <span class="p-head">🧱 アーキテクチャの実験を簡単にする</span>
+      インフラを自動化しておけば、失敗してもすぐに作り直せます。これにより、新しい構成への挑戦が容易になります。
+    </div>
+    <div class="principle-item">
+      <span class="p-head">📊 データに基づいて決定する</span>
+      CloudWatchなどのデータ（事実）に基づいて、アーキテクチャの判断を行います。
+    </div>
+  </div>
+</div>
+
+<h2>3. AWS Well-Architected Tool</h2>
+<p>自分のシステムがこのフレームワークに沿っているかを診断するための、無料のツールがAWSコンソールに用意されています。</p>
+<ul>
+<li><strong>機能：</strong> いくつかの質問に答えるだけで、「セキュリティに高リスクがあります」「信頼性が不十分です」といったレポートを出してくれます。</li>
+</ul>
+
+<h2>4. まとめと学習の完了</h2>
+<p>これで、AWSクラウドプラクティショナー（CLF）合格に必要な主要知識のレクチャーは完了です。</p>
+<ul class="check-list">
+<li><strong>クラウドの概念：</strong> クラウドのメリット、責任共有モデル、Well-Architected。</li>
+<li><strong>セキュリティ：</strong> IAM、WAF、Shield、Artifact、KMS。</li>
+<li><strong>テクノロジー：</strong> EC2, S3, RDS, DynamoDB, Lambda, VPC, Route53, CloudFront, ELB。</li>
+<li><strong>請求と料金：</strong> コスト管理、サポートプラン。</li>
+</ul>
+<p>これらの知識がつながった今、あなたは「AWSという巨大な道具箱」の中身を理解し、適切な道具を選べるようになっています。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
