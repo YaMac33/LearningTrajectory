@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-cloudtrail-exam-prep",
+    "category": "awscp",
+    "timestamp": "2026-02-01T16:37:29+09:00",
+    "title": "CloudTrailの基本と試験対策",
+    "summary": "CloudTrailはAWSアカウントの操作履歴を全て記録し、監査やセキュリティの観点から重要な情報を提供します。試験合格にはCloudWatchとの明確な違いを理解することが求められます。",
+    "tags": [
+      "AWS",
+      "CloudTrail",
+      "セキュリティ",
+      "監査",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-cloudtrail-exam-prep/"
+  },
+  {
     "id": "awscp-aws-cloudwatch-basics",
     "category": "awscp",
     "timestamp": "2026-02-01T16:11:53+09:00",
