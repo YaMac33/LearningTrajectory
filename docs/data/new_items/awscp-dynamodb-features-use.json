@@ -1,0 +1,21 @@
+{
+  "id": "awscp-dynamodb-features-use",
+  "category": "awscp",
+  "timestamp": "2026-02-01T13:34:38+09:00",
+  "post_path": "awscp/posts/2026-02-01-awscp-dynamodb-features-use/",
+  "meta": {
+    "title": "DynamoDBの特長と使い方",
+    "summary": "DynamoDBは超高速・容量無制限のNoSQLデータベースで、RDSとの違いや利用ケースを理解することができる。試験対策にも役立つポイントを解説。",
+    "tags": [
+      "DynamoDB",
+      "NoSQL",
+      "データベース",
+      "AWS",
+      "スキーマレス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
