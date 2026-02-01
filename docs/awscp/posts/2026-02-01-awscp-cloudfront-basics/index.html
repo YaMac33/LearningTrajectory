@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | CloudFrontの基本とメリット</title>
+  <meta name="description" content="CloudFrontはWebサイトを高速化するキャッシュサービスです。エッジロケーションの仕組み、S3と組み合わせたHTTPS化、試験頻出のキーワードについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CloudFrontの基本とメリット" />
+  <meta property="og:description" content="CloudFrontはWebサイトを高速化するキャッシュサービスです。エッジロケーションの仕組み、S3と組み合わせたHTTPS化、試験頻出のキーワードについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* キャッシュの仕組み図 */
+    .cache-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 650px;
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .icon-box {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #ccc;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .icon-user { border-color: #333; }
+    .icon-edge { border-color: #d86613; color: #d86613; background: #fff5eb; }
+    .icon-origin { border-color: #24882c; color: #24882c; background: #eaffea; }
+
+    .arrow-right {
+      color: #999;
+      font-size: 1.2rem;
+      position: relative;
+    }
+    .arrow-label {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      white-space: nowrap;
+      color: #666;
+    }
+
+    .cache-status-box {
+      border: 1px dashed #999;
+      padding: 1rem;
+      border-radius: 6px;
+      width: 100%;
+      background: #fff;
+    }
+    .status-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.2rem;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* ゴールデン構成図 */
+    .golden-stack {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      background: #fff;
+      padding: 1rem;
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+    }
+    .stack-item {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .bg-s3 { background: #24882c; }
+    .bg-cf { background: #d86613; }
+    .bg-r53 { background: #2a5caa; }
+    .plus-sign { font-weight: bold; color: #999; }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CloudFrontの基本とメリット</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">CloudFront</li>
+            <li class="tag">AWS</li>
+            <li class="tag">S3</li>
+            <li class="tag">EC2</li>
+            <li class="tag">キャッシュ</li>
+            <li class="tag">高速化</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon CloudFront（クラウドフロント）は、これまでに学んだS3やEC2と組み合わせることで、Webサイトを<strong>「爆速」</strong>にするためのサービスです。一言で言うと、<strong>「世界中にばら撒かれた『キャッシュ（コピー）置き場』」</strong>です。</p>
+<p>これは「コンビニの物流」に例えると非常に分かりやすくなります。</p>
+<ul>
+<li><strong>S3 (オリジン)：</strong> 「北海道にある巨大な工場」。商品はここにしかありません。</li>
+<li><strong>CloudFront (エッジ)：</strong> 「あなたの家の近所のコンビニ」。</li>
+</ul>
+<p>沖縄のユーザーが北海道まで商品を買いに行くのは大変ですが、近所のコンビニに置いてあれば一瞬で手に入ります。</p>
+
+<h2>1. 仕組みと用語（エッジロケーション）</h2>
+<p>CloudFrontを理解するには、AWSの物理的な場所の区別が重要です。</p>
+<ul>
+<li><strong>リージョン：</strong> 東京、大阪など（データセンターの集まり）。世界に30箇所以上。</li>
+<li><strong>エッジロケーション：</strong> CloudFront専用のキャッシュサーバー。世界に600箇所以上（リージョンより遥かに多い！）。</li>
+</ul>
+
+<h3>データの流れ（キャッシュの仕組み）</h3>
+<p>ロンドンのユーザーが、東京のS3にある画像を見ようとした時の流れを図解します。</p>
+
+<div class="diagram-container">
+  <!-- 1回目：キャッシュミス -->
+  <div class="cache-status-box">
+    <span class="status-title">① 1人目のユーザー（キャッシュミス）</span>
+    <div class="cache-flow">
+      <div class="flow-step">
+        <div class="icon-box icon-user">👤</div>
+        <small>User</small>
+      </div>
+      <div class="arrow-right">➡<div class="arrow-label">要求</div></div>
+      <div class="flow-step">
+        <div class="icon-box icon-edge">🏪</div>
+        <small>Edge<br>(ロンドン)</small>
+      </div>
+      <div class="arrow-right">➡<div class="arrow-label">取りに行く</div></div>
+      <div class="flow-step">
+        <div class="icon-box icon-origin">🏭</div>
+        <small>Origin<br>(東京S3)</small>
+      </div>
+    </div>
+    <p style="font-size:0.8rem; color:#666; margin-top:0.5rem; text-align:center;">まだ商品がないので、工場まで取りに行く（少し遅い）。ついでにコピーを保存。</p>
+  </div>
+
+  <!-- 2回目：キャッシュヒット -->
+  <div class="cache-status-box" style="margin-top:1rem;">
+    <span class="status-title" style="color:#d86613;">② 2人目のユーザー（キャッシュヒット）</span>
+    <div class="cache-flow">
+      <div class="flow-step">
+        <div class="icon-box icon-user">👤</div>
+        <small>User</small>
+      </div>
+      <div class="arrow-right">➡<div class="arrow-label">要求</div></div>
+      <div class="flow-step">
+        <div class="icon-box icon-edge" style="border:2px solid #d86613;">📦</div>
+        <small>Edge<br>(ロンドン)</small>
+      </div>
+      <div class="arrow-right" style="opacity:0.3;">➡</div>
+      <div class="flow-step" style="opacity:0.3;">
+        <div class="icon-box icon-origin">🏭</div>
+        <small>Origin</small>
+      </div>
+    </div>
+    <p style="font-size:0.8rem; color:#666; margin-top:0.5rem; text-align:center;"><strong>在庫がある！</strong> 即座に返す（爆速）。工場へは行かない。</p>
+  </div>
+</div>
+
+<h2>2. CloudFrontの3つのメリット</h2>
+<p>試験では以下のポイントが問われます。</p>
+
+<h3>① レイテンシー（遅延）の低下</h3>
+<p>物理的にユーザーに近い場所からデータを返すので、表示速度が劇的に上がります。動画配信や画像が多いサイトで必須です。</p>
+
+<h3>② セキュリティ向上（DDoS対策）</h3>
+<p>CloudFrontが「最前線の盾」になります。攻撃者が大量のアクセスを送ってきても、世界中のエッジロケーションが分散して受け止めるため、大元のS3やEC2が守られます。<strong>AWS Shield</strong> というDDoS保護機能が標準で組み込まれています。</p>
+
+<h3>③ サーバー負荷の軽減</h3>
+<p>2人目以降のアクセスはエッジが返してくれるので、オリジン（EC2やS3）へのアクセスが激減します。結果としてEC2の台数を減らせたり、S3のリクエスト料金を節約できたりと、コスト削減に繋がります。</p>
+
+<h2>3. 試験に出る重要キーワード</h2>
+<p>CloudFrontの問題が出たら、以下の単語に注目してください。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>用語</th>
+      <th>意味・試験ポイント</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="highlight-cell">Origin<br>(オリジン)</td>
+      <td>データの発生源。S3バケット、EC2インスタンス、ELB、あるいはオンプレミスのサーバーも指定可能。</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell">Distribution<br>(ディストリビューション)</td>
+      <td>CloudFrontの設定そのもの。「どこのオリジンを使うか」「ドメインは何にするか」などをまとめた設定単位。</td>
+    </tr>
+    <tr>
+      <td>TTL<br>(Time To Live)</td>
+      <td>キャッシュの有効期限。これを「0」にすると毎回取りに行く。「24時間」にすると1日は古いまま。情報の鮮度に関わる。</td>
+    </tr>
+    <tr>
+      <td>OAI / OAC</td>
+      <td><strong>「S3の中身をCloudFront経由でしか見せない」</strong>ようにする設定。S3のURLを直接叩いても見られないようにロックを掛ける（セキュリティ）。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. あなたの「ブログ」との関係（HTTPS化）</h2>
+<p>GitHub PagesやS3で公開する静的ブログにおいて、CloudFrontは最強の相棒になります。</p>
+<ul>
+<li><strong>S3単体：</strong> 独自のドメインで「https (鍵マーク)」をつけるのが大変です。</li>
+<li><strong>S3 + CloudFront：</strong> CloudFrontを使うと、簡単に無料でSSL証明書（https）を使えます。</li>
+</ul>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:0.5rem;">AWS静的Webサイトの「ゴールデン構成」</p>
+  <div class="golden-stack">
+    <div class="stack-item bg-s3">S3<br><small>(置き場)</small></div>
+    <div class="plus-sign">＋</div>
+    <div class="stack-item bg-cf">CloudFront<br><small>(配信・SSL)</small></div>
+    <div class="plus-sign">＋</div>
+    <div class="stack-item bg-r53">Route 53<br><small>(ドメイン)</small></div>
+  </div>
+</div>
+
+<h2>5. 間違いやすい「S3 Transfer Acceleration」との違い</h2>
+<p>似たような機能で、試験でひっかけとして出るものがあります。</p>
+<ul class="check-list">
+<li><strong>CloudFront：</strong> コンテンツを<strong>「配る（下り）」</strong>ためのキャッシュ。</li>
+<li><strong>S3 Transfer Acceleration：</strong> 遠くのS3にデータを<strong>「アップロード（上り）」</strong>するのを速くする機能。エッジロケーションを使って、アップロードの近道を作ります。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<p>CloudFrontは「世界中にコピーを置くことで、速く、安全に、安くする」サービスです。これで主要な「攻め」のサービス（EC2, S3, RDS, DynamoDB, CloudFront, Route 53）はほぼ網羅しました。</p>
+<p>これだけのシステムが動いていると、次は<strong>「今、CPUは大丈夫か？」「誰か悪いことしてないか？」と監視したくなりますよね？</strong> 次回は監視サービスについて見ていきましょう。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
