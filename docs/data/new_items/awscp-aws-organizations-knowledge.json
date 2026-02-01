@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-organizations-knowledge",
+  "category": "awscp",
+  "timestamp": "2026-02-02T07:50:57+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-organizations-knowledge/",
+  "meta": {
+    "title": "AWS Organizationsの基礎知識",
+    "summary": "AWS Organizationsは複数のクラウドアカウントを統合管理するサービスです。試験では一括請求とSCPの重要性が問われます。",
+    "tags": [
+      "AWS",
+      "Organizations",
+      "SCP",
+      "一括請求",
+      "クラウド管理"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
