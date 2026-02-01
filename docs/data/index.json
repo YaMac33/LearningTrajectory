@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-ses-sns-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-02T08:28:26+09:00",
+    "title": "SESとSNSの違いを理解しよう",
+    "summary": "AWSのSESとSNSはそれぞれ異なるメッセージ配信サービスで、役割や用途を理解することが試験対策に役立ちます。",
+    "tags": [
+      "AWS",
+      "SES",
+      "SNS",
+      "メッセージング",
+      "通知",
+      "Eメール"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-ses-sns-difference/"
+  },
+  {
     "id": "awscp-aws-iot-core-basics",
     "category": "awscp",
     "timestamp": "2026-02-02T08:20:51+09:00",
