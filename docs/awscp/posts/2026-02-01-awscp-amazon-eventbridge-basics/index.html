@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon EventBridgeの基本</title>
+  <meta name="description" content="AWSサービスを自動連携する「司令塔」、Amazon EventBridge。定期実行やシステムの状態変化をトリガーにアクションを起こす仕組みと、CloudWatch Eventsとの関係について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon EventBridgeの基本" />
+  <meta property="og:description" content="AWSサービスを自動連携する「司令塔」、Amazon EventBridge。定期実行やシステムの状態変化をトリガーにアクションを起こす仕組みと、CloudWatch Eventsとの関係について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* EventBridgeの仕組み図 */
+    .event-bridge-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 650px;
+      flex-wrap: wrap;
+    }
+    
+    .eb-step {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      min-width: 130px;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .step-source { border-color: #2a5caa; color: #2a5caa; } /* Blue */
+    .step-eb { border-color: #d63384; color: #d63384; background-color: #fff0f6; } /* Pink */
+    .step-target { border-color: #d86613; color: #d86613; } /* Orange */
+
+    .step-number {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #333;
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.8rem;
+      line-height: 20px;
+      display: block;
+    }
+    .eb-step.step-eb .step-number { background: #d63384; }
+
+    .step-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .step-label {
+      font-weight: bold;
+      font-size: 0.9rem;
+      display: block;
+    }
+    .step-desc {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.3rem;
+    }
+
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    /* ユースケースボックス */
+    .usecase-box {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      background: #fff;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 1rem;
+    }
+    .usecase-title {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .usecase-icon {
+      font-size: 1.2rem;
+    }
+
+    /* 連携例の矢印 */
+    .integration-flow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #eee;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon EventBridgeの基本</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">EventBridge</li>
+            <li class="tag">AWS</li>
+            <li class="tag">自動化</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">サービス連携</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon EventBridge（イベントブリッジ）は、これまでに学んだAWSのサービスたちを、「ピタゴラスイッチ」のように自動連携させるための「司令塔（ハブ）」</strong>です。一言で言うと、<strong>「『もし〇〇が起きたら、××をする』というルールを管理するサービス」</strong>です。以前は「CloudWatch Events」という名前でしたが、機能が拡張されて今の名前になりました。</p>
+
+<h2>1. 役割：サービス同士の「仲介役」</h2>
+<p>AWSのサービスは、基本的には独立しています。「EC2が停止した」という事実は、そのままでは「Lambda」には伝わりません。EventBridgeは、AWS内で起きるあらゆる「出来事（イベント）」をキャッチして、事前に決められた「ターゲット（宛先）」にパスを出します。</p>
+
+<h2>2. EventBridgeの「3つの構成要素」</h2>
+<p>この3ステップを覚えると、仕組みが完全に理解できます。</p>
+
+<div class="diagram-container">
+  <div class="event-bridge-flow">
+    <div class="eb-step step-source">
+      <span class="step-number">1</span>
+      <span class="step-icon">📢</span>
+      <span class="step-label">イベントソース</span>
+      <div class="step-desc">きっかけ<br>(What happened?)</div>
+    </div>
+    
+    <div class="arrow-right">➡</div>
+    
+    <div class="eb-step step-eb">
+      <span class="step-number">2</span>
+      <span class="step-icon">🧠</span>
+      <span class="step-label">ルール</span>
+      <div class="step-desc">判断・フィルタ<br>(If match...)</div>
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="eb-step step-target">
+      <span class="step-number">3</span>
+      <span class="step-icon">🎯</span>
+      <span class="step-label">ターゲット</span>
+      <div class="step-desc">宛先・命令<br>(Do action!)</div>
+    </div>
+  </div>
+  
+  <div style="margin-top:1.5rem; text-align:left; width:100%; max-width:500px;">
+    <p><strong>具体例：</strong></p>
+    <ul style="font-size:0.9rem;">
+      <li><strong>ソース：</strong> 「毎日 朝9時になった」</li>
+      <li><strong>ルール：</strong> 「あ、9時のスケジュールだ。拾おう」</li>
+      <li><strong>ターゲット：</strong> 「Lambdaを起動しろ！」</li>
+    </ul>
+  </div>
+</div>
+
+<h2>3. 試験に出る「2つのメイン用途」</h2>
+<p>Cloud Practitioner試験では、具体的に以下の2つの使い方が問われます。</p>
+
+<div class="diagram-container">
+  <!-- 用途1 -->
+  <div class="usecase-box">
+    <div class="usecase-title" style="color:#d86613;">
+      <span class="usecase-icon">⏰</span> ① 定期実行（スケジューリング） ★最重要
+    </div>
+    <p><strong>「サーバーレス版のCron（クーロン）」</strong>です。サーバー（EC2）を立てずに、決まった時間にプログラムを動かせます。</p>
+    <div class="integration-flow">
+      24:00 (Event) ➡ EventBridge ➡ Lambda (Backup)
+    </div>
+    <p style="font-size:0.85rem; color:#666; margin-top:0.5rem;">
+      <strong>試験対策：</strong>「定期的なタスクの自動化」「スケジュールされたイベント」という言葉が出たら EventBridge です。
+    </p>
+  </div>
+
+  <!-- 用途2 -->
+  <div class="usecase-box">
+    <div class="usecase-title" style="color:#2a5caa;">
+      <span class="usecase-icon">⚡️</span> ② 状態変化への反応（イベントパターン）
+    </div>
+    <p>システムの「変化」をトリガーにします。</p>
+    <div class="integration-flow">
+      EC2停止 (State Change) ➡ EventBridge ➡ SNS (Mail)
+    </div>
+    <p style="font-size:0.85rem; color:#666; margin-top:0.5rem;">
+      <strong>CloudWatch Alarmとの違い：</strong><br>
+      Alarmは「CPU使用率80%」などの<strong>「数値」</strong>。<br>
+      EventBridgeは「Running → Stopped」などの<strong>「状態」</strong>。
+    </p>
+  </div>
+</div>
+
+<h2>4. CloudWatch Events との関係</h2>
+<p>ここが少しややこしいのですが、歴史的な経緯です。</p>
+<ul>
+<li><strong>昔：</strong> CloudWatch Events というサービス名でした。</li>
+<li><strong>今：</strong> Amazon EventBridge に進化しました（機能拡張版）。</li>
+</ul>
+<p><strong>試験での注意点：</strong><br>
+基本的には「EventBridge」が正解になりますが、古い問題文や選択肢で「CloudWatch Events」と書かれていたら、<strong>「ああ、EventBridgeの昔の名前だな（機能は同じ）」</strong>と脳内変換してください。</p>
+
+<h2>5. Lambdaとの最強タッグ</h2>
+<p>EventBridgeは「手を動かすこと（処理）」自体はできません。あくまで命令を出すだけです。そこで、命令を受けて実際に動く「手足」として <strong>AWS Lambda</strong> が最強の相棒になります。</p>
+<blockquote>
+<p><strong>シナリオ：</strong> 「毎日、未使用のEBSボリューム（ゴミ）を自動で削除して、コストを節約したい」</p>
+</blockquote>
+<p><strong>構成：</strong></p>
+<ol>
+<li><strong>EventBridge：</strong> 「毎日24:00」というスケジュールを設定。</li>
+<li><strong>Lambda：</strong> 「未使用EBSを探して削除する」というコードを書く。</li>
+<li><strong>連携：</strong> EventBridgeが24:00になると、Lambdaを叩き起こす。</li>
+</ol>
+<p>この構成なら、サーバーを常時起動させる必要がなく、Lambdaの実行時間（数秒）だけの課金で済むため、コスト効率が最強です。</p>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>司令塔：</strong> サービス間の連携を自動化するハブ。</li>
+<li><strong>Cronの代わり：</strong> 「決まった時間に何かをする」ならこれ。</li>
+<li><strong>状態変化：</strong> 「システムの状態が変わったら何かをする」ならこれ。</li>
+<li><strong>旧名：</strong> CloudWatch Events。</li>
+</ul>
+<p>これで、AWSの主要サービスを一通り連携させて自動化する仕組みまで理解できました。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
