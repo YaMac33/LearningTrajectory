@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DynamoDBの特長と使い方</title>
+  <meta name="description" content="RDSとは対照的な「超高速・容量無制限のNoSQLデータベース」、DynamoDB。スキーマレスな柔軟性、ミリ秒単位のパフォーマンス、RDSとの明確な使い分け基準を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DynamoDBの特長と使い方" />
+  <meta property="og:description" content="RDSとは対照的な「超高速・容量無制限のNoSQLデータベース」、DynamoDB。スキーマレスな柔軟性、ミリ秒単位のパフォーマンス、RDSとの明確な使い分け基準を解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* データ構造比較図 */
+    .structure-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .structure-box {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .structure-title {
+      font-weight: bold;
+      text-align: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 0.5rem;
+    }
+
+    /* RDS風テーブル */
+    .rds-table-visual {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      font-size: 0.85rem;
+      border: 1px solid #999;
+    }
+    .rds-table-visual th {
+      background: #eee;
+      border: 1px solid #999;
+      padding: 4px;
+      text-align: center;
+    }
+    .rds-table-visual td {
+      border: 1px solid #ccc;
+      padding: 4px 8px;
+    }
+
+    /* DynamoDB風 JSONカード */
+    .json-card {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .json-card::before {
+      content: "Item";
+      position: absolute;
+      top: -8px;
+      right: 10px;
+      background: #e06c75;
+      color: #fff;
+      padding: 0 5px;
+      font-size: 0.7rem;
+      border-radius: 4px;
+    }
+    .key { color: #e06c75; }
+    .string { color: #98c379; }
+    .number { color: #d19a66; }
+    .boolean { color: #56b6c2; }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* DAX強調ボックス */
+    .dax-box {
+      border: 2px solid #d86613;
+      background: #fff5eb;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+      text-align: center;
+    }
+    .speed-up {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #d86613;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DynamoDBの特長と使い方</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">DynamoDB</li>
+            <li class="tag">NoSQL</li>
+            <li class="tag">データベース</li>
+            <li class="tag">AWS</li>
+            <li class="tag">スキーマレス</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon DynamoDB（ダイナモディービー）は、RDSと並んで試験に必ず出るデータベースですが、その性質は真逆です。一言で言うと、<strong>「超高速・容量無制限の『NoSQL』データベース」</strong>です。RDSが「Excel（表）」なら、DynamoDBは「JSONの詰め合わせ」のようなイメージです。</p>
+
+<h2>1. RDSとの決定的な違い（NoSQLとは？）</h2>
+<p>RDS（リレーショナルデータベース）は、「列」と「行」がきっちり決まった表です。一方、DynamoDB（NoSQL）は、<strong>「キー（名札）」と「バリュー（値）」</strong>さえあれば、中身は何でもありです。</p>
+
+<div class="diagram-container">
+  <div class="structure-compare">
+    <!-- RDS側 -->
+    <div class="structure-box">
+      <div class="structure-title">RDS (SQL)</div>
+      <p style="font-size:0.85rem; color:#666;">事前に枠（スキーマ）の定義が必要。<br>全員が同じ項目を持つ。</p>
+      <table class="rds-table-visual">
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Age</th><th>Address</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Tanaka</td><td>25</td><td>Tokyo</td></tr>
+          <tr><td>2</td><td>Sato</td><td>30</td><td>Osaka</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DynamoDB側 -->
+    <div class="structure-box">
+      <div class="structure-title">DynamoDB (NoSQL)</div>
+      <p style="font-size:0.85rem; color:#666;">IDさえあれば中身は自由（スキーマレス）。<br>人によって項目がバラバラでOK。</p>
+      
+      <!-- データ1 -->
+      <div class="json-card">
+        {<br>
+        &nbsp;&nbsp;<span class="key">"ID"</span>: <span class="string">"001"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"Name"</span>: <span class="string">"Tanaka"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"Age"</span>: <span class="number">25</span>,<br>
+        &nbsp;&nbsp;<span class="key">"Hobby"</span>: <span class="string">"Soccer"</span><br>
+        }
+      </div>
+      <!-- データ2 -->
+      <div class="json-card">
+        {<br>
+        &nbsp;&nbsp;<span class="key">"ID"</span>: <span class="string">"002"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"Name"</span>: <span class="string">"Sato"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"Address"</span>: <span class="string">"Osaka"</span>,<br>
+        &nbsp;&nbsp;<span class="key">"IsPremium"</span>: <span class="boolean">true</span><br>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 試験に出る「3つの最強ポイント」</h2>
+<p>DynamoDBが選ばれる理由は、RDSにはできない以下の特徴があるからです。</p>
+
+<h3>① サーバーレス（完全マネージド）</h3>
+<ul>
+<li><strong>RDS：</strong> サーバーのサイズ（t3.microなど）を選んだり、容量を気にする必要があります。</li>
+<li><strong>DynamoDB：</strong> サーバーが存在しません。勝手に容量が増え、勝手に性能が上がります。あなたはテーブルを作るだけです。</li>
+</ul>
+
+<h3>② 桁違いのパフォーマンス</h3>
+<ul>
+<li><strong>RDS：</strong> データが増えると検索が遅くなりがちです。</li>
+<li><strong>DynamoDB：</strong> データが100件でも1億件でも、<strong>「ミリ秒単位（一桁ミリ秒）」</strong>で応答します。</li>
+<li><strong>キーワード：</strong> 「一桁ミリ秒のレイテンシー（遅延）」という言葉が出たらDynamoDBです。</li>
+</ul>
+
+<h3>③ スケーラビリティ（拡張性）</h3>
+<ul>
+<li>アクセスが急増しても、自動で性能を拡張（オートスケーリング）します。</li>
+<li><strong>用途：</strong> ゲームのハイスコアランキング、SNSの「いいね」機能、Amazonのショッピングカート（アクセスが爆発する系）。</li>
+</ul>
+
+<h2>3. DynamoDB専用の「加速装置」: DAX</h2>
+<p>試験では<strong>「もっと速くしたい」</strong>という要求が出ます。DynamoDB自体も速い（ミリ秒）ですが、Amazon DynamoDB Accelerator (DAX) という専用のキャッシュ機能を使うと、更に高速になります。</p>
+
+<div class="dax-box">
+  <p>DynamoDB + DAX = <span class="speed-up">マイクロ秒</span></p>
+  <p style="font-size:0.9rem; color:#666;">（ミリ秒の1000分の1の速さ）</p>
+</div>
+<ul class="check-list">
+<li><strong>試験対策：</strong> 「DynamoDBの読み取り負荷を下げたい」「ミリ秒をマイクロ秒にしたい」とき選ぶ。</li>
+</ul>
+
+<h2>4. グローバルテーブル（世界展開）</h2>
+<p>ボタン一つで、世界中のリージョンにデータを自動複製（レプリケーション）できます。日本のユーザーは東京のDynamoDBへ、アメリカのユーザーは米国のDynamoDBへアクセスさせることで、世界中どこでも爆速で表示できます。</p>
+
+<h2>5. RDSとDynamoDBの使い分け（最終確認）</h2>
+<p>試験で迷った時の判断基準です。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon RDS</th>
+      <th>Amazon DynamoDB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>データ構造</strong></td>
+      <td>構造化データ (表形式)<br>関係性(リレーション)がある</td>
+      <td>非構造化データ (JSON)<br>シンプルなキー・バリュー</td>
+    </tr>
+    <tr>
+      <td><strong>得意な処理</strong></td>
+      <td>複雑なクエリ<br><small>「東京在住で30代の男性を検索」</small></td>
+      <td>単純なクエリ<br><small>「IDが001のデータを取ってこい」</small></td>
+    </tr>
+    <tr>
+      <td><strong>スケーリング</strong></td>
+      <td>苦手<br><small>(リードレプリカ等で頑張る)</small></td>
+      <td class="highlight-cell">得意<br><small>(無限にスケールする)</small></td>
+    </tr>
+    <tr>
+      <td><strong>整合性</strong></td>
+      <td>強い整合性<br><small>(銀行など)</small></td>
+      <td>基本は結果整合性<br><small>(SNSなど ※設定で強くも可能)</small></td>
+    </tr>
+    <tr>
+      <td><strong>代表的な用途</strong></td>
+      <td>社内システム、ERP、<br>ECの在庫管理</td>
+      <td>ゲーム、Webセッション、<br>IoTデータ</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. まとめ</h2>
+<p>DynamoDBは、<strong>「細かいことはいいから、とにかく速く、大量の単純データをさばきたい！」</strong>という時に使う、AWSならではのクラウドネイティブなデータベースです。これで、データベース系（RDS, Aurora, DynamoDB, Redshift）の違いは完璧です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
