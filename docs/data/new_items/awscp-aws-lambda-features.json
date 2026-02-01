@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-lambda-features",
+  "category": "awscp",
+  "timestamp": "2026-02-01T19:53:26+09:00",
+  "post_path": "awscp/posts/2026-02-01-awscp-aws-lambda-features/",
+  "meta": {
+    "title": "AWS Lambdaの基本と特徴を学ぶ",
+    "summary": "AWS Lambdaはサーバーレスでイベント駆動のプログラム実行サービスです。試験に頻出のコスト効率やイベント駆動モデルの理解が得られます。",
+    "tags": [
+      "AWS",
+      "Lambda",
+      "サーバーレス",
+      "イベント駆動",
+      "コスト効率"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
