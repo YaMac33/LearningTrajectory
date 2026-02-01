@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cloudwatch-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-01T16:11:53+09:00",
+    "title": "AWS CloudWatchの基本機能を理解しよう",
+    "summary": "CloudWatchの3大機能であるメトリクス、ログ、アラームについて解説し、試験における混同ポイントを整理します。",
+    "tags": [
+      "AWS",
+      "CloudWatch",
+      "監視",
+      "メトリクス",
+      "ログ"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-aws-cloudwatch-basics/"
+  },
+  {
     "id": "awscp-cloudfront-basics",
     "category": "awscp",
     "timestamp": "2026-02-01T16:03:24+09:00",
