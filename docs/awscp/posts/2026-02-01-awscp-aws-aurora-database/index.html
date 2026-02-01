@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSの最強データベース「Aurora」</title>
+  <meta name="description" content="AWS史上最強と言われるAmazon Auroraの特徴を解説。MySQL/PostgreSQLとの互換性、6つのデータコピーによる圧倒的な耐久性、Serverlessなどの独自機能を学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSの最強データベース「Aurora」" />
+  <meta property="og:description" content="AWS史上最強と言われるAmazon Auroraの特徴を解説。MySQL/PostgreSQLとの互換性、6つのデータコピーによる圧倒的な耐久性、Serverlessなどの独自機能を学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 6コピーの図解 */
+    .replication-diagram {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .az-column {
+      border: 2px dashed #999;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      flex: 1;
+      min-width: 100px;
+      position: relative;
+    }
+    .az-label {
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 0.8rem;
+      display: block;
+      font-size: 0.9rem;
+    }
+    .data-chunk {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 50%;
+      background: #8e44ad; /* Aurora Purple */
+      color: #fff;
+      font-weight: bold;
+      margin: 0.3rem;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    .replication-info {
+      text-align: center;
+      font-weight: bold;
+      color: #8e44ad;
+      margin-top: 0.5rem;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #f3e5f5; /* Light Purple */
+      font-weight: bold;
+      color: #4a148c;
+    }
+
+    /* 特徴カード */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .feature-card {
+      border: 1px solid #ccc;
+      border-top: 4px solid #8e44ad;
+      border-radius: 6px;
+      padding: 1rem;
+      background: #fff;
+    }
+    .feature-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #8e44ad;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #8e44ad;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSの最強データベース「Aurora」</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Aurora</li>
+            <li class="tag">AWS</li>
+            <li class="tag">データベース</li>
+            <li class="tag">性能</li>
+            <li class="tag">クラウド</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon Aurora（オーロラ）は、AWSが本気を出して開発した、「AWS史上最強のデータベース」</strong>です。RDSの一部ではあるのですが、中身が凄すぎて別格扱いされています。試験でも<strong>「性能」「可用性（壊れにくさ）」</strong>の面で正解になりやすい選択肢です。</p>
+<p>一言で言うと、<strong>「オープンソース（MySQLなど）の使いやすさと、商用DB（Oracleなど）の高性能・高信頼性を併せ持った、AWS専用のデータベース」</strong>です。</p>
+
+<h2>1. Auroraの正体：何が「最強」なのか？</h2>
+<p>Auroraは、ゼロから新しく作られた言語ではありません。既存の人気データベースと互換性があります。</p>
+<ul>
+<li><strong>MySQL 互換</strong></li>
+<li><strong>PostgreSQL 互換</strong></li>
+</ul>
+<p>つまり、今までMySQLで使っていたアプリやツールが、そのままAuroraでも使えます。なのに、AWSのクラウドインフラに最適化されるように中身が改造されているため、性能が桁違いです。</p>
+<ul class="check-list">
+<li>MySQLの <strong>最大5倍</strong> 高速</li>
+<li>PostgreSQLの <strong>最大3倍</strong> 高速</li>
+</ul>
+<blockquote>
+<p><strong>試験ポイント：</strong> 「MySQL互換で、より高速で可用性の高いDBを選べ」と言われたら、迷わず <strong>Amazon Aurora</strong> です。</p>
+</blockquote>
+
+<h2>2. 最大の特徴：常識破りの「データの守り方」</h2>
+<p>普通のRDSとは、データの保存方法が根本的に違います。これがAuroraの強さの秘密です。</p>
+
+<h3>6つのコピーを3つのAZに (6 copies across 3 AZs)</h3>
+<p>あなたがデータを1つ書き込むと、Auroraは裏側で自動的に6個のコピーを作ります。</p>
+
+<div class="diagram-container">
+  <div class="replication-diagram">
+    <div class="az-column">
+      <span class="az-label">AZ-a</span>
+      <div class="data-chunk">1</div>
+      <div class="data-chunk">2</div>
+    </div>
+    <div class="az-column">
+      <span class="az-label">AZ-b</span>
+      <div class="data-chunk">3</div>
+      <div class="data-chunk">4</div>
+    </div>
+    <div class="az-column">
+      <span class="az-label">AZ-c</span>
+      <div class="data-chunk">5</div>
+      <div class="data-chunk">6</div>
+    </div>
+  </div>
+  <p class="replication-info">計6個のコピーを常時維持</p>
+</div>
+
+<p><strong>ここが凄い：</strong></p>
+<ul>
+<li><strong>「AZが1つ丸ごと火事で消滅」</strong>しても、他のAZにデータがあるので止まりません。</li>
+<li><strong>「ディスクが壊れた」</strong>としても、自動検知して勝手に直します（自己修復機能）。</li>
+</ul>
+
+<h2>3. Auroraだけの特殊能力</h2>
+<p>RDS（標準のMySQLなど）にはない、Auroraならではのメリットが試験に出ます。</p>
+
+<div class="feature-grid">
+  <div class="feature-card">
+    <span class="feature-title">① ストレージが「勝手に増える」</span>
+    <p>RDSでは最初に容量を決めますが、Auroraはデータが増えるに合わせて、自動で容量が拡張されます（最大128TBまで）。「今後のデータ量が予測できない」という場合に最適です。</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-title">② リードレプリカが「多い・速い」</span>
+    <p>RDSは最大5台ですが、Auroraは<strong>最大15台</strong>まで増やせます。しかも、メインとの時差（ラグ）が極めて少ない（ミリ秒単位）ため、大規模な読み取りアクセスを処理できます。</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-title">③ Aurora Serverless</span>
+    <p>アプリからのアクセスがない時は<strong>自動で停止（シャットダウン）</strong>し、アクセスが来たら数秒で起動するモードがあります。開発環境や、たまにしか使われない社内システムでコストを劇的に削減できます。</p>
+  </div>
+</div>
+
+<h2>4. RDS と Aurora の比較表（試験直前チェック）</h2>
+<p>試験では「どっちを使うべき？」という比較問題が出ます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon RDS (標準)</th>
+      <th>Amazon Aurora (最強)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>エンジン</strong></td>
+      <td>MySQL, Postgres, Oracle等</td>
+      <td>MySQL互換, PostgreSQL互換</td>
+    </tr>
+    <tr>
+      <td><strong>速度</strong></td>
+      <td>普通</td>
+      <td class="highlight-cell">5倍 / 3倍 速い</td>
+    </tr>
+    <tr>
+      <td><strong>データのコピー</strong></td>
+      <td>マルチAZ設定で 2箇所 (1+1)</td>
+      <td class="highlight-cell">標準で 6箇所 (3AZ × 2)</td>
+    </tr>
+    <tr>
+      <td><strong>ストレージ</strong></td>
+      <td>自分でサイズを決める必要あり</td>
+      <td class="highlight-cell">自動拡張 (Auto Scaling)</td>
+    </tr>
+    <tr>
+      <td><strong>コスト</strong></td>
+      <td>安い (t3.microなどが選べる)</td>
+      <td>少し高い (性能が良い分、単価は高め)</td>
+    </tr>
+    <tr>
+      <td><strong>向いている用途</strong></td>
+      <td>コスト重視、小規模、Oracle必須</td>
+      <td>性能重視、大規模、絶対に止めたくない</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Aurora Global Database（世界展開）</h2>
+<p>DynamoDBのグローバルテーブルのように、Auroraも世界中にデータを高速コピーできます。</p>
+<ul>
+<li><strong>シナリオ：</strong> 東京リージョンで書き込んだデータを、1秒以内に米国リージョンで読めるようにしたい。</li>
+<li><strong>用途：</strong> グローバルなサービス展開や、国レベルの災害対策（DR）。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>AWSネイティブ：</strong> クラウドのために再設計されたDB。</li>
+<li><strong>互換性：</strong> MySQL(5倍速い) / PostgreSQL(3倍速い)。</li>
+<li><strong>防御力：</strong> データは <strong>3つのAZに6個コピー</strong> される（標準仕様）。</li>
+<li><strong>柔軟性：</strong> ストレージ容量は自動で増える。</li>
+<li><strong>サーバーレス：</strong> Aurora Serverlessなら使わない時は停止できる。</li>
+</ul>
+<p>「性能」「信頼性」「スケーラビリティ」を求められたら、とりあえずAuroraを検討する。それがAWSの設計の基本です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
