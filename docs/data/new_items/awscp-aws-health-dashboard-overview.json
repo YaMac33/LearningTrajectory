@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-health-dashboard-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T07:42:09+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-health-dashboard-overview/",
+  "meta": {
+    "title": "AWSヘルスダッシュボードの概要",
+    "summary": "AWS Health Dashboardは、サービスの運行情報と個々のリソースへの影響を把握するための重要なツールです。特に試験で頻出のPersonal Health Dashboardについて理解を深めることができます。",
+    "tags": [
+      "AWS",
+      "ヘルスダッシュボード",
+      "運行情報",
+      "CloudWatch",
+      "通知"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
