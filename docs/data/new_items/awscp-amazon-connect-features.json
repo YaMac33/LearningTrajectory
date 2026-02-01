@@ -1,0 +1,22 @@
+{
+  "id": "awscp-amazon-connect-features",
+  "category": "awscp",
+  "timestamp": "2026-02-02T03:50:44+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-amazon-connect-features/",
+  "meta": {
+    "title": "Amazon Connectの特徴と利点",
+    "summary": "Amazon Connectは、機器不要で即時に開設できるクラウド型コールセンターサービスです。試験で出題される重要な機能や特長を理解できます。",
+    "tags": [
+      "Amazon Connect",
+      "クラウド",
+      "コールセンター",
+      "AI",
+      "IVR",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
