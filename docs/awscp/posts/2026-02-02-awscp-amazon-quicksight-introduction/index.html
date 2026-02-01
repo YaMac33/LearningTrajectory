@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon QuickSightの紹介</title>
+  <meta name="description" content="AWSのBIツール「Amazon QuickSight」を解説。S3やDBのデータを可視化する仕組み、超高速エンジンSPICE、機械学習による分析機能など、試験頻出ポイントをまとめました。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon QuickSightの紹介" />
+  <meta property="og:description" content="AWSのBIツール「Amazon QuickSight」を解説。S3やDBのデータを可視化する仕組み、超高速エンジンSPICE、機械学習による分析機能など、試験頻出ポイントをまとめました。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 役割図 */
+    .role-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .data-table {
+      border: 1px solid #999;
+      background: #fff;
+      padding: 0.5rem;
+      font-size: 0.7rem;
+      color: #666;
+      border-collapse: collapse;
+    }
+    .data-table td { border: 1px solid #ddd; padding: 2px 4px; }
+    
+    .arrow-convert {
+      font-size: 1.5rem;
+      color: #00bfa5; /* QuickSight Teal */
+      font-weight: bold;
+    }
+
+    .dashboard-mock {
+      border: 2px solid #00bfa5;
+      background: #fff;
+      border-radius: 6px;
+      padding: 0.8rem;
+      width: 180px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .chart-bar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 50px;
+      margin-top: 0.5rem;
+      border-bottom: 1px solid #ccc;
+    }
+    .bar {
+      width: 15px;
+      background-color: #00bfa5;
+    }
+    
+    /* SPICEイメージ */
+    .spice-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: #e0f2f1;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 2px dashed #00bfa5;
+    }
+    .db-icon {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    .spice-engine {
+      background: #004d40;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(0,191,165,0.5);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .speed-lines {
+      font-size: 1.2rem;
+      color: #00bfa5;
+      font-weight: bold;
+      font-style: italic;
+    }
+
+    /* 構成図 */
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .source-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .source-box {
+      border: 1px solid #666;
+      background: #fff;
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+    .qs-box {
+      border: 2px solid #00bfa5;
+      background: #fff;
+      padding: 1rem 3rem;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      color: #00796b;
+      position: relative;
+    }
+    .qs-spice-badge {
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      background: #004d40;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .user-box {
+      text-align: center;
+    }
+    .arrow-down {
+      font-size: 1.5rem;
+      color: #999;
+      line-height: 1;
+    }
+
+    /* 特徴カード */
+    .feature-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      width: 100%;
+    }
+    .feature-card {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 1rem;
+      flex: 1;
+      min-width: 250px;
+      background: #fff;
+    }
+    .feature-head {
+      font-weight: bold;
+      color: #00796b;
+      margin-bottom: 0.5rem;
+      display: block;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #00bfa5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon QuickSightの紹介</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Amazon QuickSight</li>
+            <li class="tag">ビジネスインテリジェンス</li>
+            <li class="tag">データ分析</li>
+            <li class="tag">SaaS</li>
+            <li class="tag">SPICE</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon QuickSight（クイックサイト）は、AWSが提供する「BI（ビジネス・インテリジェンス）ツール」</strong>です。一言で言うと、<strong>「S3やデータベースにある大量の数字データを、見やすい『グラフ』や『ダッシュボード』に変換して、分析するツール」</strong>です。Tableau（タブロー）やPower BIのAWS版と考えると分かりやすいでしょう。</p>
+
+<h2>1. 何をするサービス？（役割）</h2>
+<p>企業には、売上データ（RDS）、ログデータ（S3）、顧客データ（Redshift）など、文字や数字の羅列がたくさんあります。これをエンジニアではない経営者やマーケティング担当者が見ても、直感的には理解できません。</p>
+<p>QuickSightを使うと、これらのデータを読み込んで、<strong>「売上の推移グラフ」や「地域別のヒートマップ」</strong>などをドラッグ＆ドロップで簡単に作れます。</p>
+
+<div class="diagram-container">
+  <div class="role-flow">
+    <div style="text-align:center;">
+      <table class="data-table">
+        <tr><td>Date</td><td>Sales</td></tr>
+        <tr><td>4/1</td><td>100</td></tr>
+        <tr><td>4/2</td><td>120</td></tr>
+        <tr><td>4/3</td><td>90</td></tr>
+      </table>
+      <small>数字の羅列</small>
+    </div>
+    
+    <div class="arrow-convert">➡ 可視化</div>
+    
+    <div class="dashboard-mock">
+      <div style="font-size:0.7rem; font-weight:bold;">Sales Report</div>
+      <div class="chart-bar">
+        <div class="bar" style="height:30px;"></div>
+        <div class="bar" style="height:40px;"></div>
+        <div class="bar" style="height:25px;"></div>
+      </div>
+      <small>直感的なグラフ</small>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">毎朝Excelを集計し直す必要がなく、ブラウザを開けば常に最新のグラフが見られます。</p>
+</div>
+
+<h2>2. 試験に出る「SPICE（スパイス）」とは？</h2>
+<p>QuickSightの心臓部にある、超高速な計算エンジンのことです。Super-fast, Parallel, In-memory Calculation Engine の略です。</p>
+
+<div class="diagram-container">
+  <div class="spice-container">
+    <div class="db-icon">🗄️<br><small>DB</small></div>
+    <div style="font-size:1.5rem;">➡</div>
+    <div class="spice-engine">
+      ⚡️<br>SPICE
+    </div>
+    <div class="speed-lines">>>> 爆速表示 >>></div>
+    <div style="font-size:2rem;">📊</div>
+  </div>
+</div>
+
+<ul>
+<li><strong>役割：</strong> データを一旦この「SPICE」というメモリ領域に取り込むことで、高速に処理します。</li>
+<li><strong>メリット：</strong> 元のデータベース（RDSなど）が遅くても、グラフの表示はサクサク動きます。また、何度も元のDBにアクセスしなくて済むので、DBの負荷も下がります。</li>
+</ul>
+
+<h2>3. QuickSightの強み（試験ポイント）</h2>
+<p>試験で問われるQuickSightならではの特徴は以下の3点です。</p>
+
+<div class="feature-list">
+  <div class="feature-card">
+    <span class="feature-head">① サーバーレス</span>
+    <p>EC2などを立てる必要はありません。ユーザーが1人でも1万人でも、自動でスケールします。管理の手間がありません。</p>
+  </div>
+  <div class="feature-card">
+    <span class="feature-head">② 機械学習 (ML Insights)</span>
+    <p>専門知識がなくても、AIがデータを分析してくれます。</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem;">
+      <li><strong>異常検知：</strong> 「あれ？この日の売上だけ異常に低いですね」と教えてくれる。</li>
+      <li><strong>予測：</strong> 「来月の売上はこれくらいになりそうです」と予測を表示。</li>
+      <li><strong>Amazon Q：</strong> 「先月一番売れた商品は？」とチャットで質問するだけでグラフを作ってくれる。</li>
+    </ul>
+  </div>
+  <div class="feature-card">
+    <span class="feature-head">③ セッション課金 (Reader)</span>
+    <p>これがコスト面での最大の特徴です。</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem;">
+      <li><strong>Author（作る人）：</strong> 月額固定料金。</li>
+      <li><strong>Reader（見るだけの人）：</strong> 「30分あたり◯円」という従量課金（上限あり）。</li>
+    </ul>
+    <p>「たまにしか見ない部長」のために高いライセンス料を払う必要がないため、全社導入しやすいです。</p>
+  </div>
+</div>
+
+<h2>4. 構成のイメージ</h2>
+<p>これまで学んだデータストアと組み合わせると、以下のような流れになります。</p>
+
+<div class="diagram-container">
+  <div class="arch-flow">
+    <div class="source-row">
+      <div class="source-box">RDS</div>
+      <div class="source-box">S3</div>
+      <div class="source-box">Redshift</div>
+    </div>
+    
+    <div class="arrow-down">↓ データ取り込み</div>
+    
+    <div class="qs-box">
+      Amazon QuickSight
+      <span class="qs-spice-badge">SPICE</span>
+      <div style="font-size:0.8rem; font-weight:normal; margin-top:0.5rem;">
+        [ 📊 グラフ作成 ] [ 📈 AI 分析 ]
+      </div>
+    </div>
+
+    <div class="arrow-down">↓ ブラウザで閲覧</div>
+
+    <div class="user-box">
+      <div style="font-size:2rem;">👤</div>
+      <strong>ユーザー (経営者)</strong><br>
+      <small>「なるほど、今月はここが伸びているな」</small>
+    </div>
+  </div>
+</div>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>BIツール：</strong> データを可視化（グラフ化）して分析するサービス。</li>
+<li><strong>SPICE：</strong> データを高速処理するインメモリエンプジン。</li>
+<li><strong>サーバーレス：</strong> 管理不要で、PCやスマホからブラウザで見られる。</li>
+<li><strong>AI連携：</strong> 異常検知や将来予測が自動でできる。</li>
+<li><strong>コスト：</strong> 「見るだけ」の人は使った分だけ払えばいい（セッション課金）。</li>
+</ul>
+<p>これで、データの「保存（S3/RDS）」から「分析（Redshift/Athena）」、そして「可視化（QuickSight）」までの一連の流れがつながりました。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
