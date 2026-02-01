@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-trusted-advisor-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T07:46:31+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-trusted-advisor-overview/",
+  "meta": {
+    "title": "AWS Trusted Advisorを徹底解説",
+    "summary": "AWS Trusted Advisorでは、コスト、セキュリティ、パフォーマンスの観点から環境を診断し、必要な改善点を提案します。サポートプランによる機能の制限にも注意が必要です。",
+    "tags": [
+      "AWS",
+      "Trusted Advisor",
+      "セキュリティ",
+      "コスト最適化",
+      "パフォーマンス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
