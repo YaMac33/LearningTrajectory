@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-appsync-graphql-pubsub",
+  "category": "awscp",
+  "timestamp": "2026-02-02T04:20:21+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-appsync-graphql-pubsub/",
+  "meta": {
+    "title": "AWS AppSyncの基本「GraphQLとPub/Sub」",
+    "summary": "AWS AppSyncのGraphQLとPub/Subの仕組みを理解し、リアルタイム通信の実現方法を学べる記事です。",
+    "tags": [
+      "GraphQL",
+      "AWS",
+      "Pub/Sub",
+      "AppSync",
+      "API"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
