@@ -1,5 +1,28 @@
 [
   {
+    "id": "awscp-aws-appsync-features",
+    "category": "awscp",
+    "timestamp": "2026-02-02T03:32:09+09:00",
+    "title": "AWS AppSyncの特徴と利点を解説",
+    "summary": "AWS AppSyncの強みやその利点を理解し、API Gatewayとの違いを把握できます。特にリアルタイム通信やオフライン同期機能について学べます。",
+    "tags": [
+      "AWS",
+      "AppSync",
+      "GraphQL",
+      "API",
+      "リアルタイム通信",
+      "オフライン同期",
+      "データソース統合"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-appsync-features/"
+  },
+  {
     "id": "awscp-aws-artifact-overview",
     "category": "awscp",
     "timestamp": "2026-02-02T03:21:07+09:00",
