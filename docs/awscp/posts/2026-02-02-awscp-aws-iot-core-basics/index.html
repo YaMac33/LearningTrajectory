@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS IoT Coreの基本機能</title>
+  <meta name="description" content="AWS IoT Coreは、数十億台のデバイスとクラウドを安全に接続するマネージドサービスです。Device Shadowによるオフライン対策や、Greengrassとの違いなど、試験頻出ポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS IoT Coreの基本機能" />
+  <meta property="og:description" content="AWS IoT Coreは、数十億台のデバイスとクラウドを安全に接続するマネージドサービスです。Device Shadowによるオフライン対策や、Greengrassとの違いなど、試験頻出ポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* IoT Core 全体像 */
+    .iot-architecture {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 650px;
+    }
+    
+    .device-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .device-icon {
+      border: 2px solid #333;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      background: #fff;
+    }
+    
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    .core-box {
+      border: 2px solid #2a5caa;
+      background: #e6f7ff;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      min-width: 250px;
+    }
+    .core-label {
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      background: #2a5caa;
+      color: #fff;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+    
+    .component-box {
+      background: #fff;
+      border: 1px solid #2a5caa;
+      padding: 0.5rem;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: #0050b3;
+    }
+    
+    .aws-services {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .service-badge {
+      background: #fff;
+      border: 1px solid #666;
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Device Shadow 図 */
+    .shadow-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+      align-items: center;
+    }
+    .shadow-json {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      text-align: left;
+    }
+    .shadow-title {
+      font-weight: bold;
+      text-align: center;
+      grid-column: 1 / -1;
+      margin-bottom: 0.5rem;
+    }
+    .state-line {
+      border-top: 2px dashed #d9534f;
+      position: relative;
+      height: 1px;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .state-label {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f9f9f9;
+      color: #d9534f;
+      font-size: 0.75rem;
+      padding: 0 5px;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS IoT Coreの基本機能</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">IoT</li>
+            <li class="tag">Device Shadow</li>
+            <li class="tag">Greengrass</li>
+            <li class="tag">MQTT</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS IoT Coreは、<strong>「世界中にばら撒かれた数十億台のデバイス（モノ）と、AWSクラウドを安全に繋ぐ『巨大なハブ空港』」</strong>のようなサービスです。スマートホームの電球、工場のセンサー、コネクテッドカーなど、あらゆる「モノ」からのデータをAWSに吸い上げたり、逆にAWSからモノを操作したりするための中心地です。</p>
+
+<h2>1. なぜ IoT Core が必要なのか？</h2>
+<p>普通のパソコン（EC2など）と違って、IoTデバイスには特有の「弱点」があります。</p>
+<ul>
+<li><strong>非力：</strong> CPUもメモリも弱く、複雑な処理ができません。</li>
+<li><strong>不安定：</strong> 電波が悪い場所にいたり、電池切れで頻繁に切断されます。</li>
+</ul>
+<p>これらを普通のWebサーバー（HTTP）で管理するのは大変です。そこでIoT Coreが、デバイスとクラウドの間に立ち、<strong>「通訳」兼「管理人」</strong>として面倒な部分を引き受けます。</p>
+
+<div class="diagram-container">
+  <div class="iot-architecture">
+    <div class="device-group">
+      <div class="device-icon">💡</div>
+      <div class="device-icon">🌡️</div>
+      <div class="device-icon">🚗</div>
+      <small>Devices</small>
+    </div>
+    
+    <div class="arrow-right">➡</div>
+    
+    <div class="core-box">
+      <span class="core-label">AWS IoT Core</span>
+      <div class="component-box">① Device Gateway<br><small>(MQTT受付)</small></div>
+      <div class="component-box">② Device Shadow<br><small>(状態保存)</small></div>
+      <div class="component-box">③ Rules Engine<br><small>(SQL振り分け)</small></div>
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="aws-services">
+      <span class="service-badge">Lambda</span>
+      <span class="service-badge">DynamoDB</span>
+      <span class="service-badge">S3</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. 試験に出る「3つの主要機能」</h2>
+<p>IoT Coreの仕組みは、以下の3ステップで覚えましょう。特に「Device Shadow」は試験のハイライトです。</p>
+
+<h3>① Device Gateway（デバイスゲートウェイ）：入り口</h3>
+<p>デバイスとAWSを繋ぐ「玄関」です。</p>
+<ul>
+<li><strong>プロトコル：</strong> <strong>MQTT（エムキューティティ）</strong> という、非常に軽量な通信方式を使います（HTTPも使えますが、IoTではMQTTが主役です）。</li>
+<li><strong>認証：</strong> パスワードではなく、<strong>「X.509証明書」</strong>というデジタルキーを使って、厳重に本人確認（デバイス確認）をします。</li>
+</ul>
+
+<h3>② Device Shadow（デバイスシャドウ）：影武者 ★最重要</h3>
+<p><strong>「デバイスがオフライン（圏外）になっても、アプリが動くようにする仕組み」</strong>です。AWS上に、そのデバイスの状態（State）を記録した<strong>「JSONファイル（影武者）」</strong>を置きます。</p>
+
+<div class="diagram-container">
+  <span class="shadow-title">Device Shadow の仕組み</span>
+  <div class="shadow-flow">
+    <div style="text-align:center;">
+      <span style="font-size:2rem;">📱</span><br>スマホ
+    </div>
+    
+    <div class="shadow-json">
+      {<br>
+      &nbsp;&nbsp;"desired": {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;"power": "ON"<br>
+      &nbsp;&nbsp;},<br>
+      &nbsp;&nbsp;"reported": {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;"power": "OFF"<br>
+      &nbsp;&nbsp;}<br>
+      }
+    </div>
+
+    <div style="text-align:center; opacity:0.5;">
+      <span style="font-size:2rem;">💡</span><br>電球<br><small>(圏外)</small>
+    </div>
+  </div>
+  
+  <div class="state-line">
+    <span class="state-label">電球がネット復帰！</span>
+  </div>
+
+  <div class="shadow-flow" style="margin-top:1rem;">
+    <div></div>
+    <div class="shadow-json" style="border-color:#2a5caa;">
+      <span style="color:#d86613;">Shadow: "ONになれ！"</span><br>
+      ↓<br>
+      <span style="color:#2a5caa;">Device: "了解！"</span>
+    </div>
+    <div style="text-align:center;">
+      <span style="font-size:2rem;">💡</span><br>点灯✨
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>シナリオ：</strong> あなたが「電気ON」を押しても、電球が圏外なら届きません。代わりにAWS上の「Shadow」に「ONにしたい」と書き込みます。電球が復帰した瞬間、Shadowを見て「あ、ONにする命令が来てる！」と気づき、点灯します。</li>
+<li><strong>試験対策：</strong> 「不安定な接続」「オフライン時の状態管理」という言葉が出たら <strong>Device Shadow</strong> です。</li>
+</ul>
+
+<h3>③ Rules Engine（ルールエンジン）：振り分け</h3>
+<p>集まってきたデータを、他のAWSサービスに送る機能です。</p>
+<ul>
+<li><strong>仕組み：</strong> SQLのような構文で命令を書きます。</li>
+<li><strong>例：</strong> <code>SELECT * FROM 'sensor/temp' WHERE value > 50</code>
+<ul>
+<li>「温度が50度を超えたら、SNSで管理者にメールする」</li>
+<li>「データは全部 DynamoDB に保存する」</li>
+</ul>
+</li>
+</ul>
+
+<h2>3. よくセットで出る「AWS IoT Greengrass」</h2>
+<p>IoT Coreと一緒に選択肢に出てくるのが、<strong>AWS IoT Greengrass（グリーングラス）</strong>です。これは<strong>「エッジコンピューティング」</strong>のサービスです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>処理する場所</th>
+      <th>特徴・使い分け</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AWS IoT Core</td>
+      <td><strong>クラウド側</strong></td>
+      <td>全てのデータをクラウドに集めて、大規模に分析・保存する。</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell">AWS IoT Greengrass</td>
+      <td><strong>デバイス側 (現場)</strong></td>
+      <td>インターネットがない場所でも動く。<br>現場で即座に判断（推論）する。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>違いのイメージ：</strong></p>
+<ul>
+<li><strong>IoT Core：</strong> 監視カメラの映像を全部クラウドに送って、クラウドで解析する。</li>
+<li><strong>Greengrass：</strong> 監視カメラの中に小さな脳みそ（Greengrass）を入れ、カメラの中で「不審者がいるか」を判断し、不審者がいた時だけクラウドに通知する。</li>
+</ul>
+
+<h2>4. まとめ</h2>
+<ul class="check-list">
+<li><strong>IoT Core：</strong> モノとクラウドを繋ぐハブ空港。MQTTで話す。</li>
+<li><strong>Device Shadow：</strong> デバイスが圏外でも命令を保持してくれる「影武者（JSON）」。</li>
+<li><strong>Rules Engine：</strong> データをS3やLambdaにSQLで振り分ける。</li>
+<li><strong>Greengrass：</strong> クラウドではなく、現場（ローカル）で処理するならこれ。</li>
+</ul>
+<p>これで、IoT分野の基本サービスと、それぞれの役割分担が明確になりました。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
