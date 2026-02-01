@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Lexの基礎と活用法</title>
+  <meta name="description" content="Amazon Lexは、Alexaと同じ技術を利用してチャットボットを構築できるサービスです。インテント、スロットなどの基本概念や、Lambdaとの連携、他のAIサービス（Polly, Transcribe）との違いについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Lexの基礎と活用法" />
+  <meta property="og:description" content="Amazon Lexは、Alexaと同じ技術を利用してチャットボットを構築できるサービスです。インテント、スロットなどの基本概念や、Lambdaとの連携、他のAIサービス（Polly, Transcribe）との違いについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 3つの要素カード */
+    .lex-concepts {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .concept-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .concept-card.intent { border-top: 4px solid #d86613; }
+    .concept-card.utterance { border-top: 4px solid #2a5caa; }
+    .concept-card.slot { border-top: 4px solid #24882c; }
+
+    .concept-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .concept-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .concept-desc {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+    .concept-example {
+      background: #eee;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
+
+    /* チャットフロー図 */
+    .chat-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      position: relative;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .chat-msg.bot {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+    .msg-bubble {
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .chat-msg.user .msg-bubble {
+      background: #007bff;
+      color: #fff;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-msg.bot .msg-bubble {
+      background: #e9ecef;
+      color: #333;
+      border-bottom-left-radius: 2px;
+    }
+    .msg-label {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 0.2rem;
+    }
+    
+    .lambda-action {
+      align-self: center;
+      background: #fff5eb;
+      border: 2px dashed #d86613;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      color: #d86613;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin: 0.5rem 0;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Lexの基礎と活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AI</li>
+            <li class="tag">チャットボット</li>
+            <li class="tag">Amazon Lex</li>
+            <li class="tag">音声認識</li>
+            <li class="tag">自然言語理解</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon Lex（レックス）は、あのアレクサ（Alexa）と同じ技術を使った、「チャットボット（会話型AI）」を作るためのサービス</strong>です。一言で言うと、<strong>「あなたのアプリやWebサイトに、Alexaのような『耳』と『脳』を組み込むサービス」</strong>です。試験では、「音声認識」と「自然言語理解」のキーワード、そしてLambdaとの連携が問われます。</p>
+
+<h2>1. Amazon Lex とは？</h2>
+<p>Automatic Speech Recognition (ASR: 自動音声認識) と Natural Language Understanding (NLU: 自然言語理解) という高度なディープラーニング技術を、誰でも簡単に使えるようにしたフルマネージドサービスです。</p>
+<ul>
+<li><strong>何ができる？</strong>
+<ul>
+<li>「ピザを注文したい」と話しかけたら、「サイズはどうしますか？」と聞き返し、注文を完了させるボットが作れます。</li>
+<li>音声だけでなく、テキストチャット（LINEやSlackなど）にも対応しています。</li>
+</ul>
+</li>
+</ul>
+
+<h2>2. ボット作りの「3つの重要単語」</h2>
+<p>Lexを理解するには、以下の3つの専門用語（ボットの構成要素）を覚える必要があります。これらは試験でもそのまま出ます。</p>
+
+<div class="diagram-container">
+  <div class="lex-concepts">
+    <div class="concept-card intent">
+      <span class="concept-icon">🎯</span>
+      <span class="concept-title">インテント (Intent)</span>
+      <p class="concept-desc">ユーザーの<strong>「意図」</strong><br>何をしたいのか？</p>
+      <div class="concept-example">「ピザを注文する」<br>「ホテルを予約する」</div>
+    </div>
+    <div class="concept-card utterance">
+      <span class="concept-icon">🗣️</span>
+      <span class="concept-title">アターナンス (Utterance)</span>
+      <p class="concept-desc">ユーザーの<strong>「発話」</strong><br>具体的なセリフ</p>
+      <div class="concept-example">「ピザ頼みたい」<br>「出前お願い」</div>
+    </div>
+    <div class="concept-card slot">
+      <span class="concept-icon">🧩</span>
+      <span class="concept-title">スロット (Slot)</span>
+      <p class="concept-desc">必要な<strong>「情報」</strong><br>埋めるべきパラメータ</p>
+      <div class="concept-example">サイズ (S/M/L)<br>トッピング種類</div>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>インテント：</strong> ゴール（目的）です。</li>
+<li><strong>アターナンス：</strong> きっかけとなる言葉です。Lexはこれを学習し、多少表現が違っても意図を理解します。</li>
+<li><strong>スロット：</strong> 目的達成のために聞き出さなければならない情報です。</li>
+</ul>
+
+<h2>3. Lex の仕組み（会話の流れ）</h2>
+<p>Lex単体では「会話」しかできません。実際にピザを注文（データベースに書き込み）するには、<strong>AWS Lambda</strong> と連携します。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">ピザ注文ボットの会話例</p>
+  <div class="chat-flow">
+    <div class="chat-msg user">
+      <span class="msg-label">ユーザー (Utterance)</span>
+      <div class="msg-bubble">「ピザを頼みたいんだけど」</div>
+    </div>
+    <div class="chat-msg bot">
+      <span class="msg-label">Lex (Intent認識: ピザ注文)</span>
+      <div class="msg-bubble">「サイズはいかがなさいますか？」</div>
+    </div>
+    <div class="chat-msg user">
+      <span class="msg-label">ユーザー (Slot 1)</span>
+      <div class="msg-bubble">「Lサイズで」</div>
+    </div>
+    <div class="chat-msg bot">
+      <span class="msg-label">Lex (Slot確認)</span>
+      <div class="msg-bubble">「種類は何にしますか？」</div>
+    </div>
+    <div class="chat-msg user">
+      <span class="msg-label">ユーザー (Slot 2)</span>
+      <div class="msg-bubble">「マルゲリータで」</div>
+    </div>
+    
+    <div class="lambda-action">
+      ⚡️ 情報が揃ったので Lambda を起動！<br>
+      (DBへ注文書き込み & 通知)
+    </div>
+
+    <div class="chat-msg bot">
+      <span class="msg-label">Lex (完了)</span>
+      <div class="msg-bubble">「注文を受け付けました」</div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 紛らわしい「AIサービス3兄弟」の違い</h2>
+<p>試験では、以下の3つの違いが必ず問われます。「喋る」「聞く」「会話する」の違いです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>役割 (機能)</th>
+      <th>人間の機能</th>
+      <th>キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Amazon Polly</strong></td>
+      <td>Text-to-Speech<br>(テキスト読み上げ)</td>
+      <td><strong>「口」</strong><br>文章を喋る</td>
+      <td>音声合成、流暢な発音</td>
+    </tr>
+    <tr>
+      <td><strong>Amazon Transcribe</strong></td>
+      <td>Speech-to-Text<br>(文字起こし)</td>
+      <td><strong>「耳」</strong><br>聞いた音を文字にする</td>
+      <td>議事録作成、字幕生成</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell"><strong>Amazon Lex</strong></td>
+      <td>Chatbot<br>(会話型インターフェース)</td>
+      <td><strong>「脳」</strong>+「耳」+「口」</td>
+      <td>チャットボット、対話、Alexaの技術</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>試験対策の判断基準</h3>
+<ul class="check-list">
+<li>「ブログの文章を読み上げて音声ファイルにしたい」 → <strong>Polly</strong></li>
+<li>「会議の音声をテキスト化して議事録を作りたい」 → <strong>Transcribe</strong></li>
+<li>「ホテルの予約を自動で受け付ける窓口を作りたい」 → <strong>Lex</strong></li>
+</ul>
+
+<h2>5. Amazon Connect との連携</h2>
+<p>Lexは、AWSのコンタクトセンター（クラウド型コールセンター）サービスである <strong>Amazon Connect</strong> と非常に相性が良いです。</p>
+<ul>
+<li><strong>活用例：</strong> 電話をかけた時の「ご用件のある方は1番を…」というプッシュ操作ではなく、「ご用件をお話しください」とLexが対応し、自動で予約を受け付けたり、適切な担当者に繋いだりします（IVRの自動化）。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>Alexaの技術：</strong> 誰でもAlexaレベルのチャットボットが作れる。</li>
+<li><strong>構成要素：</strong> インテント（意図）、アターナンス（発言）、スロット（必要な情報）。</li>
+<li><strong>Lambda連携：</strong> 裏側の処理（予約、注文）はLambdaに任せる。</li>
+<li><strong>使い分け：</strong> Pollyは「読む」、Transcribeは「書き取る」、Lexは「会話する」。</li>
+</ul>
+<p>これで、AIサービスの使い分けもバッチリです。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
