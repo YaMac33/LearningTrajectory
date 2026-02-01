@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-iot-core-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-02T08:20:51+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-iot-core-basics/",
+  "meta": {
+    "title": "AWS IoT Coreの基本機能",
+    "summary": "AWS IoT Coreは、デバイスとクラウドを安全に接続するための手段を提供します。特にDevice Shadow機能が試験頻出ポイントとして重要です。",
+    "tags": [
+      "AWS",
+      "IoT",
+      "Device Shadow",
+      "Greengrass",
+      "MQTT"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
