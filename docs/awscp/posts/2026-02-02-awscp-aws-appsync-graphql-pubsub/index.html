@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS AppSyncの基本「GraphQLとPub/Sub 」</title>
+  <meta name="description" content="GraphQLとPub/Subを用いたAWS AppSyncの仕組みを解説。Query、Mutation、Subscriptionの役割や、リアルタイム通信を実現するWebSocketの仕組みについて学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS AppSyncの基本「GraphQLとPub/Sub 」" />
+  <meta property="og:description" content="GraphQLとPub/Subを用いたAWS AppSyncの仕組みを解説。Query、Mutation、Subscriptionの役割や、リアルタイム通信を実現するWebSocketの仕組みについて学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* GraphQL操作カード */
+    .graphql-ops {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .op-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 220px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .op-query { border-top: 4px solid #2a5caa; } /* Blue */
+    .op-mutation { border-top: 4px solid #d86613; } /* Orange */
+    .op-sub { border-top: 4px solid #d63384; } /* Pink */
+
+    .op-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .op-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+    .op-desc {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    /* チャットフロー図 */
+    .chat-flow-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+    }
+    
+    .user-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .user-box {
+      text-align: center;
+      width: 80px;
+    }
+    .user-icon { font-size: 2rem; display: block; }
+    
+    .appsync-box {
+      border: 2px solid #d63384;
+      background: #fff0f6;
+      color: #d63384;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      margin: 1rem 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* 矢印アニメーション的表現 */
+    .flow-arrow {
+      position: relative;
+      height: 40px;
+      width: 100%;
+    }
+    .arrow-line {
+      position: absolute;
+      background: #ccc;
+    }
+    .arrow-1 {
+      /* B -> AppSync (Subscribe) */
+      border-right: 2px dashed #999;
+      height: 60px;
+      right: 35px;
+      top: 40px;
+    }
+    .arrow-2 {
+      /* A -> AppSync (Publish) */
+      border-left: 2px solid #d86613;
+      height: 60px;
+      left: 35px;
+      top: 40px;
+    }
+    
+    .pipe-connection {
+      border: 3px double #d63384;
+      background: #fff;
+      padding: 0.2rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      color: #d63384;
+      position: absolute;
+      right: 10px;
+      top: 70px;
+      background-color: #fff0f6;
+    }
+
+    .msg-bubble {
+      background: #d86613;
+      color: #fff;
+      padding: 0.3rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      position: absolute;
+      left: 50px;
+      top: 60px;
+    }
+    .push-bubble {
+      background: #d63384;
+      color: #fff;
+      padding: 0.3rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      position: absolute;
+      right: 50px;
+      top: 60px;
+    }
+
+    /* 開発者視点 */
+    .dev-view {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      justify-content: center;
+    }
+    .dev-box {
+      border: 1px solid #666;
+      border-radius: 4px;
+      background: #fff;
+      padding: 1rem;
+      flex: 1;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+    .dev-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3rem;
+      font-family: sans-serif;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #d63384;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title"> AWS AppSyncの基本「GraphQLとPub/Sub 」 </h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">GraphQL</li>
+            <li class="tag">AWS</li>
+            <li class="tag">Pub/Sub</li>
+            <li class="tag">AppSync</li>
+            <li class="tag">API</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS AppSyncの核心部分である<strong>「GraphQL（グラフキューエル）」と、その最大の特徴である「Pub/Sub（パブサブ）API」</strong>について、技術的な仕組みを噛み砕いて解説します。一言で言うと、<strong>「GraphQLは『注文票』、Pub/Subは『店内放送』」</strong>です。</p>
+
+<h2>1. GraphQL とは？（3つの注文方法）</h2>
+<p>GraphQLは、APIのための言語（データへのアクセス方法）です。REST API（従来の方式）では「URL」でアクセスしていましたが、GraphQLでは<strong>「クエリ（Query）」</strong>というリクエスト文を投げます。</p>
+<p>AppSyncにおけるGraphQLには、以下の<strong>3つの操作（オペレーション）</strong>しかありません。これを覚えれば完璧です。</p>
+
+<div class="diagram-container">
+  <div class="graphql-ops">
+    <div class="op-card op-query">
+      <span class="op-icon">🔍</span>
+      <span class="op-name">Query (クエリ)</span>
+      <p class="op-desc"><strong>「取得」</strong><br>データを読み込む。<br>(RESTのGET)</p>
+    </div>
+    <div class="op-card op-mutation">
+      <span class="op-icon">✏️</span>
+      <span class="op-name">Mutation (変更)</span>
+      <p class="op-desc"><strong>「書き込み」</strong><br>作成・更新・削除する。<br>(RESTのPOST/PUT/DELETE)</p>
+    </div>
+    <div class="op-card op-sub">
+      <span class="op-icon">👂</span>
+      <span class="op-name">Subscription (購読)</span>
+      <p class="op-desc"><strong>「待ち受け」</strong><br>データの更新をリアルタイムで受け取る。<br>(WebSocket)</p>
+    </div>
+  </div>
+</div>
+
+<h3>特徴：オーバーフェッチの解消</h3>
+<p>GraphQLは<strong>「欲しいデータだけを指定」</strong>できます。</p>
+<ul>
+<li><strong>Query：</strong> 「ユーザーの『名前』だけ教えて（住所はいらない）」</li>
+<li><strong>Response：</strong> <code>{ "name": "Tanaka" }</code> だけが返ってくる。</li>
+</ul>
+<p>これにより、スマホアプリなどの通信量を劇的に減らすことができます。</p>
+
+<h2>2. Pub/Sub（パブサブ）API とは？</h2>
+<p>Pub/Subとは、<strong>Publish（送信する）</strong>と <strong>Subscribe（受信する/購読する）</strong>の略です。AppSyncにおいて、これは上記の <strong>Subscription（サブスクリプション）</strong>機能を使って実現されます。これが<strong>「リアルタイムチャット」や「スポーツ速報」</strong>を実現する仕組みです。</p>
+
+<h3>仕組み：WebSocketの「常時接続」</h3>
+<p>通常のWeb（HTTP）は、「リクエスト→レスポンス」で通信が終了します（電話をかけて、要件が終わったら切るイメージ）。しかし、AppSyncのSubscriptionは、<strong>WebSocket（ウェブソケット）という技術を使い、「サーバーとスマホの間で、電話を繋ぎっぱなし」</strong>にします。</p>
+
+<h2>3. 具体的な動作フロー（チャットアプリの例）</h2>
+<p>AさんとBさんがチャットをしている場面を想像してください。</p>
+
+<div class="diagram-container">
+  <div style="font-weight:bold; margin-bottom:1rem;">リアルタイムチャットの流れ</div>
+  
+  <div class="chat-flow-diagram">
+    <div class="user-row">
+      <div class="user-box">
+        <span class="user-icon">👤</span>
+        Aさん
+      </div>
+      <div class="user-box">
+        <span class="user-icon">📱</span>
+        Bさん
+      </div>
+    </div>
+
+    <!-- 矢印エリア -->
+    <div style="height:150px; position:relative;">
+      <!-- A -> AppSync -->
+      <div class="arrow-line" style="border-left:2px solid #d86613; height:70px; left:40px; top:0;"></div>
+      <div class="msg-bubble">Mutation: "こんにちは"</div>
+      
+      <!-- B -> AppSync (Pipe) -->
+      <div class="arrow-line" style="border-right:2px dashed #999; height:100%; right:40px; top:0;"></div>
+      <div class="pipe-connection">📡 WebSocket接続中...</div>
+      
+      <!-- AppSync Box -->
+      <div class="appsync-box" style="position:absolute; top:70px; width:60%; left:20%;">
+        AWS AppSync
+      </div>
+
+      <!-- AppSync -> B (Push) -->
+      <div class="push-bubble" style="top:120px;">Push: "こんにちは"</div>
+    </div>
+  </div>
+</div>
+
+<ol>
+<li><strong>Subscribe（購読開始）：</strong> Bさんのスマホは、AppSyncに対して「『新しいメッセージ』が来たら、すぐに教えてね！」と伝え、<strong>専用のパイプ（WebSocket）</strong>を繋いで待機します。</li>
+<li><strong>Publish（送信）：</strong> Aさんが「こんにちは」と送信します。これはデータの書き込みなので、<strong>Mutation</strong>を使います。AppSyncはこれを受け取り、裏側のDynamoDBなどにデータを保存します。</li>
+<li><strong>Push（配信）：</strong> ここがPub/Subの真骨頂です。AppSyncは、「あ、Bさんがこの更新を待っていたな」と気づき、繋ぎっぱなしのパイプを通して、AさんのメッセージをBさんに<strong>押し込み（Push）</strong>ます。</li>
+</ol>
+<p>これにより、Bさんは「再読み込みボタン」を押さなくても、瞬時に画面にメッセージが表示されます。</p>
+
+<h2>4. 開発者の視点：スキーマとリゾルバー</h2>
+<p>AppSyncを動かすために、開発者は2つのものを定義します。</p>
+
+<div class="diagram-container">
+  <div class="dev-view">
+    <div class="dev-box">
+      <span class="dev-title">📜 スキーマ (Schema)</span>
+      type Message {<br>
+      &nbsp;&nbsp;id: ID<br>
+      &nbsp;&nbsp;content: String<br>
+      }<br>
+      <br>
+      type Query { ... }
+      <div style="color:#666; margin-top:0.5rem; font-size:0.75rem;">
+        APIの「メニュー表」。<br>どんなデータ型があるか定義する。
+      </div>
+    </div>
+    <div class="dev-box">
+      <span class="dev-title">⚙️ リゾルバー (Resolver)</span>
+      {<br>
+      &nbsp;&nbsp;"version": "2018-05-29",<br>
+      &nbsp;&nbsp;"operation": "PutItem",<br>
+      &nbsp;&nbsp;"key": ...<br>
+      }
+      <div style="color:#666; margin-top:0.5rem; font-size:0.75rem;">
+        「仲介プログラム」。<br>実際にDynamoDBやLambdaを操作する指示書。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>GraphQL：</strong> 必要なデータだけ取れる、APIのクエリ言語。</li>
+<li><strong>3つの操作：</strong> Query（見る）、Mutation（変える）、Subscription（待ち受ける）。</li>
+<li><strong>Pub/Sub：</strong> Subscription機能を使って実現する。WebSocketで瞬時に届ける仕組み。</li>
+</ul>
+<p>AppSyncを使えば、難しいWebSocketサーバーの管理（何万人と同時に接続を維持する大変な作業）をAWSに丸投げできるので、開発者は「チャットの中身」を作ることに集中できるのです。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
