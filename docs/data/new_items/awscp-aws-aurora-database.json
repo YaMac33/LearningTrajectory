@@ -1,0 +1,22 @@
+{
+  "id": "awscp-aws-aurora-database",
+  "category": "awscp",
+  "timestamp": "2026-02-01T20:28:18+09:00",
+  "post_path": "awscp/posts/2026-02-01-awscp-aws-aurora-database/",
+  "meta": {
+    "title": "AWSの最強データベース「Aurora」の解説",
+    "summary": "Amazon Auroraは、MySQL/PostgreSQL互換の高性能データベースであり、性能と可用性の観点で重要なポイントを理解できます。",
+    "tags": [
+      "Aurora",
+      "AWS",
+      "データベース",
+      "性能",
+      "可用性",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
