@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | EBSの基本と試験対策</title>
+  <meta name="description" content="EBSはEC2の外付けストレージで、データの永続性やAZの制約など試験必須の知識を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EBSの基本と試験対策" />
+  <meta property="og:description" content="EBSはEC2の外付けストレージで、データの永続性やAZの制約など試験必須の知識を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* EC2とEBSの関係図 */
+    .ec2-ebs-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .ec2-box {
+      border: 2px solid #d86613; /* EC2 Orange */
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 150px;
+      position: relative;
+    }
+    .ec2-label {
+      font-weight: bold;
+      color: #d86613;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .ebs-box {
+      border: 2px solid #333;
+      background: #eee;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 120px;
+      position: relative;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    .ebs-label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .connection-line {
+      height: 4px;
+      background: #999;
+      width: 50px;
+      position: relative;
+    }
+    .connection-line::after {
+      content: "接続";
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* AZ制限図 */
+    .az-limit-diagram {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .az-area {
+      border: 2px dashed #aaa;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #fff;
+      text-align: center;
+      flex: 1;
+      min-width: 150px;
+    }
+    .az-title {
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .arrow-cross {
+      font-size: 2rem;
+      color: #d9534f;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    /* ストレージ比較 */
+    .storage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .storage-card {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      background: #fff;
+      text-align: center;
+    }
+    .storage-header {
+      font-weight: bold;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .storage-icon {
+      font-size: 2rem;
+      margin: 0.5rem 0;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+    .warn-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .warn-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+        color: #d9534f;
+    }
+    .warn-list li::before {
+        content: "⚠";
+        margin-right: 0.5em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EBSの基本と試験対策</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">EBS</li>
+            <li class="tag">EC2</li>
+            <li class="tag">ストレージ</li>
+            <li class="tag">試験対策</li>
+            <li class="tag">AWS</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon EBS（Elastic Block Store）は、EC2（サーバー）にとっての「外付けハードディスク（またはSSD）」</strong>です。EC2を「パソコン本体」とするなら、EBSはそこにケーブルで繋がっている「Cドライブ」や「Dドライブ」にあたります。非常に地味ですが、これがなくてはEC2は動きません（OSをインストールする場所だからです）。試験では、<strong>「S3との違い」と「インスタンスストアとの違い」</strong>が必ず問われます。</p>
+
+<h2>1. EBSのイメージ：ネットワーク越しのドライブ</h2>
+<p>EBSは、EC2の筐体の中に物理的に入っているわけではなく、ネットワークを経由して接続されています。</p>
+
+<div class="diagram-container">
+  <div class="ec2-ebs-diagram">
+    <div class="ec2-box">
+      <span class="ec2-label">EC2 インスタンス</span>
+      <small>CPU / メモリ</small>
+    </div>
+    <div class="connection-line"></div>
+    <div class="ebs-box">
+      <span class="ebs-label">EBS ボリューム</span>
+      <small>OS / データ</small>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>永続性：</strong> EC2を「停止」しても、EBSの中のデータは消えません。</li>
+<li><strong>付け替え：</strong> EC2から取り外して、別のEC2に付け替えることができます（USBメモリのような感覚）。</li>
+</ul>
+
+<h2>2. 試験に出る「EBSの鉄の掟」3選</h2>
+<p>ここを理解していないと、設計問題で間違えます。</p>
+
+<h3>① AZ（アベイラビリティーゾーン）の壁</h3>
+<p>EBSは、作成したAZから出られません。「東京リージョンのAZ-a」で作ったEBSは、「AZ-a」にあるEC2にしか接続できません。</p>
+
+<div class="diagram-container">
+  <div class="az-limit-diagram">
+    <div class="az-area">
+      <span class="az-title">AZ-a</span>
+      <div class="ebs-box" style="margin:0 auto;">EBS</div>
+    </div>
+    <div class="arrow-cross">❌</div>
+    <div class="az-area">
+      <span class="az-title">AZ-c</span>
+      <div class="ec2-box" style="margin:0 auto; padding:1rem; min-width:100px;">EC2</div>
+    </div>
+  </div>
+  <p style="font-size:0.9rem; margin-top:1rem;">※ 移動させるには「スナップショット（バックアップ）」を経由する必要がある。</p>
+</div>
+
+<h3>② 1対1の関係（基本）</h3>
+<ul>
+<li><strong>ルール：</strong> 基本的に、「1つのEBSは、1台のEC2にしか接続できない」。</li>
+<li><strong>例外：</strong> 「マルチアタッチ」という機能を使えば複数台に接続できますが、試験の基本問題では「EBSは1台のEC2専有」と考えてOKです。</li>
+<li>※逆に、1台のEC2に複数のEBS（Cドライブ、Dドライブ…）を付けることは可能です。</li>
+</ul>
+
+<h3>③ 削除時の挙動（Delete on Termination）</h3>
+<p>EC2インスタンスを「削除（Terminate）」した時、くっついているEBSをどうするか設定できます。</p>
+<ul class="check-list">
+<li><strong>ルートボリューム（Cドライブ）：</strong> デフォルトでは<strong>「一緒に削除される」</strong>設定になっています。</li>
+<li><strong>データボリューム（Dドライブ）：</strong> デフォルトでは<strong>「残る」</strong>設定になっています。</li>
+<li><strong>試験対策：</strong> 「EC2を削除してもデータを残したい」と言われたら、「終了時の削除（Delete on Termination）」設定をオフにします。</li>
+</ul>
+
+<h2>3. ライバルとの比較：インスタンスストア & S3</h2>
+<p>ここが最大の山場です。データ保存場所の違いを整理しましょう。</p>
+
+<h3>VS インスタンスストア (Instance Store)</h3>
+<p>インスタンスストアは、EC2が動いている物理サーバーに内蔵されているディスクです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>EBS (外付け)</th>
+      <th>インスタンスストア (内蔵)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>データの寿命</strong></td>
+      <td>永続的 (EC2を停止しても残る)</td>
+      <td style="color:#d9534f; font-weight:bold;">一時的 (EC2を停止すると消える)</td>
+    </tr>
+    <tr>
+      <td><strong>速度</strong></td>
+      <td>普通 (ネットワーク経由)</td>
+      <td>爆速 (物理直結)</td>
+    </tr>
+    <tr>
+      <td><strong>用途</strong></td>
+      <td>OS、データベース、重要データ</td>
+      <td>一時ファイル、キャッシュ</td>
+    </tr>
+    <tr>
+      <td><strong>試験の合言葉</strong></td>
+      <td>「永続ストレージ」</td>
+      <td>「エフェメラル (儚い) ストレージ」</td>
+    </tr>
+  </tbody>
+</table>
+<p class="warn-list" style="padding:1rem; border:1px solid #d9534f; border-radius:4px; background:#fff5f5;">
+  <strong>注意：</strong> 試験で「EC2を停止・再起動したらデータが消えた。なぜか？」と聞かれたら、答えは<strong>「インスタンスストアを使っていたから」</strong>です。
+</p>
+
+<h3>VS Amazon S3 (オブジェクトストレージ)</h3>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>EBS (ブロックストレージ)</th>
+      <th>S3 (オブジェクトストレージ)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>データの扱い</strong></td>
+      <td>ブロック単位<br><small>(ファイルの「一部」だけ書き換え可)</small></td>
+      <td>オブジェクト単位<br><small>(ファイル丸ごと置き換え)</small></td>
+    </tr>
+    <tr>
+      <td><strong>頻繁な書き換え</strong></td>
+      <td>得意 (OSやDBに向く)</td>
+      <td>苦手 (毎回全アップロードが必要)</td>
+    </tr>
+    <tr>
+      <td><strong>アクセス方法</strong></td>
+      <td>EC2にマウントして使う (Cドライブ)</td>
+      <td>インターネット経由 (HTTP/HTTPS)</td>
+    </tr>
+    <tr>
+      <td><strong>コスト</strong></td>
+      <td>高め (確保した容量分払う)</td>
+      <td>安い (使った容量分払う)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. バックアップ：スナップショット</h2>
+<p>EBSのデータをバックアップするには、<strong>「スナップショット」</strong>を取ります。</p>
+<ul>
+<li><strong>保存先：</strong> 実は裏側で <strong>S3</strong> に保存されています（安くて頑丈だから）。ユーザーからは見えません。</li>
+<li><strong>増分バックアップ：</strong> 2回目以降は「変更があった部分だけ」を保存するので、容量とお金を節約できます。</li>
+</ul>
+
+<h2>5. EBSボリュームの種類（松竹梅）</h2>
+<p>EBSには性能によっていくつかタイプがあります。</p>
+<ul>
+<li><strong>汎用SSD (gp2 / gp3)：</strong> バランス型。迷ったらこれ（デフォルト）。Webサーバーなど。</li>
+<li><strong>プロビジョンドIOPS SSD (io1 / io2)：</strong> 超高性能。高い。IOPS（速度）を指定して買う。大規模DBなど。</li>
+<li><strong>HDD (st1 / sc1)：</strong> 安いが、ブート（OS起動）には使えない。ログ分析など。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>EBS = EC2の外付けハードディスク。</strong></li>
+<li><strong>永続性 = EC2を止めてもデータは消えない（インスタンスストアは消える）。</strong></li>
+<li><strong>AZロック = 作ったAZから移動できない（移動にはスナップショットが必要）。</strong></li>
+<li><strong>ブロックストレージ = OSやDBのように、頻繁に中身を書き換える用途に使う。</strong></li>
+</ul>
+<p>これで、ストレージ周りの知識（S3とEBSの違い）は完璧です。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
