@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-well-architected-introduction",
+    "category": "awscp",
+    "timestamp": "2026-02-02T04:01:22+09:00",
+    "title": "AWSウェル・アーキテクテッドフレームワーク入門",
+    "summary": "AWS Well-Architected Frameworkの6つの柱を学び、設計原則や評価基準を理解します。試験に向けての準備を助けます。",
+    "tags": [
+      "AWS",
+      "Well-Architected",
+      "フレームワーク",
+      "設計原則",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "アーキテクチャと設計原則",
+      "Well-Architected"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-well-architected-introduction/"
+  },
+  {
     "id": "awscp-amazon-connect-features",
     "category": "awscp",
     "timestamp": "2026-02-02T03:50:44+09:00",
