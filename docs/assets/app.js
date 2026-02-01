@@ -65,7 +65,7 @@ function buildCategoryTree(posts) {
   Object.entries(tree).forEach(([category, lv1Map]) => {
     const group = document.createElement("details");
     group.className = "category-group";
-    group.open = true;
+    group.open = false;
 
     const total = Object.values(lv1Map)
       .flatMap(v => Object.values(v))
