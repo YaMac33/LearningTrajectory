@@ -1,0 +1,21 @@
+{
+  "id": "awscp-amazon-lex-basis",
+  "category": "awscp",
+  "timestamp": "2026-02-02T03:44:27+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-amazon-lex-basis/",
+  "meta": {
+    "title": "Amazon Lexの基礎と活用法",
+    "summary": "Amazon Lexは、チャットボットを構築するためのフルマネージドサービスであり、音声認識や自然言語理解を通じてユーザーの意図を理解します。試験対策としてインテント、アターナンス、スロットの理解が重要です。",
+    "tags": [
+      "AI",
+      "チャットボット",
+      "Amazon Lex",
+      "音声認識",
+      "自然言語理解"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
