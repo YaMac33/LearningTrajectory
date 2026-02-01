@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Connectの特徴と利点</title>
+  <meta name="description" content="Amazon Connectは、機器不要で即時開設できるクラウド型コールセンターサービスです。従来のオンプレミス型との違いや、AI（Lex）と連携した自動応答システムの仕組みについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Connectの特徴と利点" />
+  <meta property="og:description" content="Amazon Connectは、機器不要で即時開設できるクラウド型コールセンターサービスです。従来のオンプレミス型との違いや、AI（Lex）と連携した自動応答システムの仕組みについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 比較カード */
+    .compare-wrapper {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .compare-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 260px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-legacy { border-top: 4px solid #666; }
+    .card-connect { border-top: 4px solid #d63384; } /* Connect Pink */
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: block;
+      border-bottom: 1px dashed #ddd;
+      padding-bottom: 0.5rem;
+    }
+    .card-list {
+      text-align: left;
+      font-size: 0.9rem;
+      padding-left: 1.2rem;
+      color: #555;
+    }
+    .card-list li { margin-bottom: 0.5rem; }
+
+    /* IVR連携図 */
+    .ivr-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      background: #fff;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      position: relative;
+    }
+    .flow-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+    }
+    .flow-desc {
+      font-size: 0.9rem;
+      flex: 1;
+    }
+    .arrow-down {
+      font-size: 1.2rem;
+      color: #999;
+      line-height: 1;
+    }
+    
+    .role-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fff;
+      margin-right: 0.5rem;
+      font-weight: bold;
+      vertical-align: middle;
+    }
+    .bg-connect { background-color: #d63384; }
+    .bg-lex { background-color: #2a5caa; }
+    .bg-lambda { background-color: #d86613; }
+
+    /* CCPイメージ */
+    .ccp-mock {
+      border: 2px solid #333;
+      border-radius: 8px;
+      background: #f4f4f4;
+      padding: 1rem;
+      width: 200px;
+      text-align: center;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .ccp-screen {
+      background: #fff;
+      border: 1px solid #ccc;
+      height: 100px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .ccp-btn {
+      background: #28a745;
+      color: #fff;
+      padding: 0.5rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Connectの特徴と利点</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Amazon Connect</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">コールセンター</li>
+            <li class="tag">AI</li>
+            <li class="tag">IVR</li>
+            <li class="tag">AWS</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon Connect（アマゾンコネクト）は、AWSが提供する「クラウド型コンタクトセンター（コールセンター）」</strong>サービスです。一言で言うと、<strong>「電話機も、交換機（PBX）も、物理的な場所も一切不要で、ブラウザとヘッドセットさえあれば、今日からでもコールセンターが開設できるサービス」</strong>です。実は、Amazonの巨大なショッピングサイトのカスタマーサポートで実際に使われているシステムを、一般向けに公開したものがこれです。</p>
+
+<h2>1. 従来のコールセンターとの違い</h2>
+<p>ここが最大の試験ポイントです。「何がすごいのか」を従来のオンプレミス型と比較して理解しましょう。</p>
+
+<div class="diagram-container">
+  <div class="compare-wrapper">
+    <!-- 従来型 -->
+    <div class="compare-card card-legacy">
+      <span class="card-icon">🏢</span>
+      <span class="card-title">従来のコールセンター<br>(オンプレミス)</span>
+      <ul class="card-list">
+        <li>❌ <strong>高い専用機器(PBX)</strong>を買う必要がある。</li>
+        <li>❌ 電話線を引く<strong>工事が必要</strong>（数ヶ月待ち）。</li>
+        <li>❌ オペレーターはオフィスに<strong>出社必須</strong>。</li>
+        <li>❌ 初期費用が莫大。</li>
+      </ul>
+    </div>
+
+    <!-- Amazon Connect -->
+    <div class="compare-card card-connect">
+      <span class="card-icon">☁️</span>
+      <span class="card-title">Amazon Connect<br>(クラウド型)</span>
+      <ul class="card-list">
+        <li>⭕ <strong>完全ソフトウェア</strong>。機器一切不要。</li>
+        <li>⭕ <strong>即時開設</strong>。数分で番号取得可能。</li>
+        <li>⭕ <strong>場所不問</strong>。自宅でもカフェでもOK。</li>
+        <li>⭕ <strong>従量課金</strong>。使った分だけ払う。</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h2>2. Connect の重要機能 3選（試験用）</h2>
+<p>以下の用語は試験によく出ます。</p>
+
+<h3>① 問い合わせフロー (Contact Flows)</h3>
+<p>電話がかかってきた時の動きを、ブロックを並べるだけで視覚的に作れる機能です。「プログラミング不要のGUI（ドラッグ＆ドロップ）」で作れるのが特徴です。</p>
+<ul>
+<li><strong>例：</strong> 「営業時間内なら担当者へ、時間外なら『またおかけ直しください』と音声を流して切断」といったロジックを組みます。</li>
+</ul>
+
+<h3>② スキルベースルーティング (Skill-based Routing)</h3>
+<p>電話の内容に合わせて、<strong>「最も適切なオペレーター」</strong>に繋ぐ機能です。キュー（待ち行列）を使って管理します。</p>
+<ul>
+<li>「技術的な質問」→ 「エンジニア資格を持つAさん」へ</li>
+<li>「英語での問い合わせ」→ 「英語が話せるBさん」へ</li>
+</ul>
+
+<h3>③ オムニチャネル (Omnichannel)</h3>
+<p>「電話」だけでなく、「チャット」や「タスク」も同じ画面で一元管理できます。電話オペレーターが、空いている時間にチャット対応をする、といった柔軟な運用が可能です。</p>
+
+<h2>3. 最強の組み合わせ：Connect + Lex + Lambda</h2>
+<p>先ほど学んだ Amazon Lex と組み合わせることで、<strong>「AIによる自動音声応答（IVR）」</strong>が作れます。人間が電話に出る前に、AIが用件を解決してしまうシナリオです。</p>
+
+<div class="diagram-container">
+  <div style="font-weight:bold; margin-bottom:1rem;">ホテルの自動電話予約シナリオ</div>
+  <div class="ivr-flow">
+    <div class="flow-row">
+      <span class="flow-icon">📞</span>
+      <div class="flow-desc">
+        <strong>ユーザー</strong><br>電話をかける
+      </div>
+    </div>
+    
+    <div class="arrow-down">↓</div>
+
+    <div class="flow-row">
+      <span class="flow-icon">🎧</span>
+      <div class="flow-desc">
+        <span class="role-badge bg-connect">Connect</span>
+        電話を受ける。「ご用件をお話しください」
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <div class="flow-row">
+      <span class="flow-icon">🧠</span>
+      <div class="flow-desc">
+        <span class="role-badge bg-lex">Lex</span>
+        「来週の土曜、空いてる？」という声を認識・理解。
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <div class="flow-row">
+      <span class="flow-icon">⚡️</span>
+      <div class="flow-desc">
+        <span class="role-badge bg-lambda">Lambda</span>
+        予約システムを確認。「空いてます」と返す。
+      </div>
+    </div>
+
+    <div class="arrow-down">↓</div>
+
+    <div class="flow-row">
+      <span class="flow-icon">🗣️</span>
+      <div class="flow-desc">
+        <span class="role-badge bg-lex">Lex(Polly)</span>
+        「空いております。予約しますか？」と喋る。
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; color:#666; margin-top:1rem;">※ 複雑な用件の場合のみ、人間のオペレーターに転送します。</p>
+</div>
+
+<h2>4. 試験に出る「CCP」とは？</h2>
+<p><strong>CCP (Contact Control Panel)</strong> は、オペレーターが電話を取ったり、切ったりするための<strong>「画面上の操作パネル（ソフトフォン）」</strong>です。</p>
+
+<div class="diagram-container">
+  <div class="ccp-mock">
+    <div style="font-weight:bold; font-size:0.8rem; margin-bottom:0.5rem;">Contact Control Panel</div>
+    <div class="ccp-screen">
+      着信中...<br>090-XXXX-XXXX
+    </div>
+    <div class="ccp-btn">📞 受話</div>
+  </div>
+  <p style="font-size:0.9rem; margin-top:0.5rem;">ブラウザ上に表示されるため、専用の電話機は不要です。</p>
+</div>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>ハードウェア不要：</strong> クラウド上に作るコールセンター。</li>
+<li><strong>従量課金：</strong> 通話した分だけ支払う（待機時間は無料）。</li>
+<li><strong>スキルベースルーティング：</strong> 得意分野に合わせて担当者に振り分ける。</li>
+<li><strong>AI連携：</strong> Lexと組み合わせて自動化が進む。</li>
+</ul>
+<p>これで、「エンドユーザーコンピューティング（WorkSpaces, AppStream）」から「ビジネスアプリケーション（Connect, Lex）」まで、AWSの応用サービス群もバッチリです。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
