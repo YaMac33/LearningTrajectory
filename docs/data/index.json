@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-amazon-rds-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-01T11:37:49+09:00",
+    "title": "Amazon RDSの概要と特徴",
+    "summary": "Amazon RDSはAWSのマネージドサービスで、DB管理を簡素化します。試験ではAuroraの特徴やマルチAZとリードレプリカの違いが具体的に理解できます。",
+    "tags": [
+      "Amazon RDS",
+      "DB管理",
+      "マネージドサービス",
+      "Aurora",
+      "マルチAZ",
+      "リードレプリカ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-amazon-rds-overview/"
+  },
+  {
     "id": "awscp-aws-s3-basics-knowledge",
     "category": "awscp",
     "timestamp": "2026-02-01T09:34:07+09:00",
