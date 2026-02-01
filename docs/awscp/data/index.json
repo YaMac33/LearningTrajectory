@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-api-gateway-serverless",
+    "category": "awscp",
+    "timestamp": "2026-02-01T19:57:55+09:00",
+    "title": "サーバーレスアーキテクチャのAPI Gateway",
+    "summary": "API Gatewayは、Lambdaとユーザーを繋ぎ、流量管理や認証機能を提供する重要な役割を果たします。EC2時代のELBとの違いとその機能についても学べます。",
+    "tags": [
+      "API Gateway",
+      "サーバーレス",
+      "Lambda",
+      "DynamoDB",
+      "認証"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-api-gateway-serverless/"
+  },
+  {
     "id": "awscp-aws-lambda-features",
     "category": "awscp",
     "timestamp": "2026-02-01T19:53:26+09:00",
