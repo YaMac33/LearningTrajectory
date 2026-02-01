@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-quicksight-introduction",
+    "category": "awscp",
+    "timestamp": "2026-02-02T04:12:47+09:00",
+    "title": "Amazon QuickSightの基本と活用法",
+    "summary": "AWSのBIツール「Amazon QuickSight」により、データの可視化や分析が簡単にできる仕組みを解説します。特にSPICEエンジンの特徴や試験ポイントについて理解できます。",
+    "tags": [
+      "Amazon QuickSight",
+      "ビジネスインテリジェンス",
+      "データ分析",
+      "SaaS",
+      "SPICE"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-quicksight-introduction/"
+  },
+  {
     "id": "awscp-aws-well-architected-introduction",
     "category": "awscp",
     "timestamp": "2026-02-02T04:01:22+09:00",
