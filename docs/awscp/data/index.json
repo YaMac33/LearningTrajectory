@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-polly-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-02T07:55:38+09:00",
+    "title": "Amazon Pollyの概要と活用法",
+    "summary": "Amazon Pollyはテキストを自然な声で読み上げるAIサービスです。試験で重要なSSMLやスピーチマークについて解説します。",
+    "tags": [
+      "Amazon Polly",
+      "Text-to-Speech",
+      "AI",
+      "音声合成",
+      "SSML"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-polly-overview/"
+  },
+  {
     "id": "awscp-aws-organizations-knowledge",
     "category": "awscp",
     "timestamp": "2026-02-02T07:50:57+09:00",
