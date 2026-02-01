@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon RDSの概要と特徴</title>
+  <meta name="description" content="Amazon RDSはAWSのマネージドサービスで、DB管理を簡素化します。Auroraの特徴、マルチAZとリードレプリカの違いなど、試験頻出ポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon RDSの概要と特徴" />
+  <meta property="og:description" content="Amazon RDSはAWSのマネージドサービスで、DB管理を簡素化します。Auroraの特徴、マルチAZとリードレプリカの違いなど、試験頻出ポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* マルチAZ vs リードレプリカ比較図 */
+    .replication-compare {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      width: 100%;
+    }
+    .rep-card {
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .rep-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+      width: 100%;
+      text-align: center;
+    }
+    .rep-subtitle {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .db-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    .db-box {
+      border: 2px solid #333;
+      border-radius: 6px;
+      padding: 0.8rem;
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+      position: relative;
+      width: 80px;
+    }
+    .db-main { border-color: #2a5caa; color: #2a5caa; }
+    .db-sub { border-color: #666; color: #666; }
+    
+    .sync-arrow {
+      font-size: 0.8rem;
+      color: #666;
+      position: relative;
+      padding: 0 5px;
+    }
+    .sync-arrow::after {
+      content: "→";
+      font-size: 1.5rem;
+      display: block;
+      line-height: 0.8;
+    }
+    
+    .access-status {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+    }
+    .status-standby { background: #eee; color: #666; }
+    .status-active { background: #e6f7ff; color: #0050b3; font-weight: bold; }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* Aurora強調ボックス */
+    .aurora-box {
+      border: 2px solid #8e44ad;
+      background: #fbf5fc;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+      position: relative;
+    }
+    .aurora-box::before {
+      content: "👑 Amazon Aurora";
+      position: absolute;
+      top: -12px;
+      left: 15px;
+      background: #8e44ad;
+      color: #fff;
+      padding: 2px 10px;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon RDSの概要と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">Amazon RDS</li>
+            <li class="tag">DB管理</li>
+            <li class="tag">マネージドサービス</li>
+            <li class="tag">Aurora</li>
+            <li class="tag">マルチAZ</li>
+            <li class="tag">リードレプリカ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon RDS (Relational Database Service) は、S3やEC2と並んでAWSの根幹を支える最重要サービスの一つです。一言で言うと、<strong>「面倒な管理をAWSが全部やってくれる、伝統的なデータベース（Excelのような表形式のデータ）」</strong>です。試験では「何が便利なのか（マネージド）」と「2つのコピー機能（マルチAZとリードレプリカ）の違い」が問われます。</p>
+
+<h2>1. なぜEC2の中にDBを入れないのか？</h2>
+<p>「EC2の中にMySQLをインストールすればいいじゃないか」と思うかもしれません。もちろん可能ですが、それは「自炊」のようなもので、以下の手間が発生します。</p>
+<ul>
+<li>OSのアップデート</li>
+<li>DBソフトのパッチ当て</li>
+<li>毎日のバックアップ</li>
+<li>故障した時の復旧作業</li>
+</ul>
+<p>RDSは、これらを全てAWSが肩代わりしてくれる<strong>「マネージドサービス」</strong>です。あなたは「データの読み書き」だけに集中できます。</p>
+
+<h2>2. RDSで使える「エンジン」（種類）</h2>
+<p>RDSはあくまで「枠組み」の名前です。中身のソフト（エンジン）は以下から選べます。</p>
+<ul>
+<li><strong>オープンソース系：</strong> MySQL, PostgreSQL, MariaDB</li>
+<li><strong>商用系：</strong> Oracle, Microsoft SQL Server</li>
+</ul>
+
+<div class="aurora-box">
+  <p style="margin-top:0.5rem; margin-bottom:0.5rem;"><strong>試験で頻出のAWS独自エンジン</strong></p>
+  <ul class="check-list" style="margin-bottom:0;">
+    <li><strong>特徴：</strong> MySQLやPostgreSQLと互換性がありながら、AWSクラウドに特化して改造された爆速データベース。</li>
+    <li><strong>性能：</strong> MySQLの5倍、PostgreSQLの3倍高速。</li>
+    <li><strong>価格：</strong> 少し高いが、信頼性が段違いに高い（データが3つのAZに計6個コピーされる）。</li>
+    <li><strong>試験対策：</strong> 「クラウドネイティブ」「高性能」という言葉が出たらAuroraです。</li>
+  </ul>
+</div>
+
+<h2>3. 試験の最難関：2つの「コピー機能」の違い</h2>
+<p>RDSには、データを別の場所にコピーする機能が2つあります。<strong>「何のためにコピーするのか？」</strong>という目的の違いが必ず出題されます。</p>
+
+<div class="diagram-container">
+  <div class="replication-compare">
+    
+    <!-- マルチAZ -->
+    <div class="rep-card">
+      <div class="rep-title">① マルチAZ配置<br>(Multi-AZ)</div>
+      <div class="rep-subtitle">目的：高可用性（守り）</div>
+      
+      <div class="db-group">
+        <div class="db-box db-main">Main<br>(AZ-a)</div>
+        <div class="sync-arrow">同期</div>
+        <div class="db-box db-sub">Sub<br>(AZ-c)</div>
+      </div>
+      
+      <div class="access-status status-standby">Subはアクセス不可 (待機)</div>
+      <p style="font-size:0.85rem; margin-top:0.5rem; text-align:center;">故障時のみ自動で交代<br>（フェイルオーバー）</p>
+    </div>
+
+    <!-- リードレプリカ -->
+    <div class="rep-card">
+      <div class="rep-title">② リードレプリカ<br>(Read Replica)</div>
+      <div class="rep-subtitle">目的：性能向上（攻め）</div>
+      
+      <div class="db-group">
+        <div class="db-box db-main">Main<br>(AZ-a)</div>
+        <div class="sync-arrow">非同期</div>
+        <div class="db-box db-sub">Replica<br>(AZ-c)</div>
+      </div>
+      
+      <div class="access-status status-active">Replicaも読み取りOK</div>
+      <p style="font-size:0.85rem; margin-top:0.5rem; text-align:center;">「見るだけ」のアクセスを<br>分身に流して負荷分散</p>
+    </div>
+
+  </div>
+</div>
+
+<h3>比較まとめ</h3>
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>機能</th>
+      <th>マルチAZ</th>
+      <th>リードレプリカ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>目的</strong></td>
+      <td><strong>可用性</strong> (壊れないこと)</td>
+      <td><strong>スケーラビリティ</strong> (速くすること)</td>
+    </tr>
+    <tr>
+      <td><strong>同期方法</strong></td>
+      <td>同期 (データズレなし)</td>
+      <td>非同期 (数秒遅れるかも)</td>
+    </tr>
+    <tr>
+      <td><strong>予備機の役割</strong></td>
+      <td>普段は寝ている (Standby)</td>
+      <td>読み取り専用で働く (Active)</td>
+    </tr>
+    <tr>
+      <td><strong>キーワード</strong></td>
+      <td>災害対策、フェイルオーバー</td>
+      <td>読み取り負荷の軽減、パフォーマンス</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. RDSプロキシ (RDS Proxy)</h2>
+<p>これも最近よく出ます。</p>
+<ul>
+<li><strong>課題：</strong> Lambdaなどの「サーバーレス」機能からRDSに大量に接続すると、接続処理（コネクション）が溢れてRDSがダウンすることがあります。</li>
+<li><strong>解決策：</strong> RDS Proxyを間に挟むと、接続をうまくまとめて（プーリングして）管理してくれます。</li>
+<li><strong>キーワード：</strong> 「Lambdaからの接続過多」「データベース接続の効率化」。</li>
+</ul>
+
+<h2>5. 間違いやすい「他のDBサービス」との比較</h2>
+<p>試験では「この要件に最適なDBはどれか？」と聞かれます。RDSと迷うのが以下の2つです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>データ形式</th>
+      <th>特徴・使い分け</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="highlight-cell">Amazon RDS</td>
+      <td>リレーショナル<br>(表形式)</td>
+      <td>複雑な結合(JOIN)が必要。<br>ECサイトの在庫管理、銀行システム。</td>
+    </tr>
+    <tr>
+      <td><strong>Amazon DynamoDB</strong></td>
+      <td>NoSQL<br>(キー・バリュー)</td>
+      <td>構造が単純で<strong>超高速</strong>。<br>ゲームのスコア、カート情報、スキーマレス。</td>
+    </tr>
+    <tr>
+      <td><strong>Amazon Redshift</strong></td>
+      <td>DWH<br>(分析用)</td>
+      <td><strong>分析専用</strong>。<br>過去10年分の売上分析など、超大量データの集計。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>マネージドサービス：</strong> バックアップやパッチ当てはAWSにお任せ。</li>
+<li><strong>Aurora：</strong> AWS最強のDB。速い・強い。</li>
+<li><strong>マルチAZ：</strong> 「予備機」を用意して、故障に備える（高可用性）。</li>
+<li><strong>リードレプリカ：</strong> 「コピー機」を用意して、負荷を分散する（性能向上）。</li>
+<li><strong>VPC内：</strong> 基本的にプライベートサブネットに置く（外から直接アクセスさせない）。</li>
+</ul>
+<p>これで、「RDS（かっちりしたデータ）」と、対になる「S3（ファイルなんでも）」の違いがはっきりしたと思います。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
