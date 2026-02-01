@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS S3の基礎知識と特徴</title>
+  <meta name="description" content="S3は「容量無制限の巨大なファイル保管庫」です。EC2のEBSとの違い、イレブン・ナインの耐久性、そして試験頻出のストレージクラスの使い分けまで、AWS利用の必須知識を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS S3の基礎知識と特徴" />
+  <meta property="og:description" content="S3は「容量無制限の巨大なファイル保管庫」です。EC2のEBSとの違い、イレブン・ナインの耐久性、そして試験頻出のストレージクラスの使い分けまで、AWS利用の必須知識を解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* S3構造図 */
+    .s3-structure {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .bucket-box {
+      background-color: #e6f7ff;
+      border: 2px solid #1890ff;
+      border-radius: 0 0 12px 12px; /* バケツっぽい形 */
+      padding: 1rem 2rem 2rem 2rem;
+      position: relative;
+      text-align: center;
+      min-width: 250px;
+    }
+    .bucket-label {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1890ff;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .bucket-url {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .object-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .object-item {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .object-item::before {
+      content: "📄";
+    }
+
+    /* EBS vs S3 比較図 */
+    .storage-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .storage-box {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      width: 200px;
+      text-align: center;
+    }
+    .storage-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .storage-icon {
+      font-size: 2rem;
+      margin: 0.5rem 0;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+    
+    .feature-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-left: 4px solid #24882c; /* S3 Green */
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
+    .feature-title {
+      font-weight: bold;
+      color: #24882c;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS S3の基礎知識と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">S3</li>
+            <li class="tag">クラウドストレージ</li>
+            <li class="tag">試験対策</li>
+            <li class="tag">オブジェクトストレージ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSの中で<strong>「最も使われている」「最も試験に出る」</strong>サービスの一つ、Amazon S3（Simple Storage Service）。一言で言えば、<strong>「容量無制限、インターネット経由で出し入れ可能な『巨大なファイル保管庫』」</strong>です。</p>
+
+<h2>1. Amazon S3 とは？</h2>
+<p>EC2（サーバー）にくっつける「EBS」と混同しやすいですが、役割が明確に異なります。</p>
+
+<div class="diagram-container">
+  <div class="storage-compare">
+    <div class="storage-box">
+      <span class="storage-title">EBS</span>
+      <div class="storage-icon">💾</div>
+      <p style="font-size:0.85rem;"><strong>Cドライブ</strong><br>EC2に接続してOSやアプリを入れる。<br>ブロックストレージ。</p>
+    </div>
+    <div class="storage-box" style="border-color:#24882c;">
+      <span class="storage-title" style="color:#24882c;">S3</span>
+      <div class="storage-icon">🗂️</div>
+      <p style="font-size:0.85rem;"><strong>Google Drive的</strong><br>ネット上の保管庫。画像やバックアップを入れる。<br>オブジェクトストレージ。</p>
+    </div>
+  </div>
+</div>
+
+<h3>構造のイメージ</h3>
+<p>S3には厳密な「フォルダ」という概念はありません。<strong>「バケット（バケツ）」</strong>という大きな容器を作り、その中に<strong>「オブジェクト（データ）」</strong>を放り込みます。</p>
+
+<div class="diagram-container">
+  <div class="s3-structure">
+    <div style="font-size:0.9rem; margin-bottom:1rem; font-weight:bold;">Amazon S3 の世界</div>
+    <div class="bucket-box">
+      <span class="bucket-label">バケット (my-blog)</span>
+      <span class="bucket-url">http://s3.../my-blog/</span>
+      <div class="object-list">
+        <div class="object-item">index.html</div>
+        <div class="object-item">style.css</div>
+        <div class="object-item">cat_photo.jpg</div>
+      </div>
+    </div>
+  </div>
+</div>
+<p>バケット名は<strong>世界で唯一</strong>（全AWSユーザーの中で重複しない名前）である必要があります。</p>
+
+<h2>2. 試験に出る「S3の3つの特徴」</h2>
+<p>AWS認定試験では以下の3点が頻出です。</p>
+
+<div class="feature-card">
+  <span class="feature-title">① 驚異の耐久性「イレブン・ナイン」</span>
+  データは自動的に<strong>最低3箇所のAZ（データセンター群）</strong>にコピーされます。耐久性は<strong>99.999999999%</strong>（9が11個）。「1万個のファイルを1000万年保存して、やっと1個失われるかどうか」というレベルで、事実上データは消えません。
+</div>
+
+<div class="feature-card">
+  <span class="feature-title">② 静的ウェブサイトホスティング</span>
+  EC2などのサーバーを立てなくても、S3だけでHTML/CSS/JSを公開してWebサイトにできます。<br>
+  <strong>試験ポイント：</strong>「サーバーレスで安価にWebサイトを公開するには？」→ 答えは <strong>S3</strong> です。
+</div>
+
+<div class="feature-card">
+  <span class="feature-title">③ バージョン管理</span>
+  ファイルを「上書き保存」してしまっても、過去の状態に戻せる機能です。誤って削除した場合の復活も可能です。
+</div>
+
+<h2>3. ストレージクラス（料金プランの使い分け）</h2>
+<p>S3にはアクセスの頻度に応じて「料金プラン（ストレージクラス）」を選べます。ここが試験の最頻出ポイントです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>クラス名</th>
+      <th>特徴</th>
+      <th>向いている用途</th>
+      <th>取り出し速度</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="font-weight:bold;">S3 Standard<br>(標準)</td>
+      <td>デフォルト。一番高いが性能も最高。</td>
+      <td>頻繁にアクセスするWeb画像、動画。</td>
+      <td>ミリ秒</td>
+    </tr>
+    <tr>
+      <td><strong>S3 Intelligent-Tiering</strong></td>
+      <td><strong>「迷ったらこれ」</strong>。AIがアクセス頻度を見て、自動で安い階層へ移動。</td>
+      <td>アクセスパターンが読めないデータ。</td>
+      <td>ミリ秒</td>
+    </tr>
+    <tr>
+      <td>S3 Standard-IA</td>
+      <td>保存料は安いが、取り出し料が高い。</td>
+      <td>災害対策用バックアップなど（普段使わないが、有事は即必要）。</td>
+      <td>ミリ秒</td>
+    </tr>
+    <tr>
+      <td>S3 One Zone-IA</td>
+      <td>1つのAZにしか保存しない（他は最低3AZ）。安いが消えるリスクあり。</td>
+      <td>作り直せるサムネイル画像など。</td>
+      <td>ミリ秒</td>
+    </tr>
+    <tr style="background-color:#f0f8ff;">
+      <td><strong>S3 Glacier</strong><br>(グレイシア)</td>
+      <td>激安。ただし取り出しに<strong>数分〜数時間</strong>かかる。</td>
+      <td>法律で保存義務があるログ、古いアーカイブ。</td>
+      <td style="color:#d9534f; font-weight:bold;">遅い</td>
+    </tr>
+    <tr style="background-color:#f0f8ff;">
+      <td>S3 Glacier<br>Deep Archive</td>
+      <td>最安。取り出しに<strong>12時間以上</strong>かかることも。</td>
+      <td>めったに使わない「化石」のようなデータ。</td>
+      <td style="color:#d9534f; font-weight:bold;">超遅い</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. ライフサイクルポリシー（自動化）</h2>
+<p>いちいち手動でプランを変更するのは大変です。「最初はStandardに保存して、30日経ったらIAに移して、1年経ったらGlacierに入れて、3年経ったら削除する」といったルールを事前に設定できます。これを<strong>ライフサイクルポリシー</strong>と言い、コスト最適化の切り札となります。</p>
+
+<h2>5. セキュリティ（バケットポリシー）</h2>
+<p>S3はインターネットに面しているため、設定を間違えると情報漏洩事故につながります。</p>
+<ul>
+<li><strong>デフォルト：</strong> <strong>「パブリックアクセスをすべてブロック」</strong>になっています（安全）。</li>
+<li><strong>バケットポリシー：</strong> 「誰がこのバケットにアクセスできるか」を定義するルール（JSON形式）です。特定のIPアドレスや、CloudFrontからのアクセスのみを許可する際などに使います。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>S3 = オブジェクトストレージ（ファイル置き場）。</strong></li>
+<li><strong>イレブン・ナイン（データは消えない）。</strong></li>
+<li><strong>静的サイトが作れる（EC2いらず）。</strong></li>
+<li><strong>Glacierは安いけど取り出しが遅い（アーカイブ用）。</strong></li>
+<li><strong>ライフサイクルポリシーでクラス移動を自動化。</strong></li>
+</ul>
+<p>コンピューティング(EC2)、ネットワーク(VPC)、セキュリティ(IAM)、ストレージ(S3)、データベース(RDS)。これらを組み合わせることで、AWS上で「どういう構成が一番お金がかからないか（コスト最適化）」という議論ができるようになります。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
