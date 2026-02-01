@@ -1,0 +1,21 @@
+{
+  "id": "awscp-amazon-eventbridge-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-01T20:05:32+09:00",
+  "post_path": "awscp/posts/2026-02-01-awscp-amazon-eventbridge-basics/",
+  "meta": {
+    "title": "AWS-CP試験に役立つEventBridgeの基礎",
+    "summary": "Amazon EventBridgeはAWSサービスを自動連携させるための重要な司令塔です。イベントをトリガーにしたアクションの管理方法について解説します。",
+    "tags": [
+      "EventBridge",
+      "AWS",
+      "自動化",
+      "サービス連携",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
