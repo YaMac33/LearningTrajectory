@@ -1,0 +1,21 @@
+{
+  "id": "awscp-appstream-2-0-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T03:41:11+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-appstream-2-0-overview/",
+  "meta": {
+    "title": "AppStream 2.0の概要と特長",
+    "summary": "AppStream 2.0は、アプリケーションをブラウザで配信するサービスです。低スペックPCでも高性能なソフトが使える仕組みを理解できます。",
+    "tags": [
+      "AWS",
+      "AppStream",
+      "クラウドコンピューティング",
+      "セキュリティ",
+      "VDI"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
