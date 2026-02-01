@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cost-management-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-01T20:37:41+09:00",
+    "title": "AWSコスト管理の基本を解説",
+    "summary": "AWS BudgetsとCost Explorerの主要な違いを理解し、コスト管理の力を身につけるための知識を提供します。",
+    "tags": [
+      "AWS",
+      "コスト管理",
+      "Budgets",
+      "Cost Explorer",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "料金モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-aws-cost-management-basics/"
+  },
+  {
     "id": "awscp-ebs-basic-exam-prep",
     "category": "awscp",
     "timestamp": "2026-02-01T20:33:45+09:00",
