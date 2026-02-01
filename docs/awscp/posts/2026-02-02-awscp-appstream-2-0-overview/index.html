@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AppStream 2.0の概要と特長</title>
+  <meta name="description" content="AppStream 2.0はアプリをブラウザで配信するサービスです。低スペックPCでも高性能なソフトが使える仕組みと、Amazon WorkSpacesとの決定的な違いについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AppStream 2.0の概要と特長" />
+  <meta property="og:description" content="AppStream 2.0はアプリをブラウザで配信するサービスです。低スペックPCでも高性能なソフトが使える仕組みと、Amazon WorkSpacesとの決定的な違いについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ストリーミングの仕組み図 */
+    .streaming-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .device-box {
+      border: 2px solid #333;
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      min-width: 140px;
+      position: relative;
+    }
+    .device-aws { border-color: #d86613; }
+    .device-user { border-color: #333; }
+
+    .screen-content {
+      background: #eee;
+      border: 1px solid #999;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .arrow-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .arrow-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .arrow-icon {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    /* 比較カード */
+    .compare-wrapper {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .compare-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-ws { border-top: 4px solid #2a5caa; }
+    .card-as { border-top: 4px solid #d86613; }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px dashed #ddd;
+      padding-bottom: 0.5rem;
+      width: 100%;
+      text-align: center;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      color: #555;
+      text-align: left;
+      width: 100%;
+    }
+    .tag-persistent {
+      background: #e6f7ff;
+      color: #0050b3;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .tag-non-persistent {
+      background: #fff1f0;
+      color: #cf1322;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AppStream 2.0の概要と特長</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">AppStream</li>
+            <li class="tag">クラウドコンピューティング</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">VDI</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon AppStream 2.0 は、一言で言うと<strong>「アプリケーション版のNetflix（ストリーミング配信）」</strong>です。映画のデータ自体はサーバーにあるのに、手元のスマホで映像だけ再生できるように、「重たいソフト（CADやPhotoshopなど）」をサーバーで動かし、その「画面（ピクセル）」だけをブラウザに転送するサービスです。</p>
+
+<h2>1. AppStream 2.0 の仕組みとメリット</h2>
+<p>通常、高性能なソフトを使うには、ハイスペックなPCを買って、ソフトをインストールする必要があります。AppStream 2.0 は、その常識を覆します。</p>
+
+<div class="diagram-container">
+  <div class="streaming-flow">
+    <div class="device-box device-aws">
+      <strong>AWSサーバー</strong>
+      <div class="screen-content">
+        重い処理を実行<br>
+        (Excel / CAD)
+      </div>
+    </div>
+    
+    <div class="arrow-group">
+      <div class="arrow-line">
+        <span class="arrow-icon">➡</span> 映像 (ピクセル)
+      </div>
+      <div class="arrow-line">
+        操作 (クリック) <span class="arrow-icon">⬅</span>
+      </div>
+    </div>
+
+    <div class="device-box device-user">
+      <strong>あなたのPC</strong>
+      <div class="screen-content" style="background:#fff;">
+        ブラウザ表示<br>
+        (Chromeなど)
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; color:#666; margin-top:1rem;">データの実体はAWSにあり、手元には映像しか届かないため安全。</p>
+</div>
+
+<h3>3つのメリット</h3>
+<ul class="check-list">
+<li><strong>低スペックなPCでOK：</strong> ネットさえ繋がれば、安価なノートPCやタブレットでも、3Dグラフィックスソフトがサクサク動きます。</li>
+<li><strong>インストール不要：</strong> ブラウザ（Chromeなど）があれば、URLを開くだけですぐに使えます。</li>
+<li><strong>セキュリティ：</strong> データはAWS上にあり、手元のPCには一切保存されません（情報漏洩対策）。</li>
+</ul>
+
+<h2>2. 最大の山場：WorkSpaces との違い</h2>
+<p>試験の合否を分けるポイントです。どちらも「画面を転送する」サービスですが、<strong>「提供する単位」と「永続性」</strong>が違います。</p>
+
+<div class="diagram-container">
+  <div class="compare-wrapper">
+    <!-- WorkSpaces -->
+    <div class="compare-card card-ws">
+      <span class="card-icon">🖥️</span>
+      <span class="card-title">Amazon WorkSpaces</span>
+      <span class="tag-persistent">永続的 (データ残る)</span>
+      <div class="card-desc" style="margin-top:1rem;">
+        <strong>「自分専用の部屋」</strong><br>
+        デスクトップ画面（OS）を丸ごと提供。<br>
+        壁紙を変えたり、ファイルをCドライブに保存したりできる。<br>
+        <br>
+        <small>用途：社員へのテレワーク環境配布</small>
+      </div>
+    </div>
+
+    <!-- AppStream 2.0 -->
+    <div class="compare-card card-as">
+      <span class="card-icon">🌊</span>
+      <span class="card-title">Amazon AppStream 2.0</span>
+      <span class="tag-non-persistent">非永続 (消える)</span>
+      <div class="card-desc" style="margin-top:1rem;">
+        <strong>「アプリの自動販売機」</strong><br>
+        特定のアプリ画面だけを提供。<br>
+        ログアウトすると環境はリセット（破棄）される。<br>
+        <br>
+        <small>用途：実習用ソフト、SaaS化、デモ</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>比較まとめ</h3>
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon WorkSpaces</th>
+      <th>Amazon AppStream 2.0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>提供するもの</strong></td>
+      <td>デスクトップ画面 (DaaS)</td>
+      <td class="highlight-cell">特定のアプリケーション</td>
+    </tr>
+    <tr>
+      <td><strong>データの保存</strong></td>
+      <td>永続的<br><small>(明日もそのまま残る)</small></td>
+      <td><strong>非永続的</strong><br><small>(終了時にリセットされる)</small></td>
+    </tr>
+    <tr>
+      <td><strong>クライアント</strong></td>
+      <td>専用ソフトインストール推奨</td>
+      <td><strong>HTML5ブラウザ</strong>のみでOK</td>
+    </tr>
+    <tr>
+      <td><strong>主な用途</strong></td>
+      <td>全社員へのPC配布</td>
+      <td>教育機関の実習、お試し利用</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. AppStream 2.0 の具体的なユースケース</h2>
+<p>試験で「こういう状況ならどれを使う？」と聞かれた時の判断基準です。</p>
+
+<h3>① 教育機関や研修</h3>
+<p>「今日の授業で使う3D CADソフトを、学生全員のiPadで使えるようにしたい」<br>
+→ 授業が終わればデータはリセットされて良いので、AppStream 2.0 が最適です。</p>
+
+<h3>② 既存ソフトのSaaS化</h3>
+<p>「昔作ったWindows用デスクトップアプリを、Webアプリとして顧客に提供したい（作り直す予算はない）」<br>
+→ コードを書き直さずにブラウザ配信できる AppStream 2.0 が選ばれます。</p>
+
+<h3>③ セキュリティ重視のデータ閲覧</h3>
+<p>「機密データを閲覧させたいが、ダウンロードや持ち出しは絶対禁止にしたい」<br>
+→ 画面転送だけでファイル実体が届かない AppStream 2.0 を使います。</p>
+
+<h2>4. データの保存はどうする？（非永続性への対策）</h2>
+<p>AppStream 2.0 は、使い終わると仮想マシンが消えてしまう（非永続）ため、作成したファイルを保存するには<strong>「外部ストレージ」</strong>と連携します。</p>
+<ul>
+<li>Amazon S3</li>
+<li>Google Drive</li>
+<li>OneDrive</li>
+</ul>
+<p>ユーザーは、AppStream上のWordで文章を書き、保存ボタンを押して自分のGoogle Driveに保存する、といった使い方ができます。</p>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>アプリ版Netflix：</strong> インストール不要、ブラウザで重いソフトが動く。</li>
+<li><strong>非永続：</strong> ログアウトすると環境はリセットされる（WorkSpacesとの最大の違い）。</li>
+<li><strong>セキュリティ：</strong> データは端末に残らない（ピクセルが送られるだけ）。</li>
+<li><strong>保存：</strong> S3やGoogle Driveと連携して保存する。</li>
+</ul>
+<p>これで、エンドユーザーコンピューティング（EUC）分野の紛らわしい2つのサービス、「WorkSpaces（部屋）」と「AppStream（川）」の違いがクリアになったはずです。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
