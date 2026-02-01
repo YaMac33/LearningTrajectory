@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSコスト管理の基本</title>
+  <meta name="description" content="AWS BudgetsとCost Explorerの決定的な違いとは？「予算アラート」と「コスト分析」の役割分担、コスト配分タグの活用法など、試験頻出のコスト管理サービスを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSコスト管理の基本" />
+  <meta property="og:description" content="AWS BudgetsとCost Explorerの決定的な違いとは？「予算アラート」と「コスト分析」の役割分担、コスト配分タグの活用法など、試験頻出のコスト管理サービスを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* Budgets vs Cost Explorer 対比図 */
+    .cost-compare-wrapper {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .cost-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .card-budgets { border-top: 4px solid #d9534f; }
+    .card-ce { border-top: 4px solid #2a5caa; }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* タグのイメージ図 */
+    .tag-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .resource-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .resource-box {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      position: relative;
+      width: 100px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .tag-label {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #ffc107;
+      color: #333;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+      white-space: nowrap;
+    }
+    .filter-arrow {
+      font-size: 1.5rem;
+      color: #999;
+    }
+    .report-box {
+      border: 2px solid #2a5caa;
+      background: #e6f7ff;
+      padding: 1rem 2rem;
+      border-radius: 6px;
+      font-weight: bold;
+      color: #0050b3;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSコスト管理の基本</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">コスト管理</li>
+            <li class="tag">Budgets</li>
+            <li class="tag">Cost Explorer</li>
+            <li class="tag">クラウド</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>クラウドは「使った分だけ払う（従量課金）」のがメリットですが、裏を返せば<strong>「使いすぎても誰も止めてくれない」</strong>という怖さがあります。試験では、<strong>「AWS Budgets」と「Cost Explorer」</strong>の役割の違いが必ず問われます。それぞれの役割を一言で表すと以下のようになります。</p>
+
+<div class="diagram-container">
+  <div class="cost-compare-wrapper">
+    <div class="cost-card card-budgets">
+      <span class="card-icon">🚨</span>
+      <span class="card-title">AWS Budgets</span>
+      <p class="card-desc"><strong>「アラーム（警告）」</strong><br>予算を決めて、超えそうなら知らせる。<br>守りのツール。</p>
+    </div>
+    <div class="cost-card card-ce">
+      <span class="card-icon">📊</span>
+      <span class="card-title">Cost Explorer</span>
+      <p class="card-desc"><strong>「家計簿（分析）」</strong><br>過去の支出をグラフで見て、無駄を見つける。<br>分析のツール。</p>
+    </div>
+  </div>
+</div>
+
+<h2>1. AWS Budgets（バジェット）：予算管理とアラート</h2>
+<p>「今月は1万円までに抑えたい」という<strong>目標（予算）</strong>を設定し、それを超えそうになったら通知してくれるサービスです。</p>
+<ul>
+<li><strong>予算の設定：</strong> 「月額 100ドルまで」といった予算を作成します。</li>
+<li><strong>アラート通知：</strong>
+<ul>
+<li><strong>実績ベース：</strong> 「実際に80ドル（80%）に達したらメールする」</li>
+<li><strong>予測ベース：</strong> 「このペースだと月末に120ドルになりそうだよ（予測）」という段階でもメールを飛ばせます。</li>
+</ul>
+</li>
+<li><strong>アクション（応用）：</strong> 予算を超えたら、自動的にEC2を停止させる（ChatbotやLambdaと連携）ことも可能です。</li>
+</ul>
+<p><strong>イメージ：</strong> クレジットカードの「使いすぎ防止アラート」。</p>
+
+<h2>2. AWS Cost Explorer（コストエクスプローラー）：可視化と分析</h2>
+<p>AWSの請求データを、棒グラフや折れ線グラフで<strong>「見える化」</strong>するツールです。「先月、なんでこんなに高かったんだ？」と原因を突き止める時に使います。</p>
+<ul>
+<li><strong>グラフ化：</strong> 「サービス別（EC2でいくら、RDSでいくら）」や「日別」のグラフを表示します。</li>
+<li><strong>フィルタリング：</strong> 「東京リージョンの、本番環境のタグがついているEC2だけ」といった細かい絞り込みができます。</li>
+<li><strong>予測（Forecast）：</strong> 過去のデータに基づいて、<strong>「来月はこれくらいかかりそうです」</strong>という未来の予測グラフを出してくれます（最大12ヶ月先まで）。</li>
+</ul>
+<p><strong>イメージ：</strong> 詳細な「家計簿アプリ」や「クレジットカードの明細分析画面」。</p>
+
+<h2>3. 【最重要】Budgets と Cost Explorer の違い</h2>
+<p>試験で「どっちを使う？」と迷ったら、この判断基準を思い出してください。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>目的</th>
+      <th>使うサービス</th>
+      <th>判断基準</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>「予算を超えたら知らせてほしい」</td>
+      <td class="highlight-cell">AWS Budgets</td>
+      <td><strong>アクション (通知)</strong> が欲しい時</td>
+    </tr>
+    <tr>
+      <td>「なぜ高いのか原因を知りたい」</td>
+      <td>Cost Explorer</td>
+      <td><strong>分析・確認</strong> がしたい時</td>
+    </tr>
+    <tr>
+      <td>「来月の請求額を予測したい」</td>
+      <td>Cost Explorer</td>
+      <td>傾向分析からの<strong>予測</strong></td>
+    </tr>
+    <tr>
+      <td>「予算オーバーしそうか予測したい」</td>
+      <td class="highlight-cell">AWS Budgets</td>
+      <td>予算に対する<strong>アラート</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. コスト配分タグ (Cost Allocation Tags)</h2>
+<p>「AWSの請求書を見たら、EC2代が100万円だった。でも、どの部署がいくら使ったか分からない！」<br>
+こんな時に使うのが<strong>「タグ」</strong>です。</p>
+
+<div class="diagram-container">
+  <div class="tag-diagram">
+    <div class="resource-group">
+      <div class="resource-box">
+        EC2 A
+        <span class="tag-label">Dept: Sales</span>
+      </div>
+      <div class="resource-box">
+        EC2 B
+        <span class="tag-label">Dept: Dev</span>
+      </div>
+      <div class="resource-box">
+        RDS
+        <span class="tag-label">Dept: Sales</span>
+      </div>
+    </div>
+    
+    <div class="filter-arrow">⬇ フィルター集計</div>
+    
+    <div class="report-box">
+      営業部 (Sales) のコスト： ¥700,000
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>仕組み：</strong> EC2などのリソースに <code>Department: Sales</code> や <code>Project: Website</code> といったタグ（名札）を付けておきます。</li>
+<li><strong>効果：</strong> Cost Explorerなどで「Sales部署だけのコスト」を抽出できるようになります。</li>
+<li><strong>試験対策：</strong> 「部門ごと、プロジェクトごとにコストを分類するには？」→ <strong>コスト配分タグ</strong>を有効化する。</li>
+</ul>
+
+<h2>5. その他のコスト関連サービス</h2>
+<p>選択肢に混ざってくる脇役たちです。</p>
+
+<h3>AWS Cost and Usage Report (CUR)</h3>
+<ul>
+<li><strong>役割：</strong> <strong>「最も詳細な」</strong>生の請求データ（CSVファイル）です。</li>
+<li><strong>用途：</strong> Cost Explorerよりもさらに細かく、1時間ごとの明細をExcelやBIツールで分析したい時に使います。</li>
+<li><strong>試験対策：</strong> 「最も詳細なデータ」「生データ」ときたらこれ。</li>
+</ul>
+
+<h3>AWS Pricing Calculator</h3>
+<ul>
+<li><strong>役割：</strong> <strong>「見積もり」</strong>ツール。</li>
+<li><strong>用途：</strong> AWSを使う前に、「この構成だといくらになるかな？」と試算するために使います（昔のSimple Monthly Calculatorの後継）。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>AWS Budgets：</strong> 「守り」。予算を決めて、超えたらアラート（通知）。</li>
+<li><strong>Cost Explorer：</strong> 「分析」。グラフで見て、原因特定や将来予測。</li>
+<li><strong>コスト配分タグ：</strong> 請求を「部署ごと」「プロジェクトごと」に分けるための名札。</li>
+</ul>
+<p>これで、AWSクラウドプラクティショナー試験（CLF）合格に必要な主要知識は、ほぼ全て網羅しました。基礎からセキュリティ、コスト管理まで、点と点が繋がって線になっているはずです。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
