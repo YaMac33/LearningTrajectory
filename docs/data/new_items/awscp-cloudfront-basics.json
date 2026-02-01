@@ -1,0 +1,22 @@
+{
+  "id": "awscp-cloudfront-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-01T16:03:24+09:00",
+  "post_path": "awscp/posts/2026-02-01-awscp-cloudfront-basics/",
+  "meta": {
+    "title": "CloudFrontの基本と試験対策ポイント",
+    "summary": "CloudFrontはWebサイトの高速化を実現するキャッシュサービスです。エッジロケーションやその仕組み、試験対策に必要な重要キーワードについて解説します。",
+    "tags": [
+      "CloudFront",
+      "AWS",
+      "S3",
+      "EC2",
+      "キャッシュ",
+      "高速化"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
