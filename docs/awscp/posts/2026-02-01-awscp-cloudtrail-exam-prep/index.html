@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | CloudTrailの基本と試験対策</title>
+  <meta name="description" content="CloudTrailはAWSアカウント内の操作履歴を記録する「監視カメラ」です。CloudWatchとの決定的な違い、ログの保存期間、改ざん検知機能など、試験合格に必要な知識を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CloudTrailの基本と試験対策" />
+  <meta property="og:description" content="CloudTrailはAWSアカウント内の操作履歴を記録する「監視カメラ」です。CloudWatchとの決定的な違い、ログの保存期間、改ざん検知機能など、試験合格に必要な知識を解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 役割比較図 */
+    .role-compare-wrapper {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .role-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .role-card.cw { border-top: 4px solid #d86613; } /* CloudWatch Color */
+    .role-card.ct { border-top: 4px solid #999; }    /* CloudTrail Color */
+
+    .role-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .role-name {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .role-desc {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* ログイメージ */
+    .log-card {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 1.5rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+    .log-card::before {
+      content: "CloudTrail Log (API Call)";
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #e06c75;
+      color: #fff;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .log-row { margin-bottom: 0.5rem; }
+    .key { color: #61afef; }
+    .val { color: #98c379; }
+    .val-alert { color: #e06c75; font-weight: bold; }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* シナリオボックス */
+    .scenario-box {
+      border: 2px solid #333;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #fff;
+      margin: 1rem 0;
+    }
+    .scenario-title {
+      font-weight: bold;
+      background: #333;
+      color: #fff;
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CloudTrailの基本と試験対策</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">CloudTrail</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">監査</li>
+            <li class="tag">試験対策</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon CloudTrail（クラウドトレイル）は、AWSアカウント内の「監視カメラの録画記録」であり、何かあった時のための「探偵」</strong>です。試験では「セキュリティ」「監査」「コンプライアンス」という言葉が出たら、まずCloudTrailを疑ってください。合格へのカギは、似た名前のCloudWatchとの違いを明確にすることです。</p>
+
+<h2>1. CloudTrailとは？</h2>
+<p>一言で言うと、<strong>「『誰が、いつ、何をしたか』という操作履歴（APIコール）を全て記録するサービス」</strong>です。AWSでは、画面（マネジメントコンソール）からの操作も、コマンド（CLI）からの操作も、すべて「API」として処理されます。CloudTrailはこれを全て記録しています。</p>
+<ul>
+<li>「Aさんが、今日の10時に、EC2インスタンスを削除した」</li>
+<li>「Bさんが、昨日の夜に、セキュリティグループの設定を変更した」</li>
+<li>「誰かが、不正なIPアドレスからログインを試みた」</li>
+</ul>
+<p>これらの<strong>「犯人の足跡（Trail）」</strong>を克明に残します。</p>
+
+<h2>2. 記録される「5W」の情報</h2>
+<p>CloudTrailのログには、主に以下の情報が含まれます。これを追えば、誰が何をしたのか言い逃れはできません。</p>
+
+<div class="diagram-container">
+  <div class="log-card">
+    <div class="log-row"><span class="key">"userIdentity":</span> <span class="val">"User-A"</span> <span style="color:#666;">// Who (誰が)</span></div>
+    <div class="log-row"><span class="key">"eventTime":</span> <span class="val">"2026-02-01T10:00:00Z"</span> <span style="color:#666;">// When (いつ)</span></div>
+    <div class="log-row"><span class="key">"eventName":</span> <span class="val-alert">"TerminateInstances"</span> <span style="color:#666;">// What (何を：削除)</span></div>
+    <div class="log-row"><span class="key">"sourceIPAddress":</span> <span class="val">"203.0.113.5"</span> <span style="color:#666;">// Where (どこから)</span></div>
+    <div class="log-row"><span class="key">"resources":</span> <span class="val">[{ "id": "i-12345..." }]</span> <span style="color:#666;">// Which (どれを)</span></div>
+  </div>
+</div>
+
+<h2>3. CloudWatch との違い（最終確認）</h2>
+<p>試験で最も間違えやすいポイントです。必ず役割の違いを整理しておきましょう。</p>
+
+<div class="diagram-container">
+  <div class="role-compare-wrapper">
+    <!-- CloudWatch -->
+    <div class="role-card cw">
+      <span class="role-icon">🩺</span>
+      <span class="role-name">CloudWatch</span>
+      <p class="role-desc"><strong>健康診断医</strong><br>「今の調子はどう？」「CPU使いすぎてない？」<br>未来のためにアラームを鳴らす。</p>
+    </div>
+    <!-- CloudTrail -->
+    <div class="role-card ct">
+      <span class="role-icon">🕵️</span>
+      <span class="role-name">CloudTrail</span>
+      <p class="role-desc"><strong>探偵・監査人</strong><br>「過去に何が起きた？」「誰がやった？」<br>証拠としてログを残す。</p>
+    </div>
+  </div>
+</div>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>比較項目</th>
+      <th>CloudWatch</th>
+      <th>CloudTrail</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>見るもの</strong></td>
+      <td>パフォーマンス (数値)<br><small>CPU使用率、メモリなど</small></td>
+      <td>API操作履歴 (行動)<br><small>作成、変更、削除など</small></td>
+    </tr>
+    <tr>
+      <td><strong>質問の例</strong></td>
+      <td>「サーバーが重い原因は？」<br>「CPU使用率は？」</td>
+      <td>「誰がこのサーバーを消した？」<br>「いつ設定が変わった？」</td>
+    </tr>
+    <tr>
+      <td><strong>主な目的</strong></td>
+      <td>監視、運用、自動復旧</td>
+      <td class="highlight-cell">監査、セキュリティ、証拠保全</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験に出る「重要仕様」</h2>
+<p>ただ「記録する」だけでなく、以下の細かい仕様が試験に出ます。</p>
+
+<h3>① イベント履歴（Event History）は「90日間」</h3>
+<p>CloudTrailはデフォルトで有効になっていますが、コンソールで無料で見られるのは<strong>「過去90日間」</strong>分だけです。<br>
+<strong>試験対策：</strong> 「90日より前のログを長期保存・分析したい」と言われたら？<br>
+→ 答え：CloudTrailの設定で<strong>「証跡（Trail）」を作成し、S3バケットに保存する</strong>ように設定する（S3なら何年でも安価に保存可能）。</p>
+
+<h3>② ログファイルの整合性検証 (Log File Validation)</h3>
+<p>「ハッカーが侵入して、自分が侵入したというログ（足跡）をCloudTrailから消したらどうする？」という懸念に対する機能です。<br>
+<strong>機能：</strong> ログファイルが改ざん・削除されていないことを数学的に証明する機能。<br>
+<strong>試験対策：</strong> 「ログの完全性（Integrity）を保証するには？」と聞かれたらこれです。</p>
+
+<h3>③ データイベントと管理イベント</h3>
+<ul>
+<li><strong>管理イベント：</strong> 「EC2を作る」「S3バケットを作る」といった設定変更の操作。（デフォルトで記録される）</li>
+<li><strong>データイベント：</strong> 「S3の中のファイルを見る」「Lambdaを実行する」といったデータそのものへのアクセス。（デフォルトではオフ。オンにすると大量のログが出るため追加料金がかかる）</li>
+</ul>
+
+<h2>5. 実際のトラブル解決シナリオ（試験用）</h2>
+<p>試験では、以下のようなシナリオ問題が出ます。</p>
+
+<div class="scenario-box">
+  <div class="scenario-title">問題</div>
+  <p>ある日突然、本番環境のEC2インスタンスが消えてしまいました。システム管理者は、<strong>「誰が」「いつ」</strong>削除したのかを特定し、再発防止策を練る必要があります。どのサービスを使うべきですか？</p>
+  <hr style="border:0; border-top:1px dashed #ccc; margin:0.5rem 0;">
+  <div class="scenario-title" style="background:#28a745;">正解への思考プロセス</div>
+  <ol style="font-size:0.9rem; padding-left:1.2rem;">
+    <li>EC2が消えた（事実）。</li>
+    <li>必要なのは「CPUなどの数値（CloudWatch）」ではない。</li>
+    <li>必要なのは「誰がやったか（操作主）」だ。</li>
+    <li>操作履歴を見るのは？ → <strong>CloudTrail</strong>。</li>
+  </ol>
+</div>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>APIコールの記録：</strong> AWSで行われたすべての操作（足跡）を記録する。</li>
+<li><strong>監査・コンプライアンス：</strong> 「誰がやったか」を特定するための必須ツール。</li>
+<li><strong>90日：</strong> 標準保存期間。それ以上はS3へ保存。</li>
+<li><strong>改ざん検知：</strong> ログファイル整合性検証機能がある。</li>
+</ul>
+<p>これで、<strong>「CloudWatch（今の状態）」と「CloudTrail（過去の行い）」</strong>の区別は完璧です。AWS環境を守るための「目」と「記録」が揃いました。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
