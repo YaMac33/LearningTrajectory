@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-s3-basics-knowledge",
+    "category": "awscp",
+    "timestamp": "2026-02-01T09:34:07+09:00",
+    "title": "AWS S3の基礎知識と特徴",
+    "summary": "AWS S3はオブジェクトストレージとして、耐久性の高いデータ保存が可能です。試験対策としてS3の特徴やストレージクラス、ライフサイクル管理について理解できます。",
+    "tags": [
+      "AWS",
+      "S3",
+      "クラウドストレージ",
+      "試験対策",
+      "オブジェクトストレージ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-01-awscp-aws-s3-basics-knowledge/"
+  },
+  {
     "id": "awscp-aws-responsibility-model",
     "category": "awscp",
     "timestamp": "2026-02-01T08:24:27+09:00",
