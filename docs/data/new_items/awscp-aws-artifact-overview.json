@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-artifact-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T03:21:07+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-artifact-overview/",
+  "meta": {
+    "title": "AWS Artifactの概要と試験対策",
+    "summary": "AWS Artifactは、安全性を証明するための監査レポートや契約書を提供するサービスです。試験では、レポートと契約の違いや責任共有モデルとの関係が重要ポイントとなります。",
+    "tags": [
+      "AWS",
+      "Artifact",
+      "セキュリティ",
+      "コンプライアンス",
+      "監査"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
