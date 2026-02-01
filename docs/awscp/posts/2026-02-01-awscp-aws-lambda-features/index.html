@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Lambdaの基本と特徴</title>
+  <meta name="description" content="AWS Lambdaは、サーバーレスでイベント駆動のプログラム実行サービスです。EC2との違い、実行時間の制約、ステートレス性など、試験頻出のポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Lambdaの基本と特徴" />
+  <meta property="og:description" content="AWS Lambdaは、サーバーレスでイベント駆動のプログラム実行サービスです。EC2との違い、実行時間の制約、ステートレス性など、試験頻出のポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* イベント駆動フロー図 */
+    .event-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      background: #fff;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      position: relative;
+    }
+    .step-icon {
+      font-size: 1.5rem;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eee;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .step-content {
+      flex: 1;
+    }
+    .step-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+    .step-desc {
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .lambda-active {
+      border: 2px solid #d86613; /* AWS Orange */
+      background: #fff5eb;
+    }
+    .lambda-badge {
+      background: #d86613;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 0.5rem;
+      font-weight: normal;
+    }
+
+    .arrow-down {
+      font-size: 1.5rem;
+      color: #999;
+      line-height: 1;
+    }
+    .arrow-label {
+      font-size: 0.8rem;
+      color: #d86613;
+      font-weight: bold;
+      background: #fff;
+      padding: 0 5px;
+      position: relative;
+      top: -10px;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* 制約カード */
+    .limit-grid {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .limit-card {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+      background: #fff;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+    .limit-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .limit-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #d9534f;
+    }
+    .limit-desc {
+      font-size: 0.85rem;
+      color: #666;
+      text-align: left;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-01">
+            2026.02.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Lambdaの基本と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Lambda</li>
+            <li class="tag">サーバーレス</li>
+            <li class="tag">イベント駆動</li>
+            <li class="tag">コスト効率</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>AWS Lambda（ラムダ）は、クラウドの進化の最終形態とも言える、「サーバーレス」</strong>を代表するサービスです。EC2が「レンタカー（借りている間はずっとお金がかかる）」だとすれば、Lambdaは<strong>「タクシー（乗っている時間だけ、距離の分だけ払う）」</strong>です。試験では、<strong>「イベント駆動（Event-driven）」と「コスト効率」</strong>の観点で頻出します。</p>
+
+<h2>1. AWS Lambda とは？</h2>
+<p>一言で言うと、<strong>「サーバーのことを一切気にせず、プログラム（コード）だけを実行できるサービス」</strong>です。</p>
+<ul>
+<li><strong>EC2の場合：</strong> OSを選び、CPUを選び、パッチを当て、起動しっぱなしにする必要があります。</li>
+<li><strong>Lambdaの場合：</strong> PythonやJavaで書いたコードをAWSにアップロードするだけ。あとはAWSが勝手にサーバーを用意し、実行し、終わったら片付けます。</li>
+</ul>
+
+<h2>2. 仕組み：イベント駆動（Event-driven）</h2>
+<p>Lambdaは、誰か（何か）に呼ばれた時だけ、寝床から飛び起きて仕事をします。これを<strong>イベント駆動</strong>と呼びます。代表的な例として「画像をアップロードしたら自動で縮小する」処理を見てみましょう。</p>
+
+<div class="diagram-container">
+  <div class="event-flow">
+    <!-- Step 1 -->
+    <div class="flow-step">
+      <div class="step-icon">👤</div>
+      <div class="step-content">
+        <span class="step-title">1. 画像アップロード</span>
+        <span class="step-desc">ユーザーがS3バケットAに画像を置く。</span>
+      </div>
+    </div>
+    
+    <div class="arrow-down">↓ <span class="arrow-label">トリガー発動 (イベント)</span></div>
+
+    <!-- Step 2 -->
+    <div class="flow-step lambda-active">
+      <div class="step-icon" style="background:#fff; color:#d86613; font-weight:bold;">λ</div>
+      <div class="step-content">
+        <span class="step-title">2. AWS Lambda 起動 <span class="lambda-badge">課金発生</span></span>
+        <span class="step-desc">プログラムが起動し、画像を縮小加工する。<br><strong>(実行時間: 0.5秒だけ)</strong></span>
+      </div>
+    </div>
+
+    <div class="arrow-down">↓ <span class="arrow-label">完了</span></div>
+
+    <!-- Step 3 -->
+    <div class="flow-step">
+      <div class="step-icon">🗂️</div>
+      <div class="step-content">
+        <span class="step-title">3. 保存</span>
+        <span class="step-desc">縮小版をS3バケットBに保存して終了。</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.9rem; margin-top:1rem; text-align:center;">画像がアップロードされない限り、Lambdaは1円もかかりません。</p>
+</div>
+
+<h2>3. 試験に出る「Lambdaの3つの制約と特徴」</h2>
+<p>「何でもLambdaでやればいい」わけではありません。以下の特徴（制約）を覚えておいてください。</p>
+
+<div class="diagram-container">
+  <div class="limit-grid">
+    <div class="limit-card">
+      <span class="limit-icon">⏱️</span>
+      <span class="limit-title">15分の壁</span>
+      <p class="limit-desc">
+        実行時間は<strong>最大15分</strong>まで。<br>
+        動画エンコードや複雑な計算など、長時間かかる処理には向きません。<br>
+        → 長時間はEC2やAWS Batchを使う。
+      </p>
+    </div>
+    <div class="limit-card">
+      <span class="limit-icon">🧠</span>
+      <span class="limit-title">ステートレス</span>
+      <p class="limit-desc">
+        毎回「新品」で起動するため<strong>記憶喪失</strong>です。<br>
+        前回の計算結果をLambda自身に保存できません。<br>
+        → データは必ずS3やDynamoDBに保存する。
+      </p>
+    </div>
+    <div class="limit-card">
+      <span class="limit-icon">💰</span>
+      <span class="limit-title">コスパ最強</span>
+      <p class="limit-desc">
+        「リクエスト数」＋「実行時間(ミリ秒)」で課金。<br>
+        待機時間は<strong>0円</strong>。<br>
+        → アクセスに波があるシステムに最適。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>4. EC2 vs Lambda（使い分けの決定版）</h2>
+<p>試験で「どっちを使うべき？」と聞かれた時の判断基準です。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon EC2</th>
+      <th>AWS Lambda (サーバーレス)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>主導権</strong></td>
+      <td>サーバー管理型 (OSが見える)</td>
+      <td>サーバーレス (コードしか見えない)</td>
+    </tr>
+    <tr>
+      <td><strong>実行時間</strong></td>
+      <td>24時間365日ずっと動かせる</td>
+      <td><strong>最大15分</strong> (短距離走が得意)</td>
+    </tr>
+    <tr>
+      <td><strong>課金</strong></td>
+      <td>起動している時間 (1秒単位)</td>
+      <td>処理した時間 (1ミリ秒単位)</td>
+    </tr>
+    <tr>
+      <td><strong>得意なこと</strong></td>
+      <td>既存のソフトを動かす、<br>長時間のバッチ処理</td>
+      <td>データ加工、APIの裏側、<br>通知、イベント処理</td>
+    </tr>
+    <tr>
+      <td><strong>スケーリング</strong></td>
+      <td>Auto Scalingで数分かかる</td>
+      <td class="highlight-cell">瞬時に数千並列まで増える</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. Lambdaと相性の良い「相棒」たち</h2>
+<p>Lambdaは「トリガー（引き金）」がないと動きません。以下の組み合わせが鉄板です。</p>
+<ul class="check-list">
+<li><strong>S3 + Lambda：</strong> ファイルがアップロードされたら処理する（画像加工、CSV読み込み）。</li>
+<li><strong>EventBridge + Lambda：</strong> 決まった時間に動かす（毎朝9時にバックアップを取る）。</li>
+<li><strong>API Gateway + Lambda：</strong> Webサイトのボタンが押されたら動く（サーバーレスなWeb API）。</li>
+</ul>
+
+<h2>6. まとめ</h2>
+<p>Lambdaの特徴は<strong>「サーバーレス」「イベント駆動」「安い」「短い」</strong>の4点です。これで、コンピューティングの「EC2（基本）」と「Lambda（進化系）」の両方をマスターしました。</p>
+
+
+        <!-- 問い合わせ（固定） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">この記事について問い合わせる</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
