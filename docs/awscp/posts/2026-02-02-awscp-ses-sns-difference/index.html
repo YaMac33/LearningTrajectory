@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SESとSNSの違い</title>
+  <meta name="description" content="SESとSNSはどちらもメッセージを送るサービスですが、役割が全く異なります。メール配信に特化したSESと、システム通知に特化したSNSの違い、そして連携構成について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SESとSNSの違い" />
+  <meta property="og:description" content="SESとSNSはどちらもメッセージを送るサービスですが、役割が全く異なります。メール配信に特化したSESと、システム通知に特化したSNSの違い、そして連携構成について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* サービス対比（メガホンと郵便局） */
+    .metaphor-wrapper {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .service-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 260px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-sns { border-top: 4px solid #d86613; } /* SNS Orange */
+    .card-ses { border-top: 4px solid #2a5caa; } /* SES Blue */
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* ファンアウト図 */
+    .fanout-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .pub-box {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .topic-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #d86613;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(216, 102, 19, 0.4);
+      z-index: 2;
+    }
+    .sub-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      padding-top: 20px;
+    }
+    /* 拡散線 */
+    .fan-lines {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 20px;
+      border-top: 2px dashed #d86613;
+      border-left: 2px dashed #d86613;
+      border-right: 2px dashed #d86613;
+      z-index: 1;
+    }
+    .center-line {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 30px;
+      width: 2px;
+      background: #d86613; /* dashedではない */
+      border-left: 2px dashed #d86613; /* 上書き */
+    }
+
+    .sub-box {
+      border: 1px solid #999;
+      background: #fff;
+      padding: 0.5rem;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.85rem;
+      width: 80px;
+    }
+
+    /* 連携フロー図 */
+    .bounce-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.8rem;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .step-ses { border-color: #2a5caa; color: #2a5caa; font-weight: bold; }
+    .step-sns { border-color: #d86613; color: #d86613; font-weight: bold; }
+    .step-admin { border-color: #333; color: #333; }
+    
+    .arrow-right {
+      font-size: 1.2rem;
+      color: #999;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SESとSNSの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">SES</li>
+            <li class="tag">SNS</li>
+            <li class="tag">メッセージング</li>
+            <li class="tag">通知</li>
+            <li class="tag">Eメール</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon SES (Simple Email Service) と Amazon SNS (Simple Notification Service) は、どちらも「メッセージを送る」サービスなので、試験でも実務でも非常によく混同されます。しかし、その役割とターゲットは明確に異なります。</p>
+
+<div class="diagram-container">
+  <div class="metaphor-wrapper">
+    <!-- SES -->
+    <div class="service-card card-ses">
+      <span class="card-icon">📮</span>
+      <span class="card-title">Amazon SES</span>
+      <div class="card-desc">
+        <strong>「プロ仕様の郵便局」</strong><br>
+        お客様（顧客）へ手紙（Eメール）を確実に届ける。<br>
+        HTMLメール、大量配信が得意。
+      </div>
+    </div>
+
+    <!-- SNS -->
+    <div class="service-card card-sns">
+      <span class="card-icon">📢</span>
+      <span class="card-title">Amazon SNS</span>
+      <div class="card-desc">
+        <strong>「校内放送（メガホン）」</strong><br>
+        管理者やシステムへ「通知」を一斉にばら撒く。<br>
+        SMS、システム連携、簡易メール。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>1. Amazon SNS (Simple Notification Service)</h2>
+<p>役割は、<strong>「Pub/Sub（パブサブ）」型のメッセージ配信サービス</strong>です。何かが起きたら、登録している全員にメガホンで知らせます。</p>
+
+<h3>仕組み：Pub/Subとファンアウト</h3>
+<ul>
+<li><strong>トピック (Topic)：</strong> 「掲示板」のような場所です（例：「システム障害アラート」トピック）。</li>
+<li><strong>パブリッシャー：</strong> トピックにメッセージを投げ込む人（例：CloudWatch）。</li>
+<li><strong>サブスクライバー：</strong> トピックを購読している人たち（スマホ、Lambda、SQSなど）。</li>
+</ul>
+
+<div class="diagram-container">
+  <div class="fanout-diagram">
+    <div class="pub-box">CloudWatch (Pub)</div>
+    <div style="font-size:1.5rem;">⬇</div>
+    <div class="topic-circle">SNS<br>Topic</div>
+    
+    <div style="position:relative; width:100%; height:20px;">
+      <div class="fan-lines"></div>
+      <div style="position:absolute; top:-10px; left:50%; border-left:2px dashed #d86613; height:30px;"></div>
+    </div>
+
+    <div class="sub-container">
+      <div class="sub-box">📧<br>Email</div>
+      <div class="sub-box">📱<br>SMS</div>
+      <div class="sub-box">⚡️<br>Lambda</div>
+      <div class="sub-box">📦<br>SQS</div>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; color:#666; margin-top:1rem;">1つのメッセージを同時に複数の宛先に拡散する機能を「ファンアウト」と呼びます。</p>
+</div>
+
+<ul class="check-list">
+<li><strong>試験対策：</strong> 「疎結合（デカップリング）」「ファンアウト」「プッシュ通知」という言葉が出たらSNSです。</li>
+</ul>
+
+<h2>2. Amazon SES (Simple Email Service)</h2>
+<p>役割は、企業レベルの<strong>「Eメール配信エンジン」</strong>です。GmailやOutlookで1万人にメールを送ると「スパム（迷惑メール）」扱いされてブロックされますが、SESは<strong>「到達率（Deliverability）」</strong>を高める技術を使って、確実にメールを届けます。</p>
+
+<h3>主な用途</h3>
+<ul>
+<li><strong>トランザクションメール：</strong> 注文確認メール、パスワードリセット通知。</li>
+<li><strong>マーケティングメール：</strong> メルマガ、キャンペーンのお知らせ。</li>
+</ul>
+
+<ul class="check-list">
+<li><strong>試験対策：</strong> 「HTMLメール」「大量の顧客への送信」「受信メールの処理」という言葉が出たらSESです。</li>
+</ul>
+
+<h2>3. 【最重要】SES と SNS の使い分け</h2>
+<p>試験のシナリオ問題で迷わないための比較表です。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon SES</th>
+      <th>Amazon SNS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>主な宛先</strong></td>
+      <td><strong>エンドユーザー (顧客)</strong></td>
+      <td>管理者 / システム間連携</td>
+    </tr>
+    <tr>
+      <td><strong>メールの中身</strong></td>
+      <td>HTML (リッチ)<br><small>画像やリンク付きの綺麗なメール</small></td>
+      <td>プレーンテキスト (質素)<br><small>「件名: Alarm / 本文: CPU High」のような文字だけ</small></td>
+    </tr>
+    <tr>
+      <td><strong>目的</strong></td>
+      <td>「商品を買ってもらう」「連絡する」</td>
+      <td>「気付かせる」「プログラムを動かす」</td>
+    </tr>
+    <tr>
+      <td><strong>プロトコル</strong></td>
+      <td>SMTP / HTTP API</td>
+      <td>HTTP / HTTPS / SMS / SQS等</td>
+    </tr>
+    <tr>
+      <td><strong>返信</strong></td>
+      <td>受け取れる (S3保存など)</td>
+      <td>受け取れない (一方通行)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 連携プレー（よくある構成）</h2>
+<p>この2つは競合するものではなく、協力して動くことが多いです。</p>
+<p><strong>シナリオ：</strong><br>
+SESでメルマガを送ったが、宛先不明で戻ってきた（バウンスした）場合、それを管理者に知らせたい。</p>
+
+<div class="diagram-container">
+  <div class="bounce-flow">
+    <div class="flow-step step-ses">
+      Amazon SES<br>
+      <small>メール送信失敗！(Bounce)</small>
+    </div>
+    <div class="arrow-right">通知 ➡</div>
+    <div class="flow-step step-sns">
+      Amazon SNS<br>
+      <small>トピックへPublish</small>
+    </div>
+    <div class="arrow-right">配信 ➡</div>
+    <div class="flow-step step-admin">
+      管理者<br>
+      <small>「宛先リストを修正しなきゃ」</small>
+    </div>
+  </div>
+</div>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>SES：</strong> 顧客向けの「ちゃんとしたメール」を送る。到達率が命。</li>
+<li><strong>SNS：</strong> システム通知や管理者への連絡を「一斉に」送る。連携が命。</li>
+<li><strong>使い分け：</strong> 「おしゃれなメール」ならSES。「文字だけの通知」ならSNS。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
