@@ -1,0 +1,21 @@
+{
+  "id": "awscp-ebs-basic-exam-prep",
+  "category": "awscp",
+  "timestamp": "2026-02-01T20:33:45+09:00",
+  "post_path": "awscp/posts/2026-02-01-awscp-ebs-basic-exam-prep/",
+  "meta": {
+    "title": "EBSの基本と試験対策について",
+    "summary": "EBSはEC2向けの外付けストレージで、永続性やAZの制約など試験で重要な知識を解説。試験対策にはS3やインスタンスストアとの違いも理解する必要があります。",
+    "tags": [
+      "EBS",
+      "EC2",
+      "ストレージ",
+      "試験対策",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
