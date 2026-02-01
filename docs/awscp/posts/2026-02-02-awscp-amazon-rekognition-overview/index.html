@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Rekognitionの概要</title>
+  <meta name="description" content="Amazon Rekognitionは、画像・動画分析を簡単に行えるAIサービスです。物体検出、顔認証、不適切コンテンツの検出など、試験頻出の機能と活用例を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Rekognitionの概要" />
+  <meta property="og:description" content="Amazon Rekognitionは、画像・動画分析を簡単に行えるAIサービスです。物体検出、顔認証、不適切コンテンツの検出など、試験頻出の機能と活用例を解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* Rekognitionの仕組み図 */
+    .rekognition-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .input-box {
+      border: 1px solid #999;
+      background: #fff;
+      padding: 0.5rem;
+      text-align: center;
+      width: 100px;
+    }
+    .input-image {
+      background: #ddd;
+      width: 80px;
+      height: 60px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .rekognition-brain {
+      border: 2px solid #2a5caa;
+      background: #e6f7ff;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #2a5caa;
+      box-shadow: 0 0 15px rgba(42,92,170,0.2);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    
+    .output-json {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      text-align: left;
+      min-width: 180px;
+    }
+    .json-key { color: #e06c75; }
+    .json-val { color: #98c379; }
+    .json-num { color: #d19a66; }
+
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    /* 機能アイコン一覧 */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .feature-box {
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+    }
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .feature-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .feature-desc {
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #e6f7ff; /* Rekognition Blue light */
+      font-weight: bold;
+      color: #2a5caa;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Rekognitionの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AI</li>
+            <li class="tag">Amazon Rekognition</li>
+            <li class="tag">画像分析</li>
+            <li class="tag">顔認証</li>
+            <li class="tag">PPE検出</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon Rekognition（レコグニション）は、AWSが提供する「画像・動画分析AI」</strong>サービスです。一言で言うと、<strong>「あなたの代わりに、写真や動画に『何が映っているか』を超高速で見て、判断してくれる『AIの目』」</strong>です。機械学習の専門知識は一切不要で、画像を送るだけで「これは犬です」「これは笑っている男性です」「これは不適切な画像です」といった答えを返してくれます。</p>
+
+<h2>1. 仕組み：画像を送ると答えが返ってくる</h2>
+<p>RekognitionはAPIとして提供されているため、アプリから画像を送信するだけで利用できます。</p>
+
+<div class="diagram-container">
+  <div class="rekognition-flow">
+    <div class="input-box">
+      <div class="input-image">🐕</div>
+      <small>画像データ</small>
+    </div>
+    
+    <div class="arrow-right">➡</div>
+    
+    <div class="rekognition-brain">
+      Amazon<br>Rekognition<br>
+      <small>(AI分析)</small>
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="output-json">
+      {<br>
+      &nbsp;&nbsp;<span class="json-key">"Labels"</span>: [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="json-key">"Name"</span>: <span class="json-val">"Dog"</span>, <span class="json-key">"Confidence"</span>: <span class="json-num">99.8</span> },<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="json-key">"Name"</span>: <span class="json-val">"Animal"</span>, <span class="json-key">"Confidence"</span>: <span class="json-num">99.5</span> },<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;{ <span class="json-key">"Name"</span>: <span class="json-val">"Pet"</span>, <span class="json-key">"Confidence"</span>: <span class="json-num">95.2</span> }<br>
+      &nbsp;&nbsp;]<br>
+      }
+    </div>
+  </div>
+</div>
+
+<h2>2. 何ができるの？（主な機能5選）</h2>
+<p>Rekognitionには多くの機能がありますが、試験に出るのは主に以下の5つです。</p>
+
+<div class="diagram-container">
+  <div class="feature-grid">
+    <div class="feature-box">
+      <span class="feature-icon">🏷️</span>
+      <span class="feature-name">① 物体・シーン検出<br>(Labels)</span>
+      <p class="feature-desc">「犬」「山」「夕焼け」「自転車」などを見分け、タグ付けします。</p>
+    </div>
+    <div class="feature-box">
+      <span class="feature-icon">👤</span>
+      <span class="feature-name">② 顔の分析・比較<br>(Facial Analysis)</span>
+      <p class="feature-desc">年齢、性別、感情（笑顔か）、メガネの有無、同一人物かの判定。</p>
+    </div>
+    <div class="feature-box">
+      <span class="feature-icon">🔞</span>
+      <span class="feature-name">③ 不適切コンテンツ<br>(Content Moderation)</span>
+      <p class="feature-desc">ヌードや暴力的な表現を検知し、SNS等での投稿をブロック。</p>
+    </div>
+    <div class="feature-box">
+      <span class="feature-icon">🔤</span>
+      <span class="feature-name">④ テキスト検出<br>(Text in Image)</span>
+      <p class="feature-desc">風景の中にある文字（看板、Tシャツ、車のナンバー）を読み取る。</p>
+    </div>
+    <div class="feature-box">
+      <span class="feature-icon">🌟</span>
+      <span class="feature-name">⑤ 有名人の認識<br>(Celebrity)</span>
+      <p class="feature-desc">数万人の著名人データベースと照合して特定する。</p>
+    </div>
+  </div>
+</div>
+
+<h2>3. 試験に出る「PPE検出」とは？</h2>
+<p>最近の試験でよく出るのが、<strong>PPE（Personal Protective Equipment：個人用保護具）</strong>の検出機能です。</p>
+<ul>
+<li><strong>機能：</strong> 工事現場などの画像を見て、作業員が<strong>「ヘルメット」や「マスク」、「手袋」</strong>をちゃんと着用しているかをAIがチェックします。</li>
+<li><strong>用途：</strong> 工場の安全管理システムの自動化。「ヘルメットをしていない人がいたら管理者に通知する」などが可能です。</li>
+</ul>
+
+<h2>4. 間違いやすいライバル：Textract との違い</h2>
+<p>「画像から文字を読む」という機能は、Amazon Textract（テキストラクト） と被ります。ここで引っ掛け問題が出ます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>Amazon Rekognition</th>
+      <th>Amazon Textract</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>得意な対象</strong></td>
+      <td><strong>「風景」</strong>の中の文字</td>
+      <td><strong>「書類」</strong>の中の文字</td>
+    </tr>
+    <tr>
+      <td><strong>具体例</strong></td>
+      <td>車のナンバー、看板、Tシャツのロゴ</td>
+      <td>領収書、請求書、身分証明書、表組み</td>
+    </tr>
+    <tr>
+      <td><strong>出力内容</strong></td>
+      <td>単なる文字データと位置</td>
+      <td>表やフォーム（キー・バリュー）の構造まで理解してデータ化</td>
+    </tr>
+    <tr>
+      <td><strong>試験の判断基準</strong></td>
+      <td>「画像分析」「不適切コンテンツ」「顔」</td>
+      <td>「ドキュメント」「OCR」「スキャンデータ」</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>AIの目：</strong> 画像や動画に何が映っているか分析する。</li>
+<li><strong>顔認証：</strong> 本人確認や感情分析ができる。</li>
+<li><strong>モデレーション：</strong> ヌードや暴力を自動で弾く。</li>
+<li><strong>PPE検出：</strong> ヘルメットやマスクの着用チェック（安全管理）。</li>
+<li><strong>Textractとの違い：</strong> 書類（ドキュメント）を読みたいならRekognitionではなくTextractを使う。</li>
+</ul>
+<p>これで、AI分野の「目（Rekognition）」についても完璧です！AI分野は「Polly（口）」「Transcribe（耳）」「Lex（脳）」「Rekognition（目）」と、人間の器官に例えると非常に覚えやすくなります。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
