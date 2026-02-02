@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cloudformation-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T19:51:06+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-cloudformation-overview/",
+  "meta": {
+    "title": "AWS CloudFormationの概要と機能",
+    "summary": "AWS CloudFormationはインフラ構築をコードで自動化するIaCサービス。試験観点ではテンプレートやスタックの理解が重要です。",
+    "tags": [
+      "AWS",
+      "CloudFormation",
+      "IaC",
+      "自動化",
+      "テンプレート"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
