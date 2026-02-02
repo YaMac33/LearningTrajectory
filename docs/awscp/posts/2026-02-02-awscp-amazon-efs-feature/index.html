@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | Amazon EFSの基本と特徴</title>
+  <meta name="description" content="EFSは複数のEC2から共有アクセス可能なLinux専用のファイルシステム。EBSやS3との違いを含めて試験対策を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon EFSの基本と特徴" />
+  <meta property="og:description" content="EFSは複数のEC2から共有アクセス可能なLinux専用のファイルシステム。EBSやS3との違いを含めて試験対策を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+    
+    /* 接続構成比較図 */
+    .diagram-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .diagram-col {
+      flex: 1;
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .diagram-col h4 {
+      margin: 0 0 12px 0;
+      font-size: 1em;
+      color: #1e293b;
+    }
+    
+    /* ボックス要素 */
+    .d-box {
+      border: 2px solid;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-weight: bold;
+      font-size: 0.9em;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .d-ec2 {
+      border-color: #f59e0b; /* Orange */
+      color: #d97706;
+      background: #fffbeb;
+      margin: 4px;
+    }
+    .d-ebs {
+      border-color: #3b82f6; /* Blue */
+      color: #2563eb;
+      background: #eff6ff;
+    }
+    .d-efs {
+      border-color: #10b981; /* Green */
+      color: #059669;
+      background: #ecfdf5;
+      width: 80%;
+    }
+
+    /* 接続線表現 */
+    .d-line-v {
+      width: 2px;
+      height: 20px;
+      background: #cbd5e1;
+      margin: 0 auto;
+    }
+    .d-line-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .d-connector-multi {
+      width: 60%;
+      height: 12px;
+      border-bottom: 2px solid #cbd5e1;
+      border-left: 2px solid #cbd5e1;
+      border-right: 2px solid #cbd5e1;
+      margin: 0 auto;
+      border-radius: 0 0 8px 8px;
+      margin-bottom: 4px;
+    }
+    .d-connector-stem {
+      width: 2px;
+      height: 12px;
+      background: #cbd5e1;
+      margin: 0 auto;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .diagram-row {
+        flex-direction: column;
+      }
+      .article-content th {
+        white-space: normal;
+        min-width: 80px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon EFSの基本と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#EFS</span>
+            <span class="tag">#ストレージ</span>
+            <span class="tag">#Linux</span>
+            <span class="tag">#共有アクセス</span>
+            <span class="tag">#EC2</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Amazon EFS (Elastic File System) は、一言で言うと<strong>「クラウド上の『共有フォルダ（NAS）』」</strong>です。
+</p>
+<p>
+  これまで学んだストレージ（S3, EBS）と比較すると、EFSの立ち位置は明確です。<strong>「複数のEC2（サーバー）から、同時に、一つのフォルダを読み書きしたい」</strong>という時に使うサービスです。
+</p>
+<p>
+  試験では、<strong>「Linux専用」「共有アクセス」「自動拡張」</strong>の3点が頻出です。
+</p>
+
+<h2>1. EFS のイメージ：みんなで使う「共有の本棚」</h2>
+<p>
+  EBSとEFSの違いを直感的に理解しましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="diagram-row">
+    <!-- EBS -->
+    <div class="diagram-col">
+      <div class="art-diagram-title">EBS (ブロックストレージ)</div>
+      <h4>個人のロッカー</h4>
+      <div class="d-box d-ec2">EC2 (サーバー)</div>
+      <div class="d-line-v"></div>
+      <div class="d-box d-ebs">EBS (ディスク)</div>
+      <p style="font-size:0.85em; color:#666; margin-top:10px;">
+        基本は 1対1。<br>
+        EC2が消えると道連れの可能性あり。
+      </p>
+    </div>
+
+    <!-- EFS -->
+    <div class="diagram-col">
+      <div class="art-diagram-title">EFS (ファイルストレージ)</div>
+      <h4>共有の本棚</h4>
+      <div class="d-line-group">
+        <div class="d-box d-ec2">EC2</div>
+        <div class="d-box d-ec2">EC2</div>
+        <div class="d-box d-ec2">EC2</div>
+      </div>
+      <!-- 簡易的な結合線の表現 -->
+      <div class="d-connector-multi"></div>
+      <div class="d-connector-stem"></div>
+      
+      <div class="d-box d-efs">EFS (ファイルシステム)</div>
+      <p style="font-size:0.85em; color:#666; margin-top:10px;">
+        複数台から<strong>同時アクセス</strong>可能。<br>
+        EC2が消えてもデータは残る。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>2. 試験に出る「3つの強み」</h2>
+
+<h3>① 複数台からの同時アクセス</h3>
+<p>
+  これが最大の採用理由です。「Webサーバーが3台あるけど、画像ファイルは全部同じ場所（EFS）に置いて共有したい」といった構成（WordpressなどのCMS）で使われます。
+</p>
+
+<h3>② Linux 専用 (NFSプロトコル) ★超重要</h3>
+<p>
+  EFSは、Linux OS（Amazon Linux, Ubuntuなど）でしか使えません。
+</p>
+<ul>
+  <li><strong>注意:</strong> Windows Serverからは使えません。</li>
+  <li>もし「Windowsで共有フォルダを使いたい」という問題が出たら、正解は <strong>Amazon FSx for Windows File Server</strong> になります。</li>
+</ul>
+
+<h3>③ 容量が無制限＆自動伸縮 (Elastic)</h3>
+<p>
+  EBSのように「最初に100GB確保する」という必要がありません。
+</p>
+<ul>
+  <li>ファイルを入れたら勝手に大きくなり、消したら勝手に小さくなります。</li>
+  <li>使った容量分だけ課金されます（事前プロビジョニング不要）。</li>
+</ul>
+
+<h2>3. ストレージ「3兄弟」の比較（試験の鉄板）</h2>
+<p>
+  この表を覚えれば、AWS認定試験のストレージ選択問題は完璧です。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon EBS</th>
+      <th>Amazon S3</th>
+      <th>Amazon EFS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>たとえ</th>
+      <td>Cドライブ / USBメモリ</td>
+      <td>ネット上の巨大倉庫</td>
+      <td>社内共有フォルダ (NAS)</td>
+    </tr>
+    <tr>
+      <th>接続</th>
+      <td>基本 1対1<br><small>(EC2に直結)</small></td>
+      <td>Web経由<br><small>(どこからでも)</small></td>
+      <td><strong>多対1</strong><br><small>(複数EC2から同時)</small></td>
+    </tr>
+    <tr>
+      <th>OS</th>
+      <td>Windows / Linux</td>
+      <td>OS関係なし</td>
+      <td><strong>Linux 専用</strong></td>
+    </tr>
+    <tr>
+      <th>速度</th>
+      <td>最速<br><small>(ミリ秒単位)</small></td>
+      <td>普通</td>
+      <td>EBSよりは遅い</td>
+    </tr>
+    <tr>
+      <th>耐久性</th>
+      <td>AZ内<br><small>(1つのデータセンター)</small></td>
+      <td>最強<br><small>(3つのAZにコピー)</small></td>
+      <td>高<br><small>(3つのAZにコピー)</small></td>
+    </tr>
+    <tr>
+      <th>主な用途</th>
+      <td>OS、DB、頻繁な更新</td>
+      <td>バックアップ、静的Web</td>
+      <td>Webサーバーの共有ファイル</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>耐久性の違い:</strong> EFSは、S3と同じようにデータを<strong>「複数のAZ（データセンター）」</strong>に自動保存してくれます。だから、もし1つのAZが停電してもデータは無事です。</p>
+</blockquote>
+
+<h2>4. コスト最適化機能（EFS IA）</h2>
+<p>
+  S3と同じように、EFSにも<strong>「あまり使わないデータを安くする機能」</strong>があります。
+</p>
+<ul>
+  <li><strong>EFS Standard:</strong> よく使うファイル用（標準）。</li>
+  <li><strong>EFS Infrequent Access (EFS IA):</strong> たまにしか使わないファイル用（低頻度アクセス）。標準クラスより安価です。</li>
+  <li><strong>ライフサイクル管理:</strong> 「30日間アクセスがないファイルを、自動的にIAクラス（安い方）に移動する」という設定が可能です。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> 複数のEC2でデータを共有するための<strong>「共有ファイルシステム」</strong>。</li>
+  <li><strong>OS:</strong> Linux専用（NFSプロトコル）。WindowsはNG。</li>
+  <li><strong>特徴:</strong> 容量の確保不要（自動伸縮）、複数AZにデータ保存（高耐久）。</li>
+  <li><strong>キーワード:</strong> <strong>「共有アクセス」「Linux」「NFS」</strong>が出たらEFS。</li>
+</ul>
+<p>
+  これで、主要なストレージサービス（S3, EBS, EFS）の違いもクリアになったはずです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
