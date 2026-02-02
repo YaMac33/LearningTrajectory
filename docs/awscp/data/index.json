@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-guardduty-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:52:28+09:00",
+    "title": "AWS GuardDutyの基本を理解しよう",
+    "summary": "AWS環境を守るGuardDutyの脅威検知機能について学び、機械学習やログ分析を通じてセキュリティを強化することができるようになります。",
+    "tags": [
+      "AWS",
+      "GuardDuty",
+      "セキュリティ",
+      "脅威検知",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-guardduty-basics/"
+  },
+  {
     "id": "awscp-aws-cost-optimization-rightsizing",
     "category": "awscp",
     "timestamp": "2026-02-02T12:47:16+09:00",
