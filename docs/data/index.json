@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-s3-lifecycle-policy-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-02T20:32:42+09:00",
+    "title": "S3ライフサイクルポリシーの概要と実務",
+    "summary": "S3ライフサイクルポリシーは、データの保存期間に応じて自動で整理・削除を行う手法について解説します。特に試験対策として、コスト最適化の観点からの理解が求められます。",
+    "tags": [
+      "S3",
+      "ライフサイクルポリシー",
+      "データ管理",
+      "コスト最適化",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-s3-lifecycle-policy-overview/"
+  },
+  {
     "id": "awscp-aws-ec2-dedicated-hosts",
     "category": "awscp",
     "timestamp": "2026-02-02T20:27:28+09:00",
