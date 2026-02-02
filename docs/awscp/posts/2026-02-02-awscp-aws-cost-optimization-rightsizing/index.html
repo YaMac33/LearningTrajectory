@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | オンプレミスからAWSへの移行時のライツージング（適正規模化） </title>
+  <meta name="description" content="オンプレミスからAWSへの移行時、コストを最適化するための「ライツージング（適正規模化）」の重要性を解説。「50人乗りのバス」の例えを使って、無駄なスペックを削減するプロセスを学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="オンプレミスからAWSへの移行時のライツージング（適正規模化） " />
+  <meta property="og:description" content="オンプレミスからAWSへの移行時、コストを最適化するための「ライツージング（適正規模化）」の重要性を解説。「50人乗りのバス」の例えを使って、無駄なスペックを削減するプロセスを学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ビフォー・アフター比較図 */
+    .resize-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .resize-box {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .box-onprem { border-top: 4px solid #666; }
+    .box-cloud { border-top: 4px solid #28a745; }
+
+    .vehicle-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .spec-gauge {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      font-size: 0.8rem;
+    }
+    .gauge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .gauge-label { width: 40px; text-align: right; font-weight: bold; }
+    .gauge-bar-bg {
+      flex: 1;
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .gauge-fill {
+      height: 100%;
+      border-radius: 5px;
+    }
+    /* オンプレミス：過剰スペック */
+    .fill-cpu-low { width: 10%; background: #d9534f; } /* 使ってないのに赤い（無駄） */
+    .fill-ram-low { width: 8%; background: #d9534f; }
+
+    /* クラウド：最適スペック */
+    .fill-cpu-opt { width: 70%; background: #28a745; } /* ちょうどいい */
+    .fill-ram-opt { width: 80%; background: #28a745; }
+
+    .waste-alert {
+      color: #d9534f;
+      font-weight: bold;
+      font-size: 0.85rem;
+      background: #fff5f5;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+    .optimize-ok {
+      color: #28a745;
+      font-weight: bold;
+      font-size: 0.85rem;
+      background: #f0fff4;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .arrow-right {
+      font-size: 2rem;
+      color: #999;
+      display: flex;
+      align-items: center;
+    }
+
+    /* プロセス図 */
+    .process-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .process-step {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 130px;
+    }
+    .step-check { border-color: #2a5caa; color: #2a5caa; }
+    .step-select { border-color: #d86613; color: #d86613; }
+    .step-done { border-color: #28a745; color: #28a745; }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #28a745;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title"> オンプレミスからAWSへの移行時のライツージング（適正規模化）  </h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">コスト最適化</li>
+            <li class="tag">ライツージング</li>
+            <li class="tag">クラウド移行</li>
+            <li class="tag">インスタンスタイプ</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>オンプレミス（自社サーバー）からAWSへシステムを引っ越しする際、最も重要なコスト削減テクニックの一つが<strong>「ライツージング（適正規模化）」</strong>です。難しそうに見えますが、要するに<strong>「無駄にデカい車から、ちょうどいいサイズの車に乗り換える」</strong>というだけの話です。</p>
+
+<h2>1. オンプレミス（自社サーバー）の「あるある」</h2>
+<p>会社でサーバーを買うとき、担当者は「将来アクセスが増えるかもしれないし、とりあえず一番いいやつを買っておこう（大は小を兼ねる）」と考えがちです。</p>
+
+<div class="diagram-container">
+  <div class="resize-compare">
+    <!-- オンプレミス -->
+    <div class="resize-box box-onprem">
+      <strong>オンプレミス (現状)</strong>
+      <span class="vehicle-icon">🚌</span>
+      <p style="font-size:0.9rem;">50人乗りバス</p>
+      
+      <div class="spec-gauge">
+        <div class="gauge-row">
+          <span class="gauge-label">CPU</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-cpu-low"></div></div>
+          <span>10%</span>
+        </div>
+        <div class="gauge-row">
+          <span class="gauge-label">RAM</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-ram-low"></div></div>
+          <span>4人</span>
+        </div>
+      </div>
+      <span class="waste-alert">90%が無駄な空席！</span>
+      <p style="font-size:0.8rem; color:#666; margin-top:0.5rem;">でもバスの維持費は満額かかる。</p>
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <!-- クラウド -->
+    <div class="resize-box box-cloud">
+      <strong>AWS (移行後)</strong>
+      <span class="vehicle-icon">🚗</span>
+      <p style="font-size:0.9rem;">4人乗り軽自動車</p>
+      
+      <div class="spec-gauge">
+        <div class="gauge-row">
+          <span class="gauge-label">CPU</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-cpu-opt"></div></div>
+          <span>70%</span>
+        </div>
+        <div class="gauge-row">
+          <span class="gauge-label">RAM</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-ram-opt"></div></div>
+          <span>80%</span>
+        </div>
+      </div>
+      <span class="optimize-ok">無駄なし！安い！</span>
+      <p style="font-size:0.8rem; color:#666; margin-top:0.5rem;">足りなくなったら買い替えればいい。</p>
+    </div>
+  </div>
+</div>
+
+<h2>2. 失敗する移行パターン（そのまま移行）</h2>
+<p>もし、今のサーバーのスペック表だけを見て、「CPU 16コア、メモリ 64GBのサーバーを使ってるから、AWSでも同じスペックの EC2 (m5.4xlarge) を借りよう」とするとどうなるでしょう？</p>
+<ul>
+<li><strong>結果：</strong> AWS上でも「ガラガラの50人乗りバス」を走らせることになります。</li>
+<li><strong>コスト：</strong> 当然、バスのレンタル料（高額）がかかります。「クラウドにしたのに安くならない！」という失敗の典型例です。</li>
+</ul>
+
+<h2>3. 正解：ワークロードに基づいた選択</h2>
+<p>「スペック表（カタログ値）」ではなく、<strong>「実際の利用状況（実測値）」</strong>を見ることが重要です。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">ライツージング（適正規模化）のプロセス</p>
+  <div class="process-flow">
+    <div class="process-step step-check">
+      <strong>① 現状把握</strong><br>
+      <small>CPU使用率 10%<br>メモリ使用率 8%</small>
+    </div>
+    <div class="arrow-right" style="font-size:1.5rem;">➡</div>
+    <div class="process-step step-select">
+      <strong>② サイズダウン</strong><br>
+      <small>t3.micro 等の<br>小さいインスタンスを選択</small>
+    </div>
+    <div class="arrow-right" style="font-size:1.5rem;">➡</div>
+    <div class="process-step step-done">
+      <strong>③ 最適化完了</strong><br>
+      <small>コスト大幅減！</small>
+    </div>
+  </div>
+</div>
+
+<p>AWSには、バスから軽自動車、スポーツカーまで、あらゆるサイズ（インスタンスタイプ）が揃っています。「とりあえず軽自動車で始めて、狭くなったらミニバンに乗り換える」という柔軟な変更ができるのがクラウドの強みです。</p>
+
+<h2>4. まとめ</h2>
+<ul class="check-list">
+<li><strong>現状把握：</strong> スペック表ではなく、実際のCPU/メモリ使用率（ワークロード）を見る。</li>
+<li><strong>ライツージング：</strong> 実態に合わせて、AWSでは無駄のない小さいサイズを選ぶ。</li>
+<li><strong>柔軟性：</strong> 足りなければ後から変えればいい（オンプレミスにはできない芸当）。</li>
+</ul>
+<p>「大は小を兼ねる」はオンプレミスの常識。「ジャストサイズを選ぶ」のがクラウドの常識です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
