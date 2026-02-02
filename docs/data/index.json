@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-inspector-security",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:12:36+09:00",
+    "title": "Amazon Inspectorの基本と機能を解説",
+    "summary": "Amazon Inspectorは内部の脆弱性やネットワーク露出を自動診断するサービスです。試験合格のために重要な機能や利用シーンを理解できます。",
+    "tags": [
+      "AWS",
+      "セキュリティ",
+      "Amazon Inspector",
+      "脆弱性診断",
+      "IT管理"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-inspector-security/"
+  },
+  {
     "id": "awscp-aws-shield-ddos-security",
     "category": "awscp",
     "timestamp": "2026-02-02T12:08:19+09:00",
