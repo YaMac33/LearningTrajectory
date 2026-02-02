@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-security-hub-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T18:02:23+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-security-hub-overview/",
+  "meta": {
+    "title": "AWS Security Hubの全貌",
+    "summary": "AWS Security Hubは、さまざまなセキュリティアラートを集約し、優先順位をつける管理センターとして機能します。セキュリティ状態を一元的に把握し、管理することが可能です。",
+    "tags": [
+      "AWS",
+      "Security Hub",
+      "セキュリティ",
+      "管理",
+      "アラート"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
