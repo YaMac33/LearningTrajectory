@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ETLとNo ETLのデータ分析</title>
+  <meta name="description" content="ETLとNo ETLの違いを解説。Amazon Athenaと組み合わせた分析手法や、AWS Glueとの使い分けについて、料理のメタファーを用いて分かりやすく説明します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ETLとNo ETLのデータ分析" />
+  <meta property="og:description" content="ETLとNo ETLの違いを解説。Amazon Athenaと組み合わせた分析手法や、AWS Glueとの使い分けについて、料理のメタファーを用いて分かりやすく説明します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ETLフロー図 */
+    .etl-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 650px;
+      flex-wrap: wrap;
+    }
+    
+    .etl-step {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      min-width: 120px;
+      position: relative;
+      flex: 1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .step-e { border-top: 4px solid #d9534f; }
+    .step-t { border-top: 4px solid #f0ad4e; }
+    .step-l { border-top: 4px solid #28a745; }
+
+    .step-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .step-name {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+    .step-desc {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    /* Athena (No ETL) 図 */
+    .athena-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+    }
+    .fridge-box {
+      border: 2px solid #333;
+      background: #eef;
+      border-radius: 6px;
+      padding: 1.5rem;
+      text-align: center;
+      width: 150px;
+      position: relative;
+    }
+    .fridge-label {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #333;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .scan-beam {
+      flex: 1;
+      height: 40px;
+      background: linear-gradient(90deg, rgba(42,92,170,0) 0%, rgba(42,92,170,0.2) 50%, rgba(42,92,170,0) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2a5caa;
+      font-weight: bold;
+      font-size: 0.9rem;
+      position: relative;
+    }
+    .scan-beam::before {
+      content: "🔍 SQL Scan";
+      position: absolute;
+      top: -20px;
+    }
+
+    .athena-box {
+      border: 2px solid #2a5caa; /* Athena Blue */
+      background: #fff;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #2a5caa;
+      box-shadow: 0 0 10px rgba(42,92,170,0.3);
+      text-align: center;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ETLとNo ETLのデータ分析</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">ETL</li>
+            <li class="tag">Amazon Athena</li>
+            <li class="tag">AWS Glue</li>
+            <li class="tag">データ分析</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>データの活用において、<strong>ETL</strong>は「料理の仕込み」のようなものです。最近ではこの「仕込み」をあえて飛ばす <strong>No ETL</strong> という考え方も注目されています。AWSのデータ分析サービスである <strong>Amazon Athena</strong> との関係を含め、整理して解説しましょう。</p>
+
+<h2>1. ETL（Extract / Transform / Load）とは？</h2>
+<p>データを分析しやすい形に整える<strong>3つのステップ</strong>のことです。スーパーの「カット野菜」を作る工程に例えると分かりやすいです。</p>
+
+<div class="diagram-container">
+  <div class="etl-flow">
+    <div class="etl-step step-e">
+      <span class="step-icon">🚜</span>
+      <span class="step-name">E</span>
+      <small>Extract (抽出)</small>
+      <div class="step-desc">農家から野菜を運び出す。<br>(バラバラなデータ収集)</div>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="etl-step step-t">
+      <span class="step-icon">🔪</span>
+      <span class="step-name">T</span>
+      <small>Transform (変換)</small>
+      <div class="step-desc">泥を落とし、切り揃える。<br>(フォーマット統一)</div>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="etl-step step-l">
+      <span class="step-icon">🍲</span>
+      <span class="step-name">L</span>
+      <small>Load (格納)</small>
+      <div class="step-desc">袋に詰めて店頭に並べる。<br>(DWHへ保存)</div>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">料理人（分析者）は、これを使えばすぐに鍋に入れる（分析する）ことができます。</p>
+</div>
+
+<h2>2. No ETL とは？</h2>
+<p>文字通り「ETLをしない」、あるいは「ETLの工程を自動化・隠蔽する」手法です。</p>
+<ul>
+<li><strong>なぜ注目されているのか？</strong>
+<ul>
+<li>従来のETLは、データが届くまでに時間がかかり、加工用のプログラムを書く手間も大変でした。</li>
+<li>No ETLは、<strong>「データを移動・加工せず、そのままの場所で、そのままの形で分析しちゃおう」</strong>という効率重視の考え方です。</li>
+</ul>
+</li>
+<li><strong>AWSの例（Zero-ETL）：</strong> Amazon Aurora（DB）のデータを、加工せずに直接 Amazon Redshift（分析基盤）で分析できる機能などが提供されています。</li>
+</ul>
+
+<h2>3. Amazon Athena との関係</h2>
+<p>ここで <strong>Amazon Athena（アテナ）</strong> の登場です。Athenaは、<strong>ETLを頑張らなくても分析ができる「No ETL」的な要素が強いサービス</strong>です。</p>
+
+<div class="diagram-container">
+  <span style="font-weight:bold; margin-bottom:1rem;">Athenaの分析イメージ</span>
+  <div class="athena-diagram">
+    <div class="fridge-box">
+      <span class="fridge-label">S3 (冷蔵庫)</span>
+      <div style="font-size:2rem;">🥦🥩🐟</div>
+      <small>食材そのまま<br>(CSV/JSON)</small>
+    </div>
+    
+    <div class="scan-beam"></div>
+    
+    <div class="athena-box">
+      Amazon<br>Athena
+    </div>
+  </div>
+  <p style="font-size:0.9rem; margin-top:1rem;">冷蔵庫を開けて、<strong>中にある食材の数を外から光線を当てて一瞬でカウント（SQL実行）</strong>するようなイメージです。</p>
+</div>
+
+<ul class="check-list">
+<li><strong>仕組み：</strong> S3（ストレージ）に置いてあるデータ（CSVやログなど）に対して、<strong>SQL（データベース操作言語）を直接投げて分析</strong>できます。</li>
+<li><strong>役割：</strong> 本来ならETLをしてデータベースに読み込ませる必要がありますが、Athenaなら「S3にある生データを、そのまま分析対象」にできます。</li>
+</ul>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<p>データ分析サービスの違いは試験の定番です。以下のキーワードの組み合わせを覚えましょう。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>役割・特徴</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWS Glue</strong></td>
+      <td><strong>サーバーレスなETLサービス</strong>。<br>データの抽出・変換・ロードを自動化する。<br>（しっかり加工したい時）</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell">Amazon Athena</td>
+      <td><strong>S3内のデータにSQLでクエリを実行</strong>できる。<br>サーバーレスで、スキャンしたデータ量に対して課金。<br>（手軽に分析したい時）</td>
+    </tr>
+    <tr>
+      <td><strong>Amazon S3</strong></td>
+      <td>Athenaが分析対象とするデータの「置き場（データレイク）」。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. 実務イメージ：企業のログ分析</h2>
+<p>あるWebサイトで「昨日のエラーログを急ぎで調査したい」となった場合：</p>
+<ol>
+<li><strong>古いやり方（ETL）：</strong> ログを集め、加工プログラムを書き、DBにインポートして、やっと分析開始。（時間がかかる）</li>
+<li><strong>Athena（No ETL）なやり方：</strong> S3に保存されているログに対し、AthenaからSQLを1発投げる。<strong>数秒で結果が出る。</strong></li>
+</ol>
+<p>このように、「とりあえず今あるデータを確認したい」というスピード重視の現場でAthenaは最強の武器になります。</p>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>AWS Glue：</strong> 「しっかり加工して保存したい」ならこれ（ETL）。</li>
+<li><strong>Amazon Athena：</strong> 「生データのままサクッと分析したい」ならこれ（No ETL的）。</li>
+<li><strong>Amazon S3：</strong> 分析データの保存場所。</li>
+</ul>
+<p>この使い分けを覚えておけば、CLF-C02のデータ分析関連の問題は怖くありません。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
