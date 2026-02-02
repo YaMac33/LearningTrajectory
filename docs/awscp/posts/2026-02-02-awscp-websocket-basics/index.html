@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | WebSocketの基本と活用法</title>
+  <meta name="description" content="WebSocketはリアルタイム通信を実現する技術です。HTTPとの違い、サーバープッシュの仕組み、そしてAPI GatewayやAppSyncなどAWSサービスとの連携について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="WebSocketの基本と活用法" />
+  <meta property="og:description" content="WebSocketはリアルタイム通信を実現する技術です。HTTPとの違い、サーバープッシュの仕組み、そしてAPI GatewayやAppSyncなどAWSサービスとの連携について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* HTTP vs WebSocket 比較図 */
+    .protocol-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .proto-box {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 260px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .box-http { border-top: 4px solid #666; }
+    .box-ws { border-top: 4px solid #2a5caa; } /* Blue */
+
+    .proto-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: block;
+      border-bottom: 1px dashed #ddd;
+      padding-bottom: 0.5rem;
+    }
+    .proto-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .comm-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 1rem;
+    }
+    .arrow-req { color: #d86613; }
+    .arrow-res { color: #24882c; }
+    .arrow-bi { color: #2a5caa; font-weight: bold; }
+
+    /* プッシュ配信図 */
+    .push-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .server-box {
+      border: 2px solid #333;
+      background: #eee;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .device-box {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 1rem 0.5rem;
+      border-radius: 12px; /* スマホっぽく */
+      width: 120px;
+      text-align: center;
+      position: relative;
+    }
+    .screen-msg {
+      background: #e6f7ff;
+      border: 1px solid #2a5caa;
+      color: #2a5caa;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      animation: popIn 0.5s ease-out;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    
+    .push-arrow {
+      flex: 1;
+      height: 4px;
+      background: #2a5caa;
+      position: relative;
+    }
+    .push-arrow::after {
+      content: "▶";
+      position: absolute;
+      right: -8px;
+      top: -7px;
+      color: #2a5caa;
+      font-size: 1.2rem;
+    }
+    .push-label {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #2a5caa;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* ライブ配信図 */
+    .live-diagram {
+      display: grid;
+      grid-template-areas: 
+        "streamer aws viewer1"
+        "streamer aws viewer2";
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .area-streamer { grid-area: streamer; text-align: center; }
+    .area-aws { grid-area: aws; text-align: center; }
+    .area-v1 { grid-area: viewer1; text-align: center; }
+    .area-v2 { grid-area: viewer2; text-align: center; }
+    
+    .aws-cloud {
+      border: 2px dashed #d86613;
+      background: #fffaf5;
+      padding: 1.5rem;
+      border-radius: 50%;
+      font-weight: bold;
+      color: #d86613;
+    }
+    .msg-icon { font-size: 1.5rem; }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">WebSocketの基本と活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">WebSocket</li>
+            <li class="tag">AWS</li>
+            <li class="tag">リアルタイム通信</li>
+            <li class="tag">双方向通信</li>
+            <li class="tag">試験対策</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>クラウドの通信を支える重要な技術「WebSocket（ウェブソケット）」について解説します。AWSの試験（CLF-C02）では、この技術そのものの深い知識よりも、<strong>「リアルタイム性が求められる時に選ぶべき選択肢」</strong>として登場することが多いです。</p>
+
+<h2>1. WebSocketとは？</h2>
+<p>WebSocketは、ブラウザとサーバーの間で<strong>「一度つないだら、ずっとつなぎっぱなしにする」</strong>通信方式のことです。</p>
+
+<div class="diagram-container">
+  <div class="protocol-compare">
+    <!-- HTTP -->
+    <div class="proto-box box-http">
+      <span class="proto-title">HTTP (従来)</span>
+      <span class="proto-icon">✉️</span>
+      <div class="comm-flow">
+        <div>あなた ➡ <span class="arrow-req">手紙 (Req)</span> ➡ 相手</div>
+        <div>あなた ⬅ <span class="arrow-res">返事 (Res)</span> ⬅ 相手</div>
+        <div style="border-top:1px solid #ccc; margin-top:5px; padding-top:5px; font-weight:bold;">終了 (切断)</div>
+      </div>
+      <p style="font-size:0.85rem; margin-top:1rem;">用件が終わるたびに切れる。<br>相手から急に話しかけることはできない。</p>
+    </div>
+
+    <!-- WebSocket -->
+    <div class="proto-box box-ws">
+      <span class="proto-title">WebSocket</span>
+      <span class="proto-icon">📞</span>
+      <div class="comm-flow">
+        <div>あなた 📞 相手</div>
+        <div style="margin:1rem 0; font-size:1.5rem; color:#2a5caa;">⬇⬆</div>
+        <div><span class="arrow-bi">ずっと通話中</span></div>
+      </div>
+      <p style="font-size:0.85rem; margin-top:1rem;">一度繋げば、切るまで繋がりっぱなし。<br>どちらからでも喋れる。</p>
+    </div>
+  </div>
+</div>
+
+<h2>2. なぜWebSocketが必要なの？</h2>
+<p>従来のHTTPには「サーバー側から勝手にデータを送れない」という弱点がありました。</p>
+<ul>
+<li><strong>HTTPの限界：</strong> チャットアプリで、相手がメッセージを送っても、自分から「新しいメッセージある？」と聞きにいかないと（リロードしないと）画面が更新されません。</li>
+<li><strong>WebSocketの解決策：</strong> 「つなぎっぱなし」なので、サーバーに新着メッセージが届いた瞬間に<strong>サーバーからあなたの画面へデータを押し出す（プッシュ配信）</strong>ことができます。</li>
+</ul>
+
+<div class="diagram-container">
+  <div class="push-diagram">
+    <div class="server-box">Server</div>
+    <div class="push-arrow">
+      <span class="push-label">プッシュ配信</span>
+    </div>
+    <div class="device-box">
+      <div class="screen-msg">New Message!<br>こんにちは</div>
+    </div>
+  </div>
+  <p style="font-size:0.9rem; margin-top:1rem;">サーバーのタイミングで、スマホに情報を届けられる。</p>
+</div>
+
+<h2>3. WebSocketとAWSサービスの関係</h2>
+<p>試験対策として、WebSocketに対応している主要なAWSサービスを覚えましょう。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>WebSocketとの関係</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Amazon API Gateway</strong></td>
+      <td><strong>「WebSocket API」</strong>という専用のタイプがあり、チャットなどのバックエンドをサーバーレスで簡単に作れます。</td>
+    </tr>
+    <tr>
+      <td><strong>AWS AppSync</strong></td>
+      <td>GraphQLを使って<strong>リアルタイムなデータ同期</strong>を行う際、裏側の通信技術としてWebSocketが使われています。</td>
+    </tr>
+    <tr>
+      <td><strong>Application Load Balancer (ALB)</strong></td>
+      <td>WebSocketの通信を遮断せず、正しく後ろのサーバー（EC2など）へ受け流すことができます。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<ul class="check-list">
+<li><strong>キーワード：</strong> 「リアルタイム」「双方向通信」「サーバープッシュ」。</li>
+<li><strong>ユースケース：</strong> オンラインゲームの同期、チャットアプリ、株価のリアルタイム表示など。</li>
+<li><strong>接続の維持：</strong> HTTPは一回ごとに接続を切ります（ステートレス）が、WebSocketは<strong>「持続的な接続（ステートフル）」</strong>を維持します。</li>
+</ul>
+
+<h2>5. 実務イメージ：ライブ配信のコメント欄</h2>
+<p>10万人が見ているライブ配信で、誰かがコメントを投稿したとします。</p>
+
+<div class="diagram-container">
+  <div class="live-diagram">
+    <div class="area-streamer">
+      👤<br>投稿者
+    </div>
+    
+    <div class="area-aws">
+      <div style="font-size:1.5rem;">➡</div>
+      <div class="aws-cloud">AWS</div>
+      <div style="font-size:1.5rem;">➡</div>
+    </div>
+
+    <div class="area-v1">
+      📱 視聴者A<br>
+      <span class="screen-msg">コメント着信</span>
+    </div>
+    <div class="area-v2">
+      💻 視聴者B<br>
+      <span class="screen-msg">コメント着信</span>
+    </div>
+  </div>
+</div>
+
+<ol>
+<li>投稿されたコメントが <strong>API Gateway (WebSocket API)</strong> に届く。</li>
+<li>AWS側が、現在接続している10万人全員の「開いたままのパイプ」に対して、一斉にコメントデータを送り出す。</li>
+<li>全員の画面に、リロードなしで即座にコメントが表示される。</li>
+</ol>
+
+<h2>6. まとめ</h2>
+<p>「<strong>リアルタイムで双方向、つなぎっぱなしの通信</strong>」と言えばWebSocketです。AWSでは API Gateway や AppSync を使うことで、この複雑な技術を簡単に実装できます。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
