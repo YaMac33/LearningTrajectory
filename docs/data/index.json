@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-audit-manager-hipaa",
+    "category": "awscp",
+    "timestamp": "2026-02-02T20:40:32+09:00",
+    "title": "AWS Audit ManagerとHIPAAの関係",
+    "summary": "AWS Audit ManagerはHIPAA遵守を自動化し、監査に必要な証拠を簡単に集める手段を提供します。",
+    "tags": [
+      "AWS",
+      "Audit Manager",
+      "HIPAA",
+      "コンプライアンス",
+      "自動化"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "コンプライアンス概要"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-audit-manager-hipaa/"
+  },
+  {
     "id": "awscp-aws-sagemaker-ground-truth",
     "category": "awscp",
     "timestamp": "2026-02-02T20:36:19+09:00",
