@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-sagemaker-ground-truth",
+  "category": "awscp",
+  "timestamp": "2026-02-02T20:36:19+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-sagemaker-ground-truth/",
+  "meta": {
+    "title": "Ground Truthの活用法と特長",
+    "summary": "Amazon SageMaker Ground Truthを活用することで、機械学習用のデータラベリングを効率化し、さまざまな選択肢で正解ラベルを付与する方法を学びます。",
+    "tags": [
+      "AWS",
+      "SageMaker",
+      "Ground Truth",
+      "機械学習",
+      "データラベリング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
