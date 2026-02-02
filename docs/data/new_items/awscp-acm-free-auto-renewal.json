@@ -1,0 +1,21 @@
+{
+  "id": "awscp-acm-free-auto-renewal",
+  "category": "awscp",
+  "timestamp": "2026-02-02T17:05:35+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-acm-free-auto-renewal/",
+  "meta": {
+    "title": "ACMの無料自動更新の仕組み解説",
+    "summary": "AWS Certificate Managerの無料と自動更新について、仕組みや試験での重要ポイントを理解できます。特にDNS検証による自動化の流れを詳しく解説しています。",
+    "tags": [
+      "AWS",
+      "ACM",
+      "SSL証明書",
+      "自動更新",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
