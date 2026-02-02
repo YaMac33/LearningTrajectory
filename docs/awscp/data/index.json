@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-sqs-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-02T18:39:36+09:00",
+    "title": "Amazon SQSの基本とポイント",
+    "summary": "Amazon SQSはメッセージキューサービスで、試験に必ず出題される疎結合の概念を理解することが重要です。",
+    "tags": [
+      "SQS",
+      "メッセージキュー",
+      "疎結合",
+      "クラウドサービス",
+      "AWS"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "疎結合"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-sqs-basics/"
+  },
+  {
     "id": "awscp-ssl-offload-importance",
     "category": "awscp",
     "timestamp": "2026-02-02T18:10:20+09:00",
