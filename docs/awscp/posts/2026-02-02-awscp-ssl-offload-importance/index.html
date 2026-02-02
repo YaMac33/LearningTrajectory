@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SSLオフロードの重要性</title>
+  <meta name="description" content="AWSにおけるSSLオフロードの概念とメリットを解説。ALBとACMを利用してサーバー負荷を軽減し、セキュリティと効率を両立する仕組みについて学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SSLオフロードの重要性" />
+  <meta property="og:description" content="AWSにおけるSSLオフロードの概念とメリットを解説。ALBとACMを利用してサーバー負荷を軽減し、セキュリティと効率を両立する仕組みについて学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* SSLオフロード構成図 */
+    .offload-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      width: 100%;
+      max-width: 700px;
+      flex-wrap: wrap;
+    }
+    
+    .zone-box {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      position: relative;
+      flex: 1;
+      min-width: 140px;
+    }
+    .zone-internet {
+      background-color: #fff0f0;
+      border: 2px dashed #d9534f;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+    }
+    .zone-vpc {
+      background-color: #e6f7ff;
+      border: 2px solid #2a5caa;
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .zone-label {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .label-danger { background: #d9534f; color: #fff; }
+    .label-safe { background: #2a5caa; color: #fff; }
+
+    .device-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .device-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+      display: block;
+    }
+
+    .alb-wrapper {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      z-index: 2;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      min-width: 120px;
+    }
+    .alb-wrapper::before {
+      content: "ACM証明書";
+      display: block;
+      background: #ffd700;
+      color: #333;
+      font-size: 0.7rem;
+      padding: 2px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .comm-arrow {
+      height: 4px;
+      width: 100%;
+      margin: 1rem 0;
+      position: relative;
+    }
+    .arrow-https {
+      background: #d9534f;
+    }
+    .arrow-http {
+      background: #28a745;
+    }
+    .arrow-https::after, .arrow-http::after {
+      content: "▶";
+      position: absolute;
+      right: -5px;
+      top: -7px;
+      font-size: 1.2rem;
+    }
+    .arrow-https::after { color: #d9534f; }
+    .arrow-http::after { color: #28a745; }
+
+    .comm-text {
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 5px;
+      display: block;
+    }
+    .text-lock { color: #d9534f; }
+    .text-open { color: #28a745; }
+
+    /* メリットリスト */
+    .merit-list {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .merit-card {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 1rem;
+      background: #fff;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+    .merit-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .merit-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 20%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SSLオフロードの重要性</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">SSL Offload</li>
+            <li class="tag">AWS</li>
+            <li class="tag">ACM</li>
+            <li class="tag">ALB</li>
+            <li class="tag">インフラ</li>
+            <li class="tag">負荷軽減</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS認定講師として、インフラ構成を理解する上で非常に重要な概念である<strong>「SSLオフロード」</strong>について解説します。ACM（証明書管理）とALB（ロードバランサー）をセットで使う際、この「SSLオフロード」という仕組みが裏側で動いています。</p>
+
+<h2>1. SSLオフロードとは？</h2>
+<p>一言でいうと、<strong>「本来サーバーが行うべき『暗号化・復号』の重い作業を、ロードバランサーなどの別の機械に肩代わりさせること」</strong>です。</p>
+<ul>
+<li><strong>オフロード (Offload)：</strong> 荷物（負荷）を降ろす、という意味です。</li>
+</ul>
+<h3>例え話：ホテルの「コンシェルジュ」</h3>
+<p>
+  <strong>オフロードなし：</strong><br>
+  客（通信）が部屋（サーバー）の前に来るたびに、サーバーが自分で鍵を開け、本人確認をし、荷物を検査します。これではサーバーが忙しくて本来の仕事（料理を出すなど）に集中できません。<br><br>
+  <strong>オフロードあり（ALB＋ACM）：</strong><br>
+  ホテルの入り口に「コンシェルジュ（ALB）」を置きます。ここで鍵を開け、本人確認を済ませてしまいます。そこから部屋（サーバー）までは、安全な内線通路を通るだけなので、サーバーは鍵開けの手間がなくなり、本来の仕事に専念できます。
+</p>
+
+<h2>2. SSLオフロードの仕組み</h2>
+<p>図で見ると、データの「状態」が変化しているのがわかります。ALBが「暗号化の終点（SSL Termination）」となります。</p>
+
+<div class="diagram-container">
+  <div class="offload-diagram">
+    <!-- インターネット側 -->
+    <div class="zone-box zone-internet">
+      <span class="zone-label label-danger">インターネット (危険)</span>
+      <span class="device-icon">💻</span>
+      <span class="device-name">ユーザー</span>
+      <div class="comm-arrow arrow-https"></div>
+      <span class="comm-text text-lock">🔒 HTTPS (暗号化)</span>
+    </div>
+
+    <!-- ALB -->
+    <div class="alb-wrapper">
+      <span class="device-icon">🔀</span>
+      <span class="device-name">ALB</span>
+      <div style="font-size:0.8rem; margin-top:0.5rem; color:#666;">
+        ここで復号<br>
+        (鍵を開ける)
+      </div>
+    </div>
+
+    <!-- VPC側 -->
+    <div class="zone-box zone-vpc">
+      <span class="zone-label label-safe">VPC内 (安全)</span>
+      <span class="device-icon">🖥️</span>
+      <span class="device-name">EC2</span>
+      <div class="comm-arrow arrow-http"></div>
+      <span class="comm-text text-open">🔓 HTTP (平文)</span>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">ALBで暗号を解き、後ろのサーバーへは軽いHTTPで渡す。</p>
+</div>
+
+<h2>3. SSLオフロードの「3つのメリット」</h2>
+<p>なぜわざわざこんなことをするのか、試験でも問われるメリットです。</p>
+
+<div class="diagram-container">
+  <div class="merit-list">
+    <div class="merit-card">
+      <span class="merit-icon">📉</span>
+      <span class="merit-title">サーバー負荷軽減</span>
+      <p style="font-size:0.85rem; color:#666;">
+        暗号化・復号には計算パワーを使います。これをALBに任せることで、EC2サーバーのCPUを節約できます。
+      </p>
+    </div>
+    <div class="merit-card">
+      <span class="merit-icon">🔧</span>
+      <span class="merit-title">管理の一元化</span>
+      <p style="font-size:0.85rem; color:#666;">
+        100台のサーバーがあっても、証明書をインストールするのは<strong>ALBの1箇所だけ</strong>で済みます。ACMでの更新も1回で終わります。
+      </p>
+    </div>
+    <div class="merit-card">
+      <span class="merit-icon">👮</span>
+      <span class="merit-title">WAFとの相性</span>
+      <p style="font-size:0.85rem; color:#666;">
+        WAFは通信の中身を見て悪いやつをブロックします。ALBで一度「暗号を解く」からこそ、WAFが中身をチェックできるようになります。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<ul class="check-list">
+<li><strong>設置場所：</strong> SSL/TLS証明書（ACM）をどこに配置するか？ → <strong>ALB（Application Load Balancer）</strong>や<strong>CloudFront</strong>に配置して、そこで終端（オフロード）させます。</li>
+<li><strong>セキュリティと効率の両立：</strong> 「インターネット上は暗号化し、VPC内部（ALBから背後）は負荷を下げて効率化する」という考え方が正解の選択肢になりやすいです。</li>
+<li><strong>なぜ平文でいいの？：</strong> ALBの後ろ側は、AWSの専用ネットワーク（VPC）内です。ここは部外者が立ち入れない安全な場所なので、あえて暗号化を解いたまま（HTTP）でサーバーに渡しても安全とされています。</li>
+</ul>
+
+<h2>5. 実務イメージ：大規模なキャンペーン</h2>
+<p>1分間に数万件のアクセスが来るキャンペーンサイト。すべてのアクセスをサーバー側で暗号解除していると、CPUが100%になってサイトがダウンしてしまいます。</p>
+<p>そこで<strong>ACMをセットしたALB</strong>でSSLオフロードを行うことで、サーバーは「純粋なリクエスト処理」だけに集中でき、少ない台数のサーバーで大量のアクセスをさばけるようになります。</p>
+
+<h2>まとめ</h2>
+<p>「<strong>暗号解除という面倒な作業を入り口（ALB）で済ませて、中（サーバー）を楽にさせてあげること</strong>」がSSLオフロードです。「SSLオフロード」という言葉を聞いたら、ALBでカギを開けて、中身を裸にしてからサーバーに渡す図を思い出してください。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
