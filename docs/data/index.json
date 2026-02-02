@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-nat-gateway-importance",
+    "category": "awscp",
+    "timestamp": "2026-02-02T21:31:05+09:00",
+    "title": "NATゲートウェイの重要性と機能",
+    "summary": "NATゲートウェイはプライベートサーバーがインターネットと接続するための重要な仕組みです。試験ではプライベートサブネットとの関連性が求められます。",
+    "tags": [
+      "NATゲートウェイ",
+      "AWS",
+      "ネットワーク",
+      "プライベートサブネット",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-nat-gateway-importance/"
+  },
+  {
     "id": "awscp-aws-audit-manager-hipaa",
     "category": "awscp",
     "timestamp": "2026-02-02T20:40:32+09:00",
