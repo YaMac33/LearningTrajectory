@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSのAI/MLサービス全体像</title>
+  <meta name="description" content="AWSのAI/ML関連サービスを生成AIから機械学習まで整理。Bedrock、SageMaker、専用チップなど、3つのレイヤー構造と試験頻出のサービスを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSのAI/MLサービス全体像" />
+  <meta property="og:description" content="AWSのAI/ML関連サービスを生成AIから機械学習まで整理。Bedrock、SageMaker、専用チップなど、3つのレイヤー構造と試験頻出のサービスを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 3層スタック図 */
+    .stack-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .stack-layer {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      position: relative;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .layer-app {
+      border-color: #2a5caa;
+      background-color: #e6f7ff;
+    }
+    .layer-platform {
+      border-color: #d86613;
+      background-color: #fffaf5;
+    }
+    .layer-infra {
+      border-color: #24882c;
+      background-color: #f6ffed;
+    }
+    
+    .layer-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .layer-desc {
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .layer-badge {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .bg-app { background: #2a5caa; }
+    .bg-plat { background: #d86613; }
+    .bg-inf { background: #24882c; }
+
+    /* 実務フロー図 */
+    .workflow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .flow-step {
+      background: #fff;
+      border: 1px solid #999;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      min-width: 120px;
+      position: relative;
+    }
+    .step-icon {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .step-service {
+      font-weight: bold;
+      color: #2a5caa;
+      font-size: 0.9rem;
+      display: block;
+    }
+    .step-action {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+    .svc-icon {
+      margin-right: 0.5rem;
+      font-size: 1.2rem;
+      vertical-align: middle;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSのAI/MLサービス全体像</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">AI</li>
+            <li class="tag">ML</li>
+            <li class="tag">生成AI</li>
+            <li class="tag">機械学習</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS認定試験（CLF-C02）において、<strong>AI（人工知能）とML（機械学習）</strong>の分野は近年非常に重要視されています。最新の試験範囲に基づき、従来の「特定の機能を持つAIサービス」に加えて、注目度の高い「生成AI」も含めて体系的に整理しました。</p>
+
+<h2>1. AWS AI/ML サービスの全体像（3層構造）</h2>
+<p>AWSのAI/MLサービスは、利用者が必要とする「専門知識のレベル」に応じて、大きく3つの層（レイヤー）に分かれています。</p>
+
+<div class="diagram-container">
+  <div class="stack-diagram">
+    <!-- Layer 1 -->
+    <div class="stack-layer layer-app">
+      <span class="layer-badge bg-app">Layer 1: AIサービス (アプリ層)</span>
+      <span class="layer-title">すぐに使えるAI</span>
+      <span class="layer-desc">専門知識不要。APIを呼ぶだけで「目・耳・口」の機能や「生成AI」を利用可能。<br>(Bedrock, Rekognition, Polly etc.)</span>
+    </div>
+    
+    <!-- Layer 2 -->
+    <div class="stack-layer layer-platform">
+      <span class="layer-badge bg-plat">Layer 2: MLプラットフォーム</span>
+      <span class="layer-title">モデルを作る・育てる</span>
+      <span class="layer-desc">データサイエンティスト向け。独自のAIモデルを開発・管理する環境。<br>(SageMaker)</span>
+    </div>
+
+    <!-- Layer 3 -->
+    <div class="stack-layer layer-infra">
+      <span class="layer-badge bg-inf">Layer 3: インフラストラクチャ</span>
+      <span class="layer-title">パワーを支える</span>
+      <span class="layer-desc">超高性能な計算リソース。学習や推論に特化した専用チップ。<br>(Trainium, Inferentia)</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. Layer 1: 生成AI・アプリケーション層</h2>
+<p>エンジニアが機械学習の理論を知らなくても、APIを介して最先端のAI機能をアプリに組み込めるグループです。試験では「〇〇をしたい時、どのサービスを使うか？」というマッチング問題が出ます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>概要（一言でいうと）</th>
+      <th>主な利用シーン</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="highlight-cell"><span class="svc-icon">🧠</span>Amazon Bedrock</td>
+      <td><strong>生成AI</strong>の基盤モデル利用</td>
+      <td>チャットボット、文書要約、画像生成<br><small>※サーバーレスでモデルを選んで使える</small></td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">💬</span>Amazon Q</td>
+      <td><strong>AIアシスタント</strong></td>
+      <td>AWSコンソールでの質問、コード生成、ビジネス分析</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">👁️</span>Amazon Rekognition</td>
+      <td><strong>画像・ビデオ分析</strong></td>
+      <td>顔認証、不適切なコンテンツの検出、物体検出</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">🗣️</span>Amazon Polly</td>
+      <td><strong>テキストを音声に変換</strong></td>
+      <td>文章の読み上げ、ナレーション作成</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">👂</span>Amazon Transcribe</td>
+      <td><strong>音声をテキストに変換</strong></td>
+      <td>会議の文字起こし、動画の字幕作成</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">🤖</span>Amazon Lex</td>
+      <td><strong>対話型AI（チャットボット）</strong></td>
+      <td>コールセンターの自動応答 (Alexaの技術)</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">📖</span>Amazon Comprehend</td>
+      <td><strong>テキスト解析（自然言語処理）</strong></td>
+      <td>顧客レビューの感情分析（ポジ・ネガ判定）</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">🌐</span>Amazon Translate</td>
+      <td><strong>高精度な機械翻訳</strong></td>
+      <td>多言語サイトの自動翻訳、チャット翻訳</td>
+    </tr>
+    <tr>
+      <td><span class="svc-icon">📄</span>Amazon Textract</td>
+      <td><strong>文書からのデータ抽出</strong></td>
+      <td>スキャンした請求書の表データを読み取り (OCR)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Layer 2: 機械学習プラットフォーム層</h2>
+<p>自分たちで独自のAIモデルを構築したい開発者向けのグループです。</p>
+<ul class="check-list">
+<li><strong>Amazon SageMaker：</strong> 機械学習の<strong>「一連の流れ（準備→学習→デプロイ）」を1つのサービスで完結</strong>できるプラットフォームです。</li>
+<li><strong>試験ポイント：</strong> 「自社データを使い、独自のアルゴリズムでモデルをトレーニングしたい」と言われたら <strong>SageMaker</strong> が正解です。</li>
+</ul>
+
+<h2>4. Layer 3: インフラストラクチャ層</h2>
+<p>AIを動かすための「足腰」となる、専用チップや高速な計算機グループです。EC2インスタンスのタイプとして提供されます。</p>
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>役割</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWS Trainium</strong></td>
+      <td>AIの<strong>学習（トレーニング）</strong>を高速化・低コスト化する専用チップ。</td>
+    </tr>
+    <tr>
+      <td><strong>AWS Inferentia</strong></td>
+      <td>AIの<strong>推論（実行）</strong>を効率化する専用チップ。<br><small>※作ったモデルを使って予測することを「推論」と呼びます。</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. 実務イメージ：カスタマーサポートの改善</h2>
+<p>これらのサービスは単独で使うだけでなく、組み合わせることで強力なソリューションになります。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">電話対応の自動分析フロー</p>
+  <div class="workflow-diagram">
+    <div class="flow-step">
+      <span class="step-icon">📞</span>
+      <span class="step-service">Amazon Connect</span>
+      <span class="step-action">通話録音</span>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="flow-step">
+      <span class="step-icon">📝</span>
+      <span class="step-service">Amazon Transcribe</span>
+      <span class="step-action">文字起こし</span>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="flow-step">
+      <span class="step-icon">😊/😡</span>
+      <span class="step-service">Amazon Comprehend</span>
+      <span class="step-action">感情分析</span>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">「顧客が何に怒っているか」を可視化し、サービス改善に繋げます。</p>
+</div>
+
+<h2>6. まとめ：試験攻略のコツ</h2>
+<ul class="check-list">
+<li><strong>専門知識の有無：</strong> 「知識なしですぐ使いたい」ならAIサービス、「独自に作りたい」ならSageMaker。</li>
+<li><strong>キーワード一致：</strong> 「感情分析＝Comprehend」「顔認証＝Rekognition」「チャットボット＝Lex」。</li>
+<li><strong>生成AI：</strong> 「基盤モデル」「生成AI」なら <strong>Bedrock</strong>。</li>
+</ul>
+<p>AI系サービスは名前が機能を表していることが多い（Polly＝オウム、Translate＝翻訳など）ので、名前から連想できるようにしておきましょう。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
