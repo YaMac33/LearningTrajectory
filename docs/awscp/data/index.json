@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-waf-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:01:19+09:00",
+    "title": "AWS WAFを理解しよう！基本知識と対策",
+    "summary": "AWS WAFはWebアプリケーションを守る強力なセキュリティサービスで、SQLインジェクションやXSS攻撃から防御します。試験における重要なサービス理解を促進します。",
+    "tags": [
+      "AWS",
+      "WAF",
+      "セキュリティ",
+      "攻撃防止",
+      "Web ACL"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-waf-basics/"
+  },
+  {
     "id": "awscp-amazon-rekognition-overview",
     "category": "awscp",
     "timestamp": "2026-02-02T08:30:41+09:00",
