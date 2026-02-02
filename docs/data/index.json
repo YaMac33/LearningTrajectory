@@ -1,5 +1,29 @@
 [
   {
+    "id": "awscp-byod-byol-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:09:14+09:00",
+    "title": "BYODとBYOLの違いを理解しよう",
+    "summary": "BYOD（デバイス持ち込み）とBYOL（ライセンス持ち込み）の違いを解説し、AWSでの活用シーンを理解できるようになります。",
+    "tags": [
+      "BYOD",
+      "BYOL",
+      "AWS",
+      "ライセンス",
+      "デバイス",
+      "コスト削減",
+      "WorkSpaces",
+      "EC2"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-byod-byol-difference/"
+  },
+  {
     "id": "awscp-acm-free-auto-renewal",
     "category": "awscp",
     "timestamp": "2026-02-02T17:05:35+09:00",
