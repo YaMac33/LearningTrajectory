@@ -1,0 +1,22 @@
+{
+  "id": "awscp-cost-explorer-cloudwatch-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-02T12:56:52+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-cost-explorer-cloudwatch-difference/",
+  "meta": {
+    "title": "AWS Cost ExplorerとCloudWatchの違い",
+    "summary": "AWSのコスト管理のための2つのツール、Cost ExplorerとCloudWatchの機能の違いが理解できます。これにより、適切なツールの選択が可能となります。",
+    "tags": [
+      "AWS",
+      "Cost Management",
+      "CloudWatch",
+      "Cost Explorer",
+      "分析",
+      "監視"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "料金モデル"
+    ]
+  }
+}
