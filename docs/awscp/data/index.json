@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-sagemaker-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:36:39+09:00",
+    "title": "Amazon SageMakerの概要と特徴",
+    "summary": "Amazon SageMakerは機械学習モデルを構築・訓練・デプロイするためのプラットフォームで、特に自社のデータを使ったAI開発を支援します。",
+    "tags": [
+      "AWS",
+      "SageMaker",
+      "機械学習",
+      "AI",
+      "データサイエンス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-sagemaker-overview/"
+  },
+  {
     "id": "awscp-amazon-athena-features",
     "category": "awscp",
     "timestamp": "2026-02-02T12:30:39+09:00",
