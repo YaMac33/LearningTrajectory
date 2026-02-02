@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-glue-role-advantage",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:43:32+09:00",
+    "title": "AWS Glueの役割と利点について解説",
+    "summary": "AWS Glueは、データ処理を自動化するサーバーレスのETLサービスです。このサービスの3つの主な機能とその重要性を理解することが求められます。",
+    "tags": [
+      "AWS",
+      "Glue",
+      "ETL",
+      "データカタログ",
+      "サーバーレス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-glue-role-advantage/"
+  },
+  {
     "id": "awscp-aws-redshift-data-warehouse",
     "category": "awscp",
     "timestamp": "2026-02-02T17:34:34+09:00",
