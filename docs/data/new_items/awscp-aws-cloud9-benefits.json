@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cloud9-benefits",
+  "category": "awscp",
+  "timestamp": "2026-02-02T19:55:55+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-cloud9-benefits/",
+  "meta": {
+    "title": "AWS Cloud9のメリットと特徴",
+    "summary": "AWS Cloud9は、環境構築不要でブラウザ上でプログラミングが行えるIDEです。リアルタイム共同編集やサーバーレス開発との相性が優れていることを理解できます。",
+    "tags": [
+      "AWS",
+      "Cloud9",
+      "IDE",
+      "プログラミング",
+      "開発環境"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
