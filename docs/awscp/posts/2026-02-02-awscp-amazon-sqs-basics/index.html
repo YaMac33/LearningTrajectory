@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | Amazon SQSの基本とポイント</title>
+  <meta name="description" content="Amazon SQSはシステム間の疎結合を実現するメッセージキューサービス。試験対策全般を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon SQSの基本とポイント" />
+  <meta property="og:description" content="Amazon SQSはシステム間の疎結合を実現するメッセージキューサービス。試験対策全般を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+    
+    /* 疎結合フロー図 */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      background: #fff;
+      border: 2px solid #6366f1;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 700;
+      min-width: 100px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .flow-box.sqs {
+      background: #e0e7ff;
+      border-style: dashed;
+      color: #4338ca;
+    }
+    .flow-arrow {
+      font-size: 20px;
+      color: #9ca3af;
+      font-weight: bold;
+    }
+    .flow-note {
+      font-size: 0.85em;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .flow-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+      .article-content th {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon SQSの基本とポイント</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#SQS</span>
+            <span class="tag">#メッセージキュー</span>
+            <span class="tag">#疎結合</span>
+            <span class="tag">#クラウドサービス</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Amazon SQS (Simple Queue Service) は、<strong>「メッセージキュー（待ち行列）」</strong>を提供するサービスです。一言で言うと、<strong>「システムとシステムの間に置く『クッション（緩衝材）』」</strong>です。
+</p>
+<p>
+  試験では、<strong>「疎結合（Decoupling）」</strong>というキーワードとセットで必ず出題されます。これさえ覚えれば勝ちです。
+</p>
+
+<h2>1. なぜ SQS が必要なのか？（疎結合の魔法）</h2>
+<p>
+  通常、システムAがシステムBにデータを送る時、直接渡そうとすると問題が起きます。
+</p>
+<ul>
+  <li>
+    <strong>密結合 (Tightly Coupled):</strong><br>
+    システムAがデータを投げた時、もしシステムBが忙しかったり、故障していたりすると、Aも道連れでエラーになったり、待たされたりします。（例：電話。相手が出ないと話が進まない）
+  </li>
+  <li>
+    <strong>疎結合 (Loosely Coupled) = SQSあり:</strong><br>
+    システムAは、とりあえずSQS（ポスト）にデータを投函して、自分の仕事を終えます。システムBは、自分のペースでSQSからデータを取り出して処理します。
+  </li>
+</ul>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">疎結合（SQS利用）のイメージ</div>
+  <div class="flow-row">
+    <div class="flow-box">システム A<br><small>送信側</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box sqs">SQS<br><small>クッション</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">システム B<br><small>受信側</small></div>
+  </div>
+  <p class="flow-note">
+    システムBがダウンしていても、データはSQSに残るためAは止まらない
+  </p>
+</div>
+
+<h2>2. SQS の「2つのキュータイプ」</h2>
+<p>試験では、この2つの違いと使い分けが問われます。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>標準キュー (Standard)</th>
+      <th>FIFOキュー (先入れ先出し)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>順番</th>
+      <td>保証されない<br><small>(たまに入れ替わる)</small></td>
+      <td>完全に順番通り<br><small>(1→2→3)</small></td>
+    </tr>
+    <tr>
+      <th>配信回数</th>
+      <td>少なくとも1回<br><small>(たまに重複して届く)</small></td>
+      <td>正確に1回<br><small>(重複なし)</small></td>
+    </tr>
+    <tr>
+      <th>速度</th>
+      <td>爆速 (ほぼ無制限)</td>
+      <td>制限あり (300件/秒など)</td>
+    </tr>
+    <tr>
+      <th>コスト</th>
+      <td>安い</td>
+      <td>少し高い</td>
+    </tr>
+    <tr>
+      <th>用途</th>
+      <td>とにかく大量にさばく処理<br><small>(画像のサイズ変換など)</small></td>
+      <td>順番が重要な処理<br><small>(銀行の入出金、在庫管理)</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>試験のコツ:</strong> 「順序を守る必要がある」「重複してはいけない」と書かれていたら <strong>FIFO</strong>。それ以外は基本的に <strong>標準キュー</strong> です。</p>
+</blockquote>
+
+<h2>3. 試験に出る「専門用語」3選</h2>
+<p>SQS独自の仕組みに関する用語です。ここが少しややこしいので注意です。</p>
+
+<h3>① ポーリング (Polling)</h3>
+<p>
+  SQSは、システムB（コンシューマー）が<strong>「ねぇ、何かメッセージ来てない？」と自分から取りに行く（Pull型）</strong>仕組みです。
+</p>
+<ul>
+  <li><strong>ショートポーリング:</strong> すぐに返事をする（空振りが多い＝コスト増）。</li>
+  <li><strong>ロングポーリング:</strong> メッセージが来るまで最大20秒待ってくれる（空振りが減る＝コスト削減）。</li>
+</ul>
+<p>※試験では「コストを削減するには？」→ <strong>「ロングポーリングを使う」</strong>が正解です。</p>
+
+<h3>② 可視性タイムアウト (Visibility Timeout)</h3>
+<p>
+  複数のサーバーで処理している時に、<strong>「同じメッセージを二重処理しないためのロック機能」</strong>です。
+</p>
+<ul>
+  <li>誰かがメッセージを処理し始めたら、そのメッセージを一時的に<strong>「透明（不可視）」</strong>にして、他の人から見えないようにします。</li>
+  <li>処理が終われば削除しますが、もし処理中にサーバーが落ちたら、時間が来るとまた見えるようになり、他の人が処理を引き継げます。</li>
+</ul>
+
+<h3>③ デッドレターキュー (Dead Letter Queue: DLQ)</h3>
+<p><strong>「何回やってもエラーになるメッセージの墓場」</strong>です。</p>
+<ul>
+  <li>バグを含んだデータなど、何度処理しても失敗するメッセージがキューに残ると、永遠に処理し続けて邪魔です。</li>
+  <li>「5回失敗したら、別の場所（DLQ）に移動させる」ことで、メインの処理を止めないようにします。</li>
+</ul>
+
+<h2>4. SNS と SQS の違い（最終確認）</h2>
+<p>Amazon SNS との比較表です。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon SNS</th>
+      <th>Amazon SQS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>タイプ</th>
+      <td>Push型 (プッシュ)</td>
+      <td>Pull型 (プル)</td>
+    </tr>
+    <tr>
+      <th>イメージ</th>
+      <td>メガホン / 校内放送</td>
+      <td>郵便ポスト / ベルトコンベア</td>
+    </tr>
+    <tr>
+      <th>主体</th>
+      <td>送る側が勝手に送りつける</td>
+      <td>受け取る側が取りに行く</td>
+    </tr>
+    <tr>
+      <th>保存</th>
+      <td>保存しない<br><small>(聞き逃したら終わり)</small></td>
+      <td>保存する<br><small>(取りに来るまで待つ)</small></td>
+    </tr>
+    <tr>
+      <th>主な用途</th>
+      <td>即時通知 (メール, SMS)</td>
+      <td>バッファリング、負荷分散</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>最強の組み合わせ (Fan-out):</strong><br>
+  SNSに1回投稿すると、連携した複数のSQSに一斉にコピーされる構成（ファンアウト）がよく使われます。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> システム間の<strong>「疎結合（Decoupling）」</strong>を実現するクッション。</li>
+  <li><strong>メリット:</strong> 相手がダウンしていても影響を受けない。急激なアクセス増（スパイク）を吸収できる。</li>
+  <li><strong>種類:</strong> 爆速の標準キュー、順序厳守のFIFOキュー。</li>
+  <li><strong>機能:</strong> ロングポーリングでコスト削減、可視性タイムアウトで二重処理防止。</li>
+</ul>
+<p>これで、アプリケーション連携サービス（SNS, SQS）も完璧です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
