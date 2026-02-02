@@ -1,0 +1,21 @@
+{
+  "id": "awscp-route-53-traffic-flow",
+  "category": "awscp",
+  "timestamp": "2026-02-03T04:01:16+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-route-53-traffic-flow/",
+  "meta": {
+    "title": "Route 53 トラフィックフローの魅力",
+    "summary": "Route 53のTraffic Flow機能を利用すると、複雑なDNSルーティングを視覚的に管理しやすくなります。この機能により、効果的なバージョン管理とルールのテンプレート化が実現できることを理解できます。",
+    "tags": [
+      "DNS",
+      "Traffic Flow",
+      "ルーティング",
+      "フローチャート",
+      "Amazon"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
