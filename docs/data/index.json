@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-efs-feature",
+    "category": "awscp",
+    "timestamp": "2026-02-02T18:59:55+09:00",
+    "title": "Amazon EFSの基本と特徴",
+    "summary": "EFSはLinux専用の共有ファイルシステムで、複数のEC2から同時にアクセス可能です。試験準備には、共有アクセス、自動拡張が重要なポイントです。",
+    "tags": [
+      "EFS",
+      "ストレージ",
+      "Linux",
+      "共有アクセス",
+      "EC2"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-efs-feature/"
+  },
+  {
     "id": "awscp-amazon-sqs-basics",
     "category": "awscp",
     "timestamp": "2026-02-02T18:39:36+09:00",
