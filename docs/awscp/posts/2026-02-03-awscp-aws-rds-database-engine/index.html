@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS RDSのデータベースエンジン</title>
+  <meta name="description" content="AWS RDSで使える6種類のデータベースエンジン（Aurora, MySQL, PostgreSQL, Oracle等）の特徴と選び方を比較解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS RDSのデータベースエンジン" />
+  <meta property="og:description" content="AWS RDSで使える6種類のデータベースエンジン（Aurora, MySQL, PostgreSQL, Oracle等）の特徴と選び方を比較解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. DBエンジン分類マップ */
+    .db-map {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .db-group {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .g-aws { border-color: #8b5cf6; background: #f5f3ff; } /* Purple */
+    .g-oss { border-color: #10b981; background: #ecfdf5; } /* Green */
+    .g-com { border-color: #3b82f6; background: #eff6ff; } /* Blue */
+
+    .group-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #1e293b;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .db-item {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      color: #334155;
+      font-size: 0.9em;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .db-aurora {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: white;
+      border: none;
+    }
+
+    /* 2. Aurora耐久性図 */
+    .aurora-az-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .az-box {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      position: relative;
+      width: 100px;
+      text-align: center;
+    }
+    .az-label {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f8fafc;
+      padding: 0 6px;
+      font-size: 0.75em;
+      color: #64748b;
+      font-weight: bold;
+    }
+    .data-copy {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      background: #8b5cf6;
+      border-radius: 4px;
+      margin: 4px;
+      color: white;
+      font-size: 0.7em;
+      line-height: 30px;
+      font-weight: bold;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .db-map { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS RDSのデータベースエンジン</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#DBエンジン</span>
+            <span class="tag">#Aurora</span>
+            <span class="tag">#MySQL</span>
+            <span class="tag">#PostgreSQL</span>
+            <span class="tag">#SQL Server</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Amazon RDS（Relational Database Service）では、用途や予算に合わせて6種類のデータベースエンジン（心臓部）から好きなものを選ぶことができます。
+</p>
+<p>
+  これらは大きく分けて、<strong>「AWS独自」「オープンソース」「商用」</strong>の3つのグループに分類すると、特徴がスッキリ理解できます。試験でも実務でも、この分類が非常に重要です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">6つのエンジンの分類</div>
+  <div class="db-map">
+    <div class="db-group g-aws">
+      <div class="group-title">AWS独自</div>
+      <div class="db-item db-aurora">Amazon Aurora</div>
+      <small>クラウド最適化<br>最強の性能</small>
+    </div>
+    <div class="db-group g-oss">
+      <div class="group-title">オープンソース</div>
+      <div class="db-item">MySQL</div>
+      <div class="db-item">MariaDB</div>
+      <div class="db-item">PostgreSQL</div>
+      <small>ライセンス無料<br>Web標準</small>
+    </div>
+    <div class="db-group g-com">
+      <div class="group-title">商用 (有料)</div>
+      <div class="db-item">Oracle</div>
+      <div class="db-item">SQL Server</div>
+      <small>高機能・高信頼<br>企業向け</small>
+    </div>
+  </div>
+</div>
+
+<h2>1. AWS独自（最強のクラウドネイティブ）</h2>
+
+<h3>① Amazon Aurora（オーロラ）</h3>
+<p>
+  <strong>「AWSがクラウドのために再設計した、最強のデータベース」</strong>です。RDSの一部ですが、別格の存在として扱われます。
+</p>
+<ul>
+  <li><strong>互換性:</strong> MySQL と PostgreSQL に互換性があります（既存アプリをそのまま移行可能）。</li>
+  <li><strong>速度:</strong> 標準的なMySQLの5倍、PostgreSQLの3倍高速です。</li>
+  <li><strong>コスト:</strong> 商用DB（Oracle等）の1/10のコストで、同等のパフォーマンスが出せると謳っています。</li>
+</ul>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Auroraの耐久性：3つのAZに6つのコピー</div>
+  <div class="aurora-az-container">
+    <div class="az-box">
+      <div class="az-label">AZ-1</div>
+      <span class="data-copy">1</span><span class="data-copy">2</span>
+    </div>
+    <div class="az-box">
+      <div class="az-label">AZ-2</div>
+      <span class="data-copy">3</span><span class="data-copy">4</span>
+    </div>
+    <div class="az-box">
+      <div class="az-label">AZ-3</div>
+      <span class="data-copy">5</span><span class="data-copy">6</span>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#475569;">
+    データは自動的に3つのデータセンターに分散して書き込まれます。<br>
+    もし1つのデータセンターが丸ごと消滅しても、データは無事です。
+  </p>
+</div>
+
+<h2>2. オープンソース（無料で使える定番）</h2>
+<p>
+  これらはソフトウェア自体の利用料（ライセンス料）がかからないため、安価で人気があります。
+</p>
+
+<h3>② MySQL（マイエスキューエル）</h3>
+<p>
+  世界で最も利用されているオープンソースデータベースです。
+</p>
+<ul>
+  <li>Web開発（WordPressなど）の標準です。</li>
+  <li>「LAMP環境（Linux, Apache, MySQL, PHP）」のMです。</li>
+</ul>
+
+<h3>③ MariaDB（マリアディービー）</h3>
+<p>
+  MySQLから派生した（フォークされた）兄弟のようなデータベースです。
+</p>
+<ul>
+  <li>MySQLの開発者が、Oracle社に買収されたMySQLの将来を案じて作ったものです。</li>
+  <li>基本的にはMySQLとほぼ同じ使い勝手ですが、性能が改善されている部分もあります。</li>
+</ul>
+
+<h3>④ PostgreSQL（ポストグレスキューエル）</h3>
+<p>
+  「ポスグレ」と呼ばれ、MySQLと並ぶ人気者です。
+</p>
+<ul>
+  <li>MySQLよりも<strong>「複雑な処理」や「堅牢性」</strong>に強いとされています。</li>
+  <li>Oracleとの互換性が高いため、Oracleからの移行先として選ばれることが多いです。</li>
+  <li><strong>PostGIS</strong> という拡張機能を使った「地図情報（位置情報）」の処理が得意です。</li>
+</ul>
+
+<h2>3. 商用データベース（ライセンスが必要）</h2>
+<p>
+  企業が開発・販売しているデータベースです。利用にはライセンス料が必要です。
+</p>
+
+<h3>⑤ Oracle（オラクル）</h3>
+<p>
+  データベース界の絶対王者。大企業の基幹システムで長年使われています。
+</p>
+<ul>
+  <li><strong>License Included:</strong> AWSがライセンス料込みで貸してくれるモデル。</li>
+  <li><strong>BYOL (Bring Your Own License):</strong> 会社ですでに持っているライセンスをAWSに持ち込むモデル。</li>
+</ul>
+
+<h3>⑥ Microsoft SQL Server（エスキューエルサーバー）</h3>
+<p>
+  マイクロソフト製のデータベースです。
+</p>
+<ul>
+  <li>Windows Server や .NET（C#）で作られたアプリとの相性が抜群です。</li>
+  <li>Oracle同様、BYOLが可能です。</li>
+</ul>
+
+<h2>一覧比較表</h2>
+<table>
+  <thead>
+    <tr>
+      <th>分類</th>
+      <th>エンジン名</th>
+      <th>特徴・キーワード</th>
+      <th>おすすめの場面</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>AWS独自</th>
+      <td><strong>Aurora</strong></td>
+      <td>5倍高速、6つのコピー、ストレージ自動拡張</td>
+      <td>性能と可用性を最優先したい時</td>
+    </tr>
+    <tr>
+      <th>OSS</th>
+      <td>MySQL</td>
+      <td>世界標準、WordPress</td>
+      <td>一般的なWebサイト、コスト重視</td>
+    </tr>
+    <tr>
+      <th>OSS</th>
+      <td>MariaDB</td>
+      <td>MySQLの兄弟</td>
+      <td>MySQLより少し性能を上げたい時</td>
+    </tr>
+    <tr>
+      <th>OSS</th>
+      <td>PostgreSQL</td>
+      <td>複雑なクエリ、地図情報</td>
+      <td>業務システム、Oracleからの移行</td>
+    </tr>
+    <tr>
+      <th>商用</th>
+      <td>Oracle</td>
+      <td>BYOL、エンタープライズ</td>
+      <td>既存のOracle資産を活かしたい時</td>
+    </tr>
+    <tr>
+      <th>商用</th>
+      <td>SQL Server</td>
+      <td>Windows親和性、BYOL</td>
+      <td>Windows系システムの移行</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>試験のポイント</h2>
+<ul>
+  <li><strong>「商用データベース（Oracle/SQL Server）の移行」</strong><br>
+    → <strong>AWS Database Migration Service (DMS)</strong> を使って、Aurora に移行するのがAWSの推奨パターン（コスト削減のため）です。
+  </li>
+  <li><strong>「ライセンス持ち込み」</strong><br>
+    → <strong>BYOL (Bring Your Own License)</strong> という単語を覚えてください。OracleとSQL Serverで可能です。
+  </li>
+  <li><strong>「性能重視」</strong><br>
+    → 何も考えずに <strong>Aurora</strong> を選びましょう。
+  </li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
