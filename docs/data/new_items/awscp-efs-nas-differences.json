@@ -1,0 +1,21 @@
+{
+  "id": "awscp-efs-nas-differences",
+  "category": "awscp",
+  "timestamp": "2026-02-02T19:04:59+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-efs-nas-differences/",
+  "meta": {
+    "title": "EFSとNASの違いについて解説",
+    "summary": "Amazon EFSと通常のNASの運用や耐久性の違いを理解し、AWSを利用する際の選択肢を明確にします。",
+    "tags": [
+      "EFS",
+      "NAS",
+      "クラウド",
+      "ストレージ",
+      "比較"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
