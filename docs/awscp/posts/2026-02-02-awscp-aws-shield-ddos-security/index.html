@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Shieldの基礎知識</title>
+  <meta name="description" content="AWS ShieldはDDoS攻撃からAWSを守るサービスです。StandardとAdvancedの違い、WAFとの役割分担、試験頻出のポイントについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Shieldの基礎知識" />
+  <meta property="og:description" content="AWS ShieldはDDoS攻撃からAWSを守るサービスです。StandardとAdvancedの違い、WAFとの役割分担、試験頻出のポイントについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* DDoS攻撃イメージ図 */
+    .ddos-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .attacker-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      align-items: center;
+    }
+    .attacker-icon {
+      font-size: 1.5rem;
+      color: #d9534f;
+    }
+    .ddos-arrows {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 1.2rem;
+      color: #d9534f;
+      font-weight: bold;
+    }
+    .shield-wall {
+      background: #2a5caa;
+      color: #fff;
+      padding: 1rem 0.5rem;
+      border-radius: 4px;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      font-weight: bold;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.2rem;
+      box-shadow: 0 0 10px rgba(42, 92, 170, 0.5);
+    }
+    .safe-zone {
+      border: 2px solid #28a745;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .safe-arrow {
+      color: #28a745;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    /* Standard vs Advanced 比較 */
+    .plan-compare {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .plan-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+    }
+    .card-std { border-top: 4px solid #999; }
+    .card-adv { border-top: 4px solid #d9534f; background-color: #fff5f5; }
+
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-price {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+      display: block;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #ddd;
+    }
+    .card-feature {
+      font-size: 0.9rem;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* セキュリティ3兄弟 */
+    .trio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .trio-box {
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .trio-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+    .trio-name { font-weight: bold; display: block; margin-bottom: 0.3rem; }
+    .trio-desc { font-size: 0.8rem; color: #666; }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #d9534f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Shieldの基礎知識</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Shield</li>
+            <li class="tag">DDoS</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">WAF</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>先ほど解説したWAFが「手荷物検査（中身のチェック）」なら、<strong>AWS Shield（シールド）は「建物の外で暴動を防ぐ警備隊（数の暴力対策）」</strong>です。試験では、WAFとShieldの違い、そしてShieldの中にある2つのプラン（無料と有料）の違いが問われます。</p>
+
+<h2>1. AWS Shieldとは？（DDoS対策）</h2>
+<p><strong>DDoS（ディドス）攻撃</strong>からAWSを守るための専用サービスです。DDoS攻撃とは、世界中の無数のコンピュータから一斉にゴミのような通信を送りつけ、相手のサーバーをパンクさせて動かなくさせる攻撃のことです。</p>
+<p>AWS Shieldは、こうした「数の暴力」による攻撃を、建物の入り口（エッジ）で自動的に検知して追い払ってくれます。</p>
+
+<div class="diagram-container">
+  <div class="ddos-diagram">
+    <div class="attacker-group">
+      <div>👾 👾 👾</div>
+      <div>👾 👾 👾</div>
+      <small>攻撃者 (大量)</small>
+    </div>
+    
+    <div class="ddos-arrows">
+      <span>➡</span><span>➡</span><span>➡</span>
+    </div>
+    
+    <div class="shield-wall">AWS Shield</div>
+
+    <div class="safe-arrow">➡</div>
+
+    <div class="safe-zone">
+      <strong>AWSリソース</strong><br>
+      (EC2 / ELB)<br>
+      <small>平和 ✨</small>
+    </div>
+  </div>
+  <p style="font-size:0.8rem; color:#666; margin-top:1rem;">正当な通信だけを通し、攻撃トラフィックを遮断します。</p>
+</div>
+
+<h2>2. 2つのランク（Standard と Advanced）</h2>
+<p>試験対策として最も重要なのが、この2つの違いを覚えることです。</p>
+
+<div class="diagram-container">
+  <div class="plan-compare">
+    <!-- Standard -->
+    <div class="plan-card card-std">
+      <span class="card-title">Shield Standard</span>
+      <span class="card-price">無料 (自動適用)</span>
+      <div class="card-feature">
+        <ul>
+          <li><strong>全AWSユーザー</strong>に最初から付いている。</li>
+          <li>一般的なDDoS攻撃（レイヤー3/4）を自動で防ぐ。</li>
+          <li>何も設定しなくても守られている。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Advanced -->
+    <div class="plan-card card-adv">
+      <span class="card-title">Shield Advanced</span>
+      <span class="card-price">有料 (月額 $3,000〜)</span>
+      <div class="card-feature">
+        <ul>
+          <li>より大規模で巧妙な攻撃に対応。</li>
+          <li><strong>24時間体制の専門チーム（SRT）</strong>に相談できる。</li>
+          <li>攻撃によるコスト増を補填してくれる。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. Advancedだけの「すごいメリット」</h2>
+<p>Advancedは高額ですが、企業にとっては保険としての価値があります。</p>
+<ul class="check-list">
+<li><strong>DDoSコスト保護：</strong> 攻撃のせいで一時的にサーバーが勝手に増えて（オートスケーリングして）料金が高くなっても、その分をAWSが補填（返金）してくれます。</li>
+<li><strong>専門家によるサポート：</strong> 「SRT（Shield Response Team）」という、攻撃対策のプロに直接助けを求められます。</li>
+<li><strong>WAFが実質無料：</strong> Advancedを契約すると、セットでAWS WAFの利用料金もカバーされます。</li>
+</ul>
+
+<h2>4. 実務イメージ：企業のAWS利用シーン</h2>
+<p>あるオンラインゲーム会社が新作をリリースしたとします。</p>
+<ul>
+<li><strong>課題：</strong> 人気すぎて、ライバル企業や悪意のあるグループから大規模なDDoS攻撃を受け、ユーザーがゲームにログインできない状態に。</li>
+<li><strong>対策：</strong> <strong>AWS Shield Advanced</strong>を有効にします。</li>
+<li><strong>結果：</strong> AWS側で攻撃トラフィックだけを自動的に遮断。さらに、攻撃が激しい時はSRTのエンジニアが一緒に防御設定を考えてくれるため、ゲーム運営を止めることなくリリースを乗り切ることができました。</li>
+</ul>
+
+<h2>5. 試験で問われやすいポイント！</h2>
+<p>セキュリティサービスの違いを整理しておきましょう。</p>
+
+<div class="diagram-container">
+  <div class="trio-grid">
+    <div class="trio-box" style="border-color:#d86613;">
+      <span class="trio-icon">🛡️</span>
+      <span class="trio-name">AWS Shield</span>
+      <span class="trio-desc">DDoS対策<br>(外からの暴力)</span>
+    </div>
+    <div class="trio-box" style="border-color:#2a5caa;">
+      <span class="trio-icon">👮‍♂️</span>
+      <span class="trio-name">AWS WAF</span>
+      <span class="trio-desc">アプリ防御<br>(中身の検査)</span>
+    </div>
+    <div class="trio-box" style="border-color:#666;">
+      <span class="trio-icon">🔍</span>
+      <span class="trio-name">Amazon Inspector</span>
+      <span class="trio-desc">脆弱性診断<br>(健康診断)</span>
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>「DDoS攻撃」</strong>という単語が出たら、迷わず <strong>Shield</strong>。</li>
+<li><strong>「全てのAWSユーザーに追加料金なしで適用されるのは？」</strong>と聞かれたら、<strong>Shield Standard</strong>。</li>
+<li><strong>「第3層（ネットワーク層）と第4層（トランスポート層）を保護する」</strong>のが基本の役割です。（WAFは第7層でしたね！）</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
