@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-ai-ml-services-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:51:43+09:00",
+    "title": "AWSのAI/MLサービス全体像の解説",
+    "summary": "AWS認定試験におけるAIとMLの重要性を整理し、各サービスの利用シーンを具体的に理解できるようになります。",
+    "tags": [
+      "AWS",
+      "AI",
+      "ML",
+      "生成AI",
+      "機械学習"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-ai-ml-services-overview/"
+  },
+  {
     "id": "awscp-aws-services-role-group",
     "category": "awscp",
     "timestamp": "2026-02-02T17:48:24+09:00",
