@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Certificate Managerの概要</title>
+  <meta name="description" content="ACMはSSL/TLS証明書を無料で発行・管理し、WebサイトのHTTPS化を助けるサービスです。自動更新機能や、CloudFront利用時のリージョン制限など、試験頻出ポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Certificate Managerの概要" />
+  <meta property="og:description" content="ACMはSSL/TLS証明書を無料で発行・管理し、WebサイトのHTTPS化を助けるサービスです。自動更新機能や、CloudFront利用時のリージョン制限など、試験頻出ポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* SSLオフロード図 */
+    .ssl-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .box-user {
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .box-elb {
+      border: 2px solid #d86613; /* ELB Orange */
+      background: #fff;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      font-weight: bold;
+      color: #d86613;
+    }
+    .acm-badge {
+      position: absolute;
+      top: -15px;
+      right: -10px;
+      background: #24882c; /* ACM Green */
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .box-ec2 {
+      border: 2px solid #333;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .arrow-secure {
+      font-size: 1.5rem;
+      color: #24882c;
+      font-weight: bold;
+      position: relative;
+      text-align: center;
+      margin: 0 1rem;
+    }
+    .arrow-secure::after {
+      content: "🔒 HTTPS";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #24882c;
+      white-space: nowrap;
+    }
+
+    .arrow-plain {
+      font-size: 1.5rem;
+      color: #666;
+      font-weight: bold;
+      position: relative;
+      text-align: center;
+      margin: 0 1rem;
+    }
+    .arrow-plain::after {
+      content: "🔓 HTTP";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    /* メリット比較 */
+    .benefit-grid {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .benefit-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+    }
+    .benefit-card.acm { border-top: 4px solid #24882c; }
+    
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-list {
+      text-align: left;
+      font-size: 0.9rem;
+      color: #555;
+      padding-left: 1.2rem;
+    }
+    .card-list li { margin-bottom: 0.3rem; }
+
+    /* 注意喚起ボックス */
+    .warning-box {
+      border: 2px solid #d9534f;
+      background: #fff5f5;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 100%;
+      position: relative;
+    }
+    .warning-title {
+      font-weight: bold;
+      color: #d9534f;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #d9534f;
+      padding-bottom: 0.3rem;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #24882c;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Certificate Managerの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">ACM</li>
+            <li class="tag">SSL</li>
+            <li class="tag">AWS</li>
+            <li class="tag">証明書</li>
+            <li class="tag">自動更新</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>AWS Certificate Manager (ACM)</strong> は、Webサイトを<strong>HTTPS化（通信の暗号化）するために必要な「SSL/TLSサーバー証明書」</strong>を、発行・管理・更新してくれるサービスです。一言で言うと、<strong>「Webサイトの『身分証明書（鍵マーク）』を無料で発行し、期限切れにならないように勝手に更新してくれる、ありがたい事務員さん」</strong>です。</p>
+
+<h2>1. そもそも「SSL/TLSサーバー証明書」とは？</h2>
+<p>WebサイトのURLが <code>http://</code> ではなく <code>https://</code> になっていると、ブラウザに<strong>「鍵マーク🔒」</strong>が出ますよね？ これを実現するための電子ファイルです。</p>
+<ul>
+<li><strong>役割：</strong> 通信を暗号化し、盗聴を防ぐ。サイトが偽物でないことを証明する。</li>
+<li><strong>昔の悩み：</strong>
+<ul>
+<li>買うと高い（年間数万円）。</li>
+<li>設定が難しい。</li>
+<li>「有効期限（通常1年）」が切れると、サイトに「危険なサイトです」という警告画面が出て信用ガタ落ちになる（更新忘れが頻発）。</li>
+</ul>
+</li>
+</ul>
+<p>ACMは、この「昔の悩み」をすべて解決しました。</p>
+
+<h2>2. ACMの「3つの最強メリット」</h2>
+<p>ACMを使うことで得られるメリットは圧倒的です。試験でもここが問われます。</p>
+
+<div class="diagram-container">
+  <div class="benefit-grid">
+    <div class="benefit-card">
+      <span class="card-icon">💸</span>
+      <span class="card-title">従来の証明書</span>
+      <ul class="card-list">
+        <li>❌ <strong>有料</strong> (年額数万円)</li>
+        <li>❌ <strong>手動更新</strong> (忘れると事故)</li>
+        <li>❌ <strong>インストールが面倒</strong></li>
+      </ul>
+    </div>
+    <div class="benefit-card acm">
+      <span class="card-icon">👑</span>
+      <span class="card-title">AWS Certificate Manager</span>
+      <ul class="card-list">
+        <li>⭕ <strong>無料</strong> (Public Certificate)</li>
+        <li>⭕ <strong>自動更新</strong> (勝手にやってくれる)</li>
+        <li>⭕ <strong>ポチるだけ</strong> (簡単設定)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3>① 無料 (Public Certificate)</h3>
+<p>AWS上で使う場合、証明書の発行料は<strong>無料</strong>です。外部の認証局で買うとコストがかかるものが、タダになります。</p>
+
+<h3>② 自動更新 (Auto Renewal) ★試験頻出</h3>
+<p>これが最大のメリットです。ACMで発行し、ELBやCloudFrontにセットした証明書は、有効期限が切れる前に<strong>AWSが勝手に更新</strong>してくれます。管理者が「あ！更新忘れてた！」と青ざめることがなくなります。</p>
+
+<h2>3. 使い方とアーキテクチャ（SSLオフロード）</h2>
+<p>ACMの証明書は、EC2に直接インストールすることは（基本的には）できません。必ず、<strong>ELB (ロードバランサー) や CloudFront</strong> といった「前段のサービス」に取り付けます。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">SSLオフロードの仕組み</p>
+  <div class="ssl-flow">
+    <div class="flow-row">
+      <div class="box-user">
+        👤 ユーザー<br>
+        (ブラウザ)
+      </div>
+      <div class="arrow-secure">➡</div>
+      <div class="box-elb">
+        ELB / CloudFront
+        <span class="acm-badge">📄 ACM証明書</span>
+        <div style="font-size:0.75rem; color:#666; margin-top:0.5rem; font-weight:normal;">ここで暗号を解く<br>(重い処理を担当)</div>
+      </div>
+      <div class="arrow-plain">➡</div>
+      <div class="box-ec2">
+        EC2
+        <div style="font-size:0.75rem; color:#666; margin-top:0.2rem;">Web処理に専念</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">EC2は暗号化解除の重荷から解放され、軽くなります（SSLオフロード）。</p>
+</div>
+
+<h2>4. 試験に出る「CloudFrontの罠」</h2>
+<p>これは非常によく出るひっかけ問題です。証明書を発行する「リージョン（場所）」に注意してください。</p>
+
+<div class="diagram-container">
+  <div class="warning-box">
+    <span class="warning-title">⚠️ CloudFrontで使う場合の絶対ルール</span>
+    <p>CloudFrontはグローバルサービスのため、ACM証明書は必ず<br>
+    <strong>「米国東部（バージニア北部）リージョン (us-east-1)」</strong><br>
+    で発行しなければなりません。</p>
+    <p style="font-size:0.9rem; margin-top:0.5rem; color:#666;">
+      ※ たとえ東京のS3を使っていても、CloudFrontに付ける証明書はバージニア発行必須です。<br>
+      ※ ELBの場合は、ELBがあるリージョン（東京なら東京）でOKです。
+    </p>
+  </div>
+</div>
+
+<h2>5. 証明書の種類（パブリック vs プライベート）</h2>
+<p>試験のメインは「パブリック」ですが、違いを知っておきましょう。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>種類</th>
+      <th>ACM (Public)</th>
+      <th>AWS Private CA</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>用途</strong></td>
+      <td>一般公開するWebサイト<br><small>(Google検索に出るようなサイト)</small></td>
+      <td>社内システム専用<br><small>(VPN内だけで使うサイト)</small></td>
+    </tr>
+    <tr>
+      <td><strong>信頼性</strong></td>
+      <td>一般的なブラウザなら誰でも信頼する</td>
+      <td>社内のPCに設定しないと「危険」と出る</td>
+    </tr>
+    <tr>
+      <td><strong>コスト</strong></td>
+      <td class="highlight-cell">無料</td>
+      <td>有料 (高い。月額400ドル〜)</td>
+    </tr>
+    <tr>
+      <td><strong>外部持ち出し</strong></td>
+      <td>不可<br><small>(秘密鍵をダウンロードできない)</small></td>
+      <td>可能<br><small>(オンプレサーバー等でも使える)</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>役割：</strong> HTTPS化のための「証明書」を発行・管理する。</li>
+<li><strong>メリット：</strong> 無料、自動更新（更新忘れ防止）。</li>
+<li><strong>使い方：</strong> EC2ではなく、ELB や CloudFront に取り付ける（SSLオフロード）。</li>
+<li><strong>注意点：</strong> CloudFrontで使うなら<strong>「バージニア北部リージョン」</strong>で発行する。</li>
+</ul>
+<p>これで、Webサイトを安全に公開するためのセキュリティと暗号化の重要パーツであるACMもクリアしました。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
