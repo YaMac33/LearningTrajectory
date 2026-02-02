@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-audit-manager-compliance",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:41:53+09:00",
+    "title": "AWS Audit Managerの役割と特徴",
+    "summary": "AWS Audit Managerは、監査のための証拠を自動で収集し、コンプライアンスを支援するツールです。特にAWS Artifactとの違いや自動化の仕組みについて理解できます。",
+    "tags": [
+      "AWS",
+      "Audit Manager",
+      "コンプライアンス",
+      "自動化",
+      "エビデンス"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-audit-manager-compliance/"
+  },
+  {
     "id": "awscp-aws-sagemaker-overview",
     "category": "awscp",
     "timestamp": "2026-02-02T12:36:39+09:00",
