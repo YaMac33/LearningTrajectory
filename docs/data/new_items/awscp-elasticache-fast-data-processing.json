@@ -1,0 +1,22 @@
+{
+  "id": "awscp-elasticache-fast-data-processing",
+  "category": "awscp",
+  "timestamp": "2026-02-03T04:50:57+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-elasticache-fast-data-processing/",
+  "meta": {
+    "title": "ElastiCacheで高速データ処理を学ぼう",
+    "summary": "Amazon ElastiCacheを利用することで、データベースの負荷軽減や読み込み速度の高速化が理解できる。試験においてはRedisとMemcachedの違いを特に重視する。",
+    "tags": [
+      "ElastiCache",
+      "Redis",
+      "Memcached",
+      "データベース",
+      "AWS",
+      "キャッシュ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
