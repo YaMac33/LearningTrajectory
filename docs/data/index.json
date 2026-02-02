@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-etl-no-etl-data-analysis",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:17:37+09:00",
+    "title": "ETLとNo ETLのデータ分析について",
+    "summary": "ETLとNo ETLの違いを理解し、AWSサービスとの関連性を学ぶことで、データ分析の効率性を向上させる力が身につきます。",
+    "tags": [
+      "AWS",
+      "ETL",
+      "Amazon Athena",
+      "AWS Glue",
+      "データ分析"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-etl-no-etl-data-analysis/"
+  },
+  {
     "id": "awscp-byod-byol-difference",
     "category": "awscp",
     "timestamp": "2026-02-02T17:09:14+09:00",
