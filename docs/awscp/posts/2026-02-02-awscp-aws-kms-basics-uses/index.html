@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS KMSの基本と活用法</title>
+  <meta name="description" content="データを守るAWS KMSの概要、鍵管理の仕組み、実務での活用法を解説します。エンベロープ暗号化や3つの鍵タイプの違いなど、試験頻出ポイントを網羅。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS KMSの基本と活用法" />
+  <meta property="og:description" content="データを守るAWS KMSの概要、鍵管理の仕組み、実務での活用法を解説します。エンベロープ暗号化や3つの鍵タイプの違いなど、試験頻出ポイントを網羅。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* KMSの概念図 */
+    .kms-vault-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .service-side {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .service-box {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      width: 100px;
+    }
+    
+    .kms-vault {
+      background: #333;
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 4px solid #d9534f; /* Red for Security */
+      text-align: center;
+      position: relative;
+      width: 180px;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+    }
+    .kms-vault::before {
+      content: "AWS KMS";
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px dashed #666;
+      padding-bottom: 0.2rem;
+    }
+    .key-icon {
+      font-size: 2rem;
+    }
+    .kms-badge {
+      background: #d9534f;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      position: absolute;
+      top: -10px;
+      right: 10px;
+    }
+
+    .arrow-exchange {
+      font-size: 1.5rem;
+      color: #999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1;
+    }
+    .arrow-text {
+      font-size: 0.7rem;
+      color: #666;
+    }
+
+    /* エンベロープ暗号化図 */
+    .envelope-flow {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .step-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 140px;
+      text-align: center;
+    }
+    .data-file {
+      background: #e6f7ff;
+      border: 2px solid #2a5caa;
+      padding: 1rem;
+      border-radius: 4px;
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+    .lock-icon {
+      font-size: 1.5rem;
+      position: absolute;
+      bottom: -10px;
+      right: -5px;
+      background: #fff;
+      border-radius: 50%;
+    }
+    
+    .data-key {
+      color: #d86613; /* Orange */
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .kms-key {
+      color: #d9534f; /* Red */
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    
+    .encrypted-key-box {
+      border: 2px dashed #d9534f;
+      padding: 0.5rem;
+      border-radius: 6px;
+      background: #fff0f0;
+      margin-top: 0.5rem;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #d9534f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS KMSの基本と活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">KMS</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">暗号化</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>セキュリティ分野の最重要サービスの一つである <strong>AWS KMS (Key Management Service)</strong> について解説します。KMSは、データを暗号化するための「鍵（かぎ）」を安全に作り、管理し、保管するためのサービスです。IAMが「人の管理」なら、KMSは「データの金庫の管理」です。</p>
+
+<h2>1. AWS KMSとは？</h2>
+<p>一言でいうと、<strong>「AWS上のあらゆるデータを守るための、デジタルな鍵専用の金庫」</strong>です。</p>
+<p>ホテルにはたくさんの客室（S3やDBなどのデータ）があり、各部屋には鍵が必要です。しかし、従業員がバラバラに鍵を持ち歩くと、紛失や盗難のリスクがあります。そこで、ホテルの中心に<strong>「絶対に持ち出し禁止の頑丈な金庫（KMS）」</strong>を置き、そこで全ての鍵を一元管理します。</p>
+
+<div class="diagram-container">
+  <div class="kms-vault-wrapper">
+    <div class="service-side">
+      <div class="service-box">S3</div>
+      <div class="service-box">EBS</div>
+      <div class="service-box">RDS</div>
+    </div>
+    
+    <div class="arrow-exchange">
+      <span class="arrow-text">利用許可</span>
+      <span>⇄</span>
+      <span class="arrow-text">暗号化</span>
+    </div>
+
+    <div class="kms-vault">
+      <span class="kms-badge">出庫禁止</span>
+      <div class="key-icon">🔑 🔑 🔑</div>
+      <div style="font-size:0.8rem; margin-top:0.5rem; color:#ccc;">
+        マスターキーは<br>ここから出ない
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul class="check-list">
+<li><strong>鍵は外に出ない：</strong> KMSで作ったマスターキーは、<strong>KMSというサービスの中から一歩も外に出ません。</strong></li>
+<li><strong>使い方のイメージ：</strong> 「鍵を貸して」ではなく、「このデータを金庫の中に放り込むから、中で鍵をかけて返して」というイメージで利用します。</li>
+</ul>
+
+<h2>2. エンベロープ暗号化（ちょっと高度な仕組み）</h2>
+<p>KMSを語る上で欠かせないのが<strong>「エンベロープ（封筒）暗号化」</strong>です。巨大なデータを毎回KMSに送ると遅くなるため、2段階で暗号化します。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">2段階ロックの仕組み</p>
+  <div class="envelope-flow">
+    <div class="step-box">
+      <div class="data-file">
+        重要データ<br>
+        <div class="lock-icon">🔒</div>
+      </div>
+      <div style="font-size:0.8rem; margin-top:0.5rem;">
+        <span class="data-key">🗝️ データキー</span><br>
+        でロックする
+      </div>
+    </div>
+
+    <div style="font-size:2rem; color:#999; margin-top:2rem;">+</div>
+
+    <div class="step-box">
+      <div class="encrypted-key-box">
+        <span class="data-key">🗝️</span> 封印
+      </div>
+      <div style="font-size:0.8rem; margin-top:0.5rem;">
+        データキー自体を<br>
+        <span class="kms-key">🔑 KMSキー</span><br>
+        でさらにロック
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">データそのものは「使い捨ての鍵」で守り、その鍵を「KMSの親鍵」で守る仕組みです。</p>
+</div>
+
+<h2>3. KMSの「3つの鍵」タイプ</h2>
+<p>試験では、「誰がその鍵を作って管理しているか」の違いが問われます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>鍵のタイプ</th>
+      <th>管理者</th>
+      <th>特徴・コスト</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWS所有のキー</strong><br><small>(AWS Owned)</small></td>
+      <td>AWS</td>
+      <td>勝手に使われている鍵。ユーザーは見ることも操作もできない。<strong>無料。</strong></td>
+    </tr>
+    <tr>
+      <td><strong>AWS管理のキー</strong><br><small>(AWS Managed)</small></td>
+      <td>AWS</td>
+      <td>サービスごとに自動作成される（例: <code>aws/s3</code>）。ユーザーは見れるが削除はできない。<strong>無料。</strong></td>
+    </tr>
+    <tr>
+      <td class="highlight-cell"><strong>カスタマー管理のキー</strong><br><small>(Customer Managed)</small></td>
+      <td><strong>あなた</strong></td>
+      <td>自分で作成し、有効期限や権限を自由に設定できる。最も細かく制御可能。<strong>有料。</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<ul class="check-list">
+<li><strong>CloudTrailとの連携：</strong> 「いつ、誰が、どの鍵で、どのデータを復号したか」が<strong>全てCloudTrailに記録</strong>されます。監査（チェック）において非常に重要です。</li>
+<li><strong>FIPS 140-2 レベル3：</strong> KMSの裏側では、<strong>HSM（ハードウェアセキュリティモジュール）</strong>という非常に物理的に頑丈な機械が鍵を守っています。この高い安全基準をクリアしていることが信頼の証です。</li>
+<li><strong>共有責任モデル：</strong> 「鍵自体の安全性や紛失防止（物理管理）」は<strong>AWSの責任</strong>ですが、「誰にその鍵を使わせるか（権限設定）」は<strong>利用者の責任</strong>です。</li>
+</ul>
+
+<h2>5. 実務イメージ：情報漏洩対策</h2>
+<p>ある金融アプリが、顧客のマイナンバーをデータベース（RDS）に保存する場合のフローです。</p>
+<ol>
+<li>そのまま保存すると、万が一DBが盗まれたら中身が丸見えです。</li>
+<li><strong>KMSで作成した鍵</strong>を使って、データを暗号化してからDBに保存します。</li>
+<li>もしハッカーがDBの中身だけを盗んでも、<strong>復号するための鍵はKMSの中にある（持ち出せない）</strong>ため、解読することができません。</li>
+<li>管理者は「誰が鍵を使ったか」を <strong>CloudTrail</strong> でいつでも監視できます。</li>
+</ol>
+
+<h2>6. まとめ</h2>
+<p>KMSは<strong>「鍵を絶対に外に出さず、安全に管理する司令塔」</strong>と覚えましょう。これで、AWSの主要なセキュリティサービス（IAM, WAF, Shield, Inspector, GuardDuty, KMS）が出揃いました。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
