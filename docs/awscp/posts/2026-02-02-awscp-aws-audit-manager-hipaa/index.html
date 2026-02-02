@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Audit ManagerとHIPAAの関係</title>
+  <meta name="description" content="AWS Audit ManagerはHIPAA遵守の証拠収集を自動化するサービスです。コンプライアンス監査の負担を軽減する仕組みと、AWS Artifactとの違いについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Audit ManagerとHIPAAの関係" />
+  <meta property="og:description" content="AWS Audit ManagerはHIPAA遵守の証拠収集を自動化するサービスです。コンプライアンス監査の負担を軽減する仕組みと、AWS Artifactとの違いについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 監査プロセスの比較図 */
+    .audit-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .process-box {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .box-manual { border-top: 4px solid #666; }
+    .box-auto { border-top: 4px solid #2a5caa; } /* Audit Manager Blue */
+
+    .process-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .process-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .process-desc {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* 自動化フロー図 */
+    .automation-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.8rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 110px;
+      font-size: 0.9rem;
+      position: relative;
+    }
+    .step-framework { border-color: #d86613; color: #d86613; font-weight: bold; }
+    .step-am { border-color: #2a5caa; color: #2a5caa; font-weight: bold; background-color: #e6f7ff; }
+    .step-report { border-color: #24882c; color: #24882c; font-weight: bold; }
+
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+    .scan-icon {
+      position: absolute;
+      top: -15px;
+      right: -10px;
+      font-size: 1.2rem;
+      background: #fff;
+      border-radius: 50%;
+      padding: 2px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* 責任共有モデル図（簡易版） */
+    .resp-model {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .resp-user {
+      background: #e6f7ff;
+      padding: 1rem;
+      text-align: center;
+      color: #0050b3;
+      font-weight: bold;
+      border-bottom: 2px dashed #999;
+    }
+    .resp-aws {
+      background: #fff7e6;
+      padding: 1rem;
+      text-align: center;
+      color: #d46b08;
+      font-weight: bold;
+    }
+    .resp-desc {
+      font-size: 0.8rem;
+      font-weight: normal;
+      color: #555;
+      display: block;
+      margin-top: 0.3rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Audit ManagerとHIPAAの関係</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Audit Manager</li>
+            <li class="tag">HIPAA</li>
+            <li class="tag">コンプライアンス</li>
+            <li class="tag">自動化</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>AWS Audit Manager（オーディットマネージャー）</strong>は、あなたのAWS環境が特定の基準（今回の場合は **HIPAA**）を満たしているかどうかの「証拠集め」を自動化してくれるサービスです。コンプライアンス（法令遵守）やガバナンスの分野で非常に重要な組み合わせについて解説します。</p>
+
+<h2>1. HIPAA（ヒパ）とは？</h2>
+<p>正式名称を <strong>Health Insurance Portability and Accountability Act</strong>（医療保険の相互運用性と責任に関する法律）といいます。一言でいうと、<strong>「アメリカの医療情報（患者の個人データなど）を保護するための、非常に厳しい法律」</strong>です。</p>
+<ul class="check-list">
+<li><strong>対象：</strong> 医療機関、保険会社、およびそれらのデータを扱うIT業者（AWS上のアプリなど）。</li>
+<li><strong>重要性：</strong> 日本の企業であっても、アメリカの患者データを扱うアプリやサービスをAWS上で展開する場合、この法律を守る義務があります。</li>
+<li><strong>内容：</strong> データの暗号化、アクセス制限、操作ログの記録などが厳格に定められています。</li>
+</ul>
+
+<h2>2. AWS Audit Manager との関係</h2>
+<p>HIPAAを守っていることを証明するには、監査人に対して「いつ誰がデータを見たか」「データは常に暗号化されているか」といった大量の証拠資料を提出しなければなりません。これを手動でやるのは大変な作業です。</p>
+
+<div class="diagram-container">
+  <div class="audit-compare">
+    <div class="process-box box-manual">
+      <span class="process-icon">📚</span>
+      <span class="process-title">手動での監査対応</span>
+      <p class="process-desc">
+        ログを手作業で検索。<br>
+        スクリーンショットを撮る。<br>
+        Excelにまとめる。<br>
+        <strong>→ 時間がかかる＆漏れが出る</strong>
+      </p>
+    </div>
+
+    <div class="process-box box-auto">
+      <span class="process-icon">🤖</span>
+      <span class="process-title">Audit Manager</span>
+      <p class="process-desc">
+        AWSの設定を自動スキャン。<br>
+        証拠データを自動収集。<br>
+        レポートを自動生成。<br>
+        <strong>→ 常に準備完了</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<h3>仕組み：自動的な証拠収集フロー</h3>
+<p>Audit Managerを使えば、以下のような流れで監査準備が完了します。</p>
+
+<div class="diagram-container">
+  <div class="automation-flow">
+    <div class="flow-step step-framework">
+      基準選択<br>
+      <small>(HIPAAなど)</small>
+    </div>
+    
+    <div class="arrow-right">➡</div>
+    
+    <div class="flow-step step-am">
+      Audit Manager
+      <div class="scan-icon">🔍</div>
+      <small>証拠収集</small>
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="flow-step step-report">
+      レポート出力<br>
+      <small>(PDF提出)</small>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">ConfigやCloudTrailのログを自動的に集め、「証拠」としてパッケージ化します。</p>
+</div>
+
+<h2>3. HIPAA対応における「共同責任モデル」</h2>
+<p>ここが試験で最も重要なポイントです。「AWSを使っていれば自動的にHIPAA対応になる」わけではありません。</p>
+
+<div class="diagram-container">
+  <div class="resp-model">
+    <div class="resp-user">
+      利用者の責任<br>
+      <span class="resp-desc">データの暗号化、アクセス権限、ログ監視<br><strong>(Audit Managerで証明するのはここ)</strong></span>
+    </div>
+    <div class="resp-aws">
+      AWSの責任<br>
+      <span class="resp-desc">データセンターの物理セキュリティ、ハードウェア廃棄<br><strong>(AWS Artifactで証明するのはここ)</strong></span>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>BAA（事業提携契約）：</strong> AWS上でHIPAA対象データを扱う場合、AWSと「BAA」という契約を締結する必要があります（ArtifactのAgreementsで可能です）。</li>
+</ul>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<p>似ているサービスである「AWS Artifact」との違いを明確にしましょう。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>誰の安全性を証明する？</th>
+      <th>役割</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWS Artifact</strong></td>
+      <td><strong>AWS自体</strong></td>
+      <td>AWSが取得した合格証（ISOやSOCレポート）を<strong>ダウンロード</strong>する場所。</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell"><strong>AWS Audit Manager</strong></td>
+      <td><strong>あなた（利用者）</strong></td>
+      <td>あなたの設定が基準を満たしているかの<strong>証拠を集める</strong>ツール。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. 実務イメージ：オンライン診療アプリの構築</h2>
+<p>アメリカ市場向けのオンライン診療アプリを開発する場合のステップです。</p>
+<ol>
+<li><strong>AWS Artifact</strong> で、AWS自体がHIPAAに適合している報告書をダウンロードして確認。</li>
+<li>AWS Artifact Agreements で、AWSと **BAA契約** を結ぶ。</li>
+<li>アプリを構築し、**AWS Audit Manager** で「HIPAAフレームワーク」を有効にする。</li>
+<li>定期的に自動生成されるレポートをチェックし、設定に不備（暗号化忘れなど）がないか確認する。</li>
+</ol>
+
+<h2>6. まとめ</h2>
+<p><strong>「HIPAA（医療の厳しい法律）を守っている証拠を、自動でかき集めてくれるマネージャー」</strong>が AWS Audit Manager です。Artifactとセットで覚えておきましょう。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
