@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | RedisとMemcachedの違い</title>
+  <meta name="description" content="インメモリデータストアの概念と、Redis（シングルスレッド）とMemcached（マルチスレッド）の違いを、机やレジの例えで分かりやすく解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="RedisとMemcachedの違い" />
+  <meta property="og:description" content="インメモリデータストアの概念と、Redis（シングルスレッド）とMemcached（マルチスレッド）の違いを、机やレジの例えで分かりやすく解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 机と本棚の比較図 */
+    .storage-comp {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .storage-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .sb-disk { border-color: #94a3b8; color: #475569; }
+    .sb-mem { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    
+    .sb-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .sb-label { font-weight: bold; font-size: 1.1em; margin-bottom: 6px; }
+    .sb-desc { font-size: 0.85em; line-height: 1.4; }
+    .sb-tag { 
+      display: inline-block; 
+      padding: 2px 8px; 
+      border-radius: 12px; 
+      font-size: 0.75em; 
+      font-weight: bold; 
+      margin-top: 8px;
+    }
+    .sb-disk .sb-tag { background: #e2e8f0; color: #475569; }
+    .sb-mem .sb-tag { background: #fbbf24; color: #92400e; }
+
+    /* 2. レジ打ち（スレッド）比較図 */
+    .thread-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+    .thread-row {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .tr-redis { border-left: 5px solid #ef4444; } /* Red */
+    .tr-mem { border-left: 5px solid #3b82f6; } /* Blue */
+    
+    .tr-info {
+      width: 120px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .tr-name { font-weight: bold; display: block; margin-bottom: 4px; }
+    .tr-type { font-size: 0.8em; color: #6b7280; }
+    
+    .tr-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: #f3f4f6;
+      border-radius: 6px;
+      padding: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* レジ店員 */
+    .cashier {
+      font-size: 1.5em;
+      margin-right: 12px;
+      position: relative;
+      z-index: 2;
+    }
+    /* ワンオペ効果線 */
+    .speed-effect::after {
+      content: "⚡";
+      position: absolute;
+      top: -10px;
+      right: -5px;
+      font-size: 0.8em;
+    }
+    
+    /* 客の列 */
+    .customer-queue {
+      display: flex;
+      gap: 4px;
+    }
+    .customer {
+      width: 20px;
+      height: 20px;
+      background: #cbd5e1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7em;
+      color: #fff;
+    }
+    .c-processing { background: #10b981; } /* 処理中 */
+    
+    /* Memcachedの複数レーン */
+    .multi-lane {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .lane {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px dashed #d1d5db;
+      padding-bottom: 4px;
+    }
+    .lane:last-child { border-bottom: none; padding-bottom: 0; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .storage-comp { flex-direction: column; }
+      .thread-row { flex-direction: column; align-items: flex-start; }
+      .tr-info { text-align: left; width: 100%; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;}
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">RedisとMemcachedの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Redis</span>
+            <span class="tag">#Memcached</span>
+            <span class="tag">#キャッシュ</span>
+            <span class="tag">#インメモリ</span>
+            <span class="tag">#ITインフラ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Q. Memcached、Redisについて、「インメモリ型のデータストア、キャッシュ」とはどういう意味ですか？また、それぞれの「マルチスレッド」「シングルスレッド」について解説してください。
+</p>
+<p>
+  A. 「インメモリ」や「スレッド」という言葉は、ITインフラの根幹に関わる概念なので、ここを理解するとAWSの理解度が一気に深まります。それぞれ、<strong>「机と本棚」や「レジ打ちの店員さん」</strong>に例えて解説します。
+</p>
+
+<h2>1. 「インメモリ型のデータストア」とは？</h2>
+<p>
+  データ保存場所として、HDDやSSD（ディスク）ではなく、<strong>「メモリ（RAM）」</strong>を使うということです。これを<strong>「勉強机」</strong>でイメージしてください。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">保存場所の比較：机 vs 本棚</div>
+  <div class="storage-comp">
+    <!-- ディスク -->
+    <div class="storage-box sb-disk">
+      <div class="sb-icon">📚</div>
+      <div class="sb-label">通常のDB (ディスク)</div>
+      <div class="sb-desc">
+        本棚まで歩いて行って、<br>
+        探して、取ってくる。<br>
+        (時間がかかる)
+      </div>
+      <div class="sb-tag">永続的だが遅い</div>
+    </div>
+
+    <!-- メモリ -->
+    <div class="storage-box sb-mem">
+      <div class="sb-icon">📝</div>
+      <div class="sb-label">インメモリ (キャッシュ)</div>
+      <div class="sb-desc">
+        目の前の机に広げてある。<br>
+        0秒で目に入る。<br>
+        (爆速)
+      </div>
+      <div class="sb-tag">爆速だが消える</div>
+    </div>
+  </div>
+</div>
+
+<p>
+  <strong>要点:</strong><br>
+  机の上（メモリ）は狭いので、大量の資料は置けません。また、掃除の時間（電源OFF）になると、机の上のものは全部片付けられて（消えて）しまいます。<br>
+  つまり、<strong>「消えてもいいから、とにかく今すぐ参照したい『カンニングペーパー』を机の上に広げておくこと」</strong>を、インメモリ・キャッシュと呼びます。
+</p>
+
+<h2>2. 「シングルスレッド」と「マルチスレッド」の違い</h2>
+<p>
+  これは、RedisとMemcachedの<strong>「仕事のさばき方」</strong>の違いです。<strong>「コンビニのレジ」</strong>に例えると一発で分かります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">レジ打ち（処理）スタイルの違い</div>
+  <div class="thread-container">
+    
+    <!-- Redis -->
+    <div class="thread-row tr-redis">
+      <div class="tr-info">
+        <span class="tr-name">Redis</span>
+        <span class="tr-type">シングルスレッド</span>
+      </div>
+      <div class="tr-visual">
+        <div class="cashier speed-effect">🧑‍🍳</div>
+        <div class="customer-queue">
+          <div class="customer c-processing">1</div>
+          <div class="customer">2</div>
+          <div class="customer">3</div>
+          <div class="customer">4</div>
+          <div class="customer">5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Memcached -->
+    <div class="thread-row tr-mem">
+      <div class="tr-info">
+        <span class="tr-name">Memcached</span>
+        <span class="tr-type">マルチスレッド</span>
+      </div>
+      <div class="tr-visual">
+        <div class="multi-lane">
+          <div class="lane">
+            <div class="cashier">🧑</div>
+            <div class="customer-queue">
+              <div class="customer c-processing">1</div>
+              <div class="customer">3</div>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="cashier">🧑</div>
+            <div class="customer-queue">
+              <div class="customer c-processing">2</div>
+              <div class="customer">4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>① Redis：シングルスレッド (Single-threaded)</h3>
+<p><strong>イメージ： 「超高速で動く、レジ1台のワンオペ店員」</strong></p>
+<ul>
+  <li><strong>仕組み:</strong> CPUのコア（脳みそ）を1つだけ使います。お客さん（リクエスト）が100人並んでも、1人ずつ順番に超高速でさばきます。</li>
+  <li><strong>メリット:</strong> 「列の順番」が厳格に守られるため、「ランキング計算」や「在庫の引き落とし」など、順序が重要な処理でもデータが矛盾しません（整合性が高い）。</li>
+  <li><strong>デメリット:</strong> もし先頭のお客さんが「小銭をぶちまけた（重たい処理）」場合、後ろの99人は全員待たされます（ブロッキング）。</li>
+</ul>
+
+<h3>② Memcached：マルチスレッド (Multi-threaded)</h3>
+<p><strong>イメージ： 「普通の速さの、レジ複数台の店員チーム」</strong></p>
+<ul>
+  <li><strong>仕組み:</strong> CPUのコア（脳みそ）を複数同時に使います。お客さんが並んだら、「2番レジへどうぞ〜」と分散させて、並行してさばきます。</li>
+  <li><strong>メリット:</strong> 「データを置く」「データを取る」といった単純なキャッシュなら、CPUの数（レジの数）を増やせば増やすほど、大量のお客さんをさばけます（スケールアップが得意）。</li>
+  <li><strong>デメリット:</strong> 複数のレジで同時に処理するため、「在庫1個の商品を同時にカゴに入れた」みたいな矛盾が起きやすく、複雑な計算には向きません。</li>
+</ul>
+
+<h2>3. 試験対策としてのまとめ</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>Redis (シングルスレッド)</th>
+      <th>Memcached (マルチスレッド)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>店員の数</th>
+      <td>超人ワンオペ (1コア)</td>
+      <td>チーム制 (複数コア)</td>
+    </tr>
+    <tr>
+      <th>強み</th>
+      <td>順番待ちが得意。<br>データ操作が複雑でも矛盾しない。</td>
+      <td>単純な大量処理が得意。<br>CPUを増やせばパワーアップする。</td>
+    </tr>
+    <tr>
+      <th>弱点</th>
+      <td>重い処理が1つあると、全体が止まる。</td>
+      <td>複雑なデータの操作は苦手。</td>
+    </tr>
+    <tr>
+      <th>AWSでの選び方</th>
+      <td><strong>基本はこっち</strong><br><small>(高機能だから)</small></td>
+      <td>「非常に単純なデータを、CPUを増強してゴリ押しでさばきたい時」だけ</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>「Redisは、一人の天才が順番にさばく」「Memcachedは、みんなで手分けして単純作業をさばく」</strong>と覚えておけばOKです！
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
