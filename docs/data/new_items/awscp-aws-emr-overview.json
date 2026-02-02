@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-emr-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-02T19:40:56+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-emr-overview/",
+  "meta": {
+    "title": "AWS EMRの概要と特徴",
+    "summary": "AWS EMRはビッグデータ処理フレームワークであるHadoopやSparkをAWS上で容易に利用できるサービスであり、試験ではビッグデータ、Hadoop/Spark、コスト削減が重要な理解ポイントです。",
+    "tags": [
+      "Big Data",
+      "EMR",
+      "Hadoop",
+      "Spark",
+      "AWS"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
