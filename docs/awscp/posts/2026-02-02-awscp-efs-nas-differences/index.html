@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | EFSとNASの違い</title>
+  <meta name="description" content="EFSと通常NASの機能、運用、耐久性の違いを比較。管理負担の軽減を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EFSとNASの違い" />
+  <meta property="og:description" content="EFSと通常NASの機能、運用、耐久性の違いを比較。管理負担の軽減を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+      min-width: 100px;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 1em;
+    }
+
+    /* 運用モデル比較図 */
+    .vs-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .vs-box {
+      flex: 1;
+      min-width: 260px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 20px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .vs-nas {
+      border-color: #f59e0b; /* Orange */
+      background: #fffbeb;
+    }
+    .vs-efs {
+      border-color: #3b82f6; /* Blue */
+      background: #eff6ff;
+    }
+    .vs-icon {
+      font-size: 2em;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .vs-label {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
+    .vs-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9em;
+      color: #4b5563;
+      width: 100%;
+    }
+    .vs-list li {
+      margin-bottom: 8px;
+      padding-left: 1.2em;
+      position: relative;
+    }
+    .vs-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #9ca3af;
+    }
+    .vs-nas .vs-icon { color: #d97706; }
+    .vs-efs .vs-icon { color: #2563eb; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .vs-container {
+        flex-direction: column;
+      }
+      .article-content th {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EFSとNASの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#EFS</span>
+            <span class="tag">#NAS</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#ストレージ</span>
+            <span class="tag">#比較</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>「Amazon EFS」と、オフィスや自宅にある「通常のNAS（ネットワーク・アタッチド・ストレージ）」は、「ネットワーク経由でみんなで共有できるフォルダ」</strong>という機能面では全く同じです。
+</p>
+<p>
+  しかし、<strong>「運用（面倒くささ）」と「耐久性（壊れにくさ）」</strong>が天と地ほど違います。
+</p>
+<p>
+  一言で言うと、<strong>「通常のNASは『自分で世話をするペット』、EFSは『蛇口をひねれば出る水道』」</strong>のような違いがあります。詳しく比較解説します。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">運用の手間の違い</div>
+  <div class="vs-container">
+    <div class="vs-box vs-nas">
+      <div class="vs-icon">🐶</div>
+      <div class="vs-label">通常のNAS (ペット)</div>
+      <ul class="vs-list">
+        <li>ハード購入・設置が必要</li>
+        <li>故障したら自分で治療 (交換)</li>
+        <li>容量が足りなくなったら引越し</li>
+        <li>定期的な世話 (パッチ適用)</li>
+      </ul>
+    </div>
+    <div class="vs-box vs-efs">
+      <div class="vs-icon">🚰</div>
+      <div class="vs-label">Amazon EFS (水道)</div>
+      <ul class="vs-list">
+        <li>契約不要ですぐ使える</li>
+        <li>裏側で勝手に直る</li>
+        <li>容量は無限に湧いてくる</li>
+        <li>メンテナンス不要</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h2>1. 決定的な違いの比較表</h2>
+<p>まずは機能と運用の違いを一覧で確認しましょう。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>比較項目</th>
+      <th>通常のNAS<br><small>(オンプレミス/自作)</small></th>
+      <th>Amazon EFS<br><small>(クラウド)</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>機器の管理</th>
+      <td>必要<br><small>(購入、設置、配線、電気代)</small></td>
+      <td><strong>不要</strong><br><small>(AWSが全部やる)</small></td>
+    </tr>
+    <tr>
+      <th>容量</th>
+      <td>限界がある<br><small>(足りなくなったらHDD買い替え)</small></td>
+      <td><strong>無制限 & 自動伸縮</strong><br><small>(勝手に増える)</small></td>
+    </tr>
+    <tr>
+      <th>故障対策</th>
+      <td>自分で行う<br><small>(RAID構築、バックアップ)</small></td>
+      <td><strong>超強力</strong><br><small>(3箇所のデータセンターにコピー)</small></td>
+    </tr>
+    <tr>
+      <th>支払い</th>
+      <td>先にHDDを買う<br><small>(使わなくてもお金がかかる)</small></td>
+      <td>使った分だけ<br><small>(1GB単位の従量課金)</small></td>
+    </tr>
+    <tr>
+      <th>OSパッチ</th>
+      <td>自分で適用が必要<br><small>(夜間メンテなど)</small></td>
+      <td><strong>自動</strong><br><small>(勝手に最新になる)</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. EFS が圧倒的に優れている 3つの点</h2>
+
+<h3>① 容量設計がいらない（Elastic = 伸縮自在）</h3>
+<p>
+  通常のNASを買う時、「将来これくらい使うかな？」と予想して、大きめの4TBなどのHDDを買いますよね？
+</p>
+<ul>
+  <li><strong>通常のNAS:</strong> データが一杯になったら、新しいHDDを買ってきて、データを移行するという地獄の作業が待っています。</li>
+  <li><strong>EFS:</strong> 「容量」という概念がありません。ファイルを入れたら入れた分だけ勝手に広がり、ペタバイト（PB）クラスまで無限に大きくなります。ファイルを消せば勝手に縮み、料金も安くなります。</li>
+</ul>
+
+<h3>② 災害に強すぎる（Multi-AZ）</h3>
+<p>
+  これがクラウドを使う最大の理由です。
+</p>
+<ul>
+  <li><strong>通常のNAS:</strong> オフィスに置いてあります。もしオフィスが火事になったり、停電したりしたら、データは終わりです。</li>
+  <li><strong>EFS:</strong> あなたがファイルを保存した瞬間、裏側で<strong>「3つの異なるデータセンター（AZ）」にコピー</strong>されます。もし東京の一部が壊滅的な被害を受けても、データは生き残ります。これを自前のNASでやるのは不可能です。</li>
+</ul>
+
+<h3>③ メンテナンス時間ゼロ</h3>
+<ul>
+  <li><strong>通常のNAS:</strong> ファームウェアの更新や再起動のために、<strong>「今夜はサーバー止めるからアクセスしないでね」</strong>とアナウンスする必要があります。</li>
+  <li><strong>EFS:</strong> メンテナンスによる停止はありません。24時間365日、いつでも使えます。</li>
+</ul>
+
+<h2>3. 通常のNASの方が良い点（デメリット）</h2>
+<p>
+  EFSも万能ではありません。通常のNASに負ける点もあります。
+</p>
+<ul>
+  <li><strong>Windowsで使えない:</strong><br>
+    EFSはLinux専用です。オフィスのWindows PCから手軽にアクセスするファイルサーバーとしては使えません（※その場合は FSx for Windows を使います）。
+  </li>
+  <li><strong>コスト（単価）:</strong><br>
+    「1GBあたりの単価」だけで見ると、HDDを買ってきて自作するNASの方が圧倒的に安いです。EFSは「管理の手間賃」や「3拠点バックアップ代」が含まれているため、純粋なディスク単価は高めです。<br>
+    ※ただし、<strong>EFS IA（低頻度アクセス）</strong>などの割引機能を使えば、かなり安く抑えられます。
+  </li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>通常のNAS:</strong> 「箱」を買うこと。自分でHDDを交換したり、バックアップを管理したりする手間を楽しめる（またはコストを極限まで下げたい）場合。</li>
+  <li><strong>Amazon EFS:</strong> 「サービス」を買うこと。「容量不足」や「故障」という悩み自体をお金で解決し、ビジネス（アプリ開発など）に集中したい場合。</li>
+</ul>
+<p>
+  企業がAWSを使う場合、「ハードウェアの管理をしたくないから」という理由が大きいため、ほとんどの場合でEFS（またはFSx）が選ばれます。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
