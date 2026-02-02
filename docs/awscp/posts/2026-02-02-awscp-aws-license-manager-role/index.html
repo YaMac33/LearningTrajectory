@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSライセンスマネージャーの役割</title>
+  <meta name="description" content="AWS License Managerは、企業が保有するソフトウェアライセンスをクラウドで無駄なく管理するためのサービスです。BYOLの仕組みやDedicated Hostsとの連携について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSライセンスマネージャーの役割" />
+  <meta property="og:description" content="AWS License Managerは、企業が保有するソフトウェアライセンスをクラウドで無駄なく管理するためのサービスです。BYOLの仕組みやDedicated Hostsとの連携について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 制限動作の比較図 */
+    .limit-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .limit-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-hard { border-top: 4px solid #d9534f; } /* Red */
+    .card-soft { border-top: 4px solid #f0ad4e; } /* Yellow */
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-action {
+      background: #eee;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-top: 1rem;
+      display: block;
+    }
+    .action-block { color: #d9534f; background: #fff5f5; border: 1px solid #d9534f; }
+    .action-alert { color: #856404; background: #fff3cd; border: 1px solid #ffeeba; }
+
+    /* BYOLフロー図 */
+    .byol-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .box-license {
+      border: 2px dashed #333;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #fff;
+      text-align: center;
+    }
+    .box-manager {
+      background: #2a5caa;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .box-ec2 {
+      border: 2px solid #d86613;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #fff;
+      text-align: center;
+      font-weight: bold;
+      color: #d86613;
+    }
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSライセンスマネージャーの役割</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">License Manager</li>
+            <li class="tag">BYOL</li>
+            <li class="tag">ソフトウェアライセンス</li>
+            <li class="tag">コンプライアンス</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>AWS License Manager（ライセンスマネージャー）</strong>は、企業が保有しているソフトウェアライセンス（Microsoft Windows Server, SQL Server, Oracleなど）を、AWS上でも<strong>「ルール違反せず、無駄なく使う」</strong>ための管理サービスです。一言で言うと、<strong>「あなたの会社の『ライセンス監査員（コンプライアンス担当）』」</strong>です。</p>
+
+<h2>1. なぜ License Manager が必要なのか？</h2>
+<p>企業は、MicrosoftやOracleなどの高価なソフトウェアライセンスをすでに大量に購入していることが多いです。これをAWSに移行する際、<strong>「持ち込み（BYOL）」</strong>をしたいと考えます。</p>
+<p>しかし、ソフトウェアベンダーのライセンス規約は非常に複雑です。</p>
+<ul>
+<li>「CPUのコア数分だけ課金する」</li>
+<li>「物理ソケット数で数える」</li>
+<li>「同時に10台までしか起動してはいけない」</li>
+</ul>
+<p>これらを手動でExcelなどで管理していると、うっかり使いすぎて<strong>「ライセンス監査で巨額の違反金を請求される」</strong>か、逆に予備を買いすぎて<strong>「無駄なコストを払う」</strong>ことになります。License Managerは、これを自動化します。</p>
+
+<h2>2. License Manager の「3つの仕事」</h2>
+<p>License Managerの主な機能は以下の3つです。特に「強制執行」の種類が試験で問われます。</p>
+
+<h3>① ルールの定義 (License Configurations)</h3>
+<p>「SQL Serverのライセンスを100個持っている。課金単位はvCPUだ」といったルールを登録します。</p>
+
+<h3>② 強制執行 (Enforcement) ★試験ポイント</h3>
+<p>設定した上限を超えそうになった時の挙動を選べます。</p>
+
+<div class="diagram-container">
+  <div class="limit-compare">
+    <div class="limit-card card-hard">
+      <span class="card-icon">🛑</span>
+      <span class="card-title">ハードリミット<br>(Hard Limit)</span>
+      <p>上限に達したら、それ以上は絶対に使わせない。</p>
+      <span class="card-action action-block">EC2の起動をブロック</span>
+      <p style="font-size:0.8rem; color:#666; margin-top:0.5rem;">コンプライアンス厳守向け</p>
+    </div>
+    <div class="limit-card card-soft">
+      <span class="card-icon">⚠️</span>
+      <span class="card-title">ソフトリミット<br>(Soft Limit)</span>
+      <p>上限を超えても起動はさせるが、管理者に知らせる。</p>
+      <span class="card-action action-alert">アラート（警告）通知</span>
+      <p style="font-size:0.8rem; color:#666; margin-top:0.5rem;">業務を止めたくない場合</p>
+    </div>
+  </div>
+</div>
+
+<h3>③ 可視化とレポート (Dashboard)</h3>
+<p>「今、誰がどれくらいライセンスを使っているか」をダッシュボードで一元管理できます。AWS Organizations と連携すれば、会社全体のライセンス使用状況をまとめて管理できます。</p>
+
+<h2>3. 重要キーワード：BYOL (Bring Your Own License)</h2>
+<p>試験では「BYOL」という単語とセットで出ることが多いです。</p>
+
+<div class="diagram-container">
+  <div class="byol-flow">
+    <div class="box-license">
+      <strong>自社ライセンス</strong><br>
+      <small>(Windows等)</small>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="box-manager">
+      AWS<br>License Manager
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="box-ec2">
+      EC2<br>
+      <small>(割引価格)</small>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">持ち込みルールをAWS側で自動チェックさせる。</p>
+</div>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>ライセンス形態</th>
+      <th>内容</th>
+      <th>コストと管理</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>License Included</strong><br>(ライセンス込み)</td>
+      <td>AWSが用意した「Windows入りEC2」を使う。</td>
+      <td>ライセンス料はEC2料金に含まれる（少し高い）。<br>管理はAWS任せで楽。</td>
+    </tr>
+    <tr>
+      <td><strong>BYOL</strong><br>(ライセンス持ち込み)</td>
+      <td>自社で買ったライセンスを使う。</td>
+      <td>EC2料金は安くなる（OS代不要）。<br>管理責任は自分にある。<br>→ <strong>ここで License Manager を使う！</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. セットで出る：Dedicated Hosts (専有ホスト)</h2>
+<p>一部の古いソフトウェアライセンス（特にWindowsやOracle）は、<strong>「物理サーバーが固定されていないとライセンス違反になる」</strong>という厳しい規約があります。通常のEC2は、裏側で物理サーバーがコロコロ変わる可能性があるため、規約違反になることがあります。</p>
+<p>そこで登場するのが <strong>Amazon EC2 Dedicated Hosts（専有ホスト）</strong> です。</p>
+<ul>
+<li><strong>役割：</strong> 物理サーバーを1台まるごと借り切る。</li>
+<li><strong>License Managerとの関係：</strong> License Managerは、<strong>「Dedicated Hostsへのライセンス割り当て」</strong>を自動管理する機能を持っています。</li>
+</ul>
+<blockquote>
+<p><strong>試験対策：</strong><br>
+「既存のライセンスを持ち込みたい（BYOL）が、ハードウェアの占有が必要である。管理を自動化するには？」<br>
+→ 答え：<strong>AWS License Manager と EC2 Dedicated Hosts を組み合わせる。</strong></p>
+</blockquote>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>役割：</strong> ソフトウェアライセンス（Windows, SQL Server等）の管理・監視。</li>
+<li><strong>BYOL：</strong> 既存ライセンスを持ち込む際に、規約違反（使いすぎ）を防ぐ。</li>
+<li><strong>制限：</strong> ハードリミット（起動ブロック）とソフトリミット（警告）が選べる。</li>
+<li><strong>連携：</strong> Dedicated Hosts（物理サーバー固定）の管理もできる。</li>
+</ul>
+<p>これで、管理・コンプライアンス系のサービスも完璧です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
