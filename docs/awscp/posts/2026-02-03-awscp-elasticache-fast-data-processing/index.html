@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | ElastiCacheの高速データ処理</title>
+  <meta name="description" content="ElastiCacheはデータベース負荷軽減と高速化を実現するキャッシュサービス。RedisとMemcachedの違いやユースケースを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ElastiCacheの高速データ処理" />
+  <meta property="og:description" content="ElastiCacheはデータベース負荷軽減と高速化を実現するキャッシュサービス。RedisとMemcachedの違いやユースケースを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 速度比較イメージ図 */
+    .speed-comp-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .speed-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 20px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    
+    /* RDS (遅い) */
+    .sb-rds {
+      border-color: #64748b; /* Gray */
+      color: #475569;
+    }
+    .sb-rds .sb-icon { font-size: 2.5em; margin-bottom: 10px; opacity: 0.8; }
+    
+    /* ElastiCache (速い) */
+    .sb-cache {
+      border-color: #ef4444; /* Red for speed/power */
+      background: #fff5f5;
+      color: #991b1b;
+      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.15);
+    }
+    .sb-cache .sb-icon { font-size: 2.5em; margin-bottom: 10px; }
+
+    .sb-title { font-weight: bold; font-size: 1.1em; margin-bottom: 6px; }
+    .sb-meta { font-size: 0.9em; margin-bottom: 8px; }
+    .sb-time { 
+      font-weight: 800; 
+      font-size: 1.2em; 
+      padding: 4px 12px; 
+      border-radius: 20px;
+      display: inline-block;
+    }
+    .sb-rds .sb-time { background: #f1f5f9; color: #64748b; }
+    .sb-cache .sb-time { background: #fee2e2; color: #dc2626; }
+
+    /* メモリ vs ディスクのラベル */
+    .media-label {
+      position: absolute;
+      top: -10px;
+      background: #fff;
+      padding: 0 10px;
+      font-size: 0.75em;
+      font-weight: bold;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      color: #6b7280;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .speed-comp-container {
+        flex-direction: column;
+      }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ElastiCacheの高速データ処理</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#ElastiCache</span>
+            <span class="tag">#Redis</span>
+            <span class="tag">#Memcached</span>
+            <span class="tag">#データベース</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#キャッシュ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Amazon ElastiCache（エラスティキャッシュ）は、「ミリ秒」を「マイクロ秒」にするための、爆速のデータ一時保存サービスです。
+</p>
+<p>
+  一言で言うと、<strong>「データベース（RDS）の手前に置く、超高速な『カンニングペーパー（キャッシュ）』」</strong>です。試験では、<strong>「データベースの負荷軽減」「読み込み速度の高速化」「RedisとMemcachedの違い」</strong>が頻出です。
+</p>
+
+<h2>1. なぜ ElastiCache が必要なのか？</h2>
+<p>
+  通常のデータベース（RDSなど）は、データが「ディスク（HDD/SSD）」に保存されています。これは安全ですが、物理的な読み書きが発生するため、スピードには限界があります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">速度と仕組みの違い</div>
+  <div class="speed-comp-container">
+    <div class="speed-box sb-rds">
+      <div class="media-label">Disk (SSD)</div>
+      <div class="sb-icon">📚</div>
+      <div class="sb-title">RDS</div>
+      <div class="sb-meta">本棚まで本を探しに行く</div>
+      <div class="sb-time">ミリ秒 (ms)</div>
+    </div>
+    
+    <div class="speed-box sb-cache">
+      <div class="media-label">Memory (RAM)</div>
+      <div class="sb-icon">⚡📝</div>
+      <div class="sb-title">ElastiCache</div>
+      <div class="sb-meta">手元のメモを見る</div>
+      <div class="sb-time">マイクロ秒 (μs)</div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; margin-top:10px;">
+    <strong>※ 1ミリ秒 = 1,000マイクロ秒</strong>。桁違いの速さです。
+  </p>
+</div>
+
+<h3>仕組み：Lazy Loading（遅延読み込み）</h3>
+<ol>
+  <li>アプリはまず、ElastiCacheを見に行きます。「答え（キャッシュ）ある？」</li>
+  <li>あれば、即座に返します（キャッシュヒット）。爆速です。</li>
+  <li>なければ、RDSに問い合わせてデータを取りに行き、その結果をElastiCacheに書き込んでおきます（キャッシュミス）。</li>
+  <li>次回からはElastiCacheが答えてくれます。</li>
+</ol>
+
+<h2>2. 試験のハイライト：「Redis」vs「Memcached」</h2>
+<p>
+  ElastiCacheを使う時、<strong>「Redis（レディス）」と「Memcached（メムキャッシュド）」</strong>という2つのエンジンからどちらかを選ばなければなりません。この2つの違いが試験で最も問われます。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Redis (レディス)</th>
+      <th>Memcached (メムキャッシュド)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>機能</th>
+      <td><strong>多機能・高機能</strong></td>
+      <td>シンプル・単純</td>
+    </tr>
+    <tr>
+      <th>データ構造</th>
+      <td>複雑なデータも扱える<br><small>(リスト、セット、ランキングなど)</small></td>
+      <td>シンプルな文字だけ<br><small>(Stringのみ)</small></td>
+    </tr>
+    <tr>
+      <th>永続化</th>
+      <td><strong>可能</strong><br><small>(ディスクにバックアップ保存できる)</small></td>
+      <td>不可<br><small>(電源切れたら消える)</small></td>
+    </tr>
+    <tr>
+      <th>可用性</th>
+      <td><strong>Multi-AZ 対応</strong><br><small>(フェイルオーバー可能)</small></td>
+      <td>基本的に非対応</td>
+    </tr>
+    <tr>
+      <th>用途</th>
+      <td>ランキング機能、高度なチャット、消えては困るセッション情報</td>
+      <td>とにかく単純なキャッシュ、マルチスレッドでの高速処理</td>
+    </tr>
+    <tr>
+      <th>合言葉</th>
+      <td><strong>「高機能」「バックアップ」「ランキング」</strong></td>
+      <td>「シンプル」「マルチスレッド」</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>★試験対策:</strong><br>
+  迷ったら <strong>Redis</strong> を選ぶのが基本です。現在のAWSでは、ほとんどのケースで高機能なRedisが推奨されます。「Memcached」が正解になるのは、「極めてシンプルな構造で、マルチスレッド性能が必要」と明記された時くらいです。</p>
+</blockquote>
+
+<h2>3. 具体的なユースケース</h2>
+<p>
+  ElastiCacheは「データベースの代わり」ではなく、「データベースを助ける」ために使われます。
+</p>
+
+<h3>① データベースの負荷軽減 (Database Caching)</h3>
+<p>
+  「商品カタログ」や「トップページのニュース」など、<strong>「みんなが同じものを見るけど、滅多に変わらないデータ」</strong>をキャッシュします。RDSへのアクセスが減り、RDSのスペックを下げてコストダウンできます。
+</p>
+
+<h3>② セッション管理 (Session Store)</h3>
+<p>
+  ユーザーの<strong>「ログイン情報」や「ショッピングカートの中身」</strong>を保存します。Webサーバーが複数台あっても、ElastiCacheに情報を預けておけば、どのサーバーに繋がっても「あ、ログイン中ですね」と認識できます。
+</p>
+
+<h3>③ リアルタイムランキング (Gaming Leaderboards)</h3>
+<p>
+  Redisの「ソート済みセット（Sorted Sets）」という機能を使うと、ゲームのスコアランキングなどをリアルタイムに集計・表示できます。RDSでこれをやるとサーバーが死にます。
+</p>
+
+<h2>4. DynamoDB Accelerator (DAX) との違い</h2>
+<p>
+  「キャッシュ」といえばもう一つ、DAX というサービスがありますが、これもしょっちゅう比較されます。
+</p>
+<ul>
+  <li><strong>ElastiCache:</strong> RDS やその他のDB（汎用的）の手前に置くキャッシュ。</li>
+  <li><strong>DAX:</strong> <strong>DynamoDB 専用</strong> のキャッシュ。</li>
+</ul>
+<p>
+  試験で「DynamoDBの読み込みを高速化したい」と言われたら、ElastiCacheではなく <strong>DAX</strong> が正解です。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> <strong>インメモリ（メモリ上）</strong>で動く超高速キャッシュサービス。</li>
+  <li><strong>メリット:</strong> データの読み込みをマイクロ秒単位にする。DBの負荷を下げる。</li>
+  <li><strong>Redis:</strong> 高機能。ランキング、バックアップ、マルチAZが必要ならこっち（基本はこれ）。</li>
+  <li><strong>Memcached:</strong> シンプル。単純なキャッシュならこっち。</li>
+</ul>
+<p>
+  これで、データベースを高速化する重要パーツであるElastiCacheも攻略完了です。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
