@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSサービスの役割別グループ</title>
+  <meta name="description" content="AWSの主要サービスを「コンピューティング」「ストレージ」などのカテゴリー別に整理。試験対策に役立つ役割分担と、代表的なサービスの特徴を一挙に解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSサービスの役割別グループ" />
+  <meta property="og:description" content="AWSの主要サービスを「コンピューティング」「ストレージ」などのカテゴリー別に整理。試験対策に役立つ役割分担と、代表的なサービスの特徴を一挙に解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* サービスマップ */
+    .service-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+    }
+    .category-box {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      position: relative;
+      border-top: 4px solid #666;
+    }
+    .cat-compute { border-top-color: #d86613; }
+    .cat-storage { border-top-color: #24882c; }
+    .cat-db { border-top-color: #2a5caa; }
+    .cat-net { border-top-color: #8e44ad; }
+
+    .cat-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .service-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .svc-tag {
+      background: #eee;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #333;
+    }
+    .svc-tag.major {
+      background: #333;
+      color: #fff;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 20%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* 例題ボックス */
+    .exam-box {
+      border: 2px dashed #d86613;
+      background: #fffaf5;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .exam-title {
+      font-weight: bold;
+      color: #d86613;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .exam-q {
+      font-style: italic;
+      margin-bottom: 1rem;
+      color: #555;
+    }
+    .exam-a {
+      font-weight: bold;
+      background: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid #d86613;
+      display: inline-block;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSサービスの役割別グループ</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">サービス</li>
+            <li class="tag">試験対策</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">テクノロジー</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSには200以上のサービスがありますが、試験に出るものは特定の分野（カテゴリー）に集中しています。まずは、主要なサービスを「役割別」にグループ分けして整理しましょう。「これは何の道具か？」という引き出しを作ることが学習の第一歩です。</p>
+
+<h2>1. AWSサービス主要グループ一覧</h2>
+<p>試験頻出のサービスをカテゴリーごとにまとめました。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>カテゴリー</th>
+      <th>役割</th>
+      <th>主なサービス (太字は超重要)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>コンピューティング</strong></td>
+      <td>サーバーや処理の実行</td>
+      <td><strong>EC2</strong>, <strong>Lambda</strong>, <strong>Fargate</strong>, Lightsail</td>
+    </tr>
+    <tr>
+      <td><strong>ストレージ</strong></td>
+      <td>データの保管箱</td>
+      <td><strong>S3</strong>, <strong>EBS</strong>, EFS, S3 Glacier</td>
+    </tr>
+    <tr>
+      <td><strong>データベース</strong></td>
+      <td>整理されたデータの保存</td>
+      <td><strong>RDS</strong>, <strong>DynamoDB</strong>, Redshift, ElastiCache</td>
+    </tr>
+    <tr>
+      <td><strong>ネットワーク</strong></td>
+      <td>通信の通り道・交通整理</td>
+      <td><strong>VPC</strong>, <strong>CloudFront</strong>, <strong>Route 53</strong>, ALB/NLB</td>
+    </tr>
+    <tr>
+      <td><strong>セキュリティ</strong></td>
+      <td>守り・権限管理</td>
+      <td><strong>IAM</strong>, <strong>WAF</strong>, Shield, KMS, Artifact</td>
+    </tr>
+    <tr>
+      <td><strong>管理と監視</strong></td>
+      <td>状態のチェック・最適化</td>
+      <td><strong>CloudWatch</strong>, <strong>CloudTrail</strong>, Trusted Advisor</td>
+    </tr>
+    <tr>
+      <td><strong>分析</strong></td>
+      <td>データの活用</td>
+      <td><strong>Athena</strong>, Glue, Redshift, QuickSight</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. 主要4カテゴリーの機能図解</h2>
+<p>特に重要な4つのカテゴリーについて、それぞれの代表選手と役割を視覚的に整理します。</p>
+
+<div class="diagram-container">
+  <div class="service-map">
+    <!-- コンピューティング -->
+    <div class="category-box cat-compute">
+      <div class="cat-title">🖥️ コンピューティング<br><small>(頭脳・計算)</small></div>
+      <div class="service-list">
+        <span class="svc-tag major">EC2</span>
+        <span class="svc-tag major">Lambda</span>
+        <span class="svc-tag">Fargate</span>
+        <span class="svc-tag">Lightsail</span>
+        <span class="svc-tag">Batch</span>
+      </div>
+      <p style="font-size:0.85rem; margin-top:0.8rem; color:#666;">
+        プログラムを動かす場所。<br>
+        <strong>EC2</strong>は自由な仮想サーバー、<strong>Lambda</strong>は管理不要のサーバーレス。
+      </p>
+    </div>
+
+    <!-- ストレージ -->
+    <div class="category-box cat-storage">
+      <div class="cat-title">💾 ストレージ<br><small>(物置・保管)</small></div>
+      <div class="service-list">
+        <span class="svc-tag major">S3</span>
+        <span class="svc-tag major">EBS</span>
+        <span class="svc-tag">S3 Glacier</span>
+        <span class="svc-tag">EFS</span>
+        <span class="svc-tag">Storage Gateway</span>
+      </div>
+      <p style="font-size:0.85rem; margin-top:0.8rem; color:#666;">
+        データを置く場所。<br>
+        <strong>S3</strong>はネット上の巨大倉庫、<strong>EBS</strong>はEC2の外付けHDD。
+      </p>
+    </div>
+
+    <!-- データベース -->
+    <div class="category-box cat-db">
+      <div class="cat-title">🗄️ データベース<br><small>(整理棚)</small></div>
+      <div class="service-list">
+        <span class="svc-tag major">RDS</span>
+        <span class="svc-tag major">DynamoDB</span>
+        <span class="svc-tag">Aurora</span>
+        <span class="svc-tag">Redshift</span>
+        <span class="svc-tag">ElastiCache</span>
+      </div>
+      <p style="font-size:0.85rem; margin-top:0.8rem; color:#666;">
+        データを整理して保存。<br>
+        <strong>RDS</strong>は表形式（Excel的）、<strong>DynamoDB</strong>はキー・バリュー型（NoSQL）。
+      </p>
+    </div>
+
+    <!-- ネットワーク -->
+    <div class="category-box cat-net">
+      <div class="cat-title">🌐 ネットワーク<br><small>(道路・配送)</small></div>
+      <div class="service-list">
+        <span class="svc-tag major">VPC</span>
+        <span class="svc-tag major">CloudFront</span>
+        <span class="svc-tag major">Route 53</span>
+        <span class="svc-tag">API Gateway</span>
+        <span class="svc-tag">Direct Connect</span>
+      </div>
+      <p style="font-size:0.85rem; margin-top:0.8rem; color:#666;">
+        通信の経路。<br>
+        <strong>VPC</strong>は私有地、<strong>CloudFront</strong>は高速配送、<strong>Route 53</strong>は住所案内。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>3. 試験で問われやすいポイント（CLF-C02）</h2>
+<p>試験では、単にサービス名を問うだけでなく、<strong>「課題解決」</strong>の文脈で出題されます。「〇〇したい時、どのカテゴリーのどのサービスを使うべきか？」を判断できるようにしましょう。</p>
+
+<div class="diagram-container">
+  <div class="exam-box">
+    <span class="exam-title">📝 例題イメージ</span>
+    <p class="exam-q">
+      「自社のWebサイトに世界中からアクセスがあり、表示速度が遅いという苦情が来ています。ユーザーへの配信速度を向上させるために、最も適切なサービスはどれですか？」
+    </p>
+    <div style="text-align:center;">
+      <span style="font-size:1.5rem;">⬇</span><br>
+      <span class="exam-a">Amazon CloudFront</span>
+    </div>
+    <p style="font-size:0.9rem; margin-top:1rem; color:#666;">
+      <strong>解説：</strong> 「世界中への配信」「速度向上」というキーワードは、ネットワーク・配信カテゴリーの <strong>CloudFront（CDN）</strong> の役割です。
+    </p>
+  </div>
+</div>
+
+<h2>4. 講師からのアドバイス</h2>
+<p>最初から全てのサービスを覚えようとすると挫折します。まずは、各グループの<strong>「代表選手（太字のサービス）」</strong>から覚えていくのがコツです。</p>
+<ul class="check-list">
+<li><strong>計算担当：</strong> EC2, Lambda</li>
+<li><strong>保管担当：</strong> S3, EBS</li>
+<li><strong>整理担当：</strong> RDS, DynamoDB</li>
+<li><strong>配送担当：</strong> VPC, CloudFront</li>
+</ul>
+<p>このように、「AWSという会社の中のどの部署の担当者か？」というイメージでサービスに住所（カテゴリー）を決めてあげると、記憶に定着しやすくなります。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
