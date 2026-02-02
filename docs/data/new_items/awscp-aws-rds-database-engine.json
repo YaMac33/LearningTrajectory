@@ -1,0 +1,22 @@
+{
+  "id": "awscp-aws-rds-database-engine",
+  "category": "awscp",
+  "timestamp": "2026-02-03T06:35:20+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-rds-database-engine/",
+  "meta": {
+    "title": "AWS RDSデータベースエンジンの特徴と選び方",
+    "summary": "AWS RDSで利用可能な6種類のデータベースエンジンの特徴を理解し、適切な選択ができるようになる。試験における重要ポイントも解説。",
+    "tags": [
+      "AWS",
+      "DBエンジン",
+      "Aurora",
+      "MySQL",
+      "PostgreSQL",
+      "SQL Server"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
