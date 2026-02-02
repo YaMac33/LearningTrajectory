@@ -1,0 +1,20 @@
+{
+  "id": "awscp-aws-kms-basics-uses",
+  "category": "awscp",
+  "timestamp": "2026-02-02T17:55:08+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-kms-basics-uses/",
+  "meta": {
+    "title": "AWS KMSの基本と活用法",
+    "summary": "AWS KMSはデータ暗号化のための鍵管理サービスで、エンベロープ暗号化や3つの鍵タイプが試験で問われるポイントです。",
+    "tags": [
+      "AWS",
+      "KMS",
+      "セキュリティ",
+      "暗号化"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
