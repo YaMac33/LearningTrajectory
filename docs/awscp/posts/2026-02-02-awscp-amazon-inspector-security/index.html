@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Inspectorの解説</title>
+  <meta name="description" content="Amazon Inspectorは、サーバー内部の脆弱性や意図しないネットワーク露出を自動で診断するサービスです。WAFやShieldとの違い、GuardDutyとの役割分担について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Inspectorの解説" />
+  <meta property="og:description" content="Amazon Inspectorは、サーバー内部の脆弱性や意図しないネットワーク露出を自動で診断するサービスです。WAFやShieldとの違い、GuardDutyとの役割分担について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 3つの防衛線 */
+    .defense-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+    }
+    .layer-box {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      position: relative;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .layer-shield { border-color: #d9534f; background: #fff5f5; }
+    .layer-waf { border-color: #f0ad4e; background: #fffaf0; }
+    .layer-inspector { border-color: #24882c; background: #f0fff4; }
+
+    .layer-icon {
+      font-size: 2rem;
+      width: 50px;
+      text-align: center;
+    }
+    .layer-content {
+      flex: 1;
+    }
+    .layer-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+    .layer-desc {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /* Inspector vs GuardDuty */
+    .compare-wrapper {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .compare-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .card-inspector { border-top: 4px solid #24882c; } /* Green */
+    .card-guardduty { border-top: 4px solid #2a5caa; } /* Blue */
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-role {
+      background: #eee;
+      padding: 0.2rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* ターゲットリソース */
+    .target-container {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .target-box {
+      border: 2px solid #555;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      background: #fff;
+      min-width: 120px;
+    }
+    .target-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .target-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #24882c;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Inspectorの解説</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">Amazon Inspector</li>
+            <li class="tag">脆弱性診断</li>
+            <li class="tag">IT管理</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>セキュリティサービスの第3の刺客、<strong>Amazon Inspector（インスペクター）</strong>について解説します！WAF（中身検査）やShield（暴動対策）が「外からの攻撃」に備えるものだったのに対し、Inspectorは<strong>「内側の弱点探し」</strong>を担当します。</p>
+
+<h2>1. Amazon Inspectorとは？</h2>
+<p>一言で言うと、AWS上のサーバー（EC2）やプログラム（Lambda）、コンテナ（ECR）の中に、<strong>「古いソフトが残っていないか？」「ウイルスに狙われやすい隙（脆弱性）がないか？」</strong>を自動でチェックしてくれる診断サービスです。</p>
+
+<div class="diagram-container">
+  <div class="defense-layers">
+    <div class="layer-box layer-shield">
+      <span class="layer-icon">🛡️</span>
+      <div class="layer-content">
+        <span class="layer-title">AWS Shield (外壁)</span>
+        <span class="layer-desc">入り口で大量の敵（DDoS）を防ぐ。</span>
+      </div>
+    </div>
+    <div class="layer-box layer-waf">
+      <span class="layer-icon">✉️</span>
+      <div class="layer-content">
+        <span class="layer-title">AWS WAF (検問)</span>
+        <span class="layer-desc">怪しい荷物（SQLインジェクション）を没収する。</span>
+      </div>
+    </div>
+    <div class="layer-box layer-inspector">
+      <span class="layer-icon">🩺</span>
+      <div class="layer-content">
+        <span class="layer-title">Amazon Inspector (内科検診)</span>
+        <span class="layer-desc"><strong>内部の状態</strong>をチェック。「この部屋の鍵、壊れてますよ」「このソフト、古くて危険ですよ」</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. Inspectorができること（スキャン対象）</h2>
+<p>試験では「何をスキャンするか」がよく問われます。以下の3つのリソースを継続的に監視します。</p>
+
+<div class="diagram-container">
+  <div class="target-container">
+    <div class="target-box">
+      <span class="target-icon">🖥️</span>
+      <span class="target-name">EC2<br>インスタンス</span>
+    </div>
+    <div class="target-box">
+      <span class="target-icon">📦</span>
+      <span class="target-name">ECR<br>コンテナ</span>
+    </div>
+    <div class="target-box">
+      <span class="target-icon">⚡️</span>
+      <span class="target-name">Lambda<br>関数</span>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>ソフトウェアの脆弱性（CVE）：</strong> 「Apacheのバージョンが古いから、すぐ乗っ取られる状態だよ」と警告します。</li>
+<li><strong>意図しないネットワーク露出：</strong> 「データベースのポートがインターネットに全開放されてるけど、これ本気？」と確認します。</li>
+</ul>
+
+<h2>3. 重要！ GuardDutyとの違い</h2>
+<p>ここが試験で最も受験生を悩ませるポイントです。「Inspector」と「GuardDuty」はどちらもセキュリティサービスですが、役割が明確に違います。</p>
+
+<div class="diagram-container">
+  <div class="compare-wrapper">
+    <!-- Inspector -->
+    <div class="compare-card card-inspector">
+      <span class="card-icon">🩺</span>
+      <span class="card-title">Amazon Inspector</span>
+      <span class="card-role">予防・診断</span>
+      <p class="card-desc">
+        <strong>「健康診断」</strong><br>
+        病気になる前に「今の体の状態（脆弱性）」をチェックする。<br>
+        キーワード：<strong>脆弱性 (Vulnerability)</strong>
+      </p>
+    </div>
+
+    <!-- GuardDuty -->
+    <div class="compare-card card-guardduty">
+      <span class="card-icon">📹</span>
+      <span class="card-title">Amazon GuardDuty</span>
+      <span class="card-role">監視・発見</span>
+      <p class="card-desc">
+        <strong>「監視カメラ」</strong><br>
+        実際に泥棒（攻撃者）が侵入した瞬間の「怪しい動き」を見つける。<br>
+        キーワード：<strong>脅威 (Threat)</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>比較項目</th>
+      <th>Amazon Inspector</th>
+      <th>Amazon GuardDuty</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>役割</strong></td>
+      <td>脆弱性管理 (Vulnerability Management)</td>
+      <td>脅威検知 (Threat Detection)</td>
+    </tr>
+    <tr>
+      <td><strong>いつ？</strong></td>
+      <td>攻撃される前 (Before)</td>
+      <td>攻撃されている時 / 後 (During/After)</td>
+    </tr>
+    <tr>
+      <td><strong>見るもの</strong></td>
+      <td>ソフトウェアのバージョン、設定</td>
+      <td>ログ (CloudTrail, VPC Flow Logs, DNS)</td>
+    </tr>
+    <tr>
+      <td><strong>メッセージ例</strong></td>
+      <td>「OSが古いです」</td>
+      <td>「怪しい通信がありました」</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 実務イメージ：企業のAWS利用シーン</h2>
+<p>ある企業のシステム管理者の日常です。</p>
+<ul>
+<li><strong>課題：</strong> 数百台のEC2サーバーを管理しており、どのサーバーのOSやミドルウェアが古いのか、手動で調べるのは不可能。</li>
+<li><strong>Inspectorの導入：</strong> 毎日自動で全サーバーをスキャンするように設定。</li>
+<li><strong>結果：</strong> 「サーバーAのOSに重大な脆弱性が見つかりました！ リスクスコア：高」というレポートが届く。管理者はそのレポートを見て、優先順位をつけてパッチ適用を行うだけで済みます。</li>
+</ul>
+
+<h2>5. 試験で問われやすいポイント！</h2>
+<ul class="check-list">
+<li><strong>「自動的かつ継続的」：</strong> 一度設定すれば、新しいサーバーが増えても自動でスキャンしてくれます（昔のInspector Classicとは違う点）。</li>
+<li><strong>リスクスコア：</strong> 見つけた弱点に対して「どれくらい危険か」を数値化して教えてくれます。これにより「とりあえずヤバいやつから直す」という判断ができます。</li>
+<li><strong>SSMエージェント：</strong> EC2の中身を見るためには、SSMエージェントというソフトが入っている必要があります（これがないと中が見えない）。</li>
+</ul>
+
+<h3>💡 セキュリティ・まとめ</h3>
+<ul>
+<li><strong>WAF：</strong> Webアプリへの攻撃（SQLインジェクション）を防ぐ。</li>
+<li><strong>Shield：</strong> 大量の通信（DDoS）を防ぐ。</li>
+<li><strong>Inspector：</strong> サーバー内の弱点（脆弱性）を見つける（健康診断）。</li>
+<li><strong>GuardDuty：</strong> アカウント内の怪しい動き（脅威）を見つける（監視カメラ）。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
