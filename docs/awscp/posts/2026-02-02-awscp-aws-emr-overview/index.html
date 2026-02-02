@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS EMRの概要と特徴</title>
+  <meta name="description" content="AWS EMRはHadoop/Sparkなどのビッグデータ処理をAWS上で簡単に実行するサービス。3種類のノード構成とスポットインスタンスによるコスト削減手法を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS EMRの概要と特徴" />
+  <meta property="og:description" content="AWS EMRはHadoop/Sparkなどのビッグデータ処理をAWS上で簡単に実行するサービス。3種類のノード構成とスポットインスタンスによるコスト削減手法を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1em;
+    }
+
+    /* EMRクラスター構成図 */
+    .cluster-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 20px;
+      background: #fff;
+      position: relative;
+    }
+    .cluster-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #fff;
+      padding: 0 10px;
+      color: #64748b;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    
+    .node-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .node-box {
+      width: 140px;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border: 2px solid;
+      background: #fff;
+      position: relative;
+    }
+    
+    /* ノード種類ごとのスタイル */
+    .n-master {
+      border-color: #6366f1; /* Indigo */
+      background: #eef2ff;
+    }
+    .n-core {
+      border-color: #10b981; /* Emerald */
+      background: #ecfdf5;
+    }
+    .n-task {
+      border-color: #f59e0b; /* Amber */
+      background: #fffbeb;
+      border-style: dotted; /* 消えやすいことを表現 */
+    }
+
+    .node-icon { font-size: 1.8em; margin-bottom: 6px; }
+    .node-title { font-weight: bold; font-size: 0.9em; color: #1e293b; margin-bottom: 4px; }
+    .node-desc { font-size: 0.75em; color: #475569; line-height: 1.3; }
+    
+    .spot-badge {
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.7em;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+    
+    .node-arrow {
+      align-self: center;
+      color: #94a3b8;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .node-group {
+        flex-direction: column;
+        align-items: center;
+      }
+      .node-arrow {
+        transform: rotate(90deg);
+        margin: 4px 0;
+      }
+      .article-content th {
+        white-space: normal;
+        min-width: 80px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS EMRの概要と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Big Data</span>
+            <span class="tag">#EMR</span>
+            <span class="tag">#Hadoop</span>
+            <span class="tag">#Spark</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Amazon EMR (Elastic MapReduce) は、一言で言うと<strong>「Hadoop（ハドゥープ）やSpark（スパーク）といった『ビッグデータ処理フレームワーク』を、AWS上で超簡単に動かせるサービス」</strong>です。
+</p>
+<p>
+  AthenaやRedshiftが「SQL」でデータを扱うのに対し、EMRは<strong>「プログラミング（Python, Java, Scalaなど）」を使って、もっと複雑で大規模なデータ加工や機械学習を行うための基盤</strong>です。
+</p>
+<p>
+  試験では、<strong>「ビッグデータ」「Hadoop/Spark」「スポットインスタンスによるコスト削減」</strong>の3点が頻出です。
+</p>
+
+<h2>1. そもそも「Hadoop / Spark」とは？</h2>
+<p>
+  これらは、1台のパソコンでは到底処理しきれないペタバイト級のデータを、数百台〜数千台のサーバーに分散させて、一気に計算する技術（オープンソース）です。
+</p>
+<ul>
+  <li><strong>課題:</strong> これらを自前（オンプレミス）で作ろうとすると、サーバーを何百台も買って、配線して、設定して…と、構築だけで数ヶ月かかります。</li>
+  <li><strong>EMR:</strong> AWSコンソールでボタンを押すだけで、数分でこの「数百台のクラスター（計算センター）」が完成します。</li>
+</ul>
+
+<h2>2. EMRの仕組み：3種類のノード</h2>
+<p>
+  EMRは、複数のEC2インスタンスを束ねて<strong>「クラスター」</strong>を作ります。この中にいるEC2（ノードと呼びます）には、3つの役割分担があります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">EMRクラスターの構成と役割</div>
+  <div class="cluster-container">
+    <div class="cluster-label">EMR Cluster</div>
+    
+    <!-- 3つのノード -->
+    <div class="node-group">
+      <!-- Master -->
+      <div class="node-box n-master">
+        <div class="node-icon">👔</div>
+        <div class="node-title">マスターノード</div>
+        <div class="node-desc">現場監督<br>全体の指示出し</div>
+      </div>
+      
+      <div class="node-arrow">→</div>
+
+      <!-- Core -->
+      <div class="node-box n-core">
+        <div class="node-icon">👷</div>
+        <div class="node-title">コアノード</div>
+        <div class="node-desc">正社員<br>計算 ＋ データ保存</div>
+      </div>
+
+      <div class="node-arrow">＋</div>
+
+      <!-- Task -->
+      <div class="node-box n-task">
+        <div class="node-icon">🤖</div>
+        <div class="node-title">タスクノード</div>
+        <div class="node-desc">派遣スタッフ<br>計算のみ</div>
+        <div class="spot-badge">スポット推奨</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#475569;">
+    <strong>コスト削減のポイント:</strong><br>
+    タスクノードはデータを保存しないため、突然消えても問題ありません。<br>
+    激安の<strong>「スポットインスタンス」</strong>を使うことで、処理費用を劇的に安くできます。
+  </p>
+</div>
+
+<h3>各ノードの詳細</h3>
+<ul>
+  <li><strong>マスターノード (Master Node):</strong> 必ず1台必要。全体の管理を行います。</li>
+  <li><strong>コアノード (Core Node):</strong> 計算処理をしながら、データの一部（HDFS）を自分のディスクに保存・管理します。</li>
+  <li><strong>タスクノード (Task Node):</strong> ★重要<br>
+    データの保存はせず、計算だけを手伝います。「マスターとコアは消えないオンデマンド、タスクは消えてもいいスポットインスタンス」という構成にするのが定石です。
+  </li>
+</ul>
+
+<h2>3. 他のデータサービスとの違い（比較）</h2>
+<p>
+  「大量のデータを処理する」サービスはたくさんあるので、迷いやすいポイントです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>得意なこと</th>
+      <th>手段</th>
+      <th>キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Amazon Redshift</th>
+      <td>データウェアハウス<br><small>構造化データの高速集計</small></td>
+      <td>SQL</td>
+      <td>DWH、ビジネス分析</td>
+    </tr>
+    <tr>
+      <th>Amazon Athena</th>
+      <td>S3への直接クエリ<br><small>手軽なログ調査</small></td>
+      <td>SQL</td>
+      <td>サーバーレス、アドホック</td>
+    </tr>
+    <tr>
+      <th>AWS Glue</th>
+      <td>ETLツール<br><small>データの抽出・変換・ロード</small></td>
+      <td>Python / Scala</td>
+      <td>サーバーレス、データカタログ</td>
+    </tr>
+    <tr>
+      <th>Amazon EMR</th>
+      <td>ビッグデータ処理基盤<br><small>超大規模な計算・加工</small></td>
+      <td>Hadoop / Spark</td>
+      <td>クラスター、スポットインスタンス</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>Glue と EMR の違い:</strong><br>
+  Glueはサーバーレスで手軽ですが、中身はいじれません。EMRはサーバー構成（EC2）が見えるため、OSレベルの細かいチューニングや、既存のオンプレミスHadoop資産をそのまま移行したい時に選ばれます。</p>
+</blockquote>
+
+<h2>4. 具体的な利用シナリオ</h2>
+<ul>
+  <li><strong>ログ解析:</strong> Webサーバーのログ数億行を読み込み、機械学習を使って「不正アクセスの予兆」を見つける。</li>
+  <li><strong>金融シミュレーション:</strong> 株価データ過去30年分を使って、複雑なリスク分析の計算を行う。</li>
+  <li><strong>オンプレミスからの移行:</strong> 自社データセンターでHadoopを使っていたが、ハードウェア更改が面倒なので、そのままAWS（EMR）に引っ越す。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> HadoopやSparkなどのビッグデータフレームワークをAWS上で簡単に動かすサービス。</li>
+  <li><strong>構成:</strong> EC2の集合体（クラスター）。マスター、コア、タスクの3種類。</li>
+  <li><strong>コスト削減:</strong> 計算専用の<strong>「タスクノード」に「スポットインスタンス」</strong>を使うのが定石。</li>
+  <li><strong>使い分け:</strong> SQLで済むならRedshift/Athena。複雑なプログラミングが必要な大規模処理ならEMR。</li>
+</ul>
+<p>
+  これで、ビッグデータ処理の重鎮であるEMRについてもバッチリです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
