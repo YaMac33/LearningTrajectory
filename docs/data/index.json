@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-redshift-data-warehouse",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:34:34+09:00",
+    "title": "Amazon Redshiftのデータウェアハウス解説",
+    "summary": "Amazon Redshiftは、高速なデータ分析を実現するデータウェアハウスであり、OLAPに特化しています。データ構造やMPPの仕組みを通じて、大規模なデータ処理を理解できます。",
+    "tags": [
+      "AWS",
+      "Redshift",
+      "データ分析",
+      "データウェアハウス",
+      "OLAP"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-redshift-data-warehouse/"
+  },
+  {
     "id": "awscp-etl-no-etl-data-analysis",
     "category": "awscp",
     "timestamp": "2026-02-02T17:17:37+09:00",
