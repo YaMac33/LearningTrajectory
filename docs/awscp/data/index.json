@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-ec2-traffic-management",
+    "category": "awscp",
+    "timestamp": "2026-02-03T03:47:10+09:00",
+    "title": "EC2インスタンス間のトラフィック管理の要点",
+    "summary": "EC2インスタンスのトラフィック制御におけるセキュリティグループとネットワークACLの役割と違いを理解します。",
+    "tags": [
+      "EC2",
+      "VPC",
+      "セキュリティグループ",
+      "ネットワークACL",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-ec2-traffic-management/"
+  },
+  {
     "id": "awscp-vpc-peering-basics",
     "category": "awscp",
     "timestamp": "2026-02-03T03:42:43+09:00",
