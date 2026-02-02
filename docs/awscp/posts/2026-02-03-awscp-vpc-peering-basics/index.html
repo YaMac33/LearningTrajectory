@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | VPCピアリングの基本と制約</title>
+  <meta name="description" content="VPCピアリングはVPC間をプライベート接続する基本機能。「推移的ルーティング不可」などの重要な制約と、Transit Gatewayとの違いを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="VPCピアリングの基本と制約" />
+  <meta property="og:description" content="VPCピアリングはVPC間をプライベート接続する基本機能。「推移的ルーティング不可」などの重要な制約と、Transit Gatewayとの違いを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 推移的ルーティング不可の図 */
+    .peering-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      position: relative;
+      padding-bottom: 40px; /* 下の矢印用 */
+    }
+    .vpc-box {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #1e293b;
+      z-index: 2;
+    }
+    .vpc-icon { font-size: 1.5em; margin-bottom: 4px; }
+    
+    .peer-link {
+      height: 4px;
+      background: #3b82f6;
+      width: 40px;
+    }
+    
+    /* NG矢印 */
+    .ng-arrow-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+    }
+    .ng-line {
+      width: 80%;
+      height: 30px;
+      border-bottom: 2px dashed #ef4444;
+      border-left: 2px dashed #ef4444;
+      border-right: 2px dashed #ef4444;
+      border-radius: 0 0 12px 12px;
+      position: absolute;
+      top: -20px; /* VPCの下端に合わせる */
+    }
+    .ng-mark {
+      background: #fff;
+      color: #ef4444;
+      font-weight: bold;
+      font-size: 1.2em;
+      padding: 0 8px;
+      position: absolute;
+      bottom: -10px; /* 線の底辺 */
+      z-index: 3;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">VPCピアリングの基本と制約</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#VPC</span>
+            <span class="tag">#Peering</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#通信</span>
+            <span class="tag">#ルーティング</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  **VPC ピアリング（VPC Peering）**は、2つの VPC 間をプライベートなネットワークで直接つなぐ接続方法です。
+</p>
+<p>
+  一言で言うと、**「別々の島（VPC）の間に、専用の橋を架けて自由に行き来できるようにすること」**です。インターネットを経由しないため、極めて安全で高速な通信が可能になります。
+</p>
+
+<h2>1. VPC ピアリングの主な特徴</h2>
+<ul>
+  <li><strong>プライベート通信:</strong> インターネット（外の世界）を一切通らず、AWSの内部バックボーン回線だけで通信します。</li>
+  <li><strong>アカウント・リージョン越えOK:</strong> 自分の別アカウントや、他人のアカウントとも接続できます。また、東京とバージニアのような遠距離（インターリージョン）でも接続可能です。</li>
+  <li><strong>ゲートウェイ不要:</strong> VPNのような専用ハードウェアやゲートウェイ設置は不要です。設定のみで即時につながります。</li>
+</ul>
+
+<h2>2. 【最重要】3つの制約事項（試験の山場）</h2>
+<p>
+  非常に便利ですが、試験では「できないこと（制約）」がよく問われます。
+</p>
+
+<h3>① 推移的ルーティングは不可（Transitive Peering）</h3>
+<p>
+  これが最も重要です。「AとB」がつながり、「BとC」がつながっていても、<strong>「AからC」へは通信できません。</strong>（Bが中継地点になることはできません）
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">推移的ルーティング不可のイメージ</div>
+  <div class="peering-flow">
+    <!-- VPC A -->
+    <div class="vpc-box">
+      <div class="vpc-icon">🏝️</div>
+      <div>VPC A</div>
+    </div>
+    <div class="peer-link"></div>
+    <!-- VPC B -->
+    <div class="vpc-box">
+      <div class="vpc-icon">🏝️</div>
+      <div>VPC B</div>
+    </div>
+    <div class="peer-link"></div>
+    <!-- VPC C -->
+    <div class="vpc-box">
+      <div class="vpc-icon">🏝️</div>
+      <div>VPC C</div>
+    </div>
+    
+    <!-- NG Line -->
+    <div class="ng-arrow-container">
+      <div class="ng-line"></div>
+      <div class="ng-mark">通信不可 (×)</div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#64748b; margin-top:20px;">
+    ※ AとCが通信したいなら、A-C間に直接新しいピアリングを作る必要があります。
+  </p>
+</div>
+
+<h3>② CIDR（IPアドレス範囲）の重複禁止</h3>
+<p>
+  接続したい2つの VPC で、IPアドレスの範囲（例: 10.0.0.0/16）が少しでも被っていると接続できません。
+</p>
+<ul>
+  <li><strong>対策:</strong> 将来ピアリングする可能性があるなら、最初からIP範囲をずらして（Aは10.0...、Bは10.1...など）設計する必要があります。</li>
+</ul>
+
+<h3>③ 1対1の接続のみ</h3>
+<p>
+  1つの設定でつなげるのは2つのVPCだけです。数十個のVPCをすべて相互接続しようとすると、設定の数が爆発的に増えて管理不能になります（フルメッシュ問題）。
+</p>
+
+<h2>3. 他の接続方法との比較</h2>
+<p>
+  「VPC同士をつなぐ方法」で迷ったら、この表で判断します。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>接続の形</th>
+      <th>メリット</th>
+      <th>デメリット</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>VPC ピアリング</th>
+      <td>1対1 (直接)</td>
+      <td><strong>無料</strong> (接続料なし)<br>低遅延</td>
+      <td>数が増えると管理が地獄<br>推移的ルーティング不可</td>
+    </tr>
+    <tr>
+      <th>Transit Gateway</th>
+      <td>ハブ＆スポーク (中心)</td>
+      <td>管理が楽<br><strong>推移的ルーティングOK</strong></td>
+      <td>有料 (接続料がかかる)</td>
+    </tr>
+    <tr>
+      <th>PrivateLink</th>
+      <td>サービス公開</td>
+      <td>特定のアプリだけを安全に共有</td>
+      <td>特定の通信のみ<br>双方向ではない</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 実務での活用メリット</h2>
+<p>
+  制約はありますが、実務では以下のシーンで必須の技術です。
+</p>
+<ul>
+  <li><strong>共通サービスの利用:</strong> 「本番VPC」と「開発VPC」から、認証サーバーがある「共通VPC」を利用する。</li>
+  <li><strong>企業間の連携:</strong> 合併したA社とB社のシステムを、プライベートにつなぐ。</li>
+  <li><strong>DBの隠蔽:</strong> データベースをインターネットから遮断されたVPCに置き、アプリVPCからのみアクセスさせる。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> 2つのVPCを「専用の橋」でつなぐ。インターネットは通らない。</li>
+  <li><strong>制約:</strong> A→B→C のようなまたぎ（推移的ルーティング）はできない。CIDR重複もNG。</li>
+  <li><strong>使い分け:</strong> 少数なら「ピアリング」、大量につなぐなら「Transit Gateway」。</li>
+</ul>
+<p>
+  「バラバラに管理したい（VPC分割）、でも通信はさせたい」という矛盾を叶えるのがVPCピアリングです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
