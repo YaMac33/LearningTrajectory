@@ -1,0 +1,22 @@
+{
+  "id": "awscp-core-vs-thread",
+  "category": "awscp",
+  "timestamp": "2026-02-03T05:30:12+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-core-vs-thread/",
+  "meta": {
+    "title": "コアとスレッドの違いを理解しよう",
+    "summary": "コアとスレッドの基本的な違いを理解し、RedisとMemcachedの処理構造についても学べる記事です。",
+    "tags": [
+      "マルチコア",
+      "スレッド",
+      "Redis",
+      "Memcached",
+      "プログラム",
+      "コンピュータ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
