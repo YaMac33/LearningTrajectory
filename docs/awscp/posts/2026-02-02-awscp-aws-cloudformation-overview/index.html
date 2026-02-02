@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS CloudFormationの概要</title>
+  <meta name="description" content="AWS CloudFormationはインフラ構築をコードで自動化するIaCサービス。テンプレート、スタックの仕組みやElastic Beanstalkとの違いを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS CloudFormationの概要" />
+  <meta property="og:description" content="AWS CloudFormationはインフラ構築をコードで自動化するIaCサービス。テンプレート、スタックの仕組みやElastic Beanstalkとの違いを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1em;
+    }
+
+    /* 1. 手動 vs 自動 比較図 */
+    .vs-process-container {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .vs-process-col {
+      flex: 1;
+      min-width: 240px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .vs-process-header {
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #1e293b;
+      font-size: 1.1em;
+    }
+    .manual-steps {
+      color: #ef4444;
+      font-size: 0.9em;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .auto-steps {
+      color: #10b981;
+      font-size: 0.9em;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .icon-large {
+      font-size: 2em;
+      margin-bottom: 8px;
+    }
+
+    /* 2. 仕組みフロー図 */
+    .cfn-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .cfn-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+      width: 140px;
+    }
+    .cfn-template { border-color: #cbd5e1; background: #f1f5f9; }
+    .cfn-engine { border-color: #f59e0b; background: #fffbeb; }
+    .cfn-stack { border-color: #3b82f6; background: #eff6ff; }
+    
+    .cfn-arrow { font-size: 1.5em; color: #94a3b8; font-weight: bold; }
+    
+    .box-icon { font-size: 1.8em; display: block; margin-bottom: 4px; }
+    .box-title { font-weight: bold; font-size: 0.95em; color: #334155; }
+    .box-desc { font-size: 0.75em; color: #64748b; margin-top: 4px; line-height: 1.3; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .vs-process-container, .cfn-flow {
+        flex-direction: column;
+      }
+      .cfn-arrow { transform: rotate(90deg); margin: 8px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS CloudFormationの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CloudFormation</span>
+            <span class="tag">#IaC</span>
+            <span class="tag">#自動化</span>
+            <span class="tag">#テンプレート</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>AWS CloudFormation（クラウドフォーメーション）は、AWSのインフラ構築を「完全自動化」</strong>するサービスです。
+</p>
+<p>
+  一言で言うと、<strong>「AWSの『設計図（コード）』を書けば、ボタン一つでその通りの環境を全自動で作ってくれるサービス」</strong>です。これを専門用語で <strong>「Infrastructure as Code (IaC)」</strong> と呼びます。試験で最も重要なキーワードの一つです。
+</p>
+
+<h2>1. なぜ CloudFormation が必要なのか？</h2>
+<p>
+  もし、あなたが「Webサーバー(EC2)と、データベース(RDS)と、ネットワーク(VPC)のセット」を、本番環境、開発環境、テスト環境の3つ分用意してくれと言われたらどうしますか？
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">手動構築 vs CloudFormation</div>
+  <div class="vs-process-container">
+    <div class="vs-process-col">
+      <div class="vs-process-header">手動 (Console)</div>
+      <div class="icon-large">🖱️😫</div>
+      <div class="manual-steps">
+        ・数百回のクリック<br>
+        ・設定ミスのリスク大<br>
+        ・3環境で数日かかる
+      </div>
+    </div>
+    <div class="vs-process-col">
+      <div class="vs-process-header">CloudFormation</div>
+      <div class="icon-large">📄🤖</div>
+      <div class="auto-steps">
+        ・設計図を1回書く<br>
+        ・それを3回流すだけ<br>
+        ・数分で全く同じ環境が完成
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 仕組み：3つの構成要素</h2>
+<p>
+  CloudFormationを理解するには、以下の3つの段階を覚えるだけでOKです。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">CloudFormation の動作フロー</div>
+  <div class="cfn-flow">
+    <div class="cfn-box cfn-template">
+      <span class="box-icon">📄</span>
+      <div class="box-title">①テンプレート</div>
+      <div class="box-desc">設計図<br>(JSON / YAML)</div>
+    </div>
+    
+    <div class="cfn-arrow">→</div>
+
+    <div class="cfn-box cfn-engine">
+      <span class="box-icon">🏗️</span>
+      <div class="box-title">②CFnエンジン</div>
+      <div class="box-desc">建設ロボット<br>(AWSサービス)</div>
+    </div>
+
+    <div class="cfn-arrow">→</div>
+
+    <div class="cfn-box cfn-stack">
+      <span class="box-icon">🏢</span>
+      <div class="box-title">③スタック</div>
+      <div class="box-desc">完成した建物<br>(リソースの集合)</div>
+    </div>
+  </div>
+</div>
+
+<h3>① テンプレート (Template) = 「設計図」</h3>
+<p>
+  「EC2を1台、S3を1つ作ってください」という指示を書いたテキストファイルです。
+</p>
+<ul>
+  <li><strong>形式:</strong> JSON または YAML（ヤムル） という形式で書かれます。</li>
+</ul>
+
+<h3>② スタック (Stack) = 「完成した建物」</h3>
+<p>
+  テンプレートをCloudFormationに読み込ませると、実際に作られるAWSリソースの「ひとまとまり」のことです。
+</p>
+<ul>
+  <li><strong>重要:</strong> スタックを削除すると、その中に含まれるEC2やRDSも一括で削除されます。お片付けが超簡単です。</li>
+</ul>
+
+<h3>③ CloudFormation エンジン = 「建設ロボット」</h3>
+<p>
+  設計図（テンプレート）を読み取って、実際にAWS APIを叩いてリソースを作ってくれる本体です。
+</p>
+
+<h2>3. 試験に出る「重要機能」</h2>
+<p>
+  CloudFormationの問題が出たら、以下のキーワードを探してください。
+</p>
+
+<h3>① 変更セット (Change Sets)</h3>
+<p>
+  スタックを更新する時の<strong>「確認画面」</strong>です。
+</p>
+<ul>
+  <li>「テンプレートを修正したけど、これを適用したら何が変わるの？」を事前にチェックできます。</li>
+  <li><strong>例:</strong> 「これを適用すると、本番DBが削除されます」といった恐ろしい事故を未然に防げます。</li>
+</ul>
+
+<h3>② ドリフト検出 (Drift Detection)</h3>
+<p>
+  <strong>「設計図と、現実のズレ」</strong>を検知する機能です。
+</p>
+<ul>
+  <li><strong>シナリオ:</strong> 誰かが勝手に手動でEC2の設定を変更してしまった（設計図には書いてないのに！）。</li>
+  <li><strong>機能:</strong> CloudFormationは「あれ？設計図と違いますよ」と教えてくれます。これを「ドリフト（漂流）」と呼びます。</li>
+</ul>
+
+<h3>③ デザイナー (Designer)</h3>
+<p>
+  コードを書くのが苦手な人のために、GUI（ドラッグ＆ドロップ）で図を描けば、自動的にJSON/YAMLコードを生成してくれるツールです。
+</p>
+
+<h2>4. AWS Elastic Beanstalk との違い</h2>
+<p>
+  「自動で環境を作る」という意味でよく混同されますが、守備範囲が違います。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>CloudFormation</th>
+      <th>Elastic Beanstalk</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>役割</th>
+      <td>インフラの自動化 (IaC)</td>
+      <td>アプリのデプロイ・管理 (PaaS)</td>
+    </tr>
+    <tr>
+      <th>自由度</th>
+      <td><strong>無限大</strong><br><small>(AWSのほぼ全サービスを操作可能)</small></td>
+      <td>制限あり<br><small>(Webアプリの定番構成のみ)</small></td>
+    </tr>
+    <tr>
+      <th>対象</th>
+      <td>ネットワーク設計や細かいセキュリティ設定までこだわりたい人</td>
+      <td>インフラのことは忘れて、アプリコードを動かしたいだけの人</td>
+    </tr>
+    <tr>
+      <th>たとえ</th>
+      <td><strong>「注文住宅」</strong><br><small>(柱一本から指定できる)</small></td>
+      <td><strong>「建売住宅」</strong><br><small>(標準的な家を即購入)</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>試験対策:</strong><br>
+  ・「アプリを手軽にデプロイしたい」 → <strong>Elastic Beanstalk</strong><br>
+  ・「インフラ構成をコードで管理したい」「再現性を高めたい」 → <strong>CloudFormation</strong></p>
+</blockquote>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>IaC (Infrastructure as Code):</strong> インフラをコード（テキスト）で管理する。</li>
+  <li><strong>テンプレート:</strong> JSONかYAMLで書かれた設計図。</li>
+  <li><strong>スタック:</strong> テンプレートから作られたリソースの集合体。一括削除が可能。</li>
+  <li><strong>メリット:</strong> 誰が作っても全く同じ環境ができる（再現性）、Gitなどでバージョン管理ができる。</li>
+</ul>
+<p>
+  これで、自動化ツールの王様であるCloudFormationについてもバッチリです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
