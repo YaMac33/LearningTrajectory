@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-ecr-role-and-features",
+    "category": "awscp",
+    "timestamp": "2026-02-02T16:53:23+09:00",
+    "title": "AWS-CP学習向け：ECRの役割とは",
+    "summary": "ECRは、コンテナイメージを保管・管理するAWSのサービスです。試験で問われるポイントとして、フルマネージドであることやIAMとの連携が挙げられます。",
+    "tags": [
+      "AWS",
+      "ECR",
+      "コンテナ",
+      "Docker",
+      "イメージ管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-ecr-role-and-features/"
+  },
+  {
     "id": "awscp-cost-explorer-cloudwatch-difference",
     "category": "awscp",
     "timestamp": "2026-02-02T12:56:52+09:00",
