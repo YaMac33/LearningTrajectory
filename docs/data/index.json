@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-macie-role-function",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:58:53+09:00",
+    "title": "Amazon Macieの役割と機能を理解しよう",
+    "summary": "Amazon Macieの機能を学ぶことで、機密データの検出やS3バケットの設定ミス防止について理解できる。試験での重要なポイントを把握することが可能です。",
+    "tags": [
+      "AWS",
+      "Macie",
+      "セキュリティ",
+      "データ保護",
+      "機密情報"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-macie-role-function/"
+  },
+  {
     "id": "awscp-aws-kms-basics-uses",
     "category": "awscp",
     "timestamp": "2026-02-02T17:55:08+09:00",
