@@ -1,0 +1,21 @@
+{
+  "id": "awscp-redis-memcached-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-03T05:12:43+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-redis-memcached-difference/",
+  "meta": {
+    "title": "RedisとMemcachedの違いを理解する",
+    "summary": "インメモリ型データストアのRedisとMemcachedの違いを、シングルスレッドとマルチスレッドの視点から理解できます。",
+    "tags": [
+      "Redis",
+      "Memcached",
+      "キャッシュ",
+      "インメモリ",
+      "ITインフラ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
