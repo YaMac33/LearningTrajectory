@@ -1,0 +1,21 @@
+{
+  "id": "awscp-websocket-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-02T18:06:34+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-websocket-basics/",
+  "meta": {
+    "title": "WebSocketの基本とAWS活用法",
+    "summary": "WebSocketの基本とリアルタイム通信の特徴を理解し、AWSサービスとの連携方法について学ぶことができます。",
+    "tags": [
+      "WebSocket",
+      "AWS",
+      "リアルタイム通信",
+      "双方向通信",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
