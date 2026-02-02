@@ -1,0 +1,21 @@
+{
+  "id": "awscp-route53-disaster-recovery",
+  "category": "awscp",
+  "timestamp": "2026-02-02T19:14:26+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-route53-disaster-recovery/",
+  "meta": {
+    "title": "Route53を利用した災害復旧戦略",
+    "summary": "AWSにおける災害復旧戦略の4種類を理解し、それぞれのコストと復旧スピードについて学びます。",
+    "tags": [
+      "AWS",
+      "Disaster Recovery",
+      "DR戦略",
+      "RTO",
+      "コスト"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
