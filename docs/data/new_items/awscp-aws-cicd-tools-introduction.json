@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cicd-tools-introduction",
+  "category": "awscp",
+  "timestamp": "2026-02-02T20:00:55+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-cicd-tools-introduction/",
+  "meta": {
+    "title": "AWS CI/CDツールの紹介",
+    "summary": "AWSのCodeシリーズを用いたCI/CDの全自動化の仕組みと役割が理解できます。各サービスの役割を工場に例えて解説しています。",
+    "tags": [
+      "AWS",
+      "CI/CD",
+      "DevOps",
+      "自動化",
+      "ソフトウェア開発"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
