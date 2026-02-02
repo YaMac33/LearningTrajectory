@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-license-manager-role",
+  "category": "awscp",
+  "timestamp": "2026-02-02T12:28:22+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-license-manager-role/",
+  "meta": {
+    "title": "AWSライセンスマネージャーの役割と機能",
+    "summary": "AWS License ManagerはSQL ServerやOracleなどのソフトウェアライセンスを無駄なく管理する方法を提供します。特にBYOLやライセンス監査に関する理解が深まります。",
+    "tags": [
+      "AWS",
+      "License Manager",
+      "BYOL",
+      "ソフトウェアライセンス",
+      "コンプライアンス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
