@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWSのマネージドとフルマネージド比較</title>
+  <meta name="description" content="AWSのマネージドサービス（RDS等）とフルマネージドサービス（DynamoDB等）の違いを、レンタカーとタクシーの例えで解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSのマネージドとフルマネージド比較" />
+  <meta property="og:description" content="AWSのマネージドサービス（RDS等）とフルマネージドサービス（DynamoDB等）の違いを、レンタカーとタクシーの例えで解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 責任分界の色分け */
+    .resp-user {
+      background-color: #fff1f2 !important; /* Light Red */
+      color: #9f1239;
+      font-weight: bold;
+    }
+    .resp-aws {
+      background-color: #ecfdf5 !important; /* Light Green */
+      color: #047857;
+      font-weight: bold;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1em;
+    }
+
+    /* 比喩比較図 */
+    .metaphor-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .metaphor-box {
+      flex: 1;
+      min-width: 260px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .m-managed {
+      border-color: #f59e0b; /* Orange */
+    }
+    .m-full {
+      border-color: #3b82f6; /* Blue */
+    }
+    .m-icon {
+      font-size: 3em;
+      margin-bottom: 10px;
+    }
+    .m-title {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      color: #1f2937;
+    }
+    .m-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      text-align: left;
+      font-size: 0.9em;
+    }
+    .m-list li {
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      background: #f3f4f6;
+    }
+    .tag-you {
+      display: inline-block;
+      background: #fca5a5;
+      color: #7f1d1d;
+      font-size: 0.75em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+      font-weight: bold;
+    }
+    .tag-aws {
+      display: inline-block;
+      background: #6ee7b7;
+      color: #064e3b;
+      font-size: 0.75em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+      font-weight: bold;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .metaphor-container {
+        flex-direction: column;
+      }
+      .article-content th {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSのマネージドとフルマネージド比較</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#マネージドサービス</span>
+            <span class="tag">#フルマネージドサービス</span>
+            <span class="tag">#RDS</span>
+            <span class="tag">#DynamoDB</span>
+            <span class="tag">#インフラ管理</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWSにおける<strong>「マネージドサービス（主にRDSなど）」と「フルマネージドサービス（S3やDynamoDB、Lambdaなど）」の違いは、一言で言うと「サーバー（OSやインスタンス）という存在を意識する必要があるかどうか」</strong>です。
+</p>
+<p>
+  これにより、利用者（あなた）が負うべき責任の範囲が大きく変わります。わかりやすく「自動車」に例えて解説します。
+</p>
+
+<h2>1. マネージドサービス vs フルマネージドサービス</h2>
+<p>
+  両者の違いを直感的に理解するための比較図です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">運用の比喩：誰が何をする？</div>
+  <div class="metaphor-container">
+    <!-- マネージド -->
+    <div class="metaphor-box m-managed">
+      <div class="m-icon">🚗</div>
+      <div class="m-title">マネージド (RDS)</div>
+      <div><strong>イメージ：レンタカー</strong></div>
+      <p style="font-size:0.85em; color:#666; margin-bottom:12px;">整備済みの車を借りる</p>
+      <ul class="m-list">
+        <li><span class="tag-aws">AWS</span>車の整備・車検</li>
+        <li><span class="tag-you">あなた</span>運転・操作</li>
+        <li><span class="tag-you">あなた</span>ガソリン補充 (容量)</li>
+        <li><span class="tag-you">あなた</span>故障時の保険加入 (冗長化)</li>
+      </ul>
+    </div>
+
+    <!-- フルマネージド -->
+    <div class="metaphor-box m-full">
+      <div class="m-icon">🚕</div>
+      <div class="m-title">フルマネージド (S3/Lambda)</div>
+      <div><strong>イメージ：タクシー</strong></div>
+      <p style="font-size:0.85em; color:#666; margin-bottom:12px;">行き先を告げるだけ</p>
+      <ul class="m-list">
+        <li><span class="tag-aws">AWS</span>車の整備・車検</li>
+        <li><span class="tag-aws">AWS</span>運転・操作</li>
+        <li><span class="tag-aws">AWS</span>ガソリン補充 (自動)</li>
+        <li><span class="tag-you">あなた</span>行き先の指定 (コード/データ)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3>マネージドサービス (例: Amazon RDS)</h3>
+<p>
+  AWSが「車の整備（OS管理）」まではしてくれますが、「運転（操作）」や「ガソリンの補充（容量管理）」はあなたの責任です。
+</p>
+<ul>
+  <li><strong>どんなサービス？</strong>: Amazon RDS, Amazon ElastiCache, Amazon Redshift など。</li>
+  <li><strong>裏側の仕組み</strong>: 裏側に「EC2インスタンス」が動いているのが見えます（インスタンスタイプ <code>db.t3.medium</code> などを選ぶ必要がある）。</li>
+  <li><strong>あなたの責任（ここが重要）</strong>:
+    <ul>
+      <li>いつパッチを当てるかのスケジュール決め（メンテナンスウィンドウ）。</li>
+      <li>ディスクが一杯にならないかの監視とサイズアップ。</li>
+      <li>「マルチAZ」にするかどうかの選択（スイッチON/OFF）。</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  結論：<strong>「OS管理などの面倒な作業はAWSがやるけど、サーバーの運用設計（サイズや冗長化）はあなたが決めてね」</strong>というスタイルです。
+</p>
+
+<h3>フルマネージドサービス (例: DynamoDB, S3, Lambda)</h3>
+<p>
+  あなたは「行き先（データやコード）」を伝えるだけです。車がどんな車種か、ガソリンがどれくらい入っているか、誰が運転するかは一切気にする必要がありません。
+</p>
+<ul>
+  <li><strong>どんなサービス？</strong>: Amazon S3, Amazon DynamoDB, AWS Lambda, Amazon SNS/SQS など。</li>
+  <li><strong>裏側の仕組み</strong>: 裏側にサーバーがあるはずですが、完全に見えません（インスタンスタイプを選ぶ必要がない）。</li>
+  <li><strong>AWSの責任</strong>:
+    <ul>
+      <li>パッチ適用（あなたが寝ている間に勝手に完了。ダウンタイムなし）。</li>
+      <li>スケーリング（アクセス増で勝手に増強）。</li>
+      <li>高可用性（最初からマルチAZで分散）。</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  結論：<strong>「サーバーの存在自体を忘れていいよ。あなたはコードとデータだけに集中してね」</strong>というスタイルです。
+</p>
+
+<h2>2. 責任境界線の比較図</h2>
+<p>
+  責任範囲がどのようにシフトするか、視覚的に比較してみましょう。色のついている部分が「誰がやるか」を示しています。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>EC2<br><small>(アンマネージド)</small></th>
+      <th>RDS<br><small>(マネージド)</small></th>
+      <th>DynamoDB<br><small>(フルマネージド)</small></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ハードウェア管理</th>
+      <td class="resp-aws">AWS</td>
+      <td class="resp-aws">AWS</td>
+      <td class="resp-aws">AWS</td>
+    </tr>
+    <tr>
+      <th>OSのパッチ当て</th>
+      <td class="resp-user">あなた</td>
+      <td class="resp-aws">AWS</td>
+      <td class="resp-aws">AWS</td>
+    </tr>
+    <tr>
+      <th>DBソフトのパッチ</th>
+      <td class="resp-user">あなた</td>
+      <td class="resp-aws">AWS<br><small>(時刻は指定)</small></td>
+      <td class="resp-aws">AWS<br><small>(勝手に完了)</small></td>
+    </tr>
+    <tr>
+      <th>バックアップ</th>
+      <td class="resp-user">あなた</td>
+      <td class="resp-aws">AWS<br><small>(設定による)</small></td>
+      <td class="resp-aws">AWS<br><small>(耐久性標準装備)</small></td>
+    </tr>
+    <tr>
+      <th>高可用性<br><small>(マルチAZ)</small></th>
+      <td class="resp-user">あなた<br><small>(自分で2台作る)</small></td>
+      <td class="resp-user">あなた<br><small>(ボタンでON)</small></td>
+      <td class="resp-aws">AWS<br><small>(最初から分散)</small></td>
+    </tr>
+    <tr>
+      <th>スケーリング</th>
+      <td class="resp-user">あなた<br><small>(Auto Scaling設定)</small></td>
+      <td class="resp-user">あなた<br><small>(手動変更)</small></td>
+      <td class="resp-aws">AWS<br><small>(自動)</small></td>
+    </tr>
+    <tr>
+      <th>データ・コード</th>
+      <td class="resp-user">あなた</td>
+      <td class="resp-user">あなた</td>
+      <td class="resp-user">あなた</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ：どちらを選ぶべき？</h2>
+<ul>
+  <li><strong>マネージドサービス (RDS等) を選ぶとき:</strong>
+    <ul>
+      <li>既存のデータベース（MySQLやPostgreSQL）をそのまま移行したい。</li>
+      <li>DBエンジンの細かい設定（パラメータ）を自分でいじりたい。</li>
+      <li>「サーバーのスペック」を自分でコントロールしたい。</li>
+    </ul>
+  </li>
+  <li><strong>フルマネージドサービス (DynamoDB/S3等) を選ぶとき:</strong>
+    <ul>
+      <li>インフラ管理を極限まで減らしたい（NoOps）。</li>
+      <li>アクセスが急増しても勝手に耐えてほしい。</li>
+      <li>OSやミドルウェアのバージョンアップ作業から解放されたい。</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  AWSの設計思想（Well-Architected）としては、可能な限り<strong>「フルマネージドサービス（サーバーレス）」を優先して採用する</strong>ことで、運用コスト（TCO）を最も下げることができるとされています。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
