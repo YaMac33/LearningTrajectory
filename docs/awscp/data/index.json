@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-shield-ddos-security",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:08:19+09:00",
+    "title": "AWS Shieldの基礎知識と試験対策",
+    "summary": "AWS Shieldを利用したDDoS攻撃対策の重要性とその2つのプランの違いを理解できる。試験対策として特に重要なポイントが整理されています。",
+    "tags": [
+      "AWS",
+      "Shield",
+      "DDoS",
+      "セキュリティ",
+      "WAF"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-shield-ddos-security/"
+  },
+  {
     "id": "awscp-aws-waf-basics",
     "category": "awscp",
     "timestamp": "2026-02-02T12:01:19+09:00",
