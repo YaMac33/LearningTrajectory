@@ -1,0 +1,22 @@
+{
+  "id": "awscp-vpc-peering-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-03T03:42:43+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-vpc-peering-basics/",
+  "meta": {
+    "title": "VPCピアリングの基本と制約",
+    "summary": "VPCピアリングは、VPC間をプライベートに接続するための基本機能です。特に推移的ルーティング不可などの制約を理解することが重要です。",
+    "tags": [
+      "VPC",
+      "Peering",
+      "AWS",
+      "ネットワーク",
+      "通信",
+      "ルーティング"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
