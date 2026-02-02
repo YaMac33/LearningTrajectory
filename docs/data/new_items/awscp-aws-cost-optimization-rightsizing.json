@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cost-optimization-rightsizing",
+  "category": "awscp",
+  "timestamp": "2026-02-02T12:47:16+09:00",
+  "post_path": "awscp/posts/2026-02-02-awscp-aws-cost-optimization-rightsizing/",
+  "meta": {
+    "title": "AWSへの移行時のライツージングポイント",
+    "summary": "オンプレミスからAWSへの移行において、コスト削減のためのライツージング（適正規模化）の重要性について理解できる。実際の利用状況に基づく最適なリソース選定が鍵となる。",
+    "tags": [
+      "AWS",
+      "コスト最適化",
+      "ライツージング",
+      "クラウド移行",
+      "インスタンスタイプ"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "コスト最適化"
+    ]
+  }
+}
