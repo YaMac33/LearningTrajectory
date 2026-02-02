@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | Route 53 トラフィックフローの魅力</title>
+  <meta name="description" content="Route 53 Traffic Flowは複雑なDNSルーティングを視覚的なフローチャートで管理できる機能。バージョン管理やテンプレート化のメリットを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Route 53 トラフィックフローの魅力" />
+  <meta property="og:description" content="Route 53 Traffic Flowは複雑なDNSルーティングを視覚的なフローチャートで管理できる機能。バージョン管理やテンプレート化のメリットを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      overflow-x: auto; /* 横スクロール対応 */
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+      position: sticky;
+      left: 0;
+    }
+
+    /* フローチャートツリー */
+    .tf-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 300px;
+    }
+    
+    .tf-node {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 0.85em;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      min-width: 140px;
+    }
+    .node-start { border-color: #64748b; color: #1e293b; }
+    .node-rule { border-color: #f59e0b; background: #fffbeb; color: #b45309; border-radius: 20px; } /* ひし形代わりの角丸 */
+    .node-end { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    
+    .tf-label {
+      font-size: 0.75em;
+      color: #64748b;
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    /* 接続線 */
+    .tf-line-v {
+      width: 2px;
+      height: 20px;
+      background: #cbd5e1;
+    }
+    
+    .tf-branch {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      position: relative;
+      padding-top: 20px;
+    }
+    /* 分岐の横線 */
+    .tf-branch::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 20px;
+      background: #cbd5e1;
+    }
+    /* 分岐の結合線 (T字) */
+    .tf-connector {
+      position: absolute;
+      top: 0;
+      left: 25%; /* 簡易的な調整 */
+      right: 25%;
+      height: 2px;
+      background: #cbd5e1;
+    }
+    /* 個別の枝 */
+    .tf-limb {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    /* 枝ごとの上線 */
+    .tf-limb::before {
+      content: "";
+      width: 2px;
+      height: 20px;
+      background: #cbd5e1;
+      margin-bottom: 0; /* nodeとの接続 */
+    }
+    
+    /* 複雑な分岐の線調整 (CSSだけで完全なツリーを描くための簡易ハック) */
+    .branch-root > .tf-limb:first-child > .tf-limb-line {
+       /* 左の枝への線 */
+       position: absolute; top: -20px; right: 50%; width: 50%; height: 2px; background: #cbd5e1;
+    }
+    .branch-root > .tf-limb:last-child > .tf-limb-line {
+       /* 右の枝への線 */
+       position: absolute; top: -20px; left: 50%; width: 50%; height: 2px; background: #cbd5e1;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .article-content th { white-space: normal; }
+      /* フローチャートは横スクロールさせるため縮小しすぎない */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Route 53 トラフィックフローの魅力</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#DNS</span>
+            <span class="tag">#Traffic Flow</span>
+            <span class="tag">#ルーティング</span>
+            <span class="tag">#フローチャート</span>
+            <span class="tag">#Amazon</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  **Route 53 Traffic Flow（トラフィックフロー）は、複雑なDNSのルールを「お絵かきソフト」**のように、ドラッグ＆ドロップで視覚的に作れる機能です。
+</p>
+<p>
+  通常、DNSの設定は無機質な「文字のリスト（表）」で行いますが、Traffic Flowを使うと、それが**「見やすいフローチャート（木構造）」**になります。そのイメージを、図を使って具体的に解説します。
+</p>
+
+<h2>1. 「文字のリスト」vs「Traffic Flow」</h2>
+<p>
+  まず、この違いをイメージしてください。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>通常の設定 (Standard)</th>
+      <th>Traffic Flow</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>見た目</th>
+      <td>Excelのような行の羅列</td>
+      <td><strong>フローチャート (図)</strong></td>
+    </tr>
+    <tr>
+      <th>複雑なルール</th>
+      <td>全体像を把握しづらい<br><small>「結局どうなってるの？」となりがち</small></td>
+      <td>一目瞭然<br><small>「ここから分岐してる」が分かる</small></td>
+    </tr>
+    <tr>
+      <th>履歴管理</th>
+      <td>基本的にない<br><small>(上書き保存)</small></td>
+      <td><strong>バージョン管理あり</strong><br><small>(v1, v2... と保存され戻せる)</small></td>
+    </tr>
+    <tr>
+      <th>コスト</th>
+      <td>レコード数課金のみ</td>
+      <td>ポリシー1つにつき月額$50程度<br><small>(※少し高いので注意)</small></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. 図解：Traffic Flow でできること</h2>
+<p>
+  Traffic Flowの画面では、上から下へ水が流れるようにトラフィック（アクセス）を整理します。以下は、「場所で振り分けて、さらに障害時（フェイルオーバー）の対策も入れる」という複雑なルールの例です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Traffic Flow のイメージ図</div>
+  
+  <div class="tf-tree">
+    <!-- Start -->
+    <div class="tf-node node-start">
+      <span class="tf-label">DNS Name</span>
+      www.example.com
+    </div>
+    
+    <div class="tf-line-v"></div>
+
+    <!-- Rule 1: Geolocation -->
+    <div class="tf-node node-rule">
+      <span class="tf-label">Rule: Geolocation</span>
+      場所で分岐
+    </div>
+
+    <!-- Branch 1 -->
+    <div class="tf-branch branch-root">
+      <!-- Left Limb (Japan) -->
+      <div class="tf-limb">
+        <div class="tf-limb-line"></div> <!-- CSS line hack -->
+        <span class="tf-label" style="margin-bottom:4px;">Japan</span>
+        
+        <!-- Rule 2: Failover (Nested) -->
+        <div class="tf-node node-rule">
+          <span class="tf-label">Rule: Failover</span>
+          健康状態で分岐
+        </div>
+        
+        <!-- Branch 2 (Failover) -->
+        <div class="tf-branch branch-root">
+          <div class="tf-limb">
+             <div class="tf-limb-line"></div>
+             <span class="tf-label">Primary</span>
+             <div class="tf-node node-end">
+               東京サーバー
+             </div>
+          </div>
+          <div class="tf-limb">
+             <div class="tf-limb-line"></div>
+             <span class="tf-label">Secondary</span>
+             <div class="tf-node node-end">
+               大阪サーバー
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Limb (Default) -->
+      <div class="tf-limb">
+        <div class="tf-limb-line"></div>
+        <span class="tf-label" style="margin-bottom:4px;">Default (Other)</span>
+        <div class="tf-node node-end" style="margin-top:auto;">
+          米国サーバー
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>図の解説</h3>
+<ol>
+  <li><strong>第1の分岐（場所）：</strong> 「日本からのアクセス（左）」と「それ以外（右）」に分けます。</li>
+  <li><strong>第2の分岐（健康状態）：</strong> 日本用のルートの中に、さらに「メイン（東京）」と「バックアップ（大阪）」の分岐を作ります。</li>
+  <li><strong>結果：</strong> 「日本からアクセスして、もし東京がダウンしていたら、大阪へ行く」という高度な動きが、図を見るだけで理解できます。</li>
+</ol>
+
+<h2>3. Traffic Flow だけのメリット</h2>
+<p>
+  単に「見やすい」だけではありません。実務で役立つ強力な機能があります。
+</p>
+
+<h3>① バージョニング（履歴管理）</h3>
+<p>
+  作成したフローチャートを「バージョン1」「バージョン2」として保存できます。
+</p>
+<ul>
+  <li>「設定を変えたら障害が起きた！」という時に、ボタン一つで<strong>「バージョン1（正常だった時の図）」に戻す</strong>ことができます。</li>
+  <li>これは普通のDNS設定（レコード編集）ではできない、Traffic Flowならではの強みです。</li>
+</ul>
+
+<h3>② テンプレート化（使い回し）</h3>
+<p>
+  一度作った複雑なフローチャート（トラフィックポリシー）を保存しておけば、別のドメイン（例：<code>app.example.com</code>）でも同じルールをすぐに適用できます。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>何ができる？</strong> 複雑なルーティング（地域分散＋フェイルオーバーなど）を、<strong>「フローチャートの絵」</strong>として作成・管理できる。</li>
+  <li><strong>どう見える？</strong> 上から下へ、条件分岐の箱がつながった<strong>「木（ツリー）」</strong>のように見える。</li>
+  <li><strong>メリットは？</strong> パッと見て構造がわかることと、失敗した時に<strong>「過去のバージョン」</strong>にすぐ戻せること。</li>
+</ul>
+<p>
+  「複雑なことをやろうとしたら、文字のリストだと限界が来た。だから図で管理しよう」というのがTraffic Flowです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
