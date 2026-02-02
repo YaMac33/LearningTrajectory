@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-ssl-offload-importance",
+    "category": "awscp",
+    "timestamp": "2026-02-02T18:10:20+09:00",
+    "title": "AWSでのSSLオフロードの重要性",
+    "summary": "このメタ記事では、AWSにおけるSSLオフロードの概念とそのメリットを解説し、ALBとACMを利用することでサーバーの負荷を軽減する方法について理解できます。",
+    "tags": [
+      "SSL Offload",
+      "AWS",
+      "ACM",
+      "ALB",
+      "インフラ",
+      "負荷軽減"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-ssl-offload-importance/"
+  },
+  {
     "id": "awscp-websocket-basics",
     "category": "awscp",
     "timestamp": "2026-02-02T18:06:34+09:00",
