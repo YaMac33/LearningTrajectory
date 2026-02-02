@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | NATゲートウェイの重要性と機能</title>
+  <meta name="description" content="プライベートサーバーが安全にインターネット接続するためのNATゲートウェイの機能と配置ルール。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="NATゲートウェイの重要性と機能" />
+  <meta property="og:description" content="プライベートサーバーが安全にインターネット接続するためのNATゲートウェイの機能と配置ルール。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. マジックミラー概念図 */
+    .mirror-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      position: relative;
+      max-width: 500px;
+      width: 100%;
+    }
+    .zone {
+      flex: 1;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .zone-private {
+      background: #eff6ff;
+      border-radius: 8px 0 0 8px;
+      border: 2px solid #bfdbfe;
+      border-right: none;
+    }
+    .zone-public {
+      background: #fdf2f8;
+      border-radius: 0 8px 8px 0;
+      border: 2px solid #fbcfe8;
+      border-left: none;
+    }
+    .nat-wall {
+      width: 12px;
+      height: 140px;
+      background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+      border-radius: 4px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+    .arrow-go {
+      color: #10b981;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .arrow-stop {
+      color: #ef4444;
+      font-weight: bold;
+    }
+    .zone-icon { font-size: 2em; margin-bottom: 4px; }
+    .zone-label { font-weight: bold; font-size: 0.9em; color: #374151; }
+    .zone-desc { font-size: 0.75em; color: #6b7280; }
+
+    /* 2. 配置ルールフロー図 */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #fff;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9em;
+      position: relative;
+    }
+    .fb-private { border-color: #64748b; background: #f8fafc; color: #334155; }
+    .fb-nat { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .fb-igw { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .fb-net { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    
+    .fb-label {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 0 4px;
+      font-size: 0.65em;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+    .flow-arrow { font-size: 1.2em; color: #9ca3af; font-weight: bold; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .mirror-container { flex-direction: column; }
+      .nat-wall { width: 80%; height: 12px; }
+      .zone-private { border-right: 2px solid #bfdbfe; border-bottom: none; border-radius: 8px 8px 0 0; width: 100%; }
+      .zone-public { border-left: 2px solid #fbcfe8; border-top: none; border-radius: 0 0 8px 8px; width: 100%; }
+      
+      .flow-steps { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); margin: 4px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">NATゲートウェイの重要性と機能</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#NATゲートウェイ</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#プライベートサブネット</span>
+            <span class="tag">#セキュリティ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  NATゲートウェイ (Network Address Translation Gateway) は、一言で言うと<strong>「プライベートな場所にいるサーバーが、インターネットに『買い物（更新）』に行くための『裏口（専用出口）』」</strong>です。
+</p>
+<p>
+  セキュリティのためにインターネットから隠されているサーバー（データベースなど）が、OSのアップデートやパッチのダウンロードをしたい時だけ、安全に外に出られるようにする仕組みです。
+</p>
+<p>
+  試験では、<strong>「プライベートサブネットからのインターネット接続」</strong>というキーワードが出たら、即座にこれを選びます。
+</p>
+
+<h2>1. なぜ NATゲートウェイが必要なのか？</h2>
+<p>
+  AWSのネットワーク（VPC）には、2種類の場所があります。
+</p>
+<ul>
+  <li><strong>パブリックサブネット:</strong> 誰からも見える場所（Webサーバーなど）。</li>
+  <li><strong>プライベートサブネット:</strong> 外からは見えない隠し部屋（データベースなど）。</li>
+</ul>
+<p>
+  プライベートサブネットにあるデータベースは、ハッカーからの攻撃を防ぐために、インターネットからのアクセスを完全に遮断しています。
+  しかし、これだと<strong>「セキュリティパッチ（更新プログラム）」すらダウンロードできません。</strong>
+</p>
+<p>
+  そこで、<strong>「外からは入ってこれないけど、中から外へ取りに行くことはできる」</strong>という仕組みが必要になります。それがNATゲートウェイです。
+</p>
+
+<h2>2. 仕組み：マジックミラー（一方通行）</h2>
+<p>
+  NATゲートウェイの動きは、<strong>「マジックミラー」や「オートロックのマンション」</strong>に似ています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">一方通行の通信イメージ</div>
+  <div class="mirror-container">
+    <div class="zone zone-private">
+      <div class="zone-icon">🏠</div>
+      <div class="zone-label">部屋の中</div>
+      <div class="zone-desc">Private Subnet</div>
+      <div class="arrow-go">外へ行ける ➡</div>
+    </div>
+    
+    <div class="nat-wall"></div> <!-- マジックミラーの壁 -->
+    
+    <div class="zone zone-public">
+      <div class="zone-icon">🌏</div>
+      <div class="zone-label">インターネット</div>
+      <div class="zone-desc">The World</div>
+      <div class="arrow-stop">⬅ 入れない</div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; margin-top:10px;">
+    ※「中からリクエストした返事（ダウンロードしたデータ）」だけは通してくれます。
+  </p>
+</div>
+
+<h2>3. 配置のルール（試験の鉄板！）</h2>
+<p>
+  NATゲートウェイを設置する場所には、絶対的なルールがあります。
+</p>
+<blockquote>
+  <p><strong>「NATゲートウェイは、必ず『パブリックサブネット』に置かなければならない」</strong></p>
+</blockquote>
+<p>
+  これが一番のひっかけポイントです。「プライベートなサーバーを助けるためのもの」なので、ついプライベートサブネットに置きたくなりますが、NATゲートウェイ自身がインターネットと通信できなければ意味がないため、パブリックな場所に置く必要があります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">正しいデータの流れ</div>
+  <div class="flow-steps">
+    <div class="flow-box fb-private">
+      <div class="fb-label">Start</div>
+      DB<br><small>(Private)</small>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box fb-nat">
+      <div class="fb-label">中継</div>
+      NAT GW<br><small>(<strong>Public</strong>)</small>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box fb-igw">
+      <div class="fb-label">出口</div>
+      IGW<br><small>(Gateway)</small>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box fb-net">
+      <div class="fb-label">Goal</div>
+      ネット
+    </div>
+  </div>
+</div>
+
+<h2>4. NAT インスタンスとの違い（新旧対決）</h2>
+<p>
+  昔は「NATインスタンス」という、普通のEC2を使って自分でNATサーバーを作っていました。試験ではこの比較がよく出ます。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>NAT ゲートウェイ (新・推奨)</th>
+      <th>NAT インスタンス (旧・非推奨)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>管理</th>
+      <td>AWSにお任せ (フルマネージド)</td>
+      <td>自分で行う (OS更新など)</td>
+    </tr>
+    <tr>
+      <th>可用性</th>
+      <td>高い (AZ内で冗長化済み)</td>
+      <td>低い (自分で予備機を作る必要あり)</td>
+    </tr>
+    <tr>
+      <th>性能</th>
+      <td>自動で拡張 (スケーラブル)</td>
+      <td>ボトルネックになりやすい</td>
+    </tr>
+    <tr>
+      <th>コスト</th>
+      <td>時間課金 ＋ データ処理量</td>
+      <td>EC2の料金のみ (安く済む場合も)</td>
+    </tr>
+    <tr>
+      <th>試験対策</th>
+      <td><strong>基本はこちらを選ぶ</strong></td>
+      <td>「コストを極限まで下げたい」時だけ検討</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. 試験に出る重要キーワード</h2>
+<ul>
+  <li><strong>Elastic IP (EIP):</strong> NATゲートウェイを作るには、固定のパブリックIP（EIP）が1つ必要です。</li>
+  <li><strong>ルートテーブル:</strong> プライベートサブネットのルートテーブルを書き換えて、「0.0.0.0/0（インターネット行き）のターゲットはNATゲートウェイ」と設定する必要があります。</li>
+  <li><strong>高可用性設計:</strong> NATゲートウェイは「1つのAZ（データセンター）」の中に作られます。もしAZ自体が停電したら使えなくなります。<br>
+    → 完璧を目指すなら、<strong>「マルチAZ」</strong>にして、各AZに1つずつNATゲートウェイを置きます。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> プライベートサブネットからインターネットへアクセスするための<strong>「出口専用ドア」</strong>。</li>
+  <li><strong>方向:</strong> 中から外へは行けるが、外から中へは入れない（セキュリティ確保）。</li>
+  <li><strong>場所:</strong> 必ず<strong>「パブリックサブネット」</strong>に配置する。</li>
+  <li><strong>推奨:</strong> 古いNATインスタンスではなく、管理不要なNATゲートウェイを使うのが基本。</li>
+</ul>
+<p>
+  これで、ネットワーク構成の重要パーツであるNATゲートウェイも完璧です。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
