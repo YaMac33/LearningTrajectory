@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-ec2-dedicated-hosts",
+    "category": "awscp",
+    "timestamp": "2026-02-02T20:27:28+09:00",
+    "title": "Amazon EC2 専有ホストの解説",
+    "summary": "AWS EC2 Dedicated Hosts の仕組みと役割について学ぶことができます。License Managerとの関係を理解し、試験での出題ポイントも押さえられます。",
+    "tags": [
+      "AWS",
+      "Dedicated Hosts",
+      "License Manager",
+      "クラウド",
+      "サーバー管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-ec2-dedicated-hosts/"
+  },
+  {
     "id": "awscp-aws-cicd-tools-introduction",
     "category": "awscp",
     "timestamp": "2026-02-02T20:00:55+09:00",
