@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-managed-full-managed-comparison",
+    "category": "awscp",
+    "timestamp": "2026-02-02T19:30:08+09:00",
+    "title": "AWSのマネージドとフルマネージドの違い",
+    "summary": "AWSのマネージドサービスとフルマネージドサービスの違いを理解し、利用者の責任範囲がどのように異なるかを解説します。",
+    "tags": [
+      "AWS",
+      "マネージドサービス",
+      "フルマネージドサービス",
+      "RDS",
+      "DynamoDB",
+      "インフラ管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-managed-full-managed-comparison/"
+  },
+  {
     "id": "awscp-route53-disaster-recovery",
     "category": "awscp",
     "timestamp": "2026-02-02T19:14:26+09:00",
