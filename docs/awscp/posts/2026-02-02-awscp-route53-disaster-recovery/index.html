@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | Route53の災害復旧戦略</title>
+  <meta name="description" content="AWSにおけるDR戦略4種（バックアップ・リストア、パイロットライト、ウォームスタンバイ、マルチサイト）の特長とコスト、RTOを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Route53の災害復旧戦略" />
+  <meta property="og:description" content="AWSにおけるDR戦略4種（バックアップ・リストア、パイロットライト、ウォームスタンバイ、マルチサイト）の特長とコスト、RTOを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1em;
+    }
+
+    /* DRスペクトラム図 */
+    .dr-spectrum {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .dr-step {
+      flex: 1;
+      min-width: 140px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    
+    /* 各段階の色分け */
+    .step-1 { border-color: #94a3b8; background: #f1f5f9; } /* Gray */
+    .step-2 { border-color: #60a5fa; background: #eff6ff; } /* Blue */
+    .step-3 { border-color: #f59e0b; background: #fffbeb; } /* Orange */
+    .step-4 { border-color: #ef4444; background: #fef2f2; } /* Red */
+
+    .dr-step-title {
+      font-weight: bold;
+      font-size: 0.9em;
+      margin-bottom: 8px;
+      color: #1e293b;
+      height: 2.4em; /* 高さ揃え */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dr-step-meta {
+      font-size: 0.8em;
+      color: #475569;
+      line-height: 1.4;
+    }
+    .dr-arrow-container {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 0.8em;
+      color: #64748b;
+      font-weight: bold;
+    }
+
+    /* 比喩ボックス */
+    .metaphor-box {
+      background: #fff;
+      border-left: 4px solid #8b5cf6;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .metaphor-title {
+      font-weight: bold;
+      color: #7c3aed;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.9em;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .dr-spectrum {
+        flex-direction: column;
+      }
+      .dr-step {
+        width: 100%;
+      }
+      .article-content th {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title"> Route53の災害復旧戦略 </h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Disaster Recovery</span>
+            <span class="tag">#DR戦略</span>
+            <span class="tag">#RTO</span>
+            <span class="tag">#コスト</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWSにおけるDR（Disaster Recovery：災害復旧）戦略は、試験でも実務でも非常に重要なテーマです。
+</p>
+<p>
+  4つの主要な戦略があり、これらは<strong>「復旧までのスピード（RTO）」と「コスト」のトレードオフ</strong>の関係にあります。「お金をかければ速く直る」というシンプルな法則です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">全体像：コストと復旧スピードの関係</div>
+  <div class="dr-arrow-container">
+    <span>◀ 安い・遅い</span>
+    <span>高い・速い ▶</span>
+  </div>
+  <div class="dr-spectrum">
+    <div class="dr-step step-1">
+      <div class="dr-step-title">バックアップ<br>リストア</div>
+      <div class="dr-step-meta">コスト: 激安<br>RTO: 数日</div>
+    </div>
+    <div class="dr-step step-2">
+      <div class="dr-step-title">パイロット<br>ライト</div>
+      <div class="dr-step-meta">コスト: 低<br>RTO: 数十分</div>
+    </div>
+    <div class="dr-step step-3">
+      <div class="dr-step-title">ウォーム<br>スタンバイ</div>
+      <div class="dr-step-meta">コスト: 中<br>RTO: 数分</div>
+    </div>
+    <div class="dr-step step-4">
+      <div class="dr-step-title">マルチサイト<br>(Active/Active)</div>
+      <div class="dr-step-meta">コスト: 最高<br>RTO: 即時</div>
+    </div>
+  </div>
+</div>
+
+<p>
+  これらを実現するための「切り替えスイッチ」として、DNSサービスである <strong>Amazon Route 53</strong> が重要な役割を果たします。
+</p>
+
+<h2>1. バックアップ・リストア (Backup and Restore)</h2>
+<p>
+  <strong>「壊れてから、作り直す」</strong>方式です。
+</p>
+<div class="metaphor-box">
+  <span class="metaphor-title">イメージ</span>
+  家が全焼した後に、保管していた設計図と保険金を使って、ゼロから新しい家を建て直す。
+</div>
+<ul>
+  <li><strong>平時の状態:</strong> DR用リージョン（大阪など）には、サーバーは1台もありません。S3にデータ（バックアップ）だけが転送されています。</li>
+  <li><strong>災害時:</strong> Route 53は一旦「メンテナンス画面（Sorryページ）」を表示します。その間にCloudFormationなどでインフラを構築し、データを戻します。</li>
+  <li><strong>特徴:</strong> コストは最安（データ保管料のみ）ですが、復旧には数時間〜数日かかります。</li>
+</ul>
+
+<h2>2. パイロットライト (Pilot Light)</h2>
+<p>
+  <strong>「種火（たねび）だけ点けておく」</strong>方式です。
+</p>
+<div class="metaphor-box">
+  <span class="metaphor-title">イメージ</span>
+  ガスコンロの火は消しているが、<strong>種火（パイロットライト）</strong>だけは点いている状態。ひねればすぐ着火できる。
+</div>
+<ul>
+  <li><strong>平時の状態:</strong>
+    <ul>
+      <li>データベース（重要データ）: DR側でも常に稼働・同期させておきます（これが種火）。</li>
+      <li>Webサーバー（EC2）: <strong>停止（シャットダウン）</strong>しておきます。AMI（イメージ）だけある状態です。</li>
+    </ul>
+  </li>
+  <li><strong>災害時:</strong> 停止していたEC2を一斉に起動し、Route 53で向き先を切り替えます。</li>
+  <li><strong>特徴:</strong> サーバー起動待ち（数十分）が発生しますが、コストは安く抑えられます。</li>
+</ul>
+
+<h2>3. ウォームスタンバイ (Warm Standby)</h2>
+<p>
+  <strong>「縮小版を動かしておく」</strong>方式です。
+</p>
+<div class="metaphor-box">
+  <span class="metaphor-title">イメージ</span>
+  普段は軽自動車（小スペック）で移動しているが、いざという時はスポーツカーに変身する。
+</div>
+<ul>
+  <li><strong>平時の状態:</strong> システム全体を、DR側でも<strong>「最小構成」</strong>で動かし続けます。（例：本番10台に対し、DR側は1台だけ）</li>
+  <li><strong>災害時:</strong> Route 53が即座に切り替えます。そのままだとパンクするので、Auto Scalingで自動的に台数を増やします。</li>
+  <li><strong>特徴:</strong> ビジネスに不可欠な機能だけは即時復旧できます（数分）。</li>
+</ul>
+
+<h2>4. マルチサイト (Multi-Site Active/Active)</h2>
+<p>
+  <strong>「両方とも本番」</strong>方式です。
+</p>
+<div class="metaphor-box">
+  <span class="metaphor-title">イメージ</span>
+  東京本店と大阪支店が両方ともフル稼働していて、客は近い方に行く。
+</div>
+<ul>
+  <li><strong>平時の状態:</strong> 東京と大阪で、全く同じスペックの環境がフル稼働しています。Route 53の「レイテンシールーティング」などで負荷分散しています。</li>
+  <li><strong>災害時:</strong> もし東京が全滅しても、Route 53が自動検知し、全トラフィックを大阪へ流します。大阪もフルスペックなのでそのまま耐えられます。</li>
+  <li><strong>特徴:</strong> コストは2倍かかりますが、復旧時間はほぼゼロ（ユーザーは障害に気づかない）です。</li>
+</ul>
+
+<h2>Route 53 の設定（フェイルオーバー）</h2>
+<p>
+  これらを実現するために、Route 53では以下の設定を行います。
+</p>
+<ul>
+  <li><strong>ヘルスチェック:</strong> メインサイトが生きているか死んでいるかを常に監視します。</li>
+  <li><strong>フェイルオーバールーティング:</strong>
+    <ul>
+      <li>プライマリ: 通常時の向き先（東京）。</li>
+      <li>セカンダリ: 災害時の向き先（大阪）。</li>
+      <li>「プライマリのヘルスチェックが失敗したら、自動的にセカンダリへDNSを書き換える」という動きをします。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>まとめ</h2>
+<p>試験や設計では、<strong>「許されるダウンタイム（RTO）」と「予算」</strong>を聞き出して、この4つから最適なものを選びます。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方式名</th>
+      <th>サーバーの状態</th>
+      <th>コスト</th>
+      <th>復旧スピード (RTO)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>バックアップ・リストア</th>
+      <td>なし (データのみ)</td>
+      <td>激安</td>
+      <td>遅い (数時間〜)</td>
+    </tr>
+    <tr>
+      <th>パイロットライト</th>
+      <td>DBのみ稼働 (Appは停止)</td>
+      <td>安い</td>
+      <td>やや遅い (数十分)</td>
+    </tr>
+    <tr>
+      <th>ウォームスタンバイ</th>
+      <td>最小構成で稼働</td>
+      <td>普通</td>
+      <td>速い (数分)</td>
+    </tr>
+    <tr>
+      <th>マルチサイト</th>
+      <td>全開で稼働</td>
+      <td>高い</td>
+      <td>最速 (即時)</td>
+    </tr>
+  </tbody>
+</table>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
