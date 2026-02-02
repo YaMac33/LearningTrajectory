@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Ground Truthの活用法</title>
+  <meta name="description" content="AIに正解ラベルを効率よく付与するサービス、Amazon SageMaker Ground Truthの魅力を解説。アノテーションの自動化やワーカーの選択肢など、試験頻出ポイントを学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Ground Truthの活用法" />
+  <meta property="og:description" content="AIに正解ラベルを効率よく付与するサービス、Amazon SageMaker Ground Truthの魅力を解説。アノテーションの自動化やワーカーの選択肢など、試験頻出ポイントを学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* ラベリング作業イメージ */
+    .labeling-ui {
+      background: #333;
+      padding: 1rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+    }
+    .ui-screen {
+      background: #fff;
+      height: 150px;
+      border-radius: 4px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    .bounding-box {
+      position: absolute;
+      border: 3px solid #d86613;
+      width: 80px;
+      height: 80px;
+      top: 35px;
+      left: 100px;
+    }
+    .box-label {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      background: #d86613;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .ui-controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+    .btn-dummy {
+      background: #666;
+      height: 10px;
+      width: 60px;
+      border-radius: 5px;
+    }
+    .btn-submit {
+      background: #d86613; /* SageMaker Green-ish or Orange */
+    }
+
+    /* ワーカー比較 */
+    .worker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .worker-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+      border-top: 4px solid #666;
+    }
+    .card-mturk { border-top-color: #f0ad4e; }
+    .card-private { border-top-color: #2a5caa; }
+    .card-vendor { border-top-color: #24882c; }
+
+    .worker-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .worker-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .worker-desc {
+      font-size: 0.85rem;
+      color: #666;
+      text-align: left;
+    }
+
+    /* 自動ラベリングフロー */
+    .auto-label-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 0.8rem;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      min-width: 100px;
+    }
+    .box-human { border-color: #2a5caa; color: #2a5caa; }
+    .box-ai { border-color: #d86613; color: #d86613; background-color: #fff5eb; }
+    
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+    
+    .percentage-down {
+      font-size: 1.5rem;
+      color: #d9534f;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #24882c; /* SageMaker Green */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Ground Truthの活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">SageMaker</li>
+            <li class="tag">Ground Truth</li>
+            <li class="tag">機械学習</li>
+            <li class="tag">データラベリング</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AI/ML（機械学習）の分野で、実は一番大変で地味な作業を劇的に楽にしてくれるのが <strong>Amazon SageMaker Ground Truth（グラウンドトゥルース）</strong> です。機械学習のモデルを作るには、まず「正解」が書かれた大量のデータが必要です。これを準備するプロセスを詳しく解説します。</p>
+
+<h2>1. Ground Truth とは？</h2>
+<p>一言でいうと、<strong>「AIに学習させるための『正解ラベル』を、効率よくデータに貼り付ける（アノテーション）ためのサービス」</strong>です。</p>
+<h3>噛み砕いた解説：子供の「図鑑づくり」</h3>
+<p>小さな子供（AI）に「これは犬、これは猫」と教えるためには、写真の横に正解を書いてあげる作業が必要です。</p>
+<ul>
+<li>AIも同じで、何万枚もの写真に対して「ここに写っているのは犬です」という<strong>ラベル（正解）</strong>を人間が付けてあげないと、学習が始まりません。</li>
+<li>この<strong>「ラベルを貼る作業（アノテーション）」</strong>を、世界中のワーカーや自社チームに依頼し、管理できるのが Ground Truth です。</li>
+</ul>
+
+<div class="diagram-container">
+  <div class="labeling-ui">
+    <div style="color:#fff; font-size:0.8rem; margin-bottom:0.5rem;">ラベリング作業画面イメージ</div>
+    <div class="ui-screen">
+      🐕
+      <div class="bounding-box">
+        <span class="box-label">Dog</span>
+      </div>
+    </div>
+    <div class="ui-controls">
+      <div class="btn-dummy"></div>
+      <div class="btn-dummy"></div>
+      <div class="btn-dummy btn-submit"></div>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">人間がツールを使って「ここが犬！」と枠で囲む作業を支援します。</p>
+</div>
+
+<h2>2. 誰が「正解」を書くのか？（3つの選択肢）</h2>
+<p>Ground Truthでは、作業を依頼する相手（Workforce）を柔軟に選べます。</p>
+
+<div class="diagram-container">
+  <div class="worker-grid">
+    <div class="worker-card card-mturk">
+      <span class="worker-icon">🌍</span>
+      <span class="worker-title">Amazon Mechanical Turk</span>
+      <p class="worker-desc">
+        世界中にいる数十万人のクラウドワーカーに依頼する。<br>
+        <strong>安くて速い</strong>のが特徴。<br>
+        ※機密データには不向き。
+      </p>
+    </div>
+    <div class="worker-card card-private">
+      <span class="worker-icon">🏢</span>
+      <span class="worker-title">自社チーム (Private)</span>
+      <p class="worker-desc">
+        自社の社員や、特定の外注業者に作業させる。<br>
+        <strong>機密データ</strong>や専門知識が必要な場合に最適。
+      </p>
+    </div>
+    <div class="worker-card card-vendor">
+      <span class="worker-icon">🤝</span>
+      <span class="worker-title">認定ベンダー</span>
+      <p class="worker-desc">
+        AWSが選定したプロのデータ作成業者に依頼する。<br>
+        品質とセキュリティのバランスが良い。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>3. Ground Truth のすごい機能：自動データラベリング</h2>
+<p>数万件のデータすべてを人間がやるのは大変です。Ground Truthには<strong>「機械学習による自動化」</strong>の仕組みが備わっています。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">自動化の流れ</p>
+  <div class="auto-label-flow">
+    <div class="flow-box box-human">
+      👩‍💻 人間<br>
+      <small>最初の数件</small>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="flow-box box-ai">
+      🤖 AI学習<br>
+      <small>傾向を掴む</small>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="flow-box box-ai">
+      🤖 自動ラベル<br>
+      <small>残りを処理</small>
+    </div>
+  </div>
+  <div class="percentage-down" style="margin-top:1.5rem;">
+    📉 コスト最大 70% 削減
+  </div>
+</div>
+
+<ul>
+<li><strong>仕組み：</strong> 最初の数件を人間が手本としてやると、AIがその傾向を学習し、残りのデータを「これもおそらく犬ですね？」と自動でラベル貼りします。</li>
+<li><strong>信頼度チェック：</strong> AIが「自信がない」と判断したものだけ、人間にパスして確認を求めます。</li>
+</ul>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<ul class="check-list">
+<li><strong>キーワード：</strong> 「データラベリング」「アノテーション」「正解データ（Ground Truth）の作成」。</li>
+<li><strong>目的：</strong> 機械学習モデルの<strong>「学習用データセット」</strong>を準備すること。</li>
+<li><strong>SageMakerの一部：</strong> 独立したサービスではなく、機械学習プラットフォームである <strong>Amazon SageMaker</strong> の機能の一つです。</li>
+</ul>
+
+<h2>5. 実務イメージ：自動運転の開発</h2>
+<p>自動運転AIを作るには、道路の映像から「歩行者」「信号」「車」をすべて認識させる必要があります。</p>
+<ol>
+<li>車載カメラで撮った膨大な映像（生データ）を **S3** に保存。</li>
+<li>**Ground Truth** を起動し、映像内の物体を四角い枠（バウンディングボックス）で囲む作業を依頼。</li>
+<li>人間が「これが歩行者です」とポチポチ囲ったデータが、AIの「教科書」になる。</li>
+<li>完成した「教科書」を使って **SageMaker** でAIを訓練する。</li>
+</ol>
+
+<h2>まとめ</h2>
+<p>Ground Truthは、<strong>「AIに教えるための『正解付きの教科書』を作るサービス」</strong>です。これがあるおかげで、開発者は「ひたすら写真に名前を書く」という苦行から解放され、モデルの開発に集中できます。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
