@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | コスト管理ツールの違い(Cost ExplorerとCloudWatch)</title>
+  <meta name="description" content="AWS Cost ExplorerとAmazon CloudWatchの機能と用途の違いを解説。「家計簿」と「タクシーメーター」に例え、分析と監視の使い分けを学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="コスト管理ツールの違い(Cost ExplorerとCloudWatch)" />
+  <meta property="og:description" content="AWS Cost ExplorerとAmazon CloudWatchの機能と用途の違いを解説。「家計簿」と「タクシーメーター」に例え、分析と監視の使い分けを学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* メタファー比較図 */
+    .metaphor-wrapper {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .metaphor-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-ce { border-top: 4px solid #2a5caa; } /* Blue */
+    .card-cw { border-top: 4px solid #d9534f; } /* Red */
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .card-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .card-role {
+      font-weight: bold;
+      background: #eee;
+      padding: 0.2rem 0.8rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      display: inline-block;
+      color: #555;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 20%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* シナリオボックス */
+    .scenario-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+    .scenario-box {
+      border: 1px solid #ddd;
+      border-left: 5px solid #666;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 4px;
+    }
+    .scenario-a { border-left-color: #2a5caa; }
+    .scenario-b { border-left-color: #d9534f; }
+    
+    .scenario-title {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .scenario-solution {
+      margin-top: 0.5rem;
+      font-weight: bold;
+      color: #333;
+    }
+    .scenario-arrow {
+      color: #999;
+      margin-right: 0.5rem;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title"> コスト管理ツールの違い(Cost ExplorerとCloudWatch) </h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Cost Management</li>
+            <li class="tag">CloudWatch</li>
+            <li class="tag">Cost Explorer</li>
+            <li class="tag">分析</li>
+            <li class="tag">監視</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「コストをモニタリングする」という目的において、<strong>AWS Cost Explorer（コストエクスプローラー）とAmazon CloudWatch（クラウドウォッチ）は、「見るタイミング」と「アクション」</strong>が決定的に違います。一言で例えると、この違いは<strong>「家計簿」と「タクシーのメーター」</strong>の関係に似ています。</p>
+
+<div class="diagram-container">
+  <div class="metaphor-wrapper">
+    <!-- Cost Explorer -->
+    <div class="metaphor-card card-ce">
+      <span class="card-icon">📒</span>
+      <span class="card-title">Cost Explorer</span>
+      <span class="card-role">家計簿・分析官</span>
+      <p class="card-desc">
+        「先月いくら使った？」「来月いくらになりそう？」<br>
+        過去を分析し、未来を予測する。<br>
+        <strong>(Why & Future)</strong>
+      </p>
+    </div>
+
+    <!-- CloudWatch -->
+    <div class="metaphor-card card-cw">
+      <span class="card-icon">🚕</span>
+      <span class="card-title">CloudWatch</span>
+      <span class="card-role">メーター・警備員</span>
+      <p class="card-desc">
+        「今、料金が急上昇してない？」<br>
+        1万円を超えたら即アラームを鳴らす。<br>
+        <strong>(Now & Alert)</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>1. AWS Cost Explorer（家計簿・分析官）</h2>
+<p>こちらは<strong>「過去の分析」と「未来の予測」</strong>が得意なツールです。</p>
+<ul>
+<li><strong>役割：</strong> これまでの利用料をグラフ（棒グラフや折れ線グラフ）で可視化します。「どのサービス（EC2やRDS）にお金がかかっているか」を深掘りします。</li>
+<li><strong>データの鮮度：</strong> リアルタイムではありません。データが反映されるまで約24時間の遅れがあります。</li>
+<li><strong>主な用途：</strong>
+<ul>
+<li>「先月の請求が高かった原因を特定したい」</li>
+<li>「開発部と営業部、どっちがお金を使っているか比較したい」</li>
+<li>「年間予算を立てるための資料を作りたい」</li>
+</ul>
+</li>
+</ul>
+
+<h2>2. Amazon CloudWatch（メーター・警備員）</h2>
+<p>こちらは<strong>「リアルタイムに近い監視」と「緊急時の通知」</strong>が得意なツールです。</p>
+<ul>
+<li><strong>役割：</strong> コストを<strong>「数値（メトリクス）」</strong>として扱います。CPU使用率やメモリと同じ扱いです。「請求額（概算）」というデータを監視し、設定したラインを超えたら<strong>アラート（警報）</strong>を鳴らします。</li>
+<li><strong>データの鮮度：</strong> 比較的リアルタイム（数時間ごとの更新）でチェックできます。</li>
+<li><strong>主な用途：</strong>
+<ul>
+<li><strong>請求アラーム (Billing Alarm)：</strong> 「利用料が100ドルを超えたら、すぐにメールで通知して！」</li>
+<li>「異常な急増にすぐ気づいて、被害を最小限に止めたい」</li>
+</ul>
+</li>
+</ul>
+
+<h2>3. 違いのまとめ（比較表）</h2>
+<p>試験や実務で使い分けるためのポイントです。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS Cost Explorer</th>
+      <th>Amazon CloudWatch</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>たとえ</strong></td>
+      <td>家計簿 / 分析レポート</td>
+      <td>タクシーメーター / 警報機</td>
+    </tr>
+    <tr>
+      <td><strong>視点</strong></td>
+      <td>「分析」 (Why & Future)</td>
+      <td>「監視」 (Now & Alert)</td>
+    </tr>
+    <tr>
+      <td><strong>データの粒度</strong></td>
+      <td>日次、月次</td>
+      <td>数時間単位</td>
+    </tr>
+    <tr>
+      <td><strong>できること</strong></td>
+      <td>グラフ化、フィルタリング、予測</td>
+      <td>アラーム通知 (SNS連携)</td>
+    </tr>
+    <tr>
+      <td><strong>アクション</strong></td>
+      <td>「来月から節約しよう」と計画する</td>
+      <td class="highlight-cell">「やばい！すぐサーバーを止めろ！」と動く</td>
+    </tr>
+    <tr>
+      <td><strong>試験キーワード</strong></td>
+      <td>可視化、分析、予測、推奨事項</td>
+      <td>通知、アラーム、閾値(しきいち)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 具体的な使い分けシナリオ</h2>
+<p>実際の現場ではこのように使い分けます。</p>
+
+<div class="diagram-container">
+  <div class="scenario-container">
+    <div class="scenario-box scenario-a">
+      <span class="scenario-title">シナリオA：原因究明</span>
+      <p>「先月、急に料金が上がったんだけど、どのインスタンスが原因か調べておいて」と言われた。</p>
+      <div class="scenario-solution">
+        <span class="scenario-arrow">➡</span> Cost Explorer を使って、サービス別・タグ別でグラフを見る。
+      </div>
+    </div>
+
+    <div class="scenario-box scenario-b">
+      <span class="scenario-title">シナリオB：緊急停止</span>
+      <p>「クラウド破産が怖いから、利用料が5,000円を超えた瞬間にスマホに通知が欲しい」と言われた。</p>
+      <div class="scenario-solution">
+        <span class="scenario-arrow">➡</span> CloudWatch で「請求アラーム」を設定し、SNSでメールを送る。
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>このように、<strong>「原因を知りたいならCost Explorer」「今すぐ気づきたいならCloudWatch」</strong>と覚えておけばバッチリです！</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
