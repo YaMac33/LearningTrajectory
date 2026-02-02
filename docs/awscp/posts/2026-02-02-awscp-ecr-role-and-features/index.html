@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ECRの役割と特徴</title>
+  <meta name="description" content="Amazon ECRはコンテナイメージを保管・管理するAWSの倉庫です。「コンテナイメージ」と「コンテナ」の違いを料理に例えながら、開発から公開までの流れを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ECRの役割と特徴" />
+  <meta property="og:description" content="Amazon ECRはコンテナイメージを保管・管理するAWSの倉庫です。「コンテナイメージ」と「コンテナ」の違いを料理に例えながら、開発から公開までの流れを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* カレーの比喩図 */
+    .curry-analogy {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .analogy-box {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .box-image { border-top: 4px solid #d86613; } /* ECR Orange */
+    .box-container { border-top: 4px solid #24882c; } /* ECS Green */
+
+    .analogy-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .analogy-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .analogy-desc {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+    }
+    .aws-service {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #333;
+      display: block;
+      background: #eee;
+      padding: 0.3rem;
+      border-radius: 4px;
+    }
+
+    /* 開発フロー図 */
+    .dev-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 650px;
+      flex-wrap: wrap;
+    }
+    .flow-node {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      min-width: 120px;
+      font-size: 0.9rem;
+      position: relative;
+    }
+    .node-pc { border-color: #333; }
+    .node-ecr { border-color: #d86613; color: #d86613; font-weight: bold; }
+    .node-ecs { border-color: #24882c; color: #24882c; font-weight: bold; }
+
+    .flow-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #999;
+      font-size: 1.2rem;
+      margin: 0 0.5rem;
+    }
+    .arrow-text {
+      font-size: 0.75rem;
+      color: #d86613;
+      font-weight: bold;
+      margin-bottom: -5px;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #d86613;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ECRの役割と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">ECR</li>
+            <li class="tag">コンテナ</li>
+            <li class="tag">Docker</li>
+            <li class="tag">イメージ管理</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>コンテナ技術において、地味ですが絶対に欠かせない存在、それが「ECR」です。一言で言うと、<strong>「Amazon ECR (Elastic Container Registry) は、開発者が作った『コンテナイメージ』を安全に保管・管理するための『倉庫（レジストリ）』」</strong>です。</p>
+
+<h2>1. Amazon ECRとは？</h2>
+<p>コンテナ（アプリを動かすための詰め合わせパック）を動かすには、その「設計図兼中身」である「イメージ」が必要です。ECRは、そのイメージをしまっておくための、AWS専用のクローゼットのような存在です。</p>
+<ul>
+<li><strong>役割：</strong> コンテナイメージの保管庫。</li>
+<li><strong>イメージ：</strong> <strong>Docker HubのAWS版</strong> だと考えると分かりやすいです。Docker Hubは世界中の人が使う公開倉庫ですが、ECRは自分専用のプライベートな倉庫を作れます。</li>
+</ul>
+
+<h2>2. 「コンテナイメージ」と「コンテナ」の違い</h2>
+<p>初学者が最も混乱するのがこの2つの違いです。「料理」に例えるとスッキリ理解できます。</p>
+
+<div class="diagram-container">
+  <div class="curry-analogy">
+    <!-- イメージ -->
+    <div class="analogy-box box-image">
+      <span class="analogy-icon">🍛</span>
+      <span class="analogy-title">コンテナイメージ<br>(レトルトパック)</span>
+      <div class="analogy-desc">
+        誰がどこで開けても同じ味が再現できる「中身が詰まった状態」。<br>
+        <strong>これは「ECR」に保存します。</strong>
+      </div>
+      <span class="aws-service">保管場所：Amazon ECR</span>
+    </div>
+
+    <!-- コンテナ -->
+    <div class="analogy-box box-container">
+      <span class="analogy-icon">🍽️</span>
+      <span class="analogy-title">コンテナ<br>(お皿のカレー)</span>
+      <div class="analogy-desc">
+        パックを開封して、実際に食べられる（動いている）状態。<br>
+        <strong>これは「ECS」などで動かします。</strong>
+      </div>
+      <span class="aws-service">実行場所：Amazon ECS / EKS</span>
+    </div>
+  </div>
+</div>
+
+<blockquote>
+<p><strong>ポイント：</strong> ECRは「レトルトパック（イメージ）」を並べておく棚です。食べる（実行する）場所ではありません。</p>
+</blockquote>
+
+<h2>3. 実務イメージ：開発から公開まで</h2>
+<p>実際の開発現場では、以下のような流れでECRを使います。</p>
+
+<div class="diagram-container">
+  <p style="font-weight:bold; margin-bottom:1rem;">コンテナデプロイの流れ</p>
+  <div class="dev-flow">
+    <div class="flow-node node-pc">
+      💻 開発者PC<br>
+      <small>イメージ作成 (Build)</small>
+    </div>
+    
+    <div class="flow-arrow">
+      <span class="arrow-text">Push</span>
+      <span>➡</span>
+    </div>
+    
+    <div class="flow-node node-ecr">
+      📦 Amazon ECR<br>
+      <small>保管 (Store)</small>
+    </div>
+
+    <div class="flow-arrow">
+      <span class="arrow-text">Pull</span>
+      <span>➡</span>
+    </div>
+
+    <div class="flow-node node-ecs">
+      🚀 実行環境<br>
+      <small>ECS / Fargate</small>
+    </div>
+  </div>
+</div>
+
+<ol>
+<li><strong>作成 (Build)：</strong> 開発者が自分のPCでアプリを作り、「コンテナイメージ」を作成します。</li>
+<li><strong>保管 (Push)：</strong> そのイメージを <strong>Amazon ECR</strong> にアップロード（Push）して保存します。</li>
+<li><strong>実行 (Pull)：</strong> 本番サーバー（ECSやFargate）が、ECRからイメージをダウンロード（Pull）して、アプリを起動します。</li>
+</ol>
+
+<h2>4. 試験で問われやすいポイント</h2>
+<p>AWS認定試験（CLF-C02など）で出るポイントは以下の通りです。</p>
+
+<ul class="check-list">
+<li><strong>フルマネージド：</strong> 自分で倉庫サーバーを管理する必要がなく、スケーラブル（容量を気にしなくて良い）です。</li>
+<li><strong>IAMとの連携：</strong> 「誰がイメージを保存できるか」「誰が取り出せるか」をAWSの権限管理（IAM）で細かく設定できます（Docker Hubに対するメリット）。</li>
+<li><strong>スキャン機能：</strong> 保存したイメージにウイルスや脆弱性が含まれていないか、自動でチェックしてくれる機能があります。</li>
+<li><strong>連携先：</strong> ECRからイメージを持ってきて動かす先は、主に <strong>Amazon ECS</strong> や <strong>Amazon EKS</strong>、<strong>AWS Fargate</strong> です。</li>
+</ul>
+
+<h2>5. まとめ</h2>
+<p>「ECRはコンテナの<strong>イメージ（設計図・レトルトパック）を保管する倉庫</strong>」と覚えれば、試験対策としては完璧です。実行するのはECSなどの別のサービスの仕事です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
