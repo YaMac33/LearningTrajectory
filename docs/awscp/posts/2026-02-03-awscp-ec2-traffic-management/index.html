@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | EC2間のトラフィック管理の要点</title>
+  <meta name="description" content="EC2インスタンスのトラフィック制御における「セキュリティグループ」と「ネットワークACL」の違い、役割、使い分けを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EC2間のトラフィック管理の要点" />
+  <meta property="og:description" content="EC2インスタンスのトラフィック制御における「セキュリティグループ」と「ネットワークACL」の違い、役割、使い分けを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 2段階防御図 */
+    .defense-layers {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    /* 外側：サブネット (NACL) */
+    .layer-subnet {
+      border: 3px dashed #64748b;
+      background: #f1f5f9;
+      padding: 30px;
+      border-radius: 12px;
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .label-nacl {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #64748b;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85em;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* 内側：インスタンス (SG) */
+    .layer-instance {
+      border: 3px solid #3b82f6;
+      background: #eff6ff;
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+      width: 80%;
+      text-align: center;
+    }
+    .label-sg {
+      position: absolute;
+      top: -14px;
+      right: 20px;
+      background: #3b82f6;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85em;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .ec2-icon {
+      font-size: 2.5em;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .layer-desc {
+      font-size: 0.8em;
+      color: #475569;
+      margin-top: 4px;
+      font-weight: bold;
+    }
+    
+    /* 通信矢印 */
+    .traffic-arrow {
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5em;
+      color: #ef4444;
+      font-weight: bold;
+      text-shadow: 1px 1px 0 #fff;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .article-content th { white-space: normal; }
+      .layer-instance { width: 90%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EC2間のトラフィック管理の要点</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#EC2</span>
+            <span class="tag">#VPC</span>
+            <span class="tag">#セキュリティグループ</span>
+            <span class="tag">#ネットワークACL</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Q. 「複数のEC2インスタンス間における、許可されているトラフィックを確認するためのVPCコンポーネント」が理解できないのでわかりやすく解説してください。
+</p>
+<p>
+  A. その問題文における「確認する」という言葉は、「今の設定ルール上、どの通信が許可されているかを確認・制御している場所はどこか？」という意味で使われています。
+</p>
+<p>
+  つまり、<strong>「通信を通すか通さないかを決めている『2つのファイアウォール機能』はどれ？」</strong>という問いかけです。この2つはセットで出題される超重要項目ですので、その違いと役割を整理して解説します。
+</p>
+
+<h2>1. 二重の守り：セキュリティグループとネットワークACL</h2>
+<p>
+  AWSのVPCには、インスタンスを守るために<strong>2段階の検問（ファイアウォール）</strong>があります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">2段階の防御イメージ</div>
+  <div class="defense-layers">
+    
+    <!-- 第1関門: NACL -->
+    <div class="layer-subnet">
+      <div class="label-nacl">① ネットワークACL (関所)</div>
+      
+      <!-- 第2関門: SG -->
+      <div class="layer-instance">
+        <div class="label-sg">② セキュリティグループ (玄関)</div>
+        <span class="ec2-icon">🖥️</span>
+        <div>EC2 インスタンス</div>
+      </div>
+      
+      <!-- 矢印 -->
+      <div class="traffic-arrow" style="left: 10px;">➔</div>
+    </div>
+    
+  </div>
+  <p class="layer-desc">通信は必ず「①サブネットの入り口」を通ってから、「②インスタンスの入り口」に到達します。</p>
+</div>
+
+<h3>① 第1の関門：ネットワークACL (NACL)</h3>
+<ul>
+  <li><strong>場所:</strong> サブネットの入り口（街のゲート）。</li>
+  <li><strong>役割:</strong> そのサブネット全体の出入りを管理します。</li>
+  <li><strong>特徴:</strong>
+    <ul>
+      <li><strong>ステートレス（Stateless）:</strong> 行きの通信を許可しても、帰りの通信も別途許可しないと通れません（記憶力がない門番）。</li>
+      <li><strong>拒否（DENY）ができる:</strong> 「特定のIPアドレス（攻撃者）をブロックする」という設定が可能です。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>② 第2の関門：セキュリティグループ (SG)</h3>
+<ul>
+  <li><strong>場所:</strong> EC2インスタンスの目の前（家の玄関）。</li>
+  <li><strong>役割:</strong> インスタンスごとの出入りを管理します。</li>
+  <li><strong>特徴:</strong>
+    <ul>
+      <li><strong>ステートフル（Stateful）:</strong> 行きの通信を許可すれば、帰りの通信は自動的に許可されます（顔を覚えてくれる門番）。</li>
+      <li><strong>許可（ALLOW）のみ:</strong> 「これを通していい」というリストしか作れません。「拒否」設定はできません（リストにないものは全部拒否）。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>2. なぜこの2つが正解なのか？</h2>
+<p>
+  問題文の「複数のEC2インスタンス間における、許可されているトラフィックを確認するための…」という意図は、以下のように解釈します。
+</p>
+<blockquote>
+  <p>「AさんのEC2からBさんのEC2へ通信したい時、『通ってヨシ！』と判断（許可）している機能はどれとどれですか？」</p>
+</blockquote>
+<p>
+  通信が成立するためには、この<strong>2つの関門の両方で「許可」</strong>されている必要があります。したがって、トラフィックが許可されているか（設定）を確認するためには、この2つを見る必要があります。
+</p>
+
+<h2>3. 試験で問われる「決定的な違い」</h2>
+<p>
+  この2つを混同しないための比較表です。ここが試験のハイライトです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>セキュリティグループ (SG)</th>
+      <th>ネットワークACL (NACL)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>守る対象</th>
+      <td>インスタンス (EC2)</td>
+      <td>サブネット</td>
+    </tr>
+    <tr>
+      <th>たとえ</th>
+      <td>「家の玄関の鍵」</td>
+      <td>「街の関所」</td>
+    </tr>
+    <tr>
+      <th>記憶力</th>
+      <td><strong>ステートフル</strong><br><small>(戻り通信は自動許可)</small></td>
+      <td><strong>ステートレス</strong><br><small>(戻りも設定が必要)</small></td>
+    </tr>
+    <tr>
+      <th>ルール</th>
+      <td>許可のみ<br><small>(ホワイトリスト)</small></td>
+      <td>許可と拒否<br><small>(ブラックリストも可)</small></td>
+    </tr>
+    <tr>
+      <th>適用範囲</th>
+      <td>インスタンス単位で付け替え可能</td>
+      <td>サブネット内の全サーバーに強制適用</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ：読み解きのポイント</h2>
+<ul>
+  <li>もし問題文が「通信のログ（記録）を見たい」「通信が拒否された証拠が欲しい」なら → <strong>VPCフローログ</strong></li>
+  <li>もし問題文が「どの通信が許可されているか（設定）を知りたい」「通信を制御しているコンポーネントは？」なら → <strong>セキュリティグループ & ネットワークACL</strong></li>
+</ul>
+<p>
+  今回は「許可されているトラフィックを確認する（＝どの通信が許可設定になっているかを決定している要素は？）」という文脈だったため、この2つが正解となります。この「ステートフル（SG）」と「ステートレス（NACL）」の違いは、SAA（ソリューションアーキテクト）試験でも頻出ですので、ぜひここで押さえておいてください。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
