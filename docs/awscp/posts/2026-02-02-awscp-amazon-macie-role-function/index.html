@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Macieの役割と機能</title>
+  <meta name="description" content="Amazon MacieはS3のデータをスキャンし、機密情報を自動検出・分類するセキュリティサービスです。個人情報や認証情報の検出パターン、GuardDutyとの違いを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Macieの役割と機能" />
+  <meta property="og:description" content="Amazon MacieはS3のデータをスキャンし、機密情報を自動検出・分類するセキュリティサービスです。個人情報や認証情報の検出パターン、GuardDutyとの違いを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 検査スキャンの図 */
+    .scan-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+    }
+    .bucket-box {
+      border: 2px solid #333;
+      background: #eef;
+      padding: 1.5rem;
+      border-radius: 8px;
+      position: relative;
+      width: 150px;
+      text-align: center;
+    }
+    .file-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .macie-scanner {
+      width: 120px;
+      height: 120px;
+      border: 4px solid #2a5caa;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      font-weight: bold;
+      color: #2a5caa;
+      box-shadow: 0 0 15px rgba(42,92,170,0.3);
+      position: relative;
+      z-index: 2;
+    }
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #d9534f;
+      animation: scanMove 2s infinite alternate;
+      opacity: 0.5;
+    }
+    @keyframes scanMove {
+      from { top: 10%; }
+      to { top: 90%; }
+    }
+
+    .alert-box {
+      border: 2px dashed #d9534f;
+      background: #fff0f0;
+      padding: 1rem;
+      border-radius: 6px;
+      color: #d9534f;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-align: center;
+      min-width: 150px;
+    }
+    .arrow-right {
+      font-size: 2rem;
+      color: #999;
+    }
+
+    /* 検出パターンカード */
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      width: 100%;
+    }
+    .pattern-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .pattern-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .pattern-title {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .pattern-list {
+      font-size: 0.85rem;
+      color: #666;
+      list-style: none;
+      padding: 0;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #e6f7ff;
+      font-weight: bold;
+      color: #2a5caa;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Macieの役割と機能</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Macie</li>
+            <li class="tag">セキュリティ</li>
+            <li class="tag">データ保護</li>
+            <li class="tag">機密情報</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon Macie（メイシー）について解説します。以前紹介した「Amazon Athena」が生データを「分析」するツールなら、<strong>Amazon Macieは生データの中に「ヤバいもの（機密情報）」がないかを見つける「検査官」</strong>です。</p>
+
+<h2>1. Amazon Macieとは？</h2>
+<p>Amazon Macieは、<strong>Amazon S3</strong>上のデータを機械学習でスキャンし、<strong>個人情報（PII）や機密情報</strong>を自動的に発見・分類・保護するセキュリティサービスです。</p>
+<p><strong>イメージ：空港の「X線荷物検査」</strong><br>
+大量の荷物（S3のファイル）の中身を一つずつ人間がチェックするのは不可能です。そこでMacieという「高性能なX線検査機」を通すことで、カバンの中に隠れた「危険物（クレジットカード番号やパスワードなど）」を自動で見つけ出し、「ここに危ないものが入っていますよ！」とアラートを出してくれます。</p>
+
+<div class="diagram-container">
+  <div class="scan-flow">
+    <div class="bucket-box">
+      <span class="file-icon">📄 📁</span>
+      S3バケット<br>
+      <small>(大量のファイル)</small>
+    </div>
+    
+    <div class="arrow-right">➡</div>
+    
+    <div class="macie-scanner">
+      <div class="scan-line"></div>
+      Amazon<br>Macie<br>
+      <small>(MLスキャン)</small>
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="alert-box">
+      ⚠️ 発見！<br>
+      ・クレカ番号<br>
+      ・住所
+    </div>
+  </div>
+</div>
+
+<h2>2. Macieが「見つけるもの」</h2>
+<p>Macieは主に以下の2つのパターンで情報を探します。</p>
+
+<div class="diagram-container">
+  <div class="pattern-grid">
+    <div class="pattern-card">
+      <span class="pattern-icon">🆔</span>
+      <span class="pattern-title">個人情報 (PII)</span>
+      <ul class="pattern-list">
+        <li>氏名、住所</li>
+        <li>電話番号</li>
+        <li>マイナンバー</li>
+        <li>パスポート番号</li>
+      </ul>
+    </div>
+    <div class="pattern-card">
+      <span class="pattern-icon">💳</span>
+      <span class="pattern-title">財務情報</span>
+      <ul class="pattern-list">
+        <li>クレジットカード番号</li>
+        <li>銀行口座番号</li>
+      </ul>
+    </div>
+    <div class="pattern-card">
+      <span class="pattern-icon">🔑</span>
+      <span class="pattern-title">認証情報</span>
+      <ul class="pattern-list">
+        <li>AWSシークレットキー</li>
+        <li>APIキー</li>
+        <li>パスワード</li>
+        <li>秘密鍵</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>マネージドデータ識別子：</strong> AWSがあらかじめ用意している「よくある機密情報（上記の例）」のパターン。</li>
+<li><strong>カスタムデータ識別子：</strong> 「自社独自の社員番号（例：ID-12345）」など、特定のパターンを正規表現で登録して探させることもできます。</li>
+</ul>
+
+<h2>3. Macieの「2つの仕事」</h2>
+<p>試験では「何ができるか」が問われます。</p>
+<ul class="check-list">
+<li><strong>機密データの発見：</strong> ファイルの中身を読み取って、どこに何があるかリスト化します。</li>
+<li><strong>S3バケットの評価：</strong> 中身だけでなく、「このバケット、誰でも見れる設定（パブリック公開）になっていて危険ですよ！」といった<strong>設定ミス</strong>も教えてくれます。</li>
+</ul>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<p>特にGuardDutyとの違いは頻出です。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>検知対象</th>
+      <th>見ているもの</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="highlight-cell">Amazon Macie</td>
+      <td><strong>機密データ</strong> (情報漏洩)</td>
+      <td>S3の<strong>「ファイルの中身」</strong></td>
+    </tr>
+    <tr>
+      <td>Amazon GuardDuty</td>
+      <td><strong>脅威・攻撃</strong> (不正アクセス)</td>
+      <td>VPCフローログなどの<strong>「通信・操作ログ」</strong></td>
+    </tr>
+    <tr>
+      <td>Amazon Inspector</td>
+      <td><strong>脆弱性</strong> (セキュリティホール)</td>
+      <td>EC2などの<strong>「OS・アプリの設定」</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<ul class="check-list">
+<li><strong>対象サービス：</strong> Macieが守る対象は **Amazon S3** です（EC2の中身は見ません）。</li>
+<li><strong>技術：</strong> **機械学習（ML）**とパターンマッチングを使用して機密情報を特定します。</li>
+<li><strong>目的：</strong> データプライバシーの保護、コンプライアンス（GDPRやPCI DSSなど）の遵守。</li>
+</ul>
+
+<h2>5. 実務イメージ：情報漏洩の未然防止</h2>
+<p>ある企業で、社員が誤って「顧客名簿（CSV）」を個人情報が入ったままS3にアップロードしてしまいました。</p>
+<ol>
+<li><strong>Amazon Macie</strong> が定期スキャンでそのファイルを発見。</li>
+<li>「このファイルにはクレジットカード番号が100件含まれています」と管理者に通知（EventBridge経由など）。</li>
+<li>管理者は即座にそのファイルのアクセス制限をかけ、漏洩事故を未然に防ぐことができました。</li>
+</ol>
+
+<h2>6. まとめ</h2>
+<p>Macieは<strong>「S3専門のデータ検査官」</strong>と覚えましょう。「S3の中にある個人情報を見つけたい」という要件が出たら、迷わずMacieを選んでください。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
