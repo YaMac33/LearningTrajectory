@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | S3ライフサイクルポリシーの概要</title>
+  <meta name="description" content="データの保存期間に基づき自動で整理・削除するルールの説明と実務での活用例。ストレージクラスの階層やコスト最適化のポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="S3ライフサイクルポリシーの概要" />
+  <meta property="og:description" content="データの保存期間に基づき自動で整理・削除するルールの説明と実務での活用例。ストレージクラスの階層やコスト最適化のポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 片付けルールの比喩図 */
+    .cleaning-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .place-box {
+      background: #fff;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      min-width: 120px;
+      position: relative;
+    }
+    .box-living { border-color: #24882c; color: #24882c; }
+    .box-closet { border-color: #2a5caa; color: #2a5caa; }
+    .box-trash { border-color: #666; color: #666; background-color: #eee; }
+
+    .item-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .place-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+      display: block;
+    }
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .time-label {
+      font-size: 0.7rem;
+      color: #666;
+      background: #fff;
+      padding: 2px 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 5px;
+    }
+
+    /* ストレージクラスの階段図 */
+    .stairs-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 500px;
+      gap: 0;
+    }
+    .stair-step {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 0.8rem 1rem;
+      margin-bottom: -1px; /* 重なり */
+      position: relative;
+      border-left: 5px solid #2a5caa;
+      transition: transform 0.2s;
+    }
+    .stair-step:hover {
+      transform: translateX(5px);
+      background-color: #f0f8ff;
+    }
+    /* 階段状のインデント */
+    .step-1 { margin-left: 0; border-left-color: #4caf50; }
+    .step-2 { margin-left: 20px; border-left-color: #8bc34a; }
+    .step-3 { margin-left: 40px; border-left-color: #cddc39; }
+    .step-4 { margin-left: 60px; border-left-color: #ffeb3b; }
+    .step-5 { margin-left: 80px; border-left-color: #ffc107; }
+    .step-6 { margin-left: 100px; border-left-color: #03a9f4; background-color: #e1f5fe; } /* Glacier */
+
+    .step-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .step-name { font-weight: bold; font-size: 0.9rem; }
+    .step-desc { font-size: 0.75rem; color: #666; }
+
+    /* ログ保管タイムライン */
+    .timeline-wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      border-left: 2px solid #ccc;
+      padding-left: 1.5rem;
+      gap: 1.5rem;
+    }
+    .timeline-event {
+      position: relative;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -1.95rem; /* line width + padding + dot radius adj */
+      top: 0;
+      width: 1rem;
+      height: 1rem;
+      background: #2a5caa;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #2a5caa;
+    }
+    .event-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1rem;
+    }
+    .event-time {
+      font-weight: bold;
+      color: #2a5caa;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+    .event-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .action-badge {
+      background: #eee;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 30%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">S3ライフサイクルポリシーの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">S3</li>
+            <li class="tag">ライフサイクルポリシー</li>
+            <li class="tag">データ管理</li>
+            <li class="tag">コスト最適化</li>
+            <li class="tag">AWS</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>S3は「無制限にデータを置ける」のが魅力ですが、放っておくとデータ量が増え続け、料金がどんどん膨らんでしまいます。これを防ぐための自動お掃除・自動整理機能が <strong>「S3 ライフサイクルポリシー」</strong> です。</p>
+
+<h2>1. S3 ライフサイクルポリシーとは？</h2>
+<p>一言でいうと、<strong>「データの年齢（保存期間）に応じて、自動的に保存場所を変えたり、削除したりするルール」</strong>のことです。</p>
+<h3>家の「片付けルール」でイメージする</h3>
+<p>家の片付けを自動化するルールを決めると想像してください。</p>
+
+<div class="diagram-container">
+  <div class="cleaning-flow">
+    <div class="place-box box-living">
+      <span class="item-icon">📖</span>
+      <span class="place-name">リビング<br>(S3 標準)</span>
+      <small>すぐ読める</small>
+    </div>
+    
+    <div class="arrow-right">
+      <span class="time-label">30日後</span>
+      ➡
+    </div>
+    
+    <div class="place-box box-closet">
+      <span class="item-icon">📦</span>
+      <span class="place-name">納戸<br>(S3 Glacier)</span>
+      <small>安い</small>
+    </div>
+
+    <div class="arrow-right">
+      <span class="time-label">1年後</span>
+      ➡
+    </div>
+
+    <div class="place-box box-trash">
+      <span class="item-icon">🗑️</span>
+      <span class="place-name">ゴミ箱<br>(削除)</span>
+      <small>無料</small>
+    </div>
+  </div>
+  <p style="font-size:0.85rem; color:#666; margin-top:1rem;">人間が手作業で移動するのではなく、AWSが自動でやってくれます。</p>
+</div>
+
+<h2>2. 2つの主要なアクション</h2>
+<p>試験では、ポリシーで設定できるアクションの種類を区別することが重要です。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>アクション名</th>
+      <th>内容</th>
+      <th>例</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>移行アクション</strong><br>(Transition)</td>
+      <td>データを<strong>安いストレージクラス</strong>へ移動させる</td>
+      <td>30日経ったら「S3 標準」から「S3 Glacier」へ移動</td>
+    </tr>
+    <tr>
+      <td><strong>有効期限アクション</strong><br>(Expiration)</td>
+      <td>データを<strong>自動的に削除</strong>する</td>
+      <td>作成から5年経ったログファイルを完全削除</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. ストレージクラスの「階段」（重要！）</h2>
+<p>ライフサイクルポリシーで移動させる「引っ越し先」には順序があります。下に行くほど保存料は安くなりますが、取り出しに時間がかかったり、制約が増えたりします。</p>
+
+<div class="diagram-container">
+  <div class="stairs-container">
+    <div class="stair-step step-1">
+      <div class="step-content">
+        <span class="step-name">① S3 標準 (Standard)</span>
+        <span class="step-desc">すぐ使う用</span>
+      </div>
+    </div>
+    <div class="stair-step step-2">
+      <div class="step-content">
+        <span class="step-name">② S3 標準-IA</span>
+        <span class="step-desc">たまに使う用。少し安い。</span>
+      </div>
+    </div>
+    <div class="stair-step step-3">
+      <div class="step-content">
+        <span class="step-name">③ S3 One Zone-IA</span>
+        <span class="step-desc">さらに安い。AZ故障で消える。</span>
+      </div>
+    </div>
+    <div class="stair-step step-4">
+      <div class="step-content">
+        <span class="step-name">④ Glacier Instant Retrieval</span>
+        <span class="step-desc">数ヶ月に1回用。即取り出し可。</span>
+      </div>
+    </div>
+    <div class="stair-step step-5">
+      <div class="step-content">
+        <span class="step-name">⑤ Glacier Flexible Retrieval</span>
+        <span class="step-desc">めったに見ない。取り出し数分〜。</span>
+      </div>
+    </div>
+    <div class="stair-step step-6">
+      <div class="step-content">
+        <span class="step-name">⑥ Glacier Deep Archive</span>
+        <span class="step-desc">最安値。取り出し12時間〜。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<ul class="check-list">
+<li><strong>コスト最適化の切り札：</strong> 「ストレージコストを最小限に抑えつつ、長期間データを保存する方法は？」と聞かれたら、<strong>「ライフサイクルポリシーでGlacierへ移行する」</strong>が正解です。</li>
+<li><strong>プレフィックス（接頭辞）指定：</strong> バケット全体だけでなく、「logs/」フォルダの中身だけ、といった細かい指定が可能です。</li>
+<li><strong>Intelligent-Tieringとの違い：</strong>
+<ul>
+<li><strong>ライフサイクル：</strong> 「〇〇日経ったら移動」という<strong>「時間」</strong>ベースのルール。</li>
+<li><strong>Intelligent-Tiering：</strong> AWSが実際の<strong>「アクセス頻度」</strong>を監視して自動で移動してくれるお任せモード。</li>
+</ul>
+</li>
+</ul>
+
+<h2>5. 実務イメージ：ログの長期保管</h2>
+<p>法令で「業務ログは7年間保管しなければならない」と決まっている企業の例です。</p>
+
+<div class="diagram-container">
+  <div class="timeline-wrapper">
+    <div class="timeline-event">
+      <div class="timeline-dot"></div>
+      <div class="event-card">
+        <span class="event-time">最初の30日間</span>
+        <div class="event-action">
+          <span class="action-badge">S3 標準</span>
+          <span style="font-size:0.85rem;">障害調査などで頻繁に見るため、最高性能の場所に置く。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-event">
+      <div class="timeline-dot"></div>
+      <div class="event-card">
+        <span class="event-time">31日 〜 1年</span>
+        <div class="event-action">
+          <span class="action-badge">S3 標準-IA</span>
+          <span style="font-size:0.85rem;">念のため保管するがめったに見ないので、少し安い場所へ自動移行。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-event">
+      <div class="timeline-dot"></div>
+      <div class="event-card">
+        <span class="event-time">1年 〜 7年</span>
+        <div class="event-action">
+          <span class="action-badge">Glacier Deep Archive</span>
+          <span style="font-size:0.85rem;">ほぼ見ないが消せないので、激安の「氷の倉庫」へ自動移行。</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-event">
+      <div class="timeline-dot" style="background:#d9534f; border-color:#d9534f;"></div>
+      <div class="event-card" style="border-color:#d9534f;">
+        <span class="event-time" style="color:#d9534f;">7年経過後</span>
+        <div class="event-action">
+          <span class="action-badge" style="background:#d9534f; color:#fff;">削除</span>
+          <span style="font-size:0.85rem;">保存義務期間が過ぎたので、自動的に削除してコストゼロに。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<p>S3ライフサイクルポリシーは、<strong>「データの成長（加齢）に合わせて、自動で安い部屋へ引っ越しさせる仕組み」</strong>です。これ設定しておくだけで、管理者は何もせずともストレージ料金を最小限に保つことができます。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
