@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-services-role-group",
+    "category": "awscp",
+    "timestamp": "2026-02-02T17:48:24+09:00",
+    "title": "AWSサービスを役割別にグループ化",
+    "summary": "AWSの主要サービスを役割別に整理し、試験対策に役立つ情報をまとめています。特に、重要なサービスの特徴や利用シーンが理解できる内容です。",
+    "tags": [
+      "AWS",
+      "サービス",
+      "試験対策",
+      "クラウド",
+      "テクノロジー"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-services-role-group/"
+  },
+  {
     "id": "awscp-aws-glue-role-advantage",
     "category": "awscp",
     "timestamp": "2026-02-02T17:43:32+09:00",
