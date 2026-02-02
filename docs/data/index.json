@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-certificate-manager-summary",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:26:03+09:00",
+    "title": "AWS Certificate Managerの概要と重要ポイント",
+    "summary": "AWS Certificate Manager (ACM) は、SSL/TLS証明書を無料で発行・管理し、WebサイトのHTTPS化をサポートします。試験では、ACMのメリットや利用方法に関する知識が求められます。",
+    "tags": [
+      "ACM",
+      "SSL",
+      "AWS",
+      "証明書",
+      "自動更新"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-aws-certificate-manager-summary/"
+  },
+  {
     "id": "awscp-amazon-inspector-security",
     "category": "awscp",
     "timestamp": "2026-02-02T12:12:36+09:00",
