@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon EC2 専有ホストの解説</title>
+  <meta name="description" content="AWS EC2 Dedicated Hosts（専有ホスト）について、License Managerとの関係を交えて詳しく解説。BYOLの実現やコンプライアンス対応、Dedicated Instancesとの違いなどを学びます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon EC2 専有ホストの解説" />
+  <meta property="og:description" content="AWS EC2 Dedicated Hosts（専有ホスト）について、License Managerとの関係を交えて詳しく解説。BYOLの実現やコンプライアンス対応、Dedicated Instancesとの違いなどを学びます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* 専有ホストのイメージ図 */
+    .host-diagram {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .server-box {
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .box-shared { border-top: 4px solid #999; }
+    .box-dedicated { border-top: 4px solid #d86613; } /* EC2 Orange */
+
+    .server-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .server-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: block;
+      border-bottom: 1px dashed #ddd;
+      padding-bottom: 0.5rem;
+    }
+    .tenant-grid {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+    .tenant {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+    .t-user { background: #2a5caa; } /* Blue (You) */
+    .t-other { background: #999; }   /* Gray (Others) */
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* ライセンス管理の図 */
+    .license-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      flex-wrap: wrap;
+    }
+    .license-doc {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      position: relative;
+    }
+    .license-doc::before {
+      content: "📄";
+      font-size: 2rem;
+      display: block;
+    }
+    
+    .manager-box {
+      border: 2px dashed #2a5caa;
+      background: #e6f7ff;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      color: #2a5caa;
+      font-weight: bold;
+    }
+    
+    .arrow-right {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    .host-target {
+      border: 2px solid #d86613;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      color: #d86613;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #d86613;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon EC2 専有ホストの解説</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">Dedicated Hosts</li>
+            <li class="tag">License Manager</li>
+            <li class="tag">クラウド</li>
+            <li class="tag">サーバー管理</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon EC2 Dedicated Hosts（専有ホスト）</strong> について、<strong>AWS License Manager</strong> との深い関係を交えて詳しく解説します。</p>
+
+<h2>1. Amazon EC2 Dedicated Hosts とは？</h2>
+<p>一言でいうと、<strong>「AWSのデータセンターにある物理サーバーを、丸ごと一台あなた専用に貸し切る」</strong>サービスです。</p>
+
+<div class="diagram-container">
+  <div class="host-diagram">
+    <!-- 共有 -->
+    <div class="server-box box-shared">
+      <span class="server-icon">🏢</span>
+      <span class="server-title">通常のEC2 (共有)</span>
+      <div class="tenant-grid">
+        <div class="tenant t-user">You</div>
+        <div class="tenant t-other">A</div>
+        <div class="tenant t-other">B</div>
+      </div>
+      <p style="font-size:0.85rem; color:#666;">
+        シェアハウス。<br>
+        1台の物理サーバーを他社と共有する。
+      </p>
+    </div>
+
+    <!-- 専有 -->
+    <div class="server-box box-dedicated">
+      <span class="server-icon">🏰</span>
+      <span class="server-title">Dedicated Hosts</span>
+      <div class="tenant-grid">
+        <div class="tenant t-user">You</div>
+        <div class="tenant t-user">You</div>
+        <div class="tenant t-user">You</div>
+      </div>
+      <p style="font-size:0.85rem; color:#666;">
+        一棟貸し。<br>
+        物理サーバーを独占する。他社はいない。
+      </p>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>物理的な占有：</strong> 他のユーザーが同じ物理サーバーを使うことは絶対にありません。</li>
+<li><strong>物理ハードウェアの可視化：</strong> サーバーの「CPUソケット数」や「コア数」といった、物理的なスペックを直接確認・指定できます。</li>
+</ul>
+
+<h2>2. なぜ「丸ごと貸し切り」が必要なの？（License Managerとの関係）</h2>
+<p>ここで <strong>AWS License Manager</strong> が登場します。多くの企業が持っているソフトウェア（Windows ServerやOracle、SQL Serverなど）のライセンスには、<strong>「物理的なサーバーのCPU数やコア数に基づいて料金を払う」</strong>という古いルール（ライセンス条項）が残っています。</p>
+
+<div class="diagram-container">
+  <div class="license-flow">
+    <div class="license-doc">
+      既存ライセンス<br>
+      <small>「物理コア数で課金」</small>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="manager-box">
+      AWS License Manager<br>
+      <small>「ルール違反がないか監視」</small>
+    </div>
+    <div class="arrow-right">➡</div>
+    <div class="host-target">
+      Dedicated Hosts<br>
+      <small>物理構成が見える環境</small>
+    </div>
+  </div>
+</div>
+
+<ul>
+<li><strong>課題：</strong> 通常のEC2（シェアハウス）だと、物理的なCPU数が特定できないため、ライセンスのルールを守れません。</li>
+<li><strong>解決：</strong> <strong>Dedicated Hosts</strong> で物理サーバーを固定し、<strong>AWS License Manager</strong> で「この物理サーバーにはこのライセンスを割り当てる」と管理することで、<strong>BYOL（ライセンス持ち込み）が可能</strong>になります。</li>
+</ul>
+
+<h2>3. Dedicated Hosts のメリット</h2>
+<ul class="check-list">
+<li><strong>BYOLの実現：</strong> 既存のライセンスをそのままAWSで使えるので、ソフトウェア代を節約できる。</li>
+<li><strong>コンプライアンス：</strong> 規制の厳しい業界で「物理的に他社と隔離されていること」が求められる場合に有効。</li>
+<li><strong>ライセンス管理の自動化：</strong> <strong>License Manager</strong> と連携すれば、ライセンス違反にならないよう、自動で起動を制限したり追跡したりできる。</li>
+</ul>
+
+<h2>4. 試験で問われやすいポイント（CLF-C02）</h2>
+<p>ここが混乱しやすいポイントですので、以下の表で整理して覚えましょう。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>特徴（試験に出るキーワード）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dedicated Instances</strong><br>(ハードウェア専有インスタンス)</td>
+      <td><strong>アカウント単位</strong>で物理的に隔離されるが、ハードウェアの詳細（ソケット数など）は見えない。BYOLには不向き。</td>
+    </tr>
+    <tr>
+      <td class="highlight-cell"><strong>Dedicated Hosts</strong><br>(専有ホスト)</td>
+      <td><strong>物理サーバー単位</strong>で占有。CPU数などの詳細が見える。<strong>BYOLに最適</strong>。</td>
+    </tr>
+    <tr>
+      <td><strong>AWS License Manager</strong></td>
+      <td>ライセンスの使用状況を<strong>監視・制御</strong>する。Dedicated Hostsと組み合わせて使う。</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+<p><strong>試験のヒント：</strong> 「物理サーバーのスペックを確認する必要がある」「既存のライセンスルールを順守して持ち込みたい」と出たら、正解は <strong>Dedicated Hosts</strong> です。</p>
+</blockquote>
+
+<h2>5. 実務イメージ：コスト削減と引っ越し</h2>
+<p>ある大企業が、自社で使っていたWindowsサーバーを100台、AWSへ移すことにしました。</p>
+<ol>
+<li><strong>AWS License Manager</strong> に、今持っているライセンスの数を登録します。</li>
+<li><strong>Dedicated Hosts</strong> を予約し、その上でEC2を動かします。</li>
+<li>これにより、新しくWindowsのライセンス代をAWSに払う必要がなくなり（BYOL）、数百万円のコスト削減に成功しました。</li>
+</ol>
+
+<h2>6. まとめ</h2>
+<ul class="check-list">
+<li><strong>Dedicated Hosts</strong> = 物理サーバーの「一棟貸し」</li>
+<li><strong>License Manager</strong> = ライセンス違反がないか見張る「管理人」</li>
+</ul>
+<p>この2つは、<strong>「古いライセンスのルールを守りつつ、AWSでお得にサーバーを動かすための最強タッグ」</strong>です。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
