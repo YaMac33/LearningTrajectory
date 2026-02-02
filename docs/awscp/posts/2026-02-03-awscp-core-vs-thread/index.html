@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | コアとスレッドの違い</title>
+  <meta name="description" content="コア（ハードウェア）とスレッド（ソフトウェア）の違いを「コックさんと調理レーン」に例えて解説。RedisとMemcachedの処理構造の違いも視覚化。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="コアとスレッドの違い" />
+  <meta property="og:description" content="コア（ハードウェア）とスレッド（ソフトウェア）の違いを「コックさんと調理レーン」に例えて解説。RedisとMemcachedの処理構造の違いも視覚化。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 概念定義図 */
+    .def-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .def-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .db-core { border-color: #3b82f6; background: #eff6ff; }
+    .db-thread { border-color: #10b981; background: #ecfdf5; }
+    
+    .db-icon { font-size: 3em; margin-bottom: 8px; }
+    .db-title { font-weight: bold; font-size: 1.2em; margin-bottom: 4px; color: #1e293b; }
+    .db-cat { 
+      font-size: 0.8em; 
+      font-weight: bold; 
+      padding: 2px 8px; 
+      border-radius: 4px; 
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .db-core .db-cat { background: #bfdbfe; color: #1e40af; }
+    .db-thread .db-cat { background: #a7f3d0; color: #065f46; }
+    
+    /* 2. シミュレーション図 */
+    .sim-row {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .sim-case {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sim-meta {
+      width: 120px;
+      flex-shrink: 0;
+      font-size: 0.85em;
+      text-align: center;
+    }
+    .sim-label { font-weight: bold; display: block; margin-bottom: 4px; color: #334155; }
+    .sim-desc { font-size: 0.8em; color: #64748b; }
+    
+    .sim-kitchen {
+      flex: 1;
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      min-height: 60px;
+      position: relative;
+    }
+    
+    /* コックさん表現 */
+    .cook-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cook { font-size: 1.8em; z-index: 2; }
+    .dish { 
+      position: absolute; 
+      bottom: -5px; right: -5px; 
+      font-size: 1em; 
+      z-index: 3; 
+    }
+    .cook-sleep { opacity: 0.4; filter: grayscale(100%); }
+    .sleep-zzz { 
+      position: absolute; 
+      top: -10px; right: -5px; 
+      font-size: 0.8em; 
+      color: #64748b; 
+      font-weight: bold; 
+    }
+    
+    /* 忙しいコック（残像） */
+    .cook-busy {
+      animation: shake 0.5s infinite;
+    }
+    .dish-stack {
+      display: flex;
+      font-size: 0.8em;
+      gap: 2px;
+      position: absolute;
+      bottom: -10px;
+    }
+    
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      75% { transform: translateX(2px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .def-container { flex-direction: column; }
+      .sim-case { flex-direction: column; align-items: flex-start; }
+      .sim-meta { width: 100%; border-bottom: 1px solid #eee; padding-bottom: 8px; text-align: left; }
+      .sim-kitchen { width: 100%; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">コアとスレッドの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#マルチコア</span>
+            <span class="tag">#スレッド</span>
+            <span class="tag">#Redis</span>
+            <span class="tag">#Memcached</span>
+            <span class="tag">#プログラム</span>
+            <span class="tag">#コンピュータ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  Q. マルチコアやクアッドコアなどの「コア」と違って、「スレッド」なのは何故ですか？
+</p>
+<p>
+  A. 鋭い質問です！ここをごっちゃにしていると、この先の理解が難しくなるので、ここでスッキリさせましょう。
+</p>
+<p>
+  結論から言うと、<strong>「コア」は「肉体（ハードウェア）」であり、「スレッド」は「仕事の流れ（ソフトウェア）」</strong>だからです。わかりやすく<strong>「コックさん（料理人）」</strong>に例えて解説します。
+</p>
+
+<h2>1. 「コア」と「スレッド」の決定的な違い</h2>
+<p>
+  パソコンやサーバーの中では、この2つが以下のような関係になっています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">定義の比較</div>
+  <div class="def-container">
+    <!-- コア -->
+    <div class="def-box db-core">
+      <div class="db-cat">ハードウェア</div>
+      <div class="db-icon">👨‍🍳</div>
+      <div class="db-title">コア (Core)</div>
+      <p><strong>コックさんの人数 (肉体)</strong></p>
+      <p style="font-size:0.85em; color:#475569;">
+        物理的な部品。<br>
+        「キッチンに何人いるか？」<br>
+        例: クアッドコア＝4人
+      </p>
+    </div>
+
+    <!-- スレッド -->
+    <div class="def-box db-thread">
+      <div class="db-cat">ソフトウェア</div>
+      <div class="db-icon">📜</div>
+      <div class="db-title">スレッド (Thread)</div>
+      <p><strong>調理レーン (仕事の流れ)</strong></p>
+      <p style="font-size:0.85em; color:#475569;">
+        プログラムの命令。<br>
+        「同時にいくつの料理を作るか？」<br>
+        例: マルチスレッド＝並行作業
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>2. なぜ名前が違うのか？（関係性）</h2>
+<p>
+  「スレッド（仕事）」を処理するのは、「コア（コックさん）」だからです。コックさんの人数と、仕事の流し方の組み合わせで、効率が劇的に変わります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">コックと仕事の組み合わせ 3パターン</div>
+  <div class="sim-row">
+    
+    <!-- 1. 理想 -->
+    <div class="sim-case">
+      <div class="sim-meta">
+        <span class="sim-label">① 理想</span>
+        <span class="sim-desc">マルチコア<br>×<br>マルチスレッド</span>
+      </div>
+      <div class="sim-kitchen">
+        <div class="cook-wrapper"><div class="cook">👨‍🍳</div><div class="dish">🍛</div></div>
+        <div class="cook-wrapper"><div class="cook">👨‍🍳</div><div class="dish">🥗</div></div>
+        <div class="cook-wrapper"><div class="cook">👨‍🍳</div><div class="dish">🍝</div></div>
+        <div class="cook-wrapper"><div class="cook">👨‍🍳</div><div class="dish">🍲</div></div>
+      </div>
+      <div style="font-size:0.8em; color:#10b981; font-weight:bold;">4倍速！</div>
+    </div>
+
+    <!-- 2. もったいない -->
+    <div class="sim-case">
+      <div class="sim-meta">
+        <span class="sim-label">② もったいない</span>
+        <span class="sim-desc">マルチコア<br>×<br>シングルスレッド</span>
+      </div>
+      <div class="sim-kitchen">
+        <div class="cook-wrapper"><div class="cook">👨‍🍳</div><div class="dish">🍛</div></div>
+        <div class="cook-wrapper"><div class="cook cook-sleep">👨‍🍳</div><div class="sleep-zzz">Zzz</div></div>
+        <div class="cook-wrapper"><div class="cook cook-sleep">👨‍🍳</div><div class="sleep-zzz">Zzz</div></div>
+        <div class="cook-wrapper"><div class="cook cook-sleep">👨‍🍳</div><div class="sleep-zzz">Zzz</div></div>
+      </div>
+      <div style="font-size:0.8em; color:#f59e0b; font-weight:bold;">1人しか働いてない…</div>
+    </div>
+
+    <!-- 3. 忙しい -->
+    <div class="sim-case">
+      <div class="sim-meta">
+        <span class="sim-label">③ 忙しい</span>
+        <span class="sim-desc">シングルコア<br>×<br>マルチスレッド</span>
+      </div>
+      <div class="sim-kitchen">
+        <div class="cook-wrapper">
+          <div class="cook cook-busy">👨‍🍳💦</div>
+          <div class="dish-stack"><span>🍛</span><span>🥗</span><span>🍝</span><span>🍲</span></div>
+        </div>
+      </div>
+      <div style="font-size:0.8em; color:#ef4444; font-weight:bold;">1人で4役！</div>
+    </div>
+
+  </div>
+</div>
+
+<h3>パターンの解説</h3>
+<ul>
+  <li><strong>① 理想 (Memcached):</strong> 仕事が4つあり、コックも4人いる。全員が手分けして働くので最強です。</li>
+  <li><strong>② もったいない (Redis):</strong> コックは4人いるのに、仕事の指示書（スレッド）が1本しか来ていません。1人が働き、3人は暇しています。<br>
+  ※Redisはあえてこれをやっています。「他のコックと連携する時間のロス」すら嫌うため、あえて1人で独走します。</li>
+  <li><strong>③ 忙しい (スマホなど):</strong> 仕事はたくさんあるけど、コックが1人しかいない状態。超高速で「カレーを混ぜて、サラダを切って…」と切り替えながら（スイッチング）、あたかも同時にやっているように見せかけます。</li>
+</ul>
+
+<h2>3. Redis と Memcached に当てはめると？</h2>
+<p>
+  質問者様の疑問である「なぜスレッドと呼ぶのか？」への答えはこうなります。
+</p>
+<p>
+  RedisやMemcachedといった<strong>「ソフトウェア（アプリ）」側から見ると、自分のCPUが何個あるか（コア数）は自分では決められません。彼らに決められるのは、「自分の中で、仕事をいくつの流れ（スレッド）に分割して処理するか」</strong>だけです。
+</p>
+<ul>
+  <li><strong>Redis:</strong> 「僕は、仕事を分割せずに1本の糸（シングルスレッド）でやるよ！その代わり、迷いなく最速で走るよ！」</li>
+  <li><strong>Memcached:</strong> 「僕は、仕事をいくつもの糸（マルチスレッド）に分割するよ！もしCPUのコアがたくさんあれば、それぞれのコアに処理してもらってパワーアップできるからね！」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>コア (Core):</strong> 物理的な「作業員」。パソコンのスペック表に書いてあるもの。</li>
+  <li><strong>スレッド (Thread):</strong> 論理的な「作業指示書」。プログラムが作る仕事の流れ。</li>
+</ul>
+<p>
+  「Redisはシングルスレッド」という言葉は、<strong>「Redisというソフトは、たとえ作業員（コア）が100人いても、たった1人の作業員にしか指示書（スレッド）を渡さない」</strong>という意味になります。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
