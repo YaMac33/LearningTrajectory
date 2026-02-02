@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon SageMakerの概要と特徴</title>
+  <meta name="description" content="Amazon SageMakerは、機械学習モデルを構築・訓練・デプロイするための完全なプラットフォームです。RekognitionなどのAIサービスとの違いや、開発の3ステップについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon SageMakerの概要と特徴" />
+  <meta property="og:description" content="Amazon SageMakerは、機械学習モデルを構築・訓練・デプロイするための完全なプラットフォームです。RekognitionなどのAIサービスとの違いや、開発の3ステップについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加CSS -->
+  <style>
+    /* 図解共通コンテナ */
+    .diagram-container {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* AIサービス vs SageMaker 比喩図 */
+    .analogy-compare {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .analogy-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-ai { border-top: 4px solid #2a5caa; }
+    .card-ml { border-top: 4px solid #d86613; }
+
+    .analogy-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .analogy-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .analogy-desc {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* 3ステップフロー図 */
+    .ml-process {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 650px;
+      flex-wrap: wrap;
+    }
+    .process-step {
+      border: 2px solid #555;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 140px;
+      position: relative;
+    }
+    .step-build { border-color: #24882c; color: #24882c; }
+    .step-train { border-color: #d86613; color: #d86613; }
+    .step-deploy { border-color: #2a5caa; color: #2a5caa; }
+
+    .step-num {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      background: #333;
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.8rem;
+      line-height: 20px;
+      display: block;
+    }
+    .step-train .step-num { background: #d86613; }
+    .step-deploy .step-num { background: #2a5caa; }
+
+    .process-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .process-label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .arrow-next {
+      font-size: 1.5rem;
+      color: #999;
+    }
+
+    /* S3連携図 */
+    .s3-collab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      background: #fff;
+      padding: 1.5rem;
+      border: 1px dashed #999;
+      border-radius: 8px;
+    }
+    .s3-bucket {
+      color: #24882c;
+      font-weight: bold;
+      text-align: center;
+    }
+    .s3-icon {
+      font-size: 2.5rem;
+      display: block;
+    }
+    .cycle-arrows {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .arrow-item::before {
+      content: "⇄";
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+
+    /* 比較テーブル */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    .compare-table th, .compare-table td {
+      border: 1px solid #e0e0e0;
+      padding: 0.8rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+      white-space: nowrap;
+      width: 25%;
+    }
+    .highlight-cell {
+      background-color: #fff9e6;
+      font-weight: bold;
+    }
+
+    /* リスト調整 */
+    .check-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .check-list li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5em;
+        text-indent: -1.5em;
+    }
+    .check-list li::before {
+        content: "✔";
+        margin-right: 0.5em;
+        color: #2a5caa;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon SageMakerの概要と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <ul class="tag-list">
+            <li class="tag">AWS</li>
+            <li class="tag">SageMaker</li>
+            <li class="tag">機械学習</li>
+            <li class="tag">AI</li>
+            <li class="tag">データサイエンス</li>
+          </ul>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>Amazon SageMaker（セージメーカー）は、AWS上で「機械学習（マシンラーニング）モデルを『作る・鍛える・使う』ための全機能をセットにしたプラットフォーム」</strong>です。AWSには「Rekognition」や「Polly」といったAIサービスもありますが、それらとの違いを一言で言うとこうなります。</p>
+
+<div class="diagram-container">
+  <div class="analogy-compare">
+    <!-- AIサービス -->
+    <div class="analogy-card card-ai">
+      <span class="analogy-icon">🍱</span>
+      <span class="analogy-title">AIサービス<br><small>(Rekognition等)</small></span>
+      <p class="analogy-desc">
+        <strong>「冷凍食品（完成品）」</strong><br>
+        温める（APIを呼ぶ）だけですぐ使える。<br>
+        味（モデル）の調整はできない。<br>
+        <small>例：顔認識、翻訳、音声合成</small>
+      </p>
+    </div>
+
+    <!-- SageMaker -->
+    <div class="analogy-card card-ml">
+      <span class="analogy-icon">👨‍🍳</span>
+      <span class="analogy-title">Amazon SageMaker<br><small>(MLサービス)</small></span>
+      <p class="analogy-desc">
+        <strong>「プロ用キッチン（調理場）」</strong><br>
+        自分で素材（データ）を用意して調理する。<br>
+        独自の味（自社専用AI）が作れる。<br>
+        <small>例：来月の自社商品の売上予測</small>
+      </p>
+    </div>
+  </div>
+</div>
+
+<p>「自社のデータを使って、独自の予測AIを作りたい」というデータサイエンティストや開発者のためのサービスです。</p>
+
+<h2>1. 機械学習の「3つのステップ」を全カバー</h2>
+<p>機械学習モデルを作るには、通常3つの面倒な工程が必要ですが、SageMakerはこれを全部面倒見てくれます。</p>
+
+<div class="diagram-container">
+  <div class="ml-process">
+    <div class="process-step step-build">
+      <span class="step-num">1</span>
+      <span class="process-icon">💻</span>
+      <span class="process-label">準備 (Build)</span>
+      <small>開発環境の用意<br>(Jupyter Notebook)</small>
+    </div>
+    <div class="arrow-next">➡</div>
+    <div class="process-step step-train">
+      <span class="step-num">2</span>
+      <span class="process-icon">🏋️</span>
+      <span class="process-label">学習 (Train)</span>
+      <small>大量のデータで<br>AIを賢くする</small>
+    </div>
+    <div class="arrow-next">➡</div>
+    <div class="process-step step-deploy">
+      <span class="step-num">3</span>
+      <span class="process-icon">🚀</span>
+      <span class="process-label">推論 (Deploy)</span>
+      <small>本番アプリで<br>使えるように公開</small>
+    </div>
+  </div>
+</div>
+
+<h3>各ステップのポイント</h3>
+<ul>
+<li><strong>ステップ1：準備 (Build)</strong><br>
+データサイエンティストがコードを書くための<strong>「Jupyter Notebook（ジュピターノートブック）」</strong>という画面を、クリック一発で用意します。OSやライブラリのセットアップは不要です。</li>
+<li><strong>ステップ2：トレーニング (Train)</strong><br>
+ここがSageMakerの真骨頂です。学習の時だけ、数十台〜数百台の「超高性能サーバー（GPU搭載など）」を自動で立ち上げ、計算が終わったら<strong>即座にシャットダウン</strong>します。高いサーバーを買い続けなくて済むので、コストが激減します。</li>
+<li><strong>ステップ3：デプロイ (Deploy)</strong><br>
+賢くなったAI（モデル）を、実際のアプリから使えるようにサーバー（エンドポイント）として公開します。アクセスが増えたら自動で増えるAuto Scaling機能も備えています。</li>
+</ul>
+
+<h2>2. 試験に出る「重要機能」</h2>
+<p>SageMakerには多くの機能がありますが、試験（特にCLF/SAA）で問われるのは以下の機能です。</p>
+
+<h3>① Amazon SageMaker Ground Truth（グラウンド・トゥルース）</h3>
+<p>AIに学習させるための<strong>「教師データ（正解ラベル）」を作る作業を支援</strong>するサービスです。</p>
+<ul>
+<li><strong>課題：</strong> 「犬の画像1万枚に『これは犬』というタグを付ける」作業は、人間が手作業でやる必要があり、地獄のように大変です。</li>
+<li><strong>解決：</strong> これを効率化したり、<strong>外部の作業員（Amazon Mechanical Turkというバイト部隊）</strong>に安く外注したりできる機能です。</li>
+<li><strong>試験対策：</strong> <strong>「データのラベリング」「アノテーション」</strong>という言葉が出たらこれです。</li>
+</ul>
+
+<h3>② Amazon SageMaker Studio</h3>
+<p>機械学習のための<strong>「統合開発環境（IDE）」</strong>です。コードを書く、実験管理、デバッグ、モデルの比較などを、全部一つの画面（ブラウザ）で行えます。</p>
+
+<h3>③ Amazon SageMaker Autopilot</h3>
+<p><strong>「専門知識ゼロ」</strong>でもAIが作れる機能（AutoML）です。</p>
+<ul>
+<li><strong>使い方：</strong> 表形式のデータ（CSVなど）を渡して「この列（売上など）を予測したい！」と指定するだけ。</li>
+<li><strong>自動化：</strong> SageMakerが勝手に複数のアルゴリズムを試し、一番精度の良いモデルを作ってくれます。</li>
+</ul>
+
+<h2>3. 「AIサービス」と「SageMaker」の決定的な違い</h2>
+<p>試験で一番迷うポイントです。「どっちを使うべき？」という問題が出ます。</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th>比較項目</th>
+      <th>AIサービス<br><small>(Rekognition, Polly, Lex等)</small></th>
+      <th>Amazon SageMaker</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>必要なもの</strong></td>
+      <td>データを入れるだけ</td>
+      <td>自社の学習用データ ＋ <strong>MLの知識</strong></td>
+    </tr>
+    <tr>
+      <td><strong>カスタマイズ</strong></td>
+      <td>基本的に不可<br><small>(AWSの学習済みモデル)</small></td>
+      <td class="highlight-cell">完全に自由<br><small>(自社専用に特化)</small></td>
+    </tr>
+    <tr>
+      <td><strong>主な利用者</strong></td>
+      <td>アプリ開発者<br><small>(APIを叩くだけ)</small></td>
+      <td>データサイエンティスト</td>
+    </tr>
+    <tr>
+      <td><strong>用途例</strong></td>
+      <td>「写真に何が写っているか知りたい」</td>
+      <td>「工場のセンサーデータから故障を予測したい」</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 実際のデータの流れ（S3との連携）</h2>
+<p>SageMakerは Amazon S3 とニコイチで動きます。データは常にS3にあります。</p>
+
+<div class="diagram-container">
+  <div class="s3-collab">
+    <div class="s3-bucket">
+      <span class="s3-icon">🪣</span>
+      Amazon S3
+    </div>
+    <div class="cycle-arrows">
+      <div class="arrow-item">学習用データ (CSV/画像)</div>
+      <div class="arrow-item">学習済みモデル (成果物)</div>
+    </div>
+    <div style="font-weight:bold; color:#2a5caa;">
+      <span style="font-size:2rem; display:block; text-align:center;">👨‍🍳</span>
+      SageMaker
+    </div>
+  </div>
+</div>
+
+<h2>5. まとめ</h2>
+<ul class="check-list">
+<li><strong>役割：</strong> 機械学習モデルを「自作」するためのフルマネージドサービス。</li>
+<li><strong>3ステップ：</strong> 開発(Build) → 学習(Train) → 推論(Deploy)。</li>
+<li><strong>Ground Truth：</strong> 大変な「データラベリング（正解付け）」を楽にする機能。</li>
+<li><strong>Autopilot：</strong> 知識なしで自動でモデルを作ってくれる機能。</li>
+<li><strong>使い分け：</strong> 既製品でいいならRekognition、オーダーメイドならSageMaker。</li>
+</ul>
+<p>これで、AI・機械学習分野（Machine Learning）も完全に網羅しました！「既製品のAIサービス群」と「自作のためのSageMaker」の違いが分かれば、この分野の試験問題は怖くありません。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
