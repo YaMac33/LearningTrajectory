@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS CI/CDツールの紹介</title>
+  <meta name="description" content="AWSのCodeシリーズ（Commit, Build, Deploy, Pipeline）を「全自動パン工場」に例えて解説。CI/CDの仕組みと各サービスの役割を整理。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS CI/CDツールの紹介" />
+  <meta property="og:description" content="AWSのCodeシリーズ（Commit, Build, Deploy, Pipeline）を「全自動パン工場」に例えて解説。CI/CDの仕組みと各サービスの役割を整理。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* パン工場（パイプライン）図 */
+    .pipeline-container {
+      border: 3px solid #6366f1; /* Indigo: Pipeline色 */
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      background: #eef2ff;
+      width: 100%;
+      max-width: 600px;
+    }
+    .pipeline-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #6366f1;
+      color: white;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.85em;
+    }
+    
+    .factory-flow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .factory-step {
+      flex: 1;
+      background: white;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 110px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .fs-icon { font-size: 2em; margin-bottom: 6px; }
+    .fs-title { font-weight: bold; font-size: 0.85em; color: #1e293b; margin-bottom: 2px;}
+    .fs-sub { font-size: 0.7em; color: #64748b; }
+    .fs-aws { 
+      font-size: 0.7em; 
+      color: #4f46e5; 
+      font-weight: bold; 
+      margin-top: auto; 
+      padding-top: 6px;
+      border-top: 1px dashed #e2e8f0;
+      width: 100%;
+    }
+
+    .flow-arrow {
+      color: #6366f1;
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .factory-flow {
+        flex-direction: column;
+      }
+      .flow-arrow {
+        transform: rotate(90deg);
+        margin: -8px 0;
+      }
+      .factory-step {
+        width: 100%;
+        min-height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 12px 16px;
+      }
+      .fs-aws {
+        width: auto;
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+      }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-02">
+            2026.02.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS CI/CDツールの紹介</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CI/CD</span>
+            <span class="tag">#DevOps</span>
+            <span class="tag">#自動化</span>
+            <span class="tag">#ソフトウェア開発</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWS Codeシリーズは、ソフトウェア開発の<strong>「作る（保存）→ 組み立てる（ビルド）→ 配る（デプロイ）」という一連の流れを全自動化</strong>するためのサービス群です。
+</p>
+<p>
+  これらをまとめて<strong>「CI/CD（継続的インテグレーション／継続的デリバリー）ツール」</strong>と呼びます。
+</p>
+<p>
+  一言で例えると、<strong>「全自動のパン工場（ベルトコンベア）」</strong>です。人間は「レシピ（コード）」を投入口に入れるだけで、あとは機械が勝手にパンを焼き、包装し、お店に並べてくれます。それぞれの役割を「パン工場」に例えて解説します。
+</p>
+
+<h2>1. 全体像：4つのサービスの連携</h2>
+<p>
+  まずは、この図で全体の流れをイメージしてください。CodePipelineというベルトコンベアが、各工程をつないでいます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">全自動パン工場 (CI/CD) の流れ</div>
+  <div class="pipeline-container">
+    <div class="pipeline-label">CodePipeline (ベルトコンベア)</div>
+    <div class="factory-flow">
+      <!-- Step 1 -->
+      <div class="factory-step">
+        <div class="fs-icon">❄️</div>
+        <div>
+          <div class="fs-title">倉庫 (Git)</div>
+          <div class="fs-sub">材料保管</div>
+        </div>
+        <div class="fs-aws">CodeCommit</div>
+      </div>
+
+      <div class="flow-arrow">→</div>
+
+      <!-- Step 2 -->
+      <div class="factory-step">
+        <div class="fs-icon">🔥</div>
+        <div>
+          <div class="fs-title">調理場</div>
+          <div class="fs-sub">混ぜる・焼く</div>
+        </div>
+        <div class="fs-aws">CodeBuild</div>
+      </div>
+
+      <div class="flow-arrow">→</div>
+
+      <!-- Step 3 -->
+      <div class="factory-step">
+        <div class="fs-icon">🚚</div>
+        <div>
+          <div class="fs-title">配送係</div>
+          <div class="fs-sub">店に並べる</div>
+        </div>
+        <div class="fs-aws">CodeDeploy</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 各サービスの詳しい役割</h2>
+
+<h3>① AWS CodeCommit（コードコミット）</h3>
+<p>
+  <strong>役割：ソースコード管理（Gitリポジトリ）</strong>
+</p>
+<ul>
+  <li><strong>工場の役割:</strong> <strong>「巨大な冷蔵庫（倉庫）」</strong>です。</li>
+  <li>プログラマーが書いたコード（設計図）を安全に保存し、「誰がいつ書き換えたか」という履歴を管理します。</li>
+  <li>GitHub や GitLab のAWS版だと思ってください。プライベート（非公開）なリポジトリを安全に持てます。</li>
+</ul>
+
+<h3>② AWS CodeBuild（コードビルド）</h3>
+<p>
+  <strong>役割：ビルド＆テスト（コンパイル・テスト実行）</strong>
+</p>
+<ul>
+  <li><strong>工場の役割:</strong> <strong>「調理オーブン」</strong>です。</li>
+  <li>倉庫からコードを取り出し、機械が読める形に変換（コンパイル）します。</li>
+  <li>同時に、「味が変じゃないか？」という<strong>テスト（単体テスト）</strong>を自動で実行します。</li>
+  <li>特徴は<strong>サーバーレス</strong>であること。ビルドする時だけ動くので、待機時間は無料です。</li>
+</ul>
+
+<h3>③ AWS CodeDeploy（コードデプロイ）</h3>
+<p>
+  <strong>役割：自動デプロイ（本番環境への配布）</strong>
+</p>
+<ul>
+  <li><strong>工場の役割:</strong> <strong>「配送トラック」または「陳列スタッフ」</strong>です。</li>
+  <li>完成したソフトを、実際のサーバー（EC2, Lambda, Fargate, オンプレミス）に自動で配置します。</li>
+  <li>手作業でのファイルコピー（FTPなど）によるミスを撲滅します。<strong>「Blue/Greenデプロイ」</strong>などの高度な技を使い、サービスを止めずに切り替えることも可能です。</li>
+</ul>
+
+<h3>④ AWS CodePipeline（コードパイプライン）</h3>
+<p>
+  <strong>役割：オーケストレーション（自動化の進行役）</strong>
+</p>
+<ul>
+  <li><strong>工場の役割:</strong> 「工場長」 または <strong>「ベルトコンベアそのもの」</strong>です。</li>
+  <li>「CodeCommitにコードが保存されたら、すぐにCodeBuildを動かせ。終わったらCodeDeployに渡せ」という指示出しを行います。</li>
+  <li>これがあるおかげで、人間は「コードを保存（Commit）」するだけで、数分後には本番環境が更新されるという完全自動化が実現します。</li>
+</ul>
+
+<h2>まとめ表（試験対策）</h2>
+<p>
+  試験では「どの工程を担当するか」が問われます。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>役割</th>
+      <th>フェーズ</th>
+      <th>たとえ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CodeCommit</th>
+      <td>コードの保存</td>
+      <td>Source</td>
+      <td>倉庫 (Git)</td>
+    </tr>
+    <tr>
+      <th>CodeBuild</th>
+      <td>テスト・コンパイル</td>
+      <td>Build</td>
+      <td>調理場 (テスト実行)</td>
+    </tr>
+    <tr>
+      <th>CodeDeploy</th>
+      <td>サーバーへの配置</td>
+      <td>Deploy</td>
+      <td>配送係 (自動更新)</td>
+    </tr>
+    <tr>
+      <th>CodePipeline</th>
+      <td>全体の自動化</td>
+      <td>Pipeline</td>
+      <td>ベルトコンベア (司令塔)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>補足：AWS CodeStar（コードスター）</h2>
+<p>
+  たまに選択肢に出るのが AWS CodeStar です。
+</p>
+<ul>
+  <li>これは、上記の4つ（Commit, Build, Deploy, Pipeline）を<strong>「一括でセットアップしてくれるテンプレート機能」</strong>です。</li>
+  <li>「Webアプリ用の環境を一瞬で作りたい」という時に、これら4つのサービスをまとめて自動構築してくれます。</li>
+  <li><strong>試験対策:</strong> 「CI/CDパイプラインを素早く構築したい」と言われたら CodeStar です。</li>
+</ul>
+<p>
+  これで、AWSの主要な開発者用ツール（DevOpsツール）もコンプリートです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
