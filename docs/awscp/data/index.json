@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-athena-features",
+    "category": "awscp",
+    "timestamp": "2026-02-02T12:30:39+09:00",
+    "title": "Amazon Athenaの特徴と利点",
+    "summary": "Amazon Athenaは、S3内のデータに対して直接SQLを実行できるサーバーレス分析サービスで、データの移動が不要です。また、従量課金モデルによりコスト最適化が可能です。",
+    "tags": [
+      "Athena",
+      "AWS",
+      "データ分析",
+      "サーバーレス",
+      "SQL"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-02-awscp-amazon-athena-features/"
+  },
+  {
     "id": "awscp-aws-license-manager-role",
     "category": "awscp",
     "timestamp": "2026-02-02T12:28:22+09:00",
