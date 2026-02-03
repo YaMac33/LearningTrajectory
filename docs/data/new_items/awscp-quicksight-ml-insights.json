@@ -1,0 +1,21 @@
+{
+  "id": "awscp-quicksight-ml-insights",
+  "category": "awscp",
+  "timestamp": "2026-02-03T19:17:45+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-quicksight-ml-insights/",
+  "meta": {
+    "title": "QuickSightとML Insightsの関係を理解する",
+    "summary": "Amazon QuickSightとML Insightsの関係について学び、データ分析の未来予測機能を活用する方法を理解できる。特にノーコードでの機械学習活用が可能であることが重要。",
+    "tags": [
+      "Amazon",
+      "QuickSight",
+      "ML Insights",
+      "データ分析",
+      "機械学習"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
