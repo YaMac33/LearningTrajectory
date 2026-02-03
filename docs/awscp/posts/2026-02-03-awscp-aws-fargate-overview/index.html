@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Fargateの基本理解</title>
+  <meta name="description" content="AWS Fargateはサーバー管理なしでコンテナを動かせるサービスです。ECS/EKSとの関係やメリットを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Fargateの基本理解" />
+  <meta property="og:description" content="AWS Fargateはサーバー管理なしでコンテナを動かせるサービスです。ECS/EKSとの関係やメリットを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 起動タイプの位置づけ図 */
+    .tree-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .tree-node {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 20px;
+      background: #fff;
+      font-weight: bold;
+      text-align: center;
+      position: relative;
+    }
+    .tn-manager { border-color: #6366f1; background: #eef2ff; color: #4338ca; width: 80%; }
+    .tn-type-group {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      justify-content: center;
+    }
+    .tn-type { 
+      flex: 1;
+      border-color: #94a3b8; 
+      color: #475569; 
+      font-size: 0.9em;
+    }
+    .tn-fargate {
+      border-color: #f97316; /* Orange */
+      background: #fff7ed;
+      color: #c2410c;
+      border-width: 3px;
+    }
+    
+    .tree-line {
+      width: 2px;
+      height: 20px;
+      background: #cbd5e1;
+    }
+    .tree-branch {
+      width: 50%;
+      height: 10px;
+      border-top: 2px solid #cbd5e1;
+      border-left: 2px solid #cbd5e1;
+      border-right: 2px solid #cbd5e1;
+      border-radius: 8px 8px 0 0;
+    }
+
+    /* 2. レストランのメタファー図 */
+    .meta-compare {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .meta-box {
+      flex: 1;
+      min-width: 240px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .mb-ec2 { border-color: #94a3b8; background: #f8fafc; }
+    .mb-fargate { border-color: #f97316; background: #fff7ed; }
+
+    .mb-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .mb-title { font-weight: bold; font-size: 1.1em; color: #1e293b; margin-bottom: 8px; }
+    .mb-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9em;
+      color: #4b5563;
+      text-align: left;
+      width: 100%;
+    }
+    .mb-list li {
+      margin-bottom: 6px;
+      padding-left: 1.2em;
+      position: relative;
+    }
+    .mb-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #9ca3af;
+    }
+    .mb-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .bg-ec2 { background: #e2e8f0; color: #475569; }
+    .bg-fg { background: #ffedd5; color: #c2410c; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .meta-compare { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Fargateの基本理解</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Fargate</span>
+            <span class="tag">#コンテナ</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#従量課金</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>AWS Fargate（ファーゲート）</strong>は、一言で言うと<strong>「サーバーを一切意識せずにコンテナを動かせるサービス」</strong>です。
+</p>
+<p>
+  これまではコンテナ（Dockerなど）を使うにも、土台となるサーバー（EC2）の管理が必要でしたが、Fargateを使えばその手間がゼロになります。「コンテナ界のサーバーレス」とも言える存在です。
+</p>
+
+<h2>1. そもそも「コンテナ」って何？</h2>
+<p>
+  コンテナとは、<strong>「アプリ＋必要な環境をひとまとめにした『お弁当箱』」</strong>のようなものです。
+</p>
+<ul>
+  <li><strong>アプリ（料理）</strong>だけでなく、ライブラリや設定ファイル（調理器具や調味料）も全部パッケージされています。</li>
+  <li>そのため、開発者のPCでも、テスト環境でも、本番環境でも、<strong>「どこへ持っていっても全く同じ味（動作）になる」</strong>のが最大の特徴です。</li>
+</ul>
+
+<h2>2. Fargate の立ち位置（ECS / EKS との関係）</h2>
+<p>
+  ここが試験で最も混乱しやすいポイントです。Fargateは単独で使うものではなく、<strong>「ECS や EKS の『起動モード（オプション）』」</strong>の一つです。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">コンテナサービスの構造</div>
+  <div class="tree-diagram">
+    <div class="tree-node tn-manager">
+      管理サービス<br>(ECS / EKS)
+    </div>
+    <div class="tree-line"></div>
+    <div class="tree-branch"></div>
+    <div class="tn-type-group">
+      <div class="tree-node tn-type">
+        EC2 起動タイプ<br>
+        <small>サーバー管理：<strong>必要</strong></small>
+      </div>
+      <div class="tree-node tn-type tn-fargate">
+        Fargate 起動タイプ<br>
+        <small>サーバー管理：<strong>不要</strong></small>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center; margin-top:10px;">
+    ECSを使う時、「土台をEC2にするか、Fargateにするか」を選びます。
+  </p>
+</div>
+
+<h2>3. 例え話で理解する（レストラン）</h2>
+<p>
+  EC2を使う場合と、Fargateを使う場合の違いを「飲食店」に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">運用スタイルの比較</div>
+  <div class="meta-compare">
+    <!-- EC2 -->
+    <div class="meta-box mb-ec2">
+      <div class="mb-icon">🏠</div>
+      <div class="mb-title">EC2 (店舗経営)</div>
+      <ul class="mb-list">
+        <li>建物を借りて維持管理する</li>
+        <li>客が来なくても家賃がかかる</li>
+        <li>席数（CPU）の調整が大変</li>
+      </ul>
+      <span class="mb-badge bg-ec2">管理の手間：大</span>
+    </div>
+
+    <!-- Fargate -->
+    <div class="meta-box mb-fargate">
+      <div class="mb-icon">🍽️</div>
+      <div class="mb-title">Fargate (フードコート)</div>
+      <ul class="mb-list">
+        <li>場所の管理はモールにお任せ</li>
+        <li>料理を出した分だけ支払い</li>
+        <li>混んだら勝手に席が増える</li>
+      </ul>
+      <span class="mb-badge bg-fg">管理の手間：ゼロ</span>
+    </div>
+  </div>
+</div>
+
+<h2>4. 実務でのメリットと料金</h2>
+
+<h3>なぜ企業は Fargate を選ぶのか？</h3>
+<ul>
+  <li><strong>インフラ管理からの解放:</strong> OSのパッチ当てや、サーバーのスケーリング設定が不要になります。</li>
+  <li><strong>急なアクセス増に強い:</strong> Fargateはコンテナを「必要な数だけ」瞬時に立ち上げることができます。</li>
+</ul>
+
+<h3>料金の考え方</h3>
+<p>
+  Fargateは<strong>「完全従量課金」</strong>です。
+</p>
+<ul>
+  <li><strong>課金対象:</strong> コンテナが動いた「時間」 × 「CPU・メモリの使用量」。</li>
+  <li><strong>メリット:</strong> バッチ処理など「1日1回、10分だけ動く」ような処理なら、EC2を立てっぱなしにするより圧倒的に安くなります。</li>
+</ul>
+
+<h2>5. 試験で問われやすいポイント（キーワード対照表）</h2>
+<p>
+  問題文に以下のキーワードがあったら、右側の回答を選んでください。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>問題文のキーワード</th>
+      <th>正解に近いサービス</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>サーバー管理をしたくない</th>
+      <td><strong>Fargate</strong></td>
+    </tr>
+    <tr>
+      <th>コンテナを実行したい</th>
+      <td>ECS または EKS</td>
+    </tr>
+    <tr>
+      <th>既存のEC2インスタンスを使いたい</th>
+      <td>ECS (EC2起動タイプ)</td>
+    </tr>
+    <tr>
+      <th>Kubernetesを使いたい</th>
+      <td>EKS</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>よくあるひっかけ ⚠</h3>
+<ul>
+  <li>❌ 「Fargateは仮想サーバーである」 → <strong>間違い</strong>（EC2ではありません）。</li>
+  <li>❌ 「FargateはECSの代わりになる」 → <strong>間違い</strong>（ECSやEKSと一緒に使うものです）。</li>
+</ul>
+
+<h2>まとめ</h2>
+<p>
+  <strong>「Fargate = コンテナを、サーバー管理なしで、使った分だけ動かせる実行環境」</strong>
+</p>
+<p>
+  これだけ覚えておけば、試験対策としてはバッチリです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
