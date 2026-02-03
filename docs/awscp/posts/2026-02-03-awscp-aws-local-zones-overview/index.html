@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Local Zones の概要</title>
+  <meta name="description" content="AWS Local Zonesは大都市近くに設置された小型データセンター。Outpostsとの違いや、低遅延通信が必要なユースケースを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Local Zones の概要" />
+  <meta property="og:description" content="AWS Local Zonesは大都市近くに設置された小型データセンター。Outpostsとの違いや、低遅延通信が必要なユースケースを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. モール vs コンビニ (メタファー図) */
+    .meta-compare {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .meta-box {
+      flex: 1;
+      min-width: 220px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .mb-region { border-color: #3b82f6; background: #eff6ff; }
+    .mb-local { border-color: #f59e0b; background: #fffbeb; }
+
+    .mb-icon { font-size: 3em; margin-bottom: 8px; }
+    .mb-title { font-weight: bold; font-size: 1.1em; color: #1e293b; margin-bottom: 8px; }
+    .mb-desc { font-size: 0.9em; color: #4b5563; line-height: 1.4; margin-bottom: auto; }
+    .mb-tag {
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 12px;
+    }
+    .tag-blue { background: #3b82f6; }
+    .tag-orange { background: #f59e0b; }
+
+    /* 2. ロケーションマップ (位置関係) */
+    .loc-map {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      padding: 20px 0;
+    }
+    .loc-point {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+      position: relative;
+      width: 100px;
+      text-align: center;
+    }
+    .lp-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8em;
+      background: #fff;
+      border: 3px solid #cbd5e1;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .lp-region .lp-circle { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .lp-local .lp-circle { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .lp-outpost .lp-circle { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    
+    .lp-name { font-weight: bold; font-size: 0.85em; color: #334155; }
+    .lp-sub { font-size: 0.7em; color: #64748b; }
+
+    .map-line {
+      position: absolute;
+      top: 50px; /* circle center approx */
+      left: 50px;
+      right: 50px;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 1;
+    }
+    .dist-label {
+      position: absolute;
+      top: 30px;
+      font-size: 0.7em;
+      color: #94a3b8;
+      font-weight: bold;
+      background: #f8fafc;
+      padding: 0 4px;
+    }
+    .dl-far { right: 25%; }
+    .dl-near { left: 25%; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .meta-compare { flex-direction: column; }
+      .loc-map { flex-direction: column; height: 300px; padding: 0; align-items: center; }
+      .map-line { width: 4px; height: auto; top: 30px; bottom: 30px; left: 50%; right: auto; transform: translateX(-50%); }
+      .dist-label { position: relative; top: auto; left: auto; right: auto; margin: 10px 0; transform: none; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Local Zones の概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Local Zones</span>
+            <span class="tag">#データセンター</span>
+            <span class="tag">#低遅延</span>
+            <span class="tag">#クラウドコンピューティング</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  前回学んだ **AWS Outposts** が「自分の建物（オンプレミス）にAWSを置く」ものだったのに対し、今回の **AWS Local Zones（ローカルゾーン）** は、いわば**「都市部にあるAWSの出張所」**です。
+</p>
+
+<h2>1. AWS Local Zones とは？</h2>
+<p>
+  一言で言うと、**「大きなリージョン（東京など）から離れた大都市の近くに設置された、AWSの小規模なデータセンター」**のことです。
+</p>
+
+<h3>噛み砕いた解説：モールとコンビニ</h3>
+<p>
+  リージョンとローカルゾーンの関係を、買い物に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">規模と距離感の違い</div>
+  <div class="meta-compare">
+    <div class="meta-box mb-region">
+      <div class="mb-icon">🏬</div>
+      <div class="mb-title">AWSリージョン</div>
+      <div class="mb-desc">
+        <strong>「巨大ショッピングモール」</strong><br>
+        品揃え（全サービス）は完璧。<br>
+        ただし、郊外にあって遠い。
+      </div>
+      <span class="mb-tag tag-blue">距離：遠い / 遅延：中</span>
+    </div>
+
+    <div class="meta-box mb-local">
+      <div class="mb-icon">🏪</div>
+      <div class="mb-title">Local Zones</div>
+      <div class="mb-desc">
+        <strong>「駅前のコンビニ」</strong><br>
+        よく使う商品（EC2等）だけある。<br>
+        近所にあるのでパッと行ける。
+      </div>
+      <span class="mb-tag tag-orange">距離：近い / 遅延：小</span>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>AWSリージョン：</strong> すべてのサービスが揃っていますが、物理的に遠いと通信に時間がかかります（例：北海道から東京へアクセス）。</li>
+  <li><strong>AWS Local Zones：</strong> ユーザーが住んでいる大都市（例：札幌、ロサンゼルスなど）に設置された小さな拠点です。EC2やEBSなど「よく使う機能」だけがあり、**物理的に近いので通信が爆速**になります。</li>
+</ul>
+
+<h2>2. Outposts と何が違うの？</h2>
+<p>
+  ここが試験で最も狙われるポイントです。どちらも「低レイテンシー（通信を速くする）」が目的ですが、**「誰がどこに設置するか」**が決定的に違います。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">設置場所マップ</div>
+  <div class="loc-map">
+    <div class="map-line"></div>
+    <span class="dist-label dl-near">至近距離</span>
+    <span class="dist-label dl-far">中距離</span>
+
+    <div class="loc-point lp-outpost">
+      <div class="lp-circle">🏠</div>
+      <span class="lp-name">Outposts</span>
+      <span class="lp-sub">自社ビル</span>
+    </div>
+
+    <div class="loc-point lp-local">
+      <div class="lp-circle">🏙️</div>
+      <span class="lp-name">Local Zones</span>
+      <span class="lp-sub">近隣の大都市</span>
+    </div>
+
+    <div class="loc-point lp-region">
+      <div class="lp-circle">☁️</div>
+      <span class="lp-name">Region</span>
+      <span class="lp-sub">東京/大阪</span>
+    </div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS Outposts</th>
+      <th>AWS Local Zones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>設置場所</th>
+      <td><strong>あなたの会社</strong><br><small>(自社データセンター)</small></td>
+      <td><strong>大都市圏</strong><br><small>(AWSが用意した場所)</small></td>
+    </tr>
+    <tr>
+      <th>機材管理</th>
+      <td>AWSが管理するが、<strong>場所・電源はユーザー提供</strong></td>
+      <td>場所も含めて<strong>すべてAWSが管理</strong></td>
+    </tr>
+    <tr>
+      <th>導入の手間</th>
+      <td>ラック搬入などの工事が必要</td>
+      <td>コンソールで<strong>「有効化」するだけ</strong></td>
+    </tr>
+    <tr>
+      <th>主な用途</th>
+      <td>物理的に手元（工場内など）にデータを置きたい時</td>
+      <td>特定都市の一般ユーザーに高速配信したい時</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 試験で問われやすいポイント</h2>
+<p>
+  問題文に以下のキーワードがあったら、Local Zones を選びましょう。
+</p>
+<ul>
+  <li><strong>「ミリ秒単位（1桁）の超低遅延」:</strong> ユーザーに対して、リージョンよりもさらに速いレスポンスを返したい場合。</li>
+  <li><strong>「大都市圏 (Metropolitan areas)」:</strong> 「特定の都市に近い場所で…」「ロサンゼルスや台北のユーザーに向けて…」といった地理的な指定がある場合。</li>
+  <li><strong>「既存ツールとの一貫性」:</strong> 特別な開発は不要で、いつものAWSと同じAPIやコンソールで使えます。</li>
+</ul>
+
+<h2>4. 実務イメージ</h2>
+<ul>
+  <li><strong>オンラインゲーム開発:</strong> 「東京リージョン」だけだと、海外（例えばタイ）のプレイヤーにはラグ（遅延）が発生します。そこで「バンコクのLocal Zone」にゲームサーバーを置けば、現地のプレイヤーもラグなしで遊べます。</li>
+  <li><strong>メディア制作:</strong> 映像編集者がクラウド上の高画質ビデオを編集する際、通信が遅いと画面がカクつきます。最寄りの都市のLocal Zoneを使えば、自分のPCを操作しているような滑らかさでリモート編集が可能になります。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Local Zones:</strong> 大都市に置かれたAWSの出張所。</li>
+  <li><strong>メリット:</strong> その都市のユーザーに対して、爆速（超低遅延）でサービスを提供できる。</li>
+  <li><strong>Outpostsとの違い:</strong> Outpostsは「自社ビル（プライベート）」、Local Zonesは「都市（パブリック）」。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
