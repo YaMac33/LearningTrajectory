@@ -1,0 +1,21 @@
+{
+  "id": "awscp-kinesis-real-time-data-processing",
+  "category": "awscp",
+  "timestamp": "2026-02-03T13:05:45+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-kinesis-real-time-data-processing/",
+  "meta": {
+    "title": "Kinesisを活用したリアルタイムデータ処理",
+    "summary": "AWS Kinesisを使ってストリーミングデータをリアルタイムに処理する方法を理解できます。Kinesisの各サービスの違いや用途について詳しく解説します。",
+    "tags": [
+      "Kinesis",
+      "データ処理",
+      "ストリーミング",
+      "AWS",
+      "リアルタイム"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
