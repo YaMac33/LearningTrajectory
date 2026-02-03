@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-repost-features",
+  "category": "awscp",
+  "timestamp": "2026-02-04T05:47:42+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-repost-features/",
+  "meta": {
+    "title": "AWS re:Postの特長と利便性",
+    "summary": "AWS re:Postは、ユーザー同士が助け合うQ&Aコミュニティであり、無料で技術的なアドバイスが得られます。試験では、コミュニティ主導での解決を正解とする観点が理解できます。",
+    "tags": [
+      "AWS",
+      "Q&A",
+      "コミュニティ",
+      "サポート",
+      "無料"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
