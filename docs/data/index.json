@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-instances-roles",
+    "category": "awscp",
+    "timestamp": "2026-02-03T13:29:57+09:00",
+    "title": "AWSインスタンス役割一覧",
+    "summary": "AWSにおけるWeb/AP/DB層別のインスタンス役割を整理し、試験対策として重要なポイントを理解することができます。",
+    "tags": [
+      "AWS",
+      "インスタンス",
+      "試験対策",
+      "Web",
+      "AP",
+      "DB"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-instances-roles/"
+  },
+  {
     "id": "awscp-eventbridge-lambda-difference",
     "category": "awscp",
     "timestamp": "2026-02-03T13:23:30+09:00",
