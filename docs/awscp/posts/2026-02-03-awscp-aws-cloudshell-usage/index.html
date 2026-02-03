@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS CloudShellの使い方と特徴</title>
+  <meta name="description" content="AWS CloudShellはブラウザで即使用可能な無料のコマンド環境です。インストール不要で使えるメリットや、AWS Cloud9との明確な使い分けについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS CloudShellの使い方と特徴" />
+  <meta property="og:description" content="AWS CloudShellはブラウザで即使用可能な無料のコマンド環境です。インストール不要で使えるメリットや、AWS Cloud9との明確な使い分けについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    .feature-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+    }
+    .feature-item {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+    .feature-icon {
+      font-size: 2em;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .feature-head {
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .feature-text {
+      font-size: 0.9em;
+      color: #64748b;
+    }
+    /* Cloud9 vs CloudShell Metaphor */
+    .metaphor-comparison {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .metaphor-box {
+      flex: 1;
+      min-width: 280px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 20px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .metaphor-box.shell {
+      border-color: #f59e0b; /* Orange */
+      background: #fffbeb;
+    }
+    .metaphor-box.cloud9 {
+      border-color: #3b82f6; /* Blue */
+      background: #eff6ff;
+    }
+    .metaphor-img {
+      font-size: 3.5em;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .metaphor-title {
+      font-weight: 800;
+      font-size: 1.2em;
+      margin-bottom: 5px;
+      color: #1e293b;
+    }
+    .metaphor-desc {
+      font-size: 0.9em;
+      color: #475569;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+    .metaphor-list {
+      text-align: left;
+      font-size: 0.85em;
+      color: #334155;
+      margin: 0 auto;
+      display: inline-block;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS CloudShellの使い方と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CloudShell</span>
+            <span class="tag">#コマンドライン</span>
+            <span class="tag">#無料</span>
+            <span class="tag">#開発環境</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS CloudShellはブラウザで即使用可能な無料のコマンド環境。特徴やCloud9との違いを解説。</p>
+<hr>
+<p>
+  <strong>AWS CloudShell（クラウドシェル）</strong>は、AWSの管理画面（ブラウザ）から直接起動できる、<strong>「コマンド入力専用の黒い画面（ターミナル）」</strong>です。<br>
+  一言で言うと、<strong>「準備ゼロですぐに使える、ブラウザ版のコマンドプロンプト」</strong>です。AWS Cloud9 と似ていますが、もっと<strong>「手軽さ」</strong>に特化しています。
+</p>
+
+<h2>1. 何が便利なのか？（3つの特徴）</h2>
+<p>わざわざPCに黒い画面（ターミナル）を用意しなくてもいい理由がこれです。</p>
+
+<!-- 図解：CloudShellの3大メリット -->
+<div class="diagram-container">
+  <div class="diagram-title">CloudShellの3つの「楽」</div>
+  <div class="feature-list-grid">
+    <div class="feature-item">
+      <span class="feature-icon">📦</span>
+      <span class="feature-head">インストール不要</span>
+      <span class="feature-text">AWS CLI, Python, Node.js等が最初から入っている「全部入り」。</span>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">💾</span>
+      <span class="feature-head">1GBストレージ</span>
+      <span class="feature-text">ファイルを保存して閉じても、次回ログイン時にデータが残る。</span>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🆓</span>
+      <span class="feature-head">完全無料</span>
+      <span class="feature-text">EC2等の料金は一切かからない。タダで使えるLinux環境。</span>
+    </div>
+  </div>
+</div>
+
+<h3>① インストール不要（全部入り）</h3>
+<p>
+  AWSを操作するためのコマンド（AWS CLI）や、Python、Node.jsなどがプレインストールされています。「自分のパソコンにツールを入れるのは面倒だけど、ちょっとだけコマンドで確認したい」という時に、クリック一発で起動できます。
+</p>
+
+<h3>② 1GBの無料ストレージ付き</h3>
+<p>
+  CloudShellを閉じても、ホームディレクトリにあるデータ（最大1GB）は消えずに残ります。<br>
+  ちょっとしたスクリプト（プログラム）や設定ファイルを保存しておけるので、次回ログインした時にすぐに作業を再開できます。<br>
+  ※ただし、このデータは「リージョンごと」に保存されます。
+</p>
+
+<h3>③ 完全無料</h3>
+<p>
+  CloudShell自体は無料です。（※Cloud9は裏でEC2が動くので料金がかかりますが、CloudShellはかかりません）
+</p>
+
+<h2>2. Cloud9 との違い（試験のポイント）</h2>
+<p>
+  「どっちもブラウザで動く開発環境じゃないの？」と迷いますが、<strong>「道具としての重さ」</strong>で使い分けます。
+</p>
+
+<!-- 図解：CloudShell vs Cloud9 -->
+<div class="diagram-container">
+  <div class="diagram-title">道具としての使い分けイメージ</div>
+  <div class="metaphor-comparison">
+    
+    <!-- CloudShell -->
+    <div class="metaphor-box shell">
+      <span class="metaphor-img">🔪</span>
+      <div class="metaphor-title">AWS CloudShell</div>
+      <div class="metaphor-desc">スイスアーミーナイフ</div>
+      <div class="metaphor-list">
+        ・ポケットから出して即使う<br>
+        ・コマンド操作のみ<br>
+        ・無料
+      </div>
+    </div>
+
+    <!-- Cloud9 -->
+    <div class="metaphor-box cloud9">
+      <span class="metaphor-img">🛠️</span>
+      <div class="metaphor-title">AWS Cloud9</div>
+      <div class="metaphor-desc">整備ガレージ (IDE)</div>
+      <div class="metaphor-list">
+        ・腰を据えて作業する<br>
+        ・コード編集＋デバッグ<br>
+        ・有料 (EC2料金)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS CloudShell</th>
+      <th>AWS Cloud9</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>主な機能</strong></td>
+      <td>コマンド実行のみ (CUI)</td>
+      <td>コード編集 + 実行 (IDE)</td>
+    </tr>
+    <tr>
+      <td><strong>画面構成</strong></td>
+      <td>黒い画面 (ターミナル) だけ</td>
+      <td>エディタ、ファイルツリー、ターミナル</td>
+    </tr>
+    <tr>
+      <td><strong>コスト</strong></td>
+      <td><strong>無料</strong></td>
+      <td>有料 (EC2の料金)</td>
+    </tr>
+    <tr>
+      <td><strong>用途</strong></td>
+      <td>AWS CLIでサクッと操作。<br>短いスクリプト実行。</td>
+      <td>アプリをガッツリ開発。<br>デバッグやペアプログラミング。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 具体的な使い方</h2>
+<ol>
+  <li>AWSコンソールの画面左下（または右上）にある<strong>「ターミナルのアイコン（>_）」</strong>をクリックします。</li>
+  <li>ブラウザの下半分に黒い画面が出てきます。</li>
+  <li>すでにログイン中の権限を持っているので、すぐに <code>aws s3 ls</code> （S3の中身を見る）などのコマンドが打てます。</li>
+</ol>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS CloudShell</strong>: ブラウザですぐ使える無料のコマンド環境。</li>
+  <li><strong>特徴</strong>: AWS CLIインストール済み、1GBの永続ストレージ。</li>
+  <li><strong>使い分け</strong>:
+    <ul>
+      <li>開発（コーディング）なら <strong>Cloud9</strong>。</li>
+      <li>操作（コマンド）なら <strong>CloudShell</strong>。</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  「EC2を立てるまでもないけど、コマンドでAWSを操作したい」という時に使う便利な道具です！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
