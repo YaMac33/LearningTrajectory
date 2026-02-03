@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-opsworks-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-03T18:17:28+09:00",
+    "title": "AWS OpsWorks の基本知識",
+    "summary": "AWS OpsWorksは、ChefやPuppetを用いてサーバー内部の設定を自動化する構成管理サービスです。試験対策において、このサービスの特徴を理解し、関連用語をしっかり把握することが重要です。",
+    "tags": [
+      "AWS",
+      "OpsWorks",
+      "構成管理",
+      "Chef",
+      "Puppet"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-opsworks-basics/"
+  },
+  {
     "id": "awscp-aws-lightsail-explained",
     "category": "awscp",
     "timestamp": "2026-02-03T17:49:31+09:00",
