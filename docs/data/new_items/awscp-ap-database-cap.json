@@ -1,0 +1,22 @@
+{
+  "id": "awscp-ap-database-cap",
+  "category": "awscp",
+  "timestamp": "2026-02-03T12:38:21+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-ap-database-cap/",
+  "meta": {
+    "title": "AP型データベースの特徴と例",
+    "summary": "AP型データベースは可用性を重視し、整合性を犠牲にする特徴がある。CAP定理を基にしたデータシステムの理解が深まる。",
+    "tags": [
+      "AP型",
+      "データベース",
+      "CAP定理",
+      "可用性",
+      "整合性",
+      "DynamoDB"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
