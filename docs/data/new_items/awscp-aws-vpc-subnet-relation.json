@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-vpc-subnet-relation",
+  "category": "awscp",
+  "timestamp": "2026-02-03T20:56:47+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-vpc-subnet-relation/",
+  "meta": {
+    "title": "AWSのVPCとサブネットの関係",
+    "summary": "VPC、サブネット、インスタンスの関係を理解し、AWSネットワークの基本を習得できます。",
+    "tags": [
+      "AWS",
+      "VPC",
+      "サブネット",
+      "インスタンス",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
