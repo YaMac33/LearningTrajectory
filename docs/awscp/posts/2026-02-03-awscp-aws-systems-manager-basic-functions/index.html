@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Systems Managerの基本機能</title>
+  <meta name="description" content="AWS Systems Manager (SSM) で実現するサーバー運用の自動化。SSH不要のSession Manager、一括操作のRun Commandなど、安全かつ効率的な管理手法を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Systems Managerの基本機能" />
+  <meta property="og:description" content="AWS Systems Manager (SSM) で実現するサーバー運用の自動化。SSH不要のSession Manager、一括操作のRun Commandなど、安全かつ効率的な管理手法を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    .diagram-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      min-width: max-content;
+    }
+    .diagram-box {
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 2px solid #6366f1;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #1e293b;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .diagram-box.security {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+    .diagram-box.risk {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .diagram-arrow {
+      color: #94a3b8;
+      font-size: 1.2em;
+    }
+    .diagram-note {
+      font-size: 0.8em;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Systems Managerの基本機能</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#SSM</span>
+            <span class="tag">#運用自動化</span>
+            <span class="tag">#Session Manager</span>
+            <span class="tag">#Run Command</span>
+            <span class="tag">#Patch Manager</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Systems Managerでサーバー運用の自動化を実現。SSH不要の操作で安全かつ効率的。</p>
+<hr>
+<p>
+  AWS Systems Manager (SSM) は、AWS上の大量のサーバー（EC2）やオンプレミスのサーバーを、<strong>「一括で管理・操作するための統合コックピット」</strong>です。<br>
+  一言で言うと、<strong>「もうサーバーにログインしなくていい。SSH鍵もいらない。全部この画面から遠隔操作できる」</strong>という革命的なサービスです。
+</p>
+<p>
+  試験では、以下の3点が超頻出キーワードとなります。
+</p>
+<ul>
+  <li><strong>運用自動化</strong></li>
+  <li><strong>パッチ適用</strong></li>
+  <li><strong>SSH不要（セッションマネージャー）</strong></li>
+</ul>
+
+<h2>1. 最大の目玉機能：Session Manager（セッションマネージャー）</h2>
+<p>
+  これまでサーバー（EC2）に入ってコマンドを打つには、以下の準備が必要でした。これらはすべてセキュリティリスクや管理の手間につながります。
+</p>
+<ul>
+  <li>22番ポート（SSH）を開ける（セキュリティリスク）</li>
+  <li>SSH鍵（pemファイル）を管理する（紛失リスク）</li>
+  <li>踏み台サーバー（Bastion）を経由する（面倒）</li>
+</ul>
+<p>
+  <strong>SSM Session Manager</strong> を使うと、これらが全部不要になります。ブラウザ上のクリックだけで、安全に黒い画面（シェル）が開きます。
+</p>
+
+<!-- 図解：SSH vs SSM -->
+<div class="diagram-container">
+  <div class="diagram-title">従来のSSH接続 vs Session Manager</div>
+  
+  <div class="diagram-row" style="margin-bottom: 20px;">
+    <div class="diagram-box risk">
+      管理者PC
+      <div class="diagram-note">SSH鍵が必要</div>
+    </div>
+    <div class="diagram-arrow">→ SSH (Port 22) →</div>
+    <div class="diagram-box risk">
+      EC2サーバー
+      <div class="diagram-note">ポート開放必要</div>
+    </div>
+  </div>
+
+  <div class="diagram-row">
+    <div class="diagram-box security">
+      管理者PC
+      <div class="diagram-note">ブラウザ/CLI</div>
+    </div>
+    <div class="diagram-arrow">→ HTTPS (443) →</div>
+    <div class="diagram-box">
+      Systems Manager
+      <div class="diagram-note">AWS管理画面</div>
+    </div>
+    <div class="diagram-arrow">→ 制御ch →</div>
+    <div class="diagram-box security">
+      EC2サーバー
+      <div class="diagram-note">ポート開放不要</div>
+    </div>
+  </div>
+</div>
+
+<h3>主なメリット</h3>
+<ul>
+  <li><strong>ポート開放不要</strong>: インバウンドポートを全部閉じても入れます（アウトバウンド443があればOK）。</li>
+  <li><strong>鍵不要</strong>: IAM権限で認証するので、鍵ファイル（pem）が要りません。</li>
+  <li><strong>ログ記録</strong>: 「誰がどんなコマンドを打ったか」が全部記録されます（S3やCloudWatch Logsへ）。</li>
+</ul>
+
+<h2>2. その他の主要機能（ツールボックス）</h2>
+<p>SSMは多機能ですが、試験に出る重要機能は以下の3つです。</p>
+
+<h3>① Run Command（ランコマンド）</h3>
+<p>
+  <strong>「一斉送信」</strong>機能です。<br>
+  「サーバー100台全部で、Apacheを再起動したい」という時、1台ずつログインするのは現実的ではありません。Run Commandを使えば、ターゲットを指定してボタンを押すだけで、100台同時にコマンドを実行できます。
+</p>
+
+<h3>② Patch Manager（パッチマネージャー）</h3>
+<p>
+  <strong>「全自動アップデート」</strong>機能です。<br>
+  「毎週土曜日の夜中2時に、Windows Updateを適用して再起動する」といった作業を自動化します。「メンテナンスウィンドウ」という機能と組み合わせて、業務に影響がない時間に実行するのが一般的です。
+</p>
+
+<h3>③ Parameter Store（パラメータストア）</h3>
+<p>
+  設定値やパスワードを保存する機能です。Secrets Managerの簡易版として、より低コストで使用されます。
+</p>
+
+<h2>3. 動かすための「2つの条件」</h2>
+<p>
+  ★トラブルシューティング頻出<br>
+  「SSMの画面にサーバーが表示されない！操作できない！」というトラブルの原因は、99%以下のどちらかです。
+</p>
+
+<!-- 図解：前提条件 -->
+<div class="diagram-container">
+  <div class="diagram-title">SSMを動作させる必須セット</div>
+  <div class="diagram-row">
+    <div class="diagram-box">
+      EC2 インスタンス
+    </div>
+    <div class="diagram-arrow">← 内包 ―</div>
+    <div class="diagram-box security">
+      SSM エージェント
+      <div class="diagram-note">駐在員ソフト</div>
+    </div>
+    <div class="diagram-arrow">― 権限 →</div>
+    <div class="diagram-box security">
+      IAM ロール
+      <div class="diagram-note">SSM許可ポリシー</div>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li>
+    <strong>SSM エージェント (SSM Agent)</strong>
+    <ul>
+      <li>EC2の中に、SSMからの命令を受け取る<strong>「駐在員ソフト（エージェント）」</strong>がインストールされ、起動している必要があります。</li>
+      <li>※Amazon Linux 2 / 2023 など、最近の主要OSには最初から入っています。</li>
+    </ul>
+  </li>
+  <li>
+    <strong>IAM ロール</strong>
+    <ul>
+      <li>EC2に、「SSMと通信してもいいよ」という権限（IAMロール） がアタッチされている必要があります。</li>
+      <li>これがないと、エージェントが入っていてもSSMは操作できません（代表的なポリシー: <code>AmazonSSMManagedInstanceCore</code>）。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>4. OpsWorks や SSH との比較</h2>
+<p>「サーバーを管理する」手段としての使い分けは以下の通りです。</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>手段</th>
+      <th>特徴</th>
+      <th>今の推奨</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>SSH (手動)</strong></td>
+      <td>1台ずつ鍵を使ってログイン。ポート開放が必要。</td>
+      <td>非推奨 (セキュリティリスクが高い)</td>
+    </tr>
+    <tr>
+      <td><strong>OpsWorks</strong></td>
+      <td>Chef/Puppetを使う。複雑な設定管理向け。</td>
+      <td>特殊な場合のみ (既存資産がある時など)</td>
+    </tr>
+    <tr>
+      <td><strong>SSM (Session Manager)</strong></td>
+      <td>ポート開放不要、鍵不要。ブラウザから操作。</td>
+      <td><strong>★基本はこれ</strong> (最も安全で楽)</td>
+    </tr>
+    <tr>
+      <td><strong>SSM (Run Command)</strong></td>
+      <td>複数台への一括実行。</td>
+      <td><strong>★基本はこれ</strong> (運用の自動化)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割</strong>: EC2やオンプレサーバーの運用管理を自動化・統合するサービス。</li>
+  <li><strong>Session Manager</strong>: SSH不要、ポート開放不要、鍵不要でサーバーにログインできる最強機能。</li>
+  <li><strong>Run Command</strong>: 複数サーバーへのコマンド一括実行。</li>
+  <li><strong>Patch Manager</strong>: OSのセキュリティパッチ適用を自動化。</li>
+  <li><strong>必須条件</strong>: サーバーに<strong>「SSMエージェント」と「IAMロール」</strong>が必要。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
