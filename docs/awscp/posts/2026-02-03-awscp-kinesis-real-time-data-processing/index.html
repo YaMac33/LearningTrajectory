@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | Kinesisによるリアルタイムデータ処理</title>
+  <meta name="description" content="AWS Kinesisはストリーミングデータをリアルタイム処理するサービス。KDSとKDFの違い、SQSとの使い分け、試験対策ポイントを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Kinesisによるリアルタイムデータ処理" />
+  <meta property="og:description" content="AWS Kinesisはストリーミングデータをリアルタイム処理するサービス。KDSとKDFの違い、SQSとの使い分け、試験対策ポイントを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. バッチ vs ストリーム 比較図 */
+    .proc-compare {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .proc-box {
+      flex: 1;
+      min-width: 240px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .pb-batch { border-color: #94a3b8; color: #475569; }
+    .pb-stream { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    
+    .proc-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .proc-title { font-weight: bold; margin-bottom: 6px; }
+    .proc-desc { font-size: 0.85em; line-height: 1.4; }
+
+    /* 2. KDS vs KDF カード */
+    .kinesis-family {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .k-card {
+      flex: 1;
+      min-width: 260px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      border-top: 4px solid;
+    }
+    .kc-streams { border-top-color: #f97316; } /* Orange */
+    .kc-firehose { border-top-color: #ef4444; } /* Red */
+    
+    .kc-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .kc-icon { font-size: 1.8em; }
+    .kc-title { font-weight: bold; font-size: 1em; color: #1f2937; }
+    .kc-badge {
+      font-size: 0.7em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #f3f4f6;
+      color: #4b5563;
+      margin-left: auto;
+    }
+    .kc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9em;
+    }
+    .kc-list li {
+      margin-bottom: 6px;
+      padding-left: 14px;
+      position: relative;
+      color: #374151;
+    }
+    .kc-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #9ca3af;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .proc-compare, .kinesis-family {
+        flex-direction: column;
+      }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Kinesisによるリアルタイムデータ処理</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Kinesis</span>
+            <span class="tag">#データ処理</span>
+            <span class="tag">#ストリーミング</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#リアルタイム</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>Amazon Kinesis（キネシス）は、「大量のデータが、絶え間なく流れ込んでくる状況（ストリーミングデータ）」</strong>をリアルタイムで処理するためのサービス群です。
+</p>
+<p>
+  一言で言うと、<strong>「情報の激流を受け止める『土管』や『ダム』のようなインフラ」</strong>です。IoTセンサー、Webサイトのクリックログ、SNSの投稿など、<strong>「止まることなく流れ続けるデータ」</strong>を扱うのに特化しています。
+</p>
+
+<h2>1. なぜ Kinesis が必要なのか？（バッチ vs ストリーム）</h2>
+<p>
+  これまでのデータ処理は「バケツがいっぱいになったら運ぶ（バッチ処理）」のが普通でした。しかし、「クレジットカードの不正利用」や「株価の急変動」など、**「1秒でも早く気づきたい」**というシーンでは、バケツがいっぱいになるのを待っていられません。
+</p>
+<p>
+  Kinesisは、データが発生した瞬間に**「流れながら処理する（ストリーム処理）」**ことを可能にします。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">データ処理方式の違い</div>
+  <div class="proc-compare">
+    <div class="proc-box pb-batch">
+      <div class="proc-icon">🪣</div>
+      <div class="proc-title">バッチ処理</div>
+      <div class="proc-desc">
+        バケツに溜めてから運ぶ。<br>
+        効率は良いが、<br>結果が出るまで遅い。
+      </div>
+    </div>
+    <div class="proc-box pb-stream">
+      <div class="proc-icon">🚿</div>
+      <div class="proc-title">ストリーム処理 (Kinesis)</div>
+      <div class="proc-desc">
+        ホースで流し続ける。<br>
+        <strong>発生した瞬間に処理</strong>でき、<br>
+        即座に反応できる。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. Kinesis ファミリーの「4兄弟」</h2>
+<p>
+  Kinesisは単一のサービスではなく、役割の違う4つのサービスの総称です。試験では特に**上から2つ（StreamsとFirehose）**の違いが問われます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Streams と Firehose の違い</div>
+  <div class="kinesis-family">
+    <!-- Streams -->
+    <div class="k-card kc-streams">
+      <div class="kc-header">
+        <span class="kc-icon">🛣️</span>
+        <span class="kc-title">Data Streams</span>
+        <span class="kc-badge">手動管理</span>
+      </div>
+      <ul class="kc-list">
+        <li>役割：<strong>情報の「土管」</strong></li>
+        <li><strong>シャード（車線）</strong>の数を自分で管理</li>
+        <li>データは一時保存され、後からリプレイ可能</li>
+        <li>用途：複雑なリアルタイム分析、カスタムアプリ</li>
+      </ul>
+    </div>
+    <!-- Firehose -->
+    <div class="k-card kc-firehose">
+      <div class="kc-header">
+        <span class="kc-icon">🚒</span>
+        <span class="kc-title">Data Firehose</span>
+        <span class="kc-badge">全自動</span>
+      </div>
+      <ul class="kc-list">
+        <li>役割：<strong>S3への「配送業者」</strong></li>
+        <li>管理不要（フルマネージド）</li>
+        <li>データを変換して<strong>S3 / Redshift</strong>へ保存</li>
+        <li>用途：とにかくログを保存したい時</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3>③ Kinesis Data Analytics (KDA)</h3>
+<ul>
+  <li><strong>役割：</strong> 流れているデータに対して、<strong>「SQL」</strong>を使ってリアルタイムに集計・フィルタリングができる機能です。</li>
+  <li><strong>用途：</strong> 「エラーログが1分間に10件流れてきたらアラートを出す」といった即時対応に使います。</li>
+</ul>
+
+<h3>④ Kinesis Video Streams (KVS)</h3>
+<ul>
+  <li><strong>役割：</strong> 監視カメラやスマホからの<strong>「映像・音声」</strong>データをリアルタイムでAWSに送るサービスです。</li>
+</ul>
+
+<h2>3. SQS と Kinesis の違い（試験の超・頻出ポイント）</h2>
+<p>
+  「データを一時的に溜めて処理する」という点で Amazon SQS と似ていますが、使い道が全く違います。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon SQS (キュー)</th>
+      <th>Amazon Kinesis (ストリーム)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>たとえ</th>
+      <td>「郵便ポスト」</td>
+      <td>「ベルトコンベア / 防犯カメラ録画」</td>
+    </tr>
+    <tr>
+      <th>データの単位</th>
+      <td>個別の「メッセージ」 (手紙)</td>
+      <td>連続した「レコード」 (映像/ログ)</td>
+    </tr>
+    <tr>
+      <th>処理後</th>
+      <td>消える (取り出したら削除)</td>
+      <td><strong>消えない</strong> (保存期間内なら何度でも読める)</td>
+    </tr>
+    <tr>
+      <th>読み手</th>
+      <td>基本的に1つのシステム</td>
+      <td>複数のシステムが同時に読める</td>
+    </tr>
+    <tr>
+      <th>用途</th>
+      <td>タスクの分散、システム連携</td>
+      <td>ビッグデータ収集、ログ解析</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>試験の合言葉:</strong><br>
+  ・タスクを1つずつ確実に処理したい → <strong>SQS</strong><br>
+  ・ログをS3に保存したい、リアルタイム分析したい → <strong>Kinesis</strong></p>
+</blockquote>
+
+<h2>4. 試験における「ストリーミングデータ」の正体</h2>
+<p>
+  過去問などで「ストリーミングデータ」という言葉が出た時、Video Streams (KVS) と混同しないように注意が必要です。
+</p>
+<ul>
+  <li><strong>✕ 動画のことだけではない:</strong> NetflixやYouTubeのような映像データだけを指すわけではありません。</li>
+  <li><strong>◎ 連続データ全般を指す:</strong> Webサイトのクリックログ、株価、IoTセンサーの温度データなど、「絶え間なく発生する文字データ」もストリーミングデータです。</li>
+</ul>
+<p>
+  もし試験で「ストリーミングデータを収集・分析する」とあったら、映像という言葉がない限り、基本的には <strong>Kinesis Data Streams</strong> のことを指しています。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Kinesis Data Streams:</strong> <strong>「リアルタイム」</strong>重視。シャード管理が必要。データはリプレイ可能。</li>
+  <li><strong>Kinesis Data Firehose:</strong> <strong>「S3への保存」</strong>重視。管理不要で楽ちん。S3/Redshiftへのロードといえばこれ。</li>
+  <li><strong>見分け方:</strong> 「ログをS3に保存したい」ならFirehose。「リアルタイムにカスタム処理したい」ならStreams。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
