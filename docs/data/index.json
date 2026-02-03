@@ -1,5 +1,28 @@
 [
   {
+    "id": "awscp-aws-management-level-classification",
+    "category": "awscp",
+    "timestamp": "2026-02-03T13:09:45+09:00",
+    "title": "AWS管理レベルの分類と特徴",
+    "summary": "AWSのサービスを管理レベルによる責任範囲で分類し、それぞれの特徴を理解することが重要です。試験では、具体的なサービス名によって管理レベルの判断が求められます。",
+    "tags": [
+      "AWS",
+      "クラウド",
+      "マネージドサービス",
+      "IT",
+      "EC2",
+      "RDS",
+      "S3"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-management-level-classification/"
+  },
+  {
     "id": "awscp-kinesis-real-time-data-processing",
     "category": "awscp",
     "timestamp": "2026-02-03T13:05:45+09:00",
