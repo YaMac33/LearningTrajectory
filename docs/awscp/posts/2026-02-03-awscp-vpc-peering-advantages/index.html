@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | VPCピアリングの利点と特性</title>
+  <meta name="description" content="VPCピアリングは単一障害点がなく、高速通信が可能。VPNとの違いを比較解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="VPCピアリングの利点と特性" />
+  <meta property="og:description" content="VPCピアリングは単一障害点がなく、高速通信が可能。VPNとの違いを比較解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 接続構造の比較図 */
+    .bridge-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .bridge-box {
+      flex: 1;
+      min-width: 260px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .bridge-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 80px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    
+    .island {
+      width: 50px;
+      height: 50px;
+      background: #cbd5e1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      z-index: 2;
+    }
+    
+    /* VPN: 吊り橋 */
+    .vpn-bridge {
+      height: 4px;
+      background: #ef4444; /* Red for weakness */
+      flex: 1;
+      position: relative;
+      margin: 0 4px;
+    }
+    .vpn-gateway {
+      width: 20px;
+      height: 20px;
+      background: #ef4444;
+      border-radius: 50%;
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .vpn-label {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.7em;
+      color: #ef4444;
+      font-weight: bold;
+    }
+    
+    /* Peering: 地続き */
+    .peering-ground {
+      height: 50px;
+      background: #10b981; /* Green for strength */
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9em;
+      margin: 0 -4px; /* 島とくっつける */
+      z-index: 1;
+      border-radius: 4px;
+    }
+    
+    .bb-title {
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+    .bb-desc {
+      font-size: 0.85em;
+      color: #64748b;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .bridge-container {
+        flex-direction: column;
+      }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">VPCピアリングの利点と特性</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#VPCピアリング</span>
+            <span class="tag">#VPN</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#帯域幅</span>
+            <span class="tag">#可用性</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  VPCピアリングに関連して「単一障害点」や「帯域幅の制限」という言葉が出てくるのは、<strong>「VPCピアリングには、それらが『ない』（だから凄い）」</strong>という文脈であることがほとんどです。
+</p>
+<p>
+  VPN接続などの「従来の接続方法」と比較すると、その意味がよく分かります。それぞれ解説します。
+</p>
+
+<h2>1. 単一障害点（Single Point of Failure：SPOF）</h2>
+<p>
+  <strong>意味：</strong> 「そこが壊れたら、システム全体が止まってしまう唯一の弱点」のことです。<br>
+  <strong>イメージ：</strong> 「島と島を結ぶ、たった一本の吊り橋」です。この橋が嵐で落ちたら、交通は完全に麻痺します。
+</p>
+
+<h3>VPNの場合（SPOFあり）</h3>
+<p>
+  通常、VPN接続には「VPNゲートウェイ」という機器（または仮想マシン）を使います。もしこの機械が故障したら、通信は切れます。これが単一障害点です。
+</p>
+
+<h3>VPCピアリングの場合（SPOFなし）</h3>
+<p>
+  ピアリングは、特定の機械やケーブル一本で繋がっているわけではありません。AWSの巨大なネットワーク全体が、論理的に結合しています。
+</p>
+<ul>
+  <li>「吊り橋」ではなく、<strong>「島同士の地面がくっついた」</strong>ような状態です。特定の部品が一つ壊れたくらいでは、接続は切れません。</li>
+  <li><strong>結論：</strong> VPCピアリングは非常に頑丈で、単一障害点がありません。</li>
+</ul>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">接続強度のイメージ</div>
+  <div class="bridge-container">
+    <!-- VPN -->
+    <div class="bridge-box">
+      <div class="bridge-visual">
+        <div class="island">🏝️</div>
+        <div class="vpn-bridge">
+          <div class="vpn-label">細い道</div>
+          <div class="vpn-gateway">×</div>
+        </div>
+        <div class="island">🏝️</div>
+      </div>
+      <div class="bb-title">VPN接続</div>
+      <div class="bb-desc">
+        ゲートウェイという<br>
+        <strong>「弱点 (SPOF)」</strong>がある
+      </div>
+    </div>
+
+    <!-- Peering -->
+    <div class="bridge-box">
+      <div class="bridge-visual">
+        <div class="island" style="background:#10b981;">🏝️</div>
+        <div class="peering-ground">地面</div>
+        <div class="island" style="background:#10b981;">🏝️</div>
+      </div>
+      <div class="bb-title">VPCピアリング</div>
+      <div class="bb-desc">
+        地続きでつながる<br>
+        <strong>「弱点なし (高可用性)」</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 帯域幅の制限（Bandwidth Limits）</h2>
+<p>
+  <strong>意味：</strong> 「一度にどれくらいの量のデータを送れるか（通信速度）の上限」のことです。<br>
+  <strong>イメージ：</strong> 「道路の車線の数」や「水道管の太さ」です。細いと渋滞します。
+</p>
+
+<h3>VPNの場合（制限あり）</h3>
+<p>
+  VPN接続は、インターネット回線やVPN装置のスペックによって速度に限界があります（例：最大1Gbpsなど）。大量のデータを送ると詰まります。
+</p>
+
+<h3>VPCピアリングの場合（実質制限なし）</h3>
+<p>
+  ピアリング接続そのものには、帯域幅の制限（ボトルネック）がありません。
+</p>
+<ul>
+  <li>もし制限がかかるとすれば、それは「EC2インスタンス自体の性能」だけです。</li>
+  <li><strong>結論：</strong> インスタンスが許す限り、<strong>最大速度（フルスピード）</strong>で通信できます。</li>
+</ul>
+
+<h2>図解で比較</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>VPN接続 (ゲートウェイ利用)</th>
+      <th>VPC ピアリング</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>構造</th>
+      <td>特定の「出入り口（ゲートウェイ）」を通る</td>
+      <td>AWSネットワーク全体で直接つながる</td>
+    </tr>
+    <tr>
+      <th>単一障害点</th>
+      <td><strong>あり</strong><br><small>(ゲートウェイが壊れたら終わり)</small></td>
+      <td><strong>なし</strong><br><small>(高可用性)</small></td>
+    </tr>
+    <tr>
+      <th>帯域幅</th>
+      <td>制限あり<br><small>(ゲートウェイの性能による)</small></td>
+      <td><strong>制限なし</strong><br><small>(PCの性能が許す限り出せる)</small></td>
+    </tr>
+    <tr>
+      <th>たとえ</th>
+      <td>細い一本の吊り橋</td>
+      <td>地面続き（地続き）</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>試験対策としてのまとめ</h2>
+<p>
+  もし試験で<strong>「大量のデータを、高速かつ止まることなく、別のVPCへ転送したい。ボトルネックや単一障害点を作りたくない。どのサービスを使うべきか？」</strong>と聞かれたら：
+</p>
+<ul>
+  <li>VPN接続 → <strong>×</strong>（遅い、壊れるかも）</li>
+  <li>VPCピアリング → <strong>◎</strong>（速い、壊れない）</li>
+</ul>
+<p>
+  と判断してください。「VPCピアリングは最強の接続方法」と覚えておけばOKです！
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <section class="contact-cta">
+          <a id="contactLink" class="contact-cta__link" href="#" target="_blank">✉ お問い合わせ</a>
+        </section>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
