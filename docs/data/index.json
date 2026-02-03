@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-iq-matching-service",
+    "category": "awscp",
+    "timestamp": "2026-02-04T05:42:34+09:00",
+    "title": "AWS IQ：プロと繋がるマッチングサービス",
+    "summary": "AWS IQは、AWS認定資格を持つプロに仕事を依頼できる公式のマッチングサービスです。安全な権限管理とスムーズな支払いが特徴です。",
+    "tags": [
+      "AWS",
+      "クラウド",
+      "マッチングサービス",
+      "フリーランス",
+      "認定資格"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-iq-matching-service/"
+  },
+  {
     "id": "awscp-aws-ram-resource-sharing",
     "category": "awscp",
     "timestamp": "2026-02-04T05:36:52+09:00",
