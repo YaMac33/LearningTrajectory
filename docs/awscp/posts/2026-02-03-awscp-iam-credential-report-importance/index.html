@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | IAM認証情報レポートの重要性</title>
+  <meta name="description" content="全社員のパスワード設定やMFA状況を一括確認できるIAM認証情報レポート（Credential Report）について解説。試験でのポイントも紹介。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="IAM認証情報レポートの重要性" />
+  <meta property="og:description" content="全社員のパスワード設定やMFA状況を一括確認できるIAM認証情報レポート（Credential Report）について解説。試験でのポイントも紹介。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. レポートプレビュー図（CSV風） */
+    .csv-viewer {
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      overflow: hidden;
+      font-family: monospace;
+      font-size: 0.85em;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .csv-header-bar {
+      background: #10b981; /* Excel green */
+      color: #fff;
+      padding: 4px 12px;
+      font-weight: bold;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .csv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .csv-cell {
+      padding: 8px;
+      border-right: 1px solid #e2e8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .csv-head-cell {
+      background: #f1f5f9;
+      font-weight: bold;
+      color: #475569;
+      border-bottom: 2px solid #cbd5e1;
+    }
+    .status-ok { color: #059669; font-weight: bold; }
+    .status-ng { color: #dc2626; font-weight: bold; background: #fef2f2; }
+
+    /* 2. 点検名簿メタファー図 */
+    .checklist-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 450px;
+    }
+    .checklist-board {
+      background: #fff;
+      border: 4px solid #f59e0b; /* Board frame */
+      border-radius: 8px;
+      padding: 16px;
+      width: 100%;
+      position: relative;
+    }
+    .clip-top {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 12px;
+      background: #78350f;
+      border-radius: 4px;
+    }
+    .check-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px dashed #e2e8f0;
+      padding: 8px 0;
+    }
+    .check-user { font-weight: bold; color: #1e293b; display: flex; align-items: center; gap: 6px; }
+    .check-mark { font-weight: bold; }
+    .mark-ok { color: #10b981; }
+    .mark-no { color: #ef4444; }
+
+    /* 3. 比較ボックス */
+    .compare-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .comp-card {
+      flex: 1;
+      min-width: 200px;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+    }
+    .cc-report { border-color: #10b981; background: #ecfdf5; }
+    .cc-advisor { border-color: #3b82f6; background: #eff6ff; }
+    
+    .cc-icon { font-size: 2em; margin-bottom: 8px; display: block; }
+    .cc-title { font-weight: bold; font-size: 1em; margin-bottom: 4px; display: block; color: #1f2937; }
+    .cc-keyword { 
+      background: #fff; 
+      padding: 2px 8px; 
+      border-radius: 4px; 
+      font-size: 0.8em; 
+      font-weight: bold; 
+      display: inline-block;
+      margin-top: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .compare-wrapper { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">IAM認証情報レポートの重要性</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#IAM</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#レポート</span>
+            <span class="tag">#MFA</span>
+            <span class="tag">#監査</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  前回の「Access Advisor」が「行動履歴（何をしたか）」をチェックするものだったのに対し、今回の **「IAM 認証情報レポート（Credential Report）」** は、いわば**「全社員の名簿と防犯チェックリスト」**です。
+</p>
+<p>
+  「誰がMFAを設定していないか？」「誰のパスワードが古いままか？」を一発であぶり出すためのツールです。
+</p>
+
+<h2>1. IAM 認証情報レポート とは？</h2>
+<p>
+  一言で言うと、**「アカウント内の全ユーザーのパスワード設定やMFA状況を、一つのCSVファイルにまとめた一覧表」**です。
+</p>
+
+<h3>噛み砕いた解説：学校の点検名簿</h3>
+<p>
+  これを学校の「避難訓練の点検」に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">全員分のセキュリティ点検</div>
+  <div class="checklist-container">
+    <div class="checklist-board">
+      <div class="clip-top"></div>
+      <div style="text-align:center; font-weight:bold; margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:4px;">
+        セキュリティ点検表
+      </div>
+      
+      <div class="check-row">
+        <span class="check-user">👤 田中 (User)</span>
+        <span>鍵: <span class="mark-ok">新しい</span> / MFA: <span class="mark-ok">〇</span></span>
+      </div>
+      <div class="check-row" style="background:#fef2f2;">
+        <span class="check-user">👤 佐藤 (User)</span>
+        <span>鍵: <span class="mark-no">古い!</span> / MFA: <span class="mark-no">×</span></span>
+      </div>
+      <div class="check-row">
+        <span class="check-user">👤 鈴木 (User)</span>
+        <span>鍵: <span class="mark-ok">新しい</span> / MFA: <span class="mark-ok">〇</span></span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center; margin-top:10px;">
+    佐藤くんが「鍵（パスワード）を替えていない」「防犯ブザー（MFA）を持っていない」ことが一目で分かります。
+  </p>
+</div>
+
+<h2>2. レポートで確認できる内容（CSVの中身）</h2>
+<p>
+  このレポートをダウンロードすると、Excelなどで開けるCSV形式になっています。以下のような列がズラッと並びます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">レポート(CSV)のイメージ</div>
+  <div class="csv-viewer">
+    <div class="csv-header-bar">
+      <span>📊 credential_report.csv</span>
+    </div>
+    <div class="csv-grid">
+      <div class="csv-cell csv-head-cell">user</div>
+      <div class="csv-cell csv-head-cell">password_last_changed</div>
+      <div class="csv-cell csv-head-cell">mfa_active</div>
+      
+      <div class="csv-cell">admin</div>
+      <div class="csv-cell">2026-01-10</div>
+      <div class="csv-cell status-ok">TRUE</div>
+      
+      <div class="csv-cell">guest</div>
+      <div class="csv-cell status-ng">2020-05-01</div>
+      <div class="csv-cell status-ng">FALSE</div>
+      
+      <div class="csv-cell">system</div>
+      <div class="csv-cell">N/A</div>
+      <div class="csv-cell status-ok">TRUE</div>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>password_last_changed:</strong> パスワードを最後に変更したのはいつか？（古すぎないかチェック）</li>
+  <li><strong>mfa_active:</strong> MFA（多要素認証）が有効になっているか？（★最重要チェック項目）</li>
+  <li><strong>access_key_1_last_rotated:</strong> プログラム用のアクセスキーを最後に更新したのはいつか？</li>
+</ul>
+
+<h2>3. Access Advisor との違い（試験対策）</h2>
+<p>
+  名前が似ている「IAM Access Advisor」との違いは、試験で頻出のポイントです。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">目的の違い</div>
+  <div class="compare-wrapper">
+    <!-- Report -->
+    <div class="comp-card cc-report">
+      <span class="cc-icon">📝</span>
+      <span class="cc-title">認証情報レポート</span>
+      <div style="font-size:0.85em; color:#475569;">
+        パスワードやMFAの<br><strong>「設定状況」</strong>を見る。<br>
+        セキュリティの健康診断。
+      </div>
+      <span class="cc-keyword">CSV / 全員一括</span>
+    </div>
+
+    <!-- Advisor -->
+    <div class="comp-card cc-advisor">
+      <span class="cc-icon">🕵️</span>
+      <span class="cc-title">Access Advisor</span>
+      <div style="font-size:0.85em; color:#475569;">
+        サービスの<br><strong>「使用履歴」</strong>を見る。<br>
+        不要な権限のお掃除。
+      </div>
+      <span class="cc-keyword">最終アクセス日時</span>
+    </div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>機能名</th>
+      <th>チェック内容 (何を知りたい？)</th>
+      <th>主な目的</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>認証情報レポート<br>(Credential Report)</th>
+      <td>鍵やMFAの<strong>「設定状況」</strong><br><small>(持ってる？ 古くない？)</small></td>
+      <td>セキュリティ監査、棚卸し<br>MFA未設定者の発見</td>
+    </tr>
+    <tr>
+      <th>Access Advisor</th>
+      <td>サービスの<strong>「使用履歴」</strong><br><small>(いつ使った？)</small></td>
+      <td>最小権限の実現<br>不要な権限の削除</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験で問われやすいポイント</h2>
+<ul>
+  <li><strong>出力形式は「CSV」:</strong> 試験で「Excel形式」「JSON形式」という選択肢が出たらバツです。必ずCSVです。</li>
+  <li><strong>アカウント全体の監査:</strong> 「1人ずつ確認する」のではなく、<strong>「アカウント内の全ユーザーを一括で確認する」</strong>という文脈で登場します。</li>
+  <li><strong>監査の証拠（エビデンス）:</strong> 「年に一度、全ユーザーのパスワード運用状況を監査しなさい」という問題が出たら、このレポートが正解です。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>認証情報レポート:</strong> 全ユーザーの「パスワード変更日」や「MFA設定」をCSVで一括ダウンロードする機能。</li>
+  <li><strong>使い道:</strong> 定期的なセキュリティ監査、サボっている（MFA未設定の）ユーザーの洗い出し。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
