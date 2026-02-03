@@ -1,0 +1,22 @@
+{
+  "id": "awscp-ci-cd-iac-cli",
+  "category": "awscp",
+  "timestamp": "2026-02-03T15:37:17+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-ci-cd-iac-cli/",
+  "meta": {
+    "title": "CI/CD、IaC、CLIを活用したAWS運用",
+    "summary": "CI/CD、IaC、CLIを組み合わせたAWS運用の流れを理解し、それぞれの役割を明確に把握できる。これにより、実務における自動化の重要性を学べる。",
+    "tags": [
+      "AWS",
+      "CI/CD",
+      "IaC",
+      "CLI",
+      "運用",
+      "図解"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
