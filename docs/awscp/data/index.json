@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-global-accelerator-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-03T19:41:09+09:00",
+    "title": "AWSグローバルアクセラレーターの概要",
+    "summary": "AWS Global Acceleratorは、通信を安定化させるためにAWS専用ネットワークを利用するサービスです。試験では固定IPと動的通信の高速化に関する理解が求められます。",
+    "tags": [
+      "AWS",
+      "グローバルアクセラレーター",
+      "通信",
+      "高速化",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-global-accelerator-overview/"
+  },
+  {
     "id": "awscp-aws-support-plans-overview",
     "category": "awscp",
     "timestamp": "2026-02-03T19:36:43+09:00",
