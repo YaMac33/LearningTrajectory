@@ -1,0 +1,21 @@
+{
+  "id": "awscp-ami-basics-aws-cp",
+  "category": "awscp",
+  "timestamp": "2026-02-03T15:09:14+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-ami-basics-aws-cp/",
+  "meta": {
+    "title": "AMIの基本と試験対策",
+    "summary": "AMIはEC2を起動するための設計図であり、Cloud Practitioner試験で重要な概念です。AMIに関する基本知識と実務活用法を理解することができます。",
+    "tags": [
+      "AMI",
+      "EC2",
+      "AWS",
+      "クラウド",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
