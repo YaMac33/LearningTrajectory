@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-activate-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-04T06:11:59+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-activate-overview/",
+  "meta": {
+    "title": "AWS Activateの支援プログラム概要",
+    "summary": "AWS Activateはスタートアップ企業を支援するプログラムで、クレジットや専門的な技術サポートを提供します。これにより、企業は開発に集中できる環境が整います。",
+    "tags": [
+      "AWS",
+      "スタートアップ",
+      "支援プログラム",
+      "クレジット",
+      "技術サポート"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
