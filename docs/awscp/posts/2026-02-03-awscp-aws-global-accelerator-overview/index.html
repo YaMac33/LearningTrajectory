@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSグローバルアクセラレーターの概要</title>
+  <meta name="description" content="AWS Global Acceleratorの仕組みとメリットを解説。インターネット（公道）を使わずAWS専用ネットワーク（高速道路）を使うことで通信を安定化させるサービスです。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSグローバルアクセラレーターの概要" />
+  <meta property="og:description" content="AWS Global Acceleratorの仕組みとメリットを解説。インターネット（公道）を使わずAWS専用ネットワーク（高速道路）を使うことで通信を安定化させるサービスです。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 公道 vs 高速道路 */
+    .road-comparison {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .road-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .road-box.public {
+      background: #fef2f2;
+      border: 2px dashed #ef4444;
+    }
+    .road-box.private {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+    }
+    .road-icon {
+      font-size: 2em;
+      flex-shrink: 0;
+      width: 50px;
+      text-align: center;
+    }
+    .road-content {
+      flex-grow: 1;
+    }
+    .road-label {
+      font-weight: 800;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 1.1em;
+    }
+    .road-desc {
+      font-size: 0.9em;
+      color: #64748b;
+    }
+    
+    /* CloudFront vs GA */
+    .cf-ga-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .cf-ga-comparison { grid-template-columns: 1fr; }
+    }
+    .comparison-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px 16px;
+      text-align: center;
+      position: relative;
+    }
+    .comparison-card.cf { border-top: 4px solid #d946ef; /* Magenta */ }
+    .comparison-card.ga { border-top: 4px solid #3b82f6; /* Blue */ }
+    
+    .comp-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .comp-title { font-weight: bold; margin-bottom: 8px; color: #1e293b; font-size: 1.1em; }
+    .comp-desc { font-size: 0.9em; color: #64748b; line-height: 1.5; }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSグローバルアクセラレーターの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#グローバルアクセラレーター</span>
+            <span class="tag">#通信</span>
+            <span class="tag">#高速化</span>
+            <span class="tag">#クラウド</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSの専用ネットワークで通信を加速・安定化するサービスの解説。</p>
+<hr>
+<p>
+  AWS Global Accelerator（グローバルアクセラレーター）は、世界中にいるユーザーが、あなたのアプリ（AWS上のサーバー）にアクセスする際、「インターネットという荒れた公道」を使わず、<strong>「AWS専用の高速道路」</strong>を通らせることで、通信を爆速かつ安定させるサービスです。<br>
+  一言で言うと、<strong>「国境を越える通信のための『どこでもドア（専用トンネル）』」</strong>です。
+</p>
+
+<h2>1. 抱えている課題と解決策</h2>
+<p>
+  通常、海外のユーザーが日本のサーバーにアクセスしようとすると、インターネットという「公道」を通ります。しかし、公道は混雑したり、遠回りしたりと不安定です。
+</p>
+
+<!-- 図解：公道 vs 専用道路 -->
+<div class="diagram-container">
+  <div class="diagram-title">通信経路の違い</div>
+  <div class="road-comparison">
+    
+    <!-- 公道 -->
+    <div class="road-box public">
+      <div class="road-icon">🚦</div>
+      <div class="road-content">
+        <span class="road-label" style="color:#dc2626;">インターネット (公道)</span>
+        <div class="road-desc">
+          信号あり、渋滞あり、遠回り。<br>
+          結果：<strong>「遅い」「切れる」「反応が悪い」</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- AWS専用道 -->
+    <div class="road-box private">
+      <div class="road-icon">🚀</div>
+      <div class="road-content">
+        <span class="road-label" style="color:#2563eb;">AWS Global Accelerator (専用道)</span>
+        <div class="road-desc">
+          最寄りの入口からAWSバックボーンへ直行。<br>
+          結果：<strong>「速い」「安定」「パケットロスなし」</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  Global Accelerator を使うと、ユーザーは<strong>「一番近くのAWSエッジロケーション（入口）」</strong>から、AWSの敷地内に入ります。そこから先は、AWSが地球規模で張り巡らせている<strong>「専用の光ファイバー網」</strong>を通って、サーバーまで一直線に進みます。
+</p>
+
+<h2>2. 試験に出る「3つの最強機能」</h2>
+
+<h3>① 固定IPアドレス（Static IP）がもらえる</h3>
+<p>
+  これを使うと、<strong>2つの静的なIPアドレス（Anycast IP）</strong>が提供されます。世界中のどこにいても、ユーザーはこのIPアドレスにアクセスするだけです。<br>
+  バックエンド（EC2やALB）のIPが変わっても、ユーザー側の設定を変える必要がありません。
+</p>
+
+<h3>② 瞬時のフェイルオーバー（障害切り替え）</h3>
+<p>
+  もし「東京リージョンのサーバー」がダウンしたら、Global Acceleratorはそれを瞬時に検知し、ユーザーの通信を自動的に「大阪リージョン」や「米国リージョン」へ切り替えます。<br>
+  <strong>DNS切り替え（Route 53）よりも圧倒的に早い（数秒以内）</strong>のが特徴です。
+</p>
+
+<h3>③ TCP / UDP プロトコルに対応</h3>
+<p>
+  Webサイト（HTTP/HTTPS）だけでなく、ゲーム（UDP）やIoT（MQTT）、<strong>ボイスチャット（VoIP）</strong>など、あらゆる通信を高速化できます。
+</p>
+
+<h2>3. CloudFront との違い（ここが一番の山場！）</h2>
+<p>
+  「世界中に配信して高速化する」というと、Amazon CloudFront（CDN）と何が違うの？と必ず混乱します。<br>
+  明確な使い分けの基準は、<strong>「キャッシュ（コピー）できるか？」</strong>です。
+</p>
+
+<!-- 図解：CloudFront vs GA -->
+<div class="diagram-container">
+  <div class="diagram-title">高速化のアプローチ比較</div>
+  <div class="cf-ga-comparison">
+    
+    <!-- CloudFront -->
+    <div class="comparison-card cf">
+      <span class="comp-icon">🏪</span>
+      <div class="comp-title">Amazon CloudFront</div>
+      <div class="comp-desc">
+        <strong>「近所のコンビニに置く」</strong><br>
+        <br>
+        キャッシュ（コピー）を近くに配る。<br>
+        画像、動画、CSSなど。<br>
+        誰が見ても同じもの向け。
+      </div>
+    </div>
+
+    <!-- Global Accelerator -->
+    <div class="comparison-card ga">
+      <span class="comp-icon">🚅</span>
+      <div class="comp-title">Global Accelerator</div>
+      <div class="comp-desc">
+        <strong>「新幹線で直通させる」</strong><br>
+        <br>
+        道のり（経路）を最適化する。<br>
+        ゲーム、株価、チャットなど。<br>
+        リアルタイムで変わるもの向け。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon CloudFront</th>
+      <th>AWS Global Accelerator</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>仕組み</strong></td>
+      <td>キャッシュ (コピー)</td>
+      <td>経路最適化 (トンネル)</td>
+    </tr>
+    <tr>
+      <td><strong>得意なデータ</strong></td>
+      <td><strong>静的コンテンツ</strong><br>(画像, 動画, Webページ)</td>
+      <td><strong>動的コンテンツ</strong><br>(ゲーム位置情報, IP電話)</td>
+    </tr>
+    <tr>
+      <td><strong>プロトコル</strong></td>
+      <td>HTTP / HTTPS メイン</td>
+      <td>TCP / UDP (何でもOK)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割</strong>: インターネット（公道）を避けて、<strong>AWSの専用線（高速道路）</strong>を使って通信を安定・高速化させる。</li>
+  <li><strong>機能</strong>: 世界共通の<strong>固定IP</strong>を提供し、障害時は瞬時に別のリージョンへ逃がす。</li>
+  <li><strong>使い分け</strong>:
+    <ul>
+      <li>キャッシュしたいなら <strong>CloudFront</strong>。</li>
+      <li>キャッシュできない（UDPや動的通信）なら <strong>Global Accelerator</strong>。</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  試験で「IPアドレスを固定したい」「キャッシュできない動的な通信を高速化したい」「UDPを使いたい」というキーワードが出たら、迷わず Global Accelerator を選んでください！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
