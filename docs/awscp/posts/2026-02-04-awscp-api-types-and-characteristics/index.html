@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | APIの種類と特徴</title>
+  <meta name="description" content="APIの種類（REST、HTTP、WebSocketなど）とその特徴を解説。AWS API Gatewayで扱える形式を中心に、レストランや電話に例えて用途を紹介します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="APIの種類と特徴" />
+  <meta property="og:description" content="APIの種類（REST、HTTP、WebSocketなど）とその特徴を解説。AWS API Gatewayで扱える形式を中心に、レストランや電話に例えて用途を紹介します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 3大API比較 */
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .api-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .api-card.rest { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    .api-card.http { border-top: 4px solid #10b981; background: #ecfdf5; }
+    .api-card.socket { border-top: 4px solid #f59e0b; background: #fffbeb; }
+    
+    .api-icon { font-size: 2.5em; display: block; margin-bottom: 10px; }
+    .api-name { font-weight: 800; color: #1e293b; margin-bottom: 5px; display: block; font-size: 1.1em; }
+    .api-meta { font-size: 0.85em; font-weight: bold; color: #64748b; margin-bottom: 8px; display: block; }
+    .api-desc { font-size: 0.9em; color: #334155; line-height: 1.5; }
+
+    /* 通信フロー図 */
+    .comm-flow {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .flow-group {
+      text-align: center;
+      flex: 1;
+      min-width: 200px;
+    }
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
+      font-weight: bold;
+      color: #475569;
+    }
+    .arrow-box {
+      position: relative;
+      width: 80px;
+      height: 2px;
+      background: #94a3b8;
+    }
+    .arrow-box::after {
+      content: "▶";
+      position: absolute;
+      right: -5px;
+      top: -7px;
+      color: #94a3b8;
+    }
+    .arrow-box.dual { height: 4px; background: #f59e0b; }
+    .arrow-box.dual::after { content: "◀▶"; right: 40%; top: -10px; color: #f59e0b; font-size: 1.2em; }
+    
+    /* その他APIリスト */
+    .other-api-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .other-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .other-icon { font-size: 1.5em; flex-shrink: 0; width: 40px; text-align: center; }
+    .other-content { flex: 1; }
+    .other-title { font-weight: bold; color: #1e293b; display: block; }
+    .other-text { font-size: 0.9em; color: #64748b; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">APIの種類と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#API</span>
+            <span class="tag">#REST</span>
+            <span class="tag">#HTTP</span>
+            <span class="tag">#WebSocket</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#開発</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>APIの種類（REST、HTTP、WebSocketなど）とその特徴を解説し、用途を紹介します。</p>
+<hr>
+<p>
+  APIの種類について理解することは、システム設計やAWS認定試験において非常に重要です。<br>
+  特に、<strong>「REST、HTTP、WebSocket」</strong>の3つは、Amazon API Gateway で作成できるAPIのタイプそのものでもあります。<br>
+  これらを中心に、現代の開発で使われる主要なAPI形式を詳しく解説します。
+</p>
+
+<h2>1. 主要な3つのAPI（API Gateway対応）</h2>
+<p>
+  AWSでも中心となる3つのAPIタイプを、身近な「注文」や「会話」に例えて比較します。
+</p>
+
+<!-- 図解：3大APIのメタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">APIのキャラクター比較</div>
+  <div class="api-grid">
+    
+    <!-- REST -->
+    <div class="api-card rest">
+      <span class="api-icon">🍽️</span>
+      <span class="api-name">REST API</span>
+      <span class="api-meta">標準・高機能</span>
+      <div class="api-desc">
+        <strong>「高級レストラン」</strong><br>
+        注文票（ルール）がきっちり。<br>
+        サービス（機能）も全部入り。<br>
+        外部公開向け。
+      </div>
+    </div>
+
+    <!-- HTTP -->
+    <div class="api-card http">
+      <span class="api-icon">🍔</span>
+      <span class="api-name">HTTP API</span>
+      <span class="api-meta">高速・低価格</span>
+      <div class="api-desc">
+        <strong>「ファストフード」</strong><br>
+        機能は最小限だが爆速。<br>
+        とにかく安い。<br>
+        内部通信向け。
+      </div>
+    </div>
+
+    <!-- WebSocket -->
+    <div class="api-card socket">
+      <span class="api-icon">📞</span>
+      <span class="api-name">WebSocket</span>
+      <span class="api-meta">リアルタイム・双方向</span>
+      <div class="api-desc">
+        <strong>「電話」</strong><br>
+        繋ぎっぱなしで会話。<br>
+        サーバーからも話しかける。<br>
+        チャット向け。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h3>① REST API (Representational State Transfer)</h3>
+<p>
+  <strong>「Web APIの王様」</strong>です。世界中で最も普及しています。<br>
+  「リソース（データ）」に対して、HTTPメソッド（GET, POSTなど）を使って操作します。
+</p>
+<ul>
+  <li><strong>特徴</strong>: ルールが明確で、ステートレス（サーバーは前のやり取りを覚えない）。</li>
+  <li><strong>AWSでの位置づけ</strong>: API Gatewayの「REST API」は、WAF連携やAPIキー管理などを含む<strong>「高機能・フルスペック版」</strong>です。</li>
+</ul>
+
+<h3>② HTTP API</h3>
+<p>
+  <strong>「REST APIの『軽量・高速・安価』版」</strong>です。<br>
+  技術的にはRESTの一種ですが、AWSにおいては「機能を削ぎ落として、安さと速さを追求したもの」を指します。
+</p>
+<ul>
+  <li><strong>特徴</strong>: REST APIに比べて料金が約70%も安く、レイテンシー（反応速度）が低いです。ただしWAFが使えないなどの制限があります。</li>
+</ul>
+
+<h3>③ WebSocket API</h3>
+<p>
+  <strong>「リアルタイムの双方向通信」</strong>です。<br>
+  これまでの2つは「手紙（一方通行）」でしたが、これは「電話」です。
+</p>
+
+<!-- 図解：通信方向の違い -->
+<div class="diagram-container">
+  <div class="diagram-title">通信の流れの違い</div>
+  <div class="comm-flow">
+    <div class="flow-group">
+      <span style="font-size:0.9em; font-weight:bold;">REST / HTTP</span>
+      <div class="flow-diagram">
+        PC <span class="arrow-box"></span> サーバー
+      </div>
+      <p style="font-size:0.8em; color:#64748b;">
+        聞かれたら答える (一方通行)<br>
+        リクエスト＆レスポンス
+      </p>
+    </div>
+    <div class="flow-group">
+      <span style="font-size:0.9em; font-weight:bold; color:#d97706;">WebSocket</span>
+      <div class="flow-diagram">
+        PC <span class="arrow-box dual"></span> サーバー
+      </div>
+      <p style="font-size:0.8em; color:#64748b;">
+        いつでも喋れる (双方向)<br>
+        サーバーからプッシュ通知OK
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>2. その他、知っておくべき重要なAPI</h2>
+<p>AWSサービスとも深く関わる、その他のAPI形式です。</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">その他のプロトコル</div>
+  <div class="other-api-list">
+    
+    <div class="other-item">
+      <span class="other-icon">🍽️</span>
+      <div class="other-content">
+        <span class="other-title">GraphQL (グラフQL)</span>
+        <span class="other-text">
+          <strong>「ビュッフェスタイル」</strong><br>
+          欲しいデータだけを指定して取る。「名前だけ欲しい」と言えばそれだけ返ってくる。<br>
+          (AWS AppSync)
+        </span>
+      </div>
+    </div>
+
+    <div class="other-item">
+      <span class="other-icon">📜</span>
+      <div class="other-content">
+        <span class="other-title">SOAP</span>
+        <span class="other-text">
+          <strong>「封蝋付きの公式書簡」</strong><br>
+          XMLを使う昔ながらの厳格なプロトコル。銀行やレガシーシステムで現役。
+        </span>
+      </div>
+    </div>
+
+    <div class="other-item">
+      <span class="other-icon">🚄</span>
+      <div class="other-content">
+        <span class="other-title">gRPC</span>
+        <span class="other-text">
+          <strong>「熟練スタッフの暗号会話」</strong><br>
+          バイナリ形式で爆速通信。主にサーバー同士の裏側の会話（マイクロサービス）に使われる。
+        </span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. API Gateway における比較まとめ</h2>
+<p>試験対策として、特に重要な最初の3つを整理します。</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>種類</th>
+      <th>特徴</th>
+      <th>料金</th>
+      <th>典型的なユースケース</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>REST API</strong></td>
+      <td>高機能・全部入り</td>
+      <td>高め</td>
+      <td>外部公開API、WAFが必要な場合、複雑な管理が必要な場合</td>
+    </tr>
+    <tr>
+      <td><strong>HTTP API</strong></td>
+      <td>シンプル・低価格</td>
+      <td>安い</td>
+      <td>Lambdaへのプロキシ、コスト重視、WAF不要な場合</td>
+    </tr>
+    <tr>
+      <td><strong>WebSocket</strong></td>
+      <td>双方向・リアルタイム</td>
+      <td>接続時間課金</td>
+      <td>チャット、通知、ダッシュボード</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>「コストを抑えてLambdaを公開したい」</strong>なら HTTP API。</li>
+  <li><strong>「チャットアプリを作りたい」</strong>なら WebSocket API。</li>
+  <li><strong>「多機能な管理が必要」</strong>なら REST API。</li>
+</ul>
+<p>
+  用途に合わせて「レストラン」か「ファストフード」か「電話」かを選びましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
