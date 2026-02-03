@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-sns-sqs-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-04T07:22:49+09:00",
+    "title": "SNSとSQSの違いを理解する",
+    "summary": "SNSとSQSはメッセージングサービスですが、データの保存に対する考え方が逆です。SNSは生放送のように保存せず、SQSは郵便受けのように保存します。",
+    "tags": [
+      "SNS",
+      "SQS",
+      "メッセージ",
+      "設計",
+      "AWS"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-sns-sqs-difference/"
+  },
+  {
     "id": "awscp-cve-vulnerability-id",
     "category": "awscp",
     "timestamp": "2026-02-04T06:38:41+09:00",
