@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-eventbridge-foundation",
+    "category": "awscp",
+    "timestamp": "2026-02-03T12:59:04+09:00",
+    "title": "AWSのEventBridge入門",
+    "summary": "Amazon EventBridgeの役割や機能を理解し、AWSとSaaS間のイベント処理の仕組みを学べます。",
+    "tags": [
+      "AWS",
+      "EventBridge",
+      "CloudWatch",
+      "Lambda",
+      "自動化"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-eventbridge-foundation/"
+  },
+  {
     "id": "awscp-aws-snowball-data-migration",
     "category": "awscp",
     "timestamp": "2026-02-03T12:46:46+09:00",
