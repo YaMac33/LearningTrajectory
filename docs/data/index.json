@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-snowball-data-migration",
+    "category": "awscp",
+    "timestamp": "2026-02-03T12:46:46+09:00",
+    "title": "AWS Snowballの概要と利点",
+    "summary": "AWS Snowballは、大量データを物理的にAWSへ移行する手段を提供します。ネットワークが遅い場合の有効な解決策として重要です。",
+    "tags": [
+      "AWS",
+      "データ移行",
+      "Snowball",
+      "クラウド",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-snowball-data-migration/"
+  },
+  {
     "id": "awscp-ap-database-cap",
     "category": "awscp",
     "timestamp": "2026-02-03T12:38:21+09:00",
