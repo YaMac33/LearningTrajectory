@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-vpc-peering-advantages",
+    "category": "awscp",
+    "timestamp": "2026-02-03T17:39:38+09:00",
+    "title": "VPCピアリングの利点と特性",
+    "summary": "VPCピアリングは高可用性と帯域幅の制限がない接続方法です。単一障害点が存在しないことで、高速で安定したデータ転送が可能であることが理解できます。",
+    "tags": [
+      "VPCピアリング",
+      "VPN",
+      "ネットワーク",
+      "帯域幅",
+      "可用性"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-vpc-peering-advantages/"
+  },
+  {
     "id": "awscp-aws-wavelength-explanation",
     "category": "awscp",
     "timestamp": "2026-02-03T16:36:30+09:00",
