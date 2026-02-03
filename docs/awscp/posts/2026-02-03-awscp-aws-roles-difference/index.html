@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | Launch Wizard、CodeDeploy、Elastic Beanstalkの役割の違い </title>
+  <meta name="description" content="AWSのLaunch Wizard、CodeDeploy、Elastic Beanstalkの役割の違いと試験での見分け方を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Launch Wizard、CodeDeploy、Elastic Beanstalkの役割の違い" />
+  <meta property="og:description" content="AWSのLaunch Wizard、CodeDeploy、Elastic Beanstalkの役割の違いと試験での見分け方を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 役割分担マップ */
+    .role-map {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .role-step {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 16px;
+      position: relative;
+    }
+    .rs-wizard { border-color: #3b82f6; background: #eff6ff; }
+    .rs-deploy { border-color: #f59e0b; background: #fffbeb; }
+    .rs-beanstalk { border-color: #10b981; background: #ecfdf5; border-width: 3px; }
+
+    .rs-icon { font-size: 1.8em; margin-right: 12px; min-width: 40px; text-align: center; }
+    .rs-content { flex: 1; }
+    .rs-title { font-weight: bold; font-size: 1em; color: #1f2937; display: block; margin-bottom: 2px; }
+    .rs-desc { font-size: 0.85em; color: #4b5563; }
+    
+    .rs-label {
+      position: absolute;
+      top: -10px;
+      right: 12px;
+      font-size: 0.75em;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid currentColor;
+    }
+    .rs-wizard .rs-label { color: #2563eb; }
+    .rs-deploy .rs-label { color: #d97706; }
+    .rs-beanstalk .rs-label { color: #059669; }
+
+    /* 2. メタファー比較カード */
+    .meta-cards {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .meta-card {
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+    }
+    .mc-icon { font-size: 2.5em; margin-bottom: 8px; display: block; }
+    .mc-svc { font-weight: bold; color: #1e293b; margin-bottom: 4px; display: block; }
+    .mc-text { font-size: 0.85em; color: #64748b; line-height: 1.4; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .meta-cards { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title"> Launch Wizard、CodeDeploy、Elastic Beanstalkの役割の違い </h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#試験対策</span>
+            <span class="tag">#Launch Wizard</span>
+            <span class="tag">#CodeDeploy</span>
+            <span class="tag">#Elastic Beanstalk</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>「Launch Wizard」「CodeDeploy」「Elastic Beanstalk」</strong>の3つは、どれも「アプリケーションを動かすための手助け」をしてくれるサービスですが、担当するフェーズが異なります。
+</p>
+<p>
+  試験ではこれらが混ざった選択肢が出ることが多いため、<strong>「作るときの案内役」「配るだけの配送係」「運用まで丸投げできる支配人」</strong>という違いを明確にしておきましょう。
+</p>
+
+<h2>1. 全体像：役割の違い</h2>
+<p>
+  まずは3つのサービスが「アプリのライフサイクル」のどこを担当しているかを図で整理します。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">3サービスの守備範囲</div>
+  <div class="role-map">
+    <div class="role-step rs-wizard">
+      <span class="rs-icon">🧭</span>
+      <div class="rs-content">
+        <span class="rs-title">AWS Launch Wizard</span>
+        <span class="rs-desc">最初に「環境を作る」だけ手伝う</span>
+      </div>
+      <span class="rs-label">構築支援</span>
+    </div>
+    
+    <div class="role-step rs-deploy">
+      <span class="rs-icon">📦</span>
+      <div class="rs-content">
+        <span class="rs-title">AWS CodeDeploy</span>
+        <span class="rs-desc">「アプリを配る（更新）」だけやる</span>
+      </div>
+      <span class="rs-label">デプロイ</span>
+    </div>
+
+    <div class="role-step rs-beanstalk">
+      <span class="rs-icon">🍱</span>
+      <div class="rs-content">
+        <span class="rs-title">AWS Elastic Beanstalk</span>
+        <span class="rs-desc">「環境構築〜運用」まで全部やる</span>
+      </div>
+      <span class="rs-label">PaaS (全部入り)</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. 各サービスの詳細とメタファー</h2>
+
+<h3>① AWS Launch Wizard</h3>
+<p>
+  <strong>「質問に答えるだけで、最適なAWS構成を作ってくれる案内役」</strong>です。
+</p>
+<ul>
+  <li><strong>特徴:</strong> ウィザード形式（対話形式）で進みます。SAPやSQL Serverなどの複雑なシステムを、AWSのベストプラクティスに沿って自動構築します。</li>
+  <li><strong>ポイント:</strong> 作った後の「運用」はLaunch Wizardの仕事ではありません（普通のEC2として管理します）。</li>
+</ul>
+
+<h3>② AWS CodeDeploy</h3>
+<p>
+  <strong>「アプリの更新を自動で配布するサービス」</strong>です。
+</p>
+<ul>
+  <li><strong>特徴:</strong> EC2、Lambda、ECSなどに、新しいバージョンのプログラムをコピーします。</li>
+  <li><strong>ポイント:</strong> サーバー自体を立てる機能はありません。すでにあるサーバーに「中身」を届けるだけです。</li>
+</ul>
+
+<h3>③ AWS Elastic Beanstalk</h3>
+<p>
+  <strong>「アプリをアップロードするだけで、実行環境を全部面倒見てくれるサービス」</strong>です。
+</p>
+<ul>
+  <li><strong>特徴:</strong> EC2、ALB、Auto Scalingなどを裏で勝手に作って管理してくれます。ユーザーはインフラを意識しません（PaaS）。</li>
+  <li><strong>ポイント:</strong> 構築だけでなく、その後の「スケーリング」や「OSパッチ適用」などの運用も任せられます。</li>
+</ul>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">覚えやすい例え話</div>
+  <div class="meta-cards">
+    <div class="meta-card">
+      <span class="mc-icon">💁</span>
+      <span class="mc-svc">Launch Wizard</span>
+      <span class="mc-text"><strong>「家電量販店の店員」</strong><br>用途を聞いて最適なPCセットを選んでくれる。（使うのは自分）</span>
+    </div>
+    <div class="meta-card">
+      <span class="mc-icon">🚚</span>
+      <span class="mc-svc">CodeDeploy</span>
+      <span class="mc-text"><strong>「配送業者」</strong><br>倉庫から店舗へ商品を届けるプロ。（店舗経営はしない）</span>
+    </div>
+    <div class="meta-card">
+      <span class="mc-icon">🍽️</span>
+      <span class="mc-svc">Elastic Beanstalk</span>
+      <span class="mc-text"><strong>「レストラン」</strong><br>客は食べるだけ。厨房・配膳・片付けは店任せ。</span>
+    </div>
+  </div>
+</div>
+
+<h2>3. 比較表と試験対策</h2>
+<p>
+  試験では以下のキーワードで見分けます。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>Launch Wizard</th>
+      <th>CodeDeploy</th>
+      <th>Elastic Beanstalk</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>主目的</th>
+      <td>環境構築 (初期)</td>
+      <td>アプリ配布 (更新)</td>
+      <td>実行環境の管理 (運用)</td>
+    </tr>
+    <tr>
+      <th>対象</th>
+      <td>インフラ (SAP等)</td>
+      <td>アプリコード</td>
+      <td>アプリ＋インフラ</td>
+    </tr>
+    <tr>
+      <th>自動化範囲</th>
+      <td>初期セットアップのみ</td>
+      <td>デプロイのみ</td>
+      <td>構築 〜 運用・監視</td>
+    </tr>
+    <tr>
+      <th>試験分類</th>
+      <td>管理支援</td>
+      <td>DevOps</td>
+      <td>PaaS (プラットフォーム)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>よくあるひっかけ（CLF-C02）</h3>
+<ul>
+  <li>❌ 「アプリをアップロードするだけで実行できるサービスは CodeDeploy である」<br>
+    → <strong>間違い</strong>。正解は <strong>Elastic Beanstalk</strong> です。CodeDeployは「配る」機能だけです。
+  </li>
+  <li>❌ 「サードパーティアプリ（SAP等）の最適な構成を提案・構築するのは Beanstalk である」<br>
+    → <strong>間違い</strong>。正解は <strong>Launch Wizard</strong> です。特定の複雑なワークロード構築が得意です。
+  </li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Launch Wizard:</strong> 作るときだけ助けてくれるガイド。</li>
+  <li><strong>CodeDeploy:</strong> コードを配るときだけ助けてくれる配送係。</li>
+  <li><strong>Elastic Beanstalk:</strong> インフラ運用を全部丸投げできるプラットフォーム。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
