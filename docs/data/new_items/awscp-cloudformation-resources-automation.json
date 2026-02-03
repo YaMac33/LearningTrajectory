@@ -1,0 +1,22 @@
+{
+  "id": "awscp-cloudformation-resources-automation",
+  "category": "awscp",
+  "timestamp": "2026-02-03T15:49:21+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-cloudformation-resources-automation/",
+  "meta": {
+    "title": "CloudFormationを使ったAWSリソースの自動構築",
+    "summary": "CloudFormationを利用して、EC2、S3、VPCを一括で自動構築する手法を解説します。試験対策として、リソースの定義や依存関係についての理解が重要です。",
+    "tags": [
+      "CloudFormation",
+      "AWS",
+      "EC2",
+      "S3",
+      "VPC",
+      "IaC"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
