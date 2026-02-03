@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSサポートプランの概要</title>
+  <meta name="description" content="AWSのサポートプランの違い、特にベーシックプランと開発者プランの範囲について解説。技術サポートの有無や対応時間の違いを整理。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSサポートプランの概要" />
+  <meta property="og:description" content="AWSのサポートプランの違い、特にベーシックプランと開発者プランの範囲について解説。技術サポートの有無や対応時間の違いを整理。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    .plan-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .plan-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .plan-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+    .plan-card.basic {
+      border-top: 4px solid #64748b; /* Slate */
+    }
+    .plan-card.developer {
+      border-top: 4px solid #3b82f6; /* Blue */
+    }
+    .plan-name {
+      font-weight: 800;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .plan-price {
+      font-size: 0.85em;
+      color: #64748b;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .support-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9em;
+    }
+    .support-list li {
+      margin-bottom: 8px;
+      padding-left: 24px;
+      position: relative;
+    }
+    .support-list li.ok::before {
+      content: "✅";
+      position: absolute;
+      left: 0;
+    }
+    .support-list li.ng::before {
+      content: "❌";
+      position: absolute;
+      left: 0;
+      opacity: 0.5;
+    }
+    .support-list li.ng {
+      color: #94a3b8;
+    }
+    .note-box {
+      margin-top: 20px;
+      padding: 12px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 6px;
+      font-size: 0.9em;
+      color: #92400e;
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSサポートプランの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#サポートプラン</span>
+            <span class="tag">#技術サポート</span>
+            <span class="tag">#開発者プラン</span>
+            <span class="tag">#クラウドサポート</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSの基本と開発者向けサポートプランの違いを解説。人手によるサポートには明確な制限があります。</p>
+<hr>
+<p>
+  AWSのサポートプランには複数のランクがありますが、「24時間365日、いつでも電話で相談したい」という場合は、上位の<strong>「ビジネスプラン」</strong>か<strong>「エンタープライズプラン」</strong>が必要です。<br>
+  それ以下のプラン（ベーシック、開発者）では、エンジニアによるサポートの手厚さが大きく制限されます。
+</p>
+
+<!-- 図解：プランの比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">サポート範囲の違い</div>
+  <div class="plan-grid">
+    
+    <!-- Basic -->
+    <div class="plan-card basic">
+      <div class="plan-name">🛡️ ベーシック</div>
+      <div class="plan-price">無料 (全員自動加入)</div>
+      <ul class="support-list">
+        <li class="ok">アカウント/請求の問い合わせ</li>
+        <li class="ok">サービス上限緩和申請</li>
+        <li class="ok">ドキュメント閲覧 (24h)</li>
+        <li class="ng">技術的な質問 (動かない等)</li>
+        <li class="ng">システム障害対応</li>
+      </ul>
+    </div>
+
+    <!-- Developer -->
+    <div class="plan-card developer">
+      <div class="plan-name">🛠️ 開発者</div>
+      <div class="plan-price">有料 (月額$29〜)</div>
+      <ul class="support-list">
+        <li class="ok">アカウント/請求の問い合わせ</li>
+        <li class="ok"><strong>技術的な質問 (メールのみ)</strong></li>
+        <li class="ok"><strong>システム障害対応</strong></li>
+        <li class="ng">電話/チャットサポート</li>
+        <li class="ng">24時間365日の対応</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="note-box">
+    <strong>⚠️ 注意点:</strong><br>
+    開発者プランの技術サポート対応時間は<strong>「平日の営業時間内」</strong>に限られます。<br>
+    夜間休日にシステムが止まっても、即座の有人対応は受けられません。
+  </div>
+</div>
+
+<h2>1. ベーシックプラン（全ユーザー共通・無料）</h2>
+<p>
+  AWSアカウントを作成したすべてのユーザーが自動的に利用できるプランです。
+</p>
+<ul>
+  <li><strong>カスタマーサービス（事務的な質問）</strong>:
+    <ul>
+      <li>「請求がおかしい」「ログインできない」といった問い合わせは可能です。</li>
+      <li>対応時間：日本時間 平日 9:00〜18:00</li>
+    </ul>
+  </li>
+  <li><strong>技術サポートなし</strong>:
+    <ul>
+      <li>「EC2が起動しない」「設計の相談がしたい」といった技術的な問い合わせはできません。</li>
+    </ul>
+  </li>
+  <li><strong>情報リソース</strong>:
+    <ul>
+      <li>AWS公式ドキュメント、ホワイトペーパー、サポートフォーラムは24時間利用可能です。</li>
+      <li>自己解決が前提となりますが、試験勉強や初学者には十分な情報量があります。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>2. 開発者プラン（Developer Support）</h2>
+<p>
+  個人開発や、本番環境ではない検証環境（PoC）での利用を想定した有料プランです。
+</p>
+<ul>
+  <li><strong>メールによる技術サポート</strong>:
+    <ul>
+      <li>「使い方がわからない」といった技術的な質問が可能になります。</li>
+      <li>ただし、<strong>メールのみ</strong>です。電話はできません。</li>
+      <li>対応時間も<strong>「営業時間内」</strong>に限られます。</li>
+    </ul>
+  </li>
+  <li><strong>技術サポートの目安</strong>:
+    <ul>
+      <li><strong>一般的な質問</strong>: サービスの設定方法など（24時間以内の回答目安）。</li>
+      <li><strong>システム障害</strong>: 重大な障害の場合、より早い初期対応が目安とされています。</li>
+    </ul>
+  </li>
+  <li><strong>Trusted Advisor（ベストプラクティス）</strong>:
+    <ul>
+      <li>セキュリティやコストのチェック機能が一部（基本項目のみ）利用可能です。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>まとめ：位置づけのイメージ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>プラン</th>
+      <th>主な用途</th>
+      <th>人のサポート</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>ベーシック</strong></td>
+      <td>学習・趣味</td>
+      <td>事務手続きのみ</td>
+    </tr>
+    <tr>
+      <td><strong>開発者</strong></td>
+      <td>個人開発・検証</td>
+      <td>メールのみ (営業時間内)</td>
+    </tr>
+    <tr>
+      <td><strong>ビジネス以上</strong></td>
+      <td>本番運用</td>
+      <td>電話・チャット・24時間365日</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  「本番環境で止まったら困るシステム」を動かす場合は、開発者プランではなく、24時間対応のあるビジネスプラン以上の検討が必要です。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
