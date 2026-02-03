@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | CloudFormationによるリソース構築</title>
+  <meta name="description" content="CloudFormationを使ってEC2、S3、VPCをまとめて自動構築する方法を解説。YAMLテンプレートの構造とリソース間の参照関係を理解しよう。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CloudFormationによるリソース構築" />
+  <meta property="og:description" content="CloudFormationを使ってEC2、S3、VPCをまとめて自動構築する方法を解説。YAMLテンプレートの構造とリソース間の参照関係を理解しよう。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* テンプレートとリソースの関係図 */
+    .cfn-mapping {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .code-side, .real-side {
+      flex: 1;
+      min-width: 260px;
+      padding: 16px;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    /* Code Side */
+    .code-side {
+      background: #1e293b;
+      color: #e2e8f0;
+      font-family: monospace;
+      font-size: 0.8em;
+      border: 2px solid #334155;
+    }
+    .code-line {
+      display: block;
+      margin-bottom: 4px;
+      padding-left: 8px;
+      border-left: 2px solid transparent;
+    }
+    .cl-vpc { border-color: #3b82f6; background: rgba(59,130,246,0.2); }
+    .cl-ec2 { border-color: #f97316; background: rgba(249,115,22,0.2); }
+    .cl-s3 { border-color: #10b981; background: rgba(16,185,129,0.2); }
+    .cl-ref { color: #fbbf24; font-weight: bold; }
+
+    /* Real Side */
+    .real-side {
+      background: #fff;
+      border: 2px dashed #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+    .res-box {
+      width: 90%;
+      padding: 10px;
+      border: 2px solid;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: bold;
+      position: relative;
+      background: #fff;
+    }
+    .rb-vpc { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; height: 120px; display: flex; flex-direction: column; justify-content: flex-start; }
+    .rb-ec2 { border-color: #f97316; background: #fff7ed; color: #c2410c; margin-top: auto; margin-bottom: 10px; width: 80%; align-self: center; }
+    .rb-s3 { border-color: #10b981; background: #ecfdf5; color: #047857; }
+
+    .arrow-connect {
+      position: absolute;
+      top: 50%;
+      left: -15px;
+      font-size: 1.5em;
+      color: #94a3b8;
+      transform: translateY(-50%);
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .cfn-mapping { flex-direction: column; }
+      .arrow-connect { display: none; }
+      .code-side { display: none; } /* スマホではコード側を省略して実体だけ見せる */
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CloudFormationによるリソース構築</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#CloudFormation</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#EC2</span>
+            <span class="tag">#S3</span>
+            <span class="tag">#VPC</span>
+            <span class="tag">#IaC</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  EC2、S3、VPCといった複数のAWSリソースを、CloudFormationを使って<strong>「ひとまとめ」に自動構築する応用例</strong>を紹介します。
+</p>
+<p>
+  CloudFormationの最大のメリットは、個々のサービスをバラバラに作るのではなく、<strong>「システム全体を1つのテンプレート（設計図）として管理できる」</strong>点にあります。
+</p>
+
+<h2>1. テンプレートの全体像（YAML形式）</h2>
+<p>
+  以下は、VPC（ネットワーク）、EC2（サーバー）、S3（ストレージ）を一度に作成するシンプルなテンプレートの例です。
+</p>
+
+<pre><code class="language-yaml">AWSTemplateFormatVersion: '2010-09-09'
+Description: 簡単なVPC + EC2 + S3構築例
+
+Resources:
+  # ① VPCを作成
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: MyVPC
+
+  # ② EC2インスタンスを作成
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0abcdef1234567890
+      SubnetId: !Ref MyVPC  # ★ここでVPCを参照！
+
+  # ③ S3バケットを作成
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: my-app-bucket
+</code></pre>
+
+<h2>2. 図解：コードと実体の関係</h2>
+<p>
+  コードに書いた内容が、実際にどのような構成としてデプロイされるかを視覚化しました。
+  ポイントは <code>!Ref</code> による<strong>「リソース間の紐付け」</strong>です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">テンプレートから生成される環境</div>
+  <div class="cfn-mapping">
+    <div class="code-side">
+      <div style="text-align:center; margin-bottom:8px; font-weight:bold;">Template.yaml</div>
+      <span class="code-line">Resources:</span>
+      <span class="code-line cl-vpc">MyVPC: AWS::EC2::VPC</span>
+      <span class="code-line">...</span>
+      <span class="code-line cl-ec2">MyEC2: AWS::EC2::Instance</span>
+      <span class="code-line">  SubnetId: <span class="cl-ref">!Ref MyVPC</span></span>
+      <span class="code-line">...</span>
+      <span class="code-line cl-s3">MyS3: AWS::S3::Bucket</span>
+    </div>
+
+    <div style="align-self:center; font-size:2em; color:#94a3b8;">➡</div>
+
+    <div class="real-side">
+      <div style="text-align:center; margin-bottom:8px; font-weight:bold;">AWS Stack</div>
+      
+      <!-- VPC Box -->
+      <div class="res-box rb-vpc">
+        MyVPC (Network)
+        <!-- EC2 Box inside VPC -->
+        <div class="res-box rb-ec2">
+          MyEC2Instance
+        </div>
+      </div>
+
+      <!-- S3 Box -->
+      <div class="res-box rb-s3">
+        MyS3Bucket
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>リソースの解説</h3>
+<table>
+  <thead>
+    <tr>
+      <th>論理ID (コード上の名前)</th>
+      <th>AWSリソース</th>
+      <th>説明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>MyVPC</th>
+      <td>AWS::EC2::VPC</td>
+      <td>独自のネットワーク空間を作成します。</td>
+    </tr>
+    <tr>
+      <th>MyEC2Instance</th>
+      <td>AWS::EC2::Instance</td>
+      <td>仮想サーバーです。<code>!Ref MyVPC</code> を使うことで、「さっき作ったVPCの中に配置する」という依存関係を定義しています。</td>
+    </tr>
+    <tr>
+      <th>MyS3Bucket</th>
+      <td>AWS::S3::Bucket</td>
+      <td>独立したデータ保存領域です。EC2とは直接依存しませんが、同じスタック内で管理されます。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 実務でのメリット</h2>
+<p>
+  このように1つのファイルにまとめることで、以下のような運用が可能になります。
+</p>
+<ul>
+  <li><strong>環境の完全コピー:</strong> 全く同じ構成の「開発環境」や「ステージング環境」を、テンプレートを再利用するだけで一瞬で作れます。</li>
+  <li><strong>依存関係の解決:</strong> 「VPCを作ってからじゃないとEC2は作れない」といった作成順序を、CloudFormationが自動で判断してくれます。</li>
+  <li><strong>一括削除:</strong> スタックを削除すれば、EC2もS3もVPCも、依存関係を考慮しながら綺麗に消してくれます。</li>
+</ul>
+
+<h2>4. 試験対策ポイント (CLF-C02)</h2>
+<ul>
+  <li><strong>Resourcesセクション:</strong> ここに作りたいリソース（EC2やS3）を記述します。必須項目です。</li>
+  <li><strong>まとめて構築:</strong> CloudFormationは「複数の関連するリソース」をスタックとして一括管理するサービスです。</li>
+  <li><strong>自動化:</strong> AWS CLIで <code>aws cloudformation deploy</code> コマンドを叩けば、画面操作なしでインフラが完成します。</li>
+</ul>
+
+<h2>まとめ</h2>
+<p>
+  <strong>「CloudFormation = 複数リソースをまとめて作れる設計図」</strong>
+</p>
+<p>
+  この設計図さえあれば、何度でも同じ環境を再現できるのがIaC（Infrastructure as Code）の強みです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
