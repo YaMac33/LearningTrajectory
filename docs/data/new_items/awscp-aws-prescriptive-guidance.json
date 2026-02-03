@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-prescriptive-guidance",
+  "category": "awscp",
+  "timestamp": "2026-02-03T23:18:30+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-prescriptive-guidance/",
+  "meta": {
+    "title": "AWS Prescriptive Guidanceの概要と活用法",
+    "summary": "AWS Prescriptive Guidanceは、移行やモダナイゼーションの成功に向けた実証済みの戦略を提供します。具体的な手順やシナリオを理解することで、試験対策にも役立ちます。",
+    "tags": [
+      "AWS",
+      "移行",
+      "モダナイゼーション",
+      "ガイド",
+      "戦略"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
