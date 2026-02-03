@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-batch-processing-etl-tools",
+    "category": "awscp",
+    "timestamp": "2026-02-03T19:20:33+09:00",
+    "title": "AWSのバッチ処理とETLツール",
+    "summary": "AWS GlueとAmazon EMRの違いや役割を理解し、バッチ処理における使い分けが学べます。",
+    "tags": [
+      "AWS",
+      "バッチ処理",
+      "ETL",
+      "Glue",
+      "EMR"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-batch-processing-etl-tools/"
+  },
+  {
     "id": "awscp-quicksight-ml-insights",
     "category": "awscp",
     "timestamp": "2026-02-03T19:17:45+09:00",
