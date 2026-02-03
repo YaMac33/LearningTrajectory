@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | 対象が限定されたAWSサービス</title>
+  <meta name="description" content="AWSにはMacie(S3専用)やInspector(EC2専用)など、対象リソースが限定されたサービスが多くあります。試験対策用に守備範囲を整理して解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="対象が限定されたAWSサービス" />
+  <meta property="og:description" content="AWSにはMacie(S3専用)やInspector(EC2専用)など、対象リソースが限定されたサービスが多くあります。試験対策用に守備範囲を整理して解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. ターゲットスコープ図 */
+    .scope-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+    .scope-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .scope-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+    /* 色分け */
+    .sc-storage { border-left-color: #f59e0b; } /* Orange */
+    .sc-storage::before { background: #f59e0b; }
+    
+    .sc-compute { border-left-color: #3b82f6; } /* Blue */
+    .sc-compute::before { background: #3b82f6; }
+    
+    .sc-network { border-left-color: #8b5cf6; } /* Purple */
+    .sc-network::before { background: #8b5cf6; }
+    
+    .sc-security { border-left-color: #ef4444; } /* Red */
+    .sc-security::before { background: #ef4444; }
+
+    .svc-name {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .svc-target {
+      font-size: 0.9em;
+      background: #f1f5f9;
+      padding: 4px 8px;
+      border-radius: 4px;
+      color: #334155;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .svc-desc {
+      font-size: 0.85em;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .target-icon { font-size: 1.2em; }
+
+    /* 2. 紛らわしい3兄弟比較図 */
+    .trio-compare {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .trio-box {
+      flex: 1;
+      min-width: 200px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+    }
+    .trio-icon { font-size: 2em; margin-bottom: 8px; display: block; }
+    .trio-title { font-weight: bold; color: #1f2937; margin-bottom: 4px; }
+    .trio-focus { 
+      color: #dc2626; 
+      font-weight: bold; 
+      background: #fee2e2; 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      font-size: 0.85em;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .scope-grid { grid-template-columns: 1fr; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">対象が限定されたAWSサービス</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#サービス</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#管理</span>
+            <span class="tag">#監視</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWSのサービス名と機能の関係で一番混乱するのが、<strong>「このサービスは便利そうだけど、私の使っているリソース（EC2やRDS）には対応しているの？」</strong>という点です。
+</p>
+<p>
+  実はAWSには、汎用的なものではなく<strong>「対象が超限定されているサービス（〇〇専用）」</strong>が数多く存在します。試験ではこの「守備範囲」を正確に覚えているかが問われます。
+</p>
+
+<h2>1. カテゴリ別「〇〇専用」サービス一覧</h2>
+<p>
+  主要な限定サービスを用途別に整理しました。「何を守るためのものか」をイメージしてください。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">用途別・対象リソースマップ</div>
+  <div class="scope-grid">
+    
+    <!-- ストレージ系 -->
+    <div class="scope-card sc-storage">
+      <div class="svc-name"><span class="target-icon">🪣</span> Amazon Macie</div>
+      <div><span class="svc-target">S3 のみ</span></div>
+      <p class="svc-desc">バケットの中をスキャンして、クレジットカード番号などの「機密データ」を発見する。</p>
+    </div>
+
+    <div class="scope-card sc-storage">
+      <div class="svc-name"><span class="target-icon">🔒</span> S3 Object Lock</div>
+      <div><span class="svc-target">S3 のみ</span></div>
+      <p class="svc-desc">データを一定期間「削除・上書き」できないようにロックする（WORM方式）。</p>
+    </div>
+
+    <!-- コンピュート系 -->
+    <div class="scope-card sc-compute">
+      <div class="svc-name"><span class="target-icon">🖥️</span> Amazon Inspector</div>
+      <div><span class="svc-target">EC2 / ECR / Lambda</span></div>
+      <p class="svc-desc">サーバーの中身やコードの「脆弱性（セキュリティホール）」をスキャンする。<br>※RDSやS3は対象外。</p>
+    </div>
+
+    <div class="scope-card sc-compute">
+      <div class="svc-name"><span class="target-icon">💿</span> EC2 Image Builder</div>
+      <div><span class="svc-target">EC2 AMI のみ</span></div>
+      <p class="svc-desc">OSのパッチ適用済みの「ゴールデンイメージ（AMI）」を自動で作成・更新する。</p>
+    </div>
+
+    <!-- ネットワーク系 -->
+    <div class="scope-card sc-network">
+      <div class="svc-name"><span class="target-icon">🛡️</span> AWS WAF</div>
+      <div><span class="svc-target">CloudFront / ALB / API GW</span></div>
+      <p class="svc-desc">Webアプリへの攻撃（SQLインジェクション等）を防ぐ。<br>※EC2単体には直接つけられない。</p>
+    </div>
+
+    <div class="scope-card sc-network">
+      <div class="svc-name"><span class="target-icon">🛡️</span> AWS Shield</div>
+      <div><span class="svc-target">CloudFront / Route53 等</span></div>
+      <p class="svc-desc">DDoS攻撃（大量アクセス攻撃）から守る。</p>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 紛らわしい「セキュリティ3兄弟」の覚え方</h2>
+<p>
+  試験で最もひっかけに使われるのが、「GuardDuty」「Inspector」「Macie」の3つです。どれも「何かを探す」サービスですが、探す場所が全く違います。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">守備範囲の違い</div>
+  <div class="trio-compare">
+    <div class="trio-box">
+      <span class="trio-icon">🕵️</span>
+      <div class="trio-title">GuardDuty</div>
+      <div class="trio-focus">ログを見る</div>
+      <p style="font-size:0.8em; margin-top:8px;">
+        VPCフローログやDNSログを分析して「不審な動き」を見つける。<br>
+        <strong>本体には触らない。</strong>
+      </p>
+    </div>
+    <div class="trio-box">
+      <span class="trio-icon">👨‍⚕️</span>
+      <div class="trio-title">Inspector</div>
+      <div class="trio-focus">中身を見る</div>
+      <p style="font-size:0.8em; margin-top:8px;">
+        EC2の中に入って「脆弱性パッチが当たっているか」を診断する。<br>
+        <strong>健康診断。</strong>
+      </p>
+    </div>
+    <div class="trio-box">
+      <span class="trio-icon">🗃️</span>
+      <div class="trio-title">Macie</div>
+      <div class="trio-focus">S3を見る</div>
+      <p style="font-size:0.8em; margin-top:8px;">
+        S3バケット内のファイルを開いて「個人情報」がないか探す。<br>
+        <strong>機密情報の発見。</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>3. 比較まとめ表</h2>
+<p>
+  最後に一覧で整理します。「何を守る／監視するサービスか」で紐付けて覚えましょう。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>対象リソース</th>
+      <th>目的・キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Amazon Macie</th>
+      <td>S3</td>
+      <td>機密データ（PII）検出</td>
+    </tr>
+    <tr>
+      <th>S3 Object Lock</th>
+      <td>S3</td>
+      <td>削除・改ざん防止 (WORM)</td>
+    </tr>
+    <tr>
+      <th>Inspector</th>
+      <td>EC2 / ECR / Lambda</td>
+      <td>脆弱性スキャン (CVE)</td>
+    </tr>
+    <tr>
+      <th>EC2 Image Builder</th>
+      <td>EC2 AMI</td>
+      <td>AMI作成の自動化</td>
+    </tr>
+    <tr>
+      <th>AWS WAF</th>
+      <td>ALB / CloudFront / API GW</td>
+      <td>Webアプリ防御 (L7)</td>
+    </tr>
+    <tr>
+      <th>AWS Shield</th>
+      <td>CloudFront / ALB / NLB</td>
+      <td>DDoS対策</td>
+    </tr>
+    <tr>
+      <th>GuardDuty</th>
+      <td>各種ログ (CloudTrail等)</td>
+      <td>脅威検出 (不審な通信)</td>
+    </tr>
+    <tr>
+      <th>AWS Config</th>
+      <td>AWSリソース設定</td>
+      <td>設定変更の履歴・監査</td>
+    </tr>
+    <tr>
+      <th>CloudTrail</th>
+      <td>AWS API操作</td>
+      <td>「誰がいつ何をしたか」の記録</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>学習のコツ</h2>
+<ul>
+  <li><strong>Macie:</strong> 名前が人の名前っぽい → 「マシーさん（Macie）はS3の中身を見るのが好き」</li>
+  <li><strong>Inspector:</strong> インスペクター（検査官） → 「サーバーの健康診断（脆弱性）」</li>
+  <li><strong>GuardDuty:</strong> ガードマン → 「入り口（ログ）を見張って不審者を検知」</li>
+</ul>
+<p>
+  このように、サービス名と「対象」をセットで覚えるのが合格への近道です。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
