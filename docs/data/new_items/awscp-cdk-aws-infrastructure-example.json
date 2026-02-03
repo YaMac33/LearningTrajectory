@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cdk-aws-infrastructure-example",
+  "category": "awscp",
+  "timestamp": "2026-02-03T15:55:18+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-cdk-aws-infrastructure-example/",
+  "meta": {
+    "title": "CDKを使用したAWSインフラの具体例",
+    "summary": "AWS CDKを用いて、CloudFormationと同じ構成をPythonコードで定義する方法を解説します。CDKの利点や仕組みも理解できます。",
+    "tags": [
+      "AWS",
+      "CDK",
+      "Infrastructure as Code",
+      "Python",
+      "CloudFormation"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
