@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-fargate-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-03T14:54:38+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-fargate-overview/",
+  "meta": {
+    "title": "AWS Fargateの基本理解",
+    "summary": "AWS Fargateは、サーバー管理なしでコンテナを動かせるサービスで、ECSやEKSとの関係を理解することが重要です。",
+    "tags": [
+      "AWS",
+      "Fargate",
+      "コンテナ",
+      "クラウド",
+      "従量課金"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
