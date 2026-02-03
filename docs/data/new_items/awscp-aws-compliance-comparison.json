@@ -1,0 +1,24 @@
+{
+  "id": "awscp-aws-compliance-comparison",
+  "category": "awscp",
+  "timestamp": "2026-02-03T15:04:57+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-compliance-comparison/",
+  "meta": {
+    "title": "AWSサービスによるコンプライアンス比較",
+    "summary": "AWSのコンプライアンス関連サービスを比較し、試験対策に役立つ情報を提供します。特に、サービスの違いや利用イメージを理解することで、試験に向けた準備が可能です。",
+    "tags": [
+      "AWS",
+      "コンプライアンス",
+      "比較表",
+      "試験対策",
+      "CloudTrail",
+      "Artifact",
+      "Config",
+      "Audit Manager"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "コンプライアンス概要"
+    ]
+  }
+}
