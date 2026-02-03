@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS OpsWorks の基本</title>
+  <meta name="description" content="AWS OpsWorksはChefやPuppetを使ってサーバー内部の設定を自動化する構成管理サービス。スタック、レイヤー、ライフサイクルイベントの仕組みをレストランに例えて解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS OpsWorks の基本" />
+  <meta property="og:description" content="AWS OpsWorksはChefやPuppetを使ってサーバー内部の設定を自動化する構成管理サービス。スタック、レイヤー、ライフサイクルイベントの仕組みをレストランに例えて解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 自動調理レストラン図 */
+    .rest-container {
+      border: 4px solid #f59e0b; /* Orange for restaurant */
+      background: #fffbeb;
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+    }
+    .rest-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #f59e0b;
+      color: #fff;
+      font-weight: bold;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+    
+    .layer-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    
+    .layer-box {
+      flex: 1;
+      min-width: 120px;
+      border: 2px dashed #9ca3af;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .layer-title {
+      font-weight: bold;
+      color: #4b5563;
+      font-size: 0.85em;
+      margin-bottom: 8px;
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .chef-icon {
+      position: absolute;
+      top: -25px;
+      right: -10px;
+      font-size: 2em;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .instance-box {
+      width: 40px;
+      height: 40px;
+      background: #3b82f6;
+      color: white;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      margin: 4px 0;
+      box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    }
+    
+    .recipe-note {
+      font-size: 0.75em;
+      color: #6b7280;
+      background: #ffedd5;
+      padding: 4px;
+      border: 1px solid #fdba74;
+      margin-top: 8px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* 2. ライフサイクル図 */
+    .cycle-flow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cycle-step {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      text-align: center;
+      font-size: 0.85em;
+      font-weight: bold;
+      min-width: 100px;
+    }
+    .cs-setup { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    .cs-config { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .cs-deploy { border-color: #3b82f6; color: #1e40af; background: #eff6ff; }
+    
+    .cycle-arrow { font-size: 1.2em; color: #9ca3af; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .layer-group { flex-direction: column; }
+      .article-content th { white-space: normal; }
+      .cycle-flow { flex-direction: column; }
+      .cycle-arrow { transform: rotate(90deg); margin: 4px 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS OpsWorks の基本</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#OpsWorks</span>
+            <span class="tag">#構成管理</span>
+            <span class="tag">#Chef</span>
+            <span class="tag">#Puppet</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWS OpsWorks は、サーバーの設定やアプリケーションのデプロイを自動化するための<strong>「構成管理サービス」</strong>です。
+</p>
+<p>
+  一言で言うと、<strong>「Chef（シェフ）や Puppet（パペット）という有名ツールを使って、サーバーの中身（設定）を自動で料理してくれるサービス」</strong>です。
+</p>
+<p>
+  試験対策としては、<strong>「Chef」「Puppet」という単語が出たら、反射的に「OpsWorks！」</strong>と答えられるようにするのが第一歩です。
+</p>
+
+<h2>1. なぜ OpsWorks が必要なのか？</h2>
+<p>
+  CloudFormationは「EC2を作る（インフラ構築）」のは得意ですが、「EC2の中にApacheを入れて、設定ファイルを書き換えて、ユーザーを追加して…」というOS内部の細かい設定までは少し苦手です（User Dataでも書けますが、複雑になると管理が大変です）。
+</p>
+<p>
+  そこで、<strong>「構成管理ツール（Chef / Puppet）」</strong>の出番です。これらは「設定の手順書（レシピ）」を書くと、その通りにサーバーの中身を整えてくれます。OpsWorksは、このChefやPuppetをAWS上で使いやすくしたマネージドサービスです。
+</p>
+
+<h2>2. OpsWorks のイメージ： 「自動調理レストラン」</h2>
+<p>
+  OpsWorksの仕組みは、レストラン運営に例えると非常にわかりやすいです。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">OpsWorks の階層構造</div>
+  <div class="rest-container">
+    <div class="rest-label">Stack (レストラン全体)</div>
+    <div class="chef-icon">👨‍🍳</div>
+    
+    <div class="layer-group">
+      <!-- Layer 1 -->
+      <div class="layer-box">
+        <span class="layer-title">Web Layer</span>
+        <div class="instance-box">🖥️</div>
+        <div class="instance-box">🖥️</div>
+        <div class="recipe-note">📜 レシピA<br><small>(Apache設定)</small></div>
+      </div>
+      
+      <!-- Layer 2 -->
+      <div class="layer-box">
+        <span class="layer-title">DB Layer</span>
+        <div class="instance-box">🛢️</div>
+        <div class="recipe-note">📜 レシピB<br><small>(MySQL設定)</small></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>OpsWorks 特有の「3階層構造」</h3>
+<ul>
+  <li><strong>スタック (Stack):</strong> 一番外側の枠組み。「本番環境」「開発環境」といったシステムの全体集合です。</li>
+  <li><strong>レイヤー (Layer):</strong> ★ここが一番重要。<br>
+    サーバーの<strong>「役割」</strong>ごとのグループです。「Webレイヤーにはこのレシピ（手順）を適用する」「DBレイヤーにはあのレシピを適用する」と定義します。</li>
+  <li><strong>インスタンス (Instance):</strong> 実際に動くEC2サーバーです。必ずどこかのレイヤーに所属します。</li>
+</ul>
+
+<h2>3. OpsWorks のすごい機能：「ライフサイクルイベント」</h2>
+<p>
+  OpsWorksは、サーバーの状態変化に合わせて、勝手にレシピを実行してくれます。これをライフサイクルイベントと呼びます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">ライフサイクルイベントの流れ</div>
+  <div class="cycle-flow">
+    <div class="cycle-step cs-setup">
+      Setup<br><small>起動時</small>
+    </div>
+    <div class="cycle-arrow">→</div>
+    <div class="cycle-step cs-config">
+      Configure<br><small>構成変更時</small>
+    </div>
+    <div class="cycle-arrow">→</div>
+    <div class="cycle-step cs-deploy">
+      Deploy<br><small>アプリ配置時</small>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>Setup（セットアップ）:</strong> サーバーが起動した瞬間に走ります。「Apacheのインストール」などはここでやります。</li>
+  <li><strong>Configure（構成変更）:</strong> ★これがOpsWorksの真骨頂。<br>
+    <strong>「隣のサーバーが増減した時」</strong>に、生きている全サーバーで実行されます。<br>
+    例: Webサーバーが1台増えたら、ロードバランサーのレイヤーに対して「設定ファイルを書き換えて、新しいWebサーバーを振り分け先に追加して！」と自動で指令が飛びます。</li>
+  <li><strong>Deploy（デプロイ）:</strong> アプリケーションのコード（PHPやRubyなど）を配置する時に走ります。</li>
+  <li><strong>Shutdown（シャットダウン）:</strong> サーバーが停止する直前に走ります。「ログの退避」や「ロードバランサーからの切り離し」を行います。</li>
+</ul>
+
+<h2>4. CloudFormation との違い（試験対策）</h2>
+<p>
+  どちらも「コードで自動化」ですが、守備範囲が違います。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>CloudFormation</th>
+      <th>OpsWorks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>主な役割</th>
+      <td>インフラの構築<br><small>(AWSリソース作成)</small></td>
+      <td>OS内部の設定<br><small>(ソフトのインストール)</small></td>
+    </tr>
+    <tr>
+      <th>使う言語</th>
+      <td>JSON / YAML<br><small>(AWS独自の形式)</small></td>
+      <td><strong>Chef / Puppet</strong><br><small>(一般的な構成管理ツール)</small></td>
+    </tr>
+    <tr>
+      <th>得意分野</th>
+      <td>「VPCを作って、EC2を立てる」まで</td>
+      <td>「EC2の中にミドルウェアを入れて設定する」</td>
+    </tr>
+    <tr>
+      <th>キーワード</th>
+      <td>テンプレート、スタック、IaC</td>
+      <td><strong>レシピ、クックブック、レイヤー</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> Chef や Puppet を使って、サーバー内部の設定（構成管理）を自動化するサービス。</li>
+  <li><strong>構造:</strong> スタック（全体） > レイヤー（役割） > インスタンス（サーバー）。</li>
+  <li><strong>機能:</strong> ライフサイクルイベント（Setup, Configure等）を使って、サーバーの増減に合わせて設定を自動更新できる。</li>
+</ul>
+
+<blockquote>
+  <p><strong>【補足：現代のAWS事情】</strong><br>
+  実は現在、OpsWorksは少し古いサービスになりつつあります。今は、AWS Systems Manager (SSM) というサービスでOS内部の設定管理を行うのが主流です。しかし、試験にはまだ「Chefを使いたい場合のサービスは？」としてOpsWorksが出題されますので、知識としては必須です。</p>
+</blockquote>
+<p>
+  これで、自動化ツールの「構成管理」担当であるOpsWorksもクリアです。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
