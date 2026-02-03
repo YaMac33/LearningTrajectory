@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-subnet-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-03T21:41:50+09:00",
+    "title": "サブネットとサブネットマスクの違い",
+    "summary": "サブネットとサブネットマスクの基本的な違いと、それぞれの役割に関する理解を深めることができます。AWSネットワーク設計における重要なコンセプトです。",
+    "tags": [
+      "ネットワーク",
+      "サブネット",
+      "サブネットマスク",
+      "IPアドレス",
+      "AWS"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-subnet-difference/"
+  },
+  {
     "id": "awscp-aws-vpc-subnet-relation",
     "category": "awscp",
     "timestamp": "2026-02-03T20:56:47+09:00",
