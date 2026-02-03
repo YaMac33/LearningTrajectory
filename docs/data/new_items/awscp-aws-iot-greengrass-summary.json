@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-iot-greengrass-summary",
+  "category": "awscp",
+  "timestamp": "2026-02-04T06:18:58+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-iot-greengrass-summary/",
+  "meta": {
+    "title": "AWS IoT Greengrassの概要と機能",
+    "summary": "AWS IoT Greengrassは、エッジコンピューティングを活用し、IoTデバイスがクラウドに依存せずに地元で判断する方法を説明します。試験では、その特長や適用場面を理解することが重要です。",
+    "tags": [
+      "AWS",
+      "IoT",
+      "エッジコンピューティング",
+      "Greengrass",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
