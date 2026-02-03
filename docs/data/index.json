@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-cve-vulnerability-id",
+    "category": "awscp",
+    "timestamp": "2026-02-04T06:38:41+09:00",
+    "title": "CVEとは？脆弱性のIDカード",
+    "summary": "CVEは、セキュリティ脆弱性に付けられた共通の番号で、脆弱性の特定や対策において重要な役割を果たします。AWSのAmazon Inspectorなどでの活用方法についても解説します。",
+    "tags": [
+      "CVE",
+      "脆弱性",
+      "セキュリティ",
+      "AWS",
+      "技術"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-cve-vulnerability-id/"
+  },
+  {
     "id": "awscp-cname-alias-difference",
     "category": "awscp",
     "timestamp": "2026-02-04T06:35:47+09:00",
