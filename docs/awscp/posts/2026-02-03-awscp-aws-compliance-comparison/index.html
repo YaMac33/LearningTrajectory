@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWSサービスによるコンプライアンス比較</title>
+  <meta name="description" content="AWSのコンプライアンス関連サービスを比較し、試験対策に役立つ情報をまとめました。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSサービスによるコンプライアンス比較" />
+  <meta property="og:description" content="AWSのコンプライアンス関連サービスを比較し、試験対策に役立つ情報をまとめました。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. データフロー相関図 */
+    .flow-grid {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px 20px;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+    .fg-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: bold;
+      text-align: center;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .fg-trigger { background: #f1f5f9; color: #475569; }
+    .fg-svc { 
+      background: #eff6ff; 
+      border-color: #3b82f6; 
+      color: #1d4ed8; 
+      position: relative;
+    }
+    .fg-output { background: #fdf2f8; border-color: #f472b6; color: #be185d; }
+    
+    .fg-arrow {
+      color: #94a3b8;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* 2. 役割メタファー図 */
+    .role-cards {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .role-card {
+      flex: 1;
+      min-width: 140px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .rc-trail { border-color: #f59e0b; background: #fffbeb; }
+    .rc-config { border-color: #3b82f6; background: #eff6ff; }
+    .rc-artifact { border-color: #10b981; background: #ecfdf5; }
+    .rc-audit { border-color: #8b5cf6; background: #f5f3ff; }
+
+    .rc-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .rc-name { font-weight: bold; font-size: 0.95em; color: #1e293b; margin-bottom: 4px; }
+    .rc-desc { font-size: 0.8em; color: #4b5563; line-height: 1.3; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .flow-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        text-align: center;
+      }
+      .fg-arrow { transform: rotate(90deg); margin: -4px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSサービスによるコンプライアンス比較</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#コンプライアンス</span>
+            <span class="tag">#比較表</span>
+            <span class="tag">#試験対策</span>
+            <span class="tag">#CloudTrail</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>「コンプライアンス情報を取得できる主なAWSサービス」</strong>を整理します。
+</p>
+<p>
+  監査やログ系のサービスは名前が似ていて混乱しがちですが、<strong>「何を記録するのか（対象）」と「何に使うのか（目的）」</strong>を明確にすれば区別できます。
+</p>
+
+<h2>1. コンプライアンス関連サービス比較表（試験対策）</h2>
+<p>
+  試験で問われやすいキーワードを中心にまとめました。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>何ができる？ (超かみ砕き)</th>
+      <th>実務での利用イメージ</th>
+      <th>試験のキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>AWS CloudTrail</th>
+      <td>「誰が・いつ・何をしたか」の記録</td>
+      <td>不正操作の調査、監査ログ</td>
+      <td><strong>操作履歴・証跡・API監査</strong></td>
+    </tr>
+    <tr>
+      <th>AWS Artifact</th>
+      <td>AWSの<strong>公式監査レポート</strong>を入手</td>
+      <td>監査対応・取引先への説明</td>
+      <td><strong>AWS自身のコンプライアンス資料</strong></td>
+    </tr>
+    <tr>
+      <th>CloudWatch Logs</th>
+      <td>システムの動作ログを保存</td>
+      <td>障害調査・ログ分析</td>
+      <td><strong>運用ログ (監査目的ではない)</strong></td>
+    </tr>
+    <tr>
+      <th>AWS Config</th>
+      <td>設定変更を記録・追跡</td>
+      <td>設定ミス検知・ルール違反確認</td>
+      <td><strong>設定変更の追跡・構成履歴</strong></td>
+    </tr>
+    <tr>
+      <th>AWS Audit Manager</th>
+      <td>監査証跡を自動収集</td>
+      <td>監査作業の効率化</td>
+      <td><strong>監査レポート自動化</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. サービス同士の違いを図で整理</h2>
+<p>
+  それぞれのサービスが、システムのどの部分を監視・記録しているかの全体像です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">データの流れと担当サービス</div>
+  <div class="flow-grid">
+    <!-- Row 1 -->
+    <div class="fg-item fg-trigger">人間が操作</div>
+    <div class="fg-arrow">➡</div>
+    <div class="fg-item fg-svc">CloudTrail</div>
+    
+    <!-- Row 2 -->
+    <div class="fg-item fg-trigger">設定を変更</div>
+    <div class="fg-arrow">➡</div>
+    <div class="fg-item fg-svc">AWS Config</div>
+    
+    <!-- Row 3 -->
+    <div class="fg-item fg-trigger">アプリが動く</div>
+    <div class="fg-arrow">➡</div>
+    <div class="fg-item fg-svc">CloudWatch Logs</div>
+    
+    <!-- Row 4 -->
+    <div class="fg-item fg-trigger">監査の準備</div>
+    <div class="fg-arrow">➡</div>
+    <div class="fg-item fg-svc">Audit Manager</div>
+    
+    <!-- Row 5 -->
+    <div class="fg-item fg-trigger">証明書が欲しい</div>
+    <div class="fg-arrow">➡</div>
+    <div class="fg-item fg-svc">AWS Artifact</div>
+  </div>
+</div>
+
+<h2>3. 例え話で理解する（オフィス）</h2>
+<p>
+  会社の中の役割に例えると、一発で覚えられます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">オフィスの役割分担メタファー</div>
+  <div class="role-cards">
+    <div class="role-card rc-trail">
+      <div class="rc-icon">📹</div>
+      <div class="rc-name">CloudTrail</div>
+      <div class="rc-desc"><strong>「防犯カメラ」</strong><br>誰がいつ入室したか記録する。</div>
+    </div>
+    <div class="role-card rc-config">
+      <div class="rc-icon">📋</div>
+      <div class="rc-name">AWS Config</div>
+      <div class="rc-desc"><strong>「備品台帳」</strong><br>机の配置が変わった履歴を残す。</div>
+    </div>
+    <div class="role-card rc-artifact">
+      <div class="rc-icon">📜</div>
+      <div class="rc-name">AWS Artifact</div>
+      <div class="rc-desc"><strong>「ISO認定証」</strong><br>会社が安全である証明書。</div>
+    </div>
+    <div class="role-card rc-audit">
+      <div class="rc-icon">👩‍💼</div>
+      <div class="rc-name">Audit Manager</div>
+      <div class="rc-desc"><strong>「監査担当の秘書」</strong><br>提出書類を自動で集める。</div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 試験でよく出るひっかけ ⚠</h2>
+<ul>
+  <li>❌ 「操作ログ（誰が何をしたか）を取得したい → CloudWatch Logs」<br>
+    → <strong>間違い</strong>。正解は <strong>CloudTrail</strong> です。CloudWatchは「CPU使用率」や「アプリのエラーログ」を見るものです。
+  </li>
+  <li>❌ 「AWSが準拠しているISO資料を確認したい → AWS Config」<br>
+    → <strong>間違い</strong>。正解は <strong>AWS Artifact</strong> です。Configは「あなたのリソースの設定」を見るものです。
+  </li>
+</ul>
+
+<h2>一発暗記まとめ</h2>
+<ul>
+  <li><strong>操作履歴・証跡</strong> → CloudTrail</li>
+  <li><strong>設定変更・構成管理</strong> → AWS Config</li>
+  <li><strong>AWS公式の監査資料</strong> → AWS Artifact</li>
+  <li><strong>監査レポートの自動化</strong> → Audit Manager</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
