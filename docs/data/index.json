@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-online-tech-talks",
+    "category": "awscp",
+    "timestamp": "2026-02-04T05:55:40+09:00",
+    "title": "AWSオンラインテックトーク概要",
+    "summary": "AWSが提供するエンジニア向けの技術セミナーで、特定の技術を深く学ぶ機会を提供します。試験勉強との関係や活用法を理解できます。",
+    "tags": [
+      "AWS",
+      "オンラインセミナー",
+      "技術セミナー",
+      "エンジニア向け",
+      "デモ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-online-tech-talks/"
+  },
+  {
     "id": "awscp-aws-repost-features",
     "category": "awscp",
     "timestamp": "2026-02-04T05:47:42+09:00",
