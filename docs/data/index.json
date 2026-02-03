@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-trust-safety",
+    "category": "awscp",
+    "timestamp": "2026-02-04T03:44:46+09:00",
+    "title": "AWSの不正行為監視チームの役割と概要",
+    "summary": "AWS Trust & Safetyチームは不正行為を取り締まり、安全なインターネットを保つ役割を理解することができます。また、試験では役割の違いや連絡方法について問われることがあります。",
+    "tags": [
+      "AWS",
+      "Trust & Safety",
+      "不正行為",
+      "サポート",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-trust-safety/"
+  },
+  {
     "id": "awscp-aws-training-certification-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T03:40:15+09:00",
