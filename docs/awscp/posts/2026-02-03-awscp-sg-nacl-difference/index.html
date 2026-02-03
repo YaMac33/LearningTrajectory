@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | SGとNACLの違いを解説</title>
+  <meta name="description" content="AWSのセキュリティグループ（SG）とネットワークACL（NACL）の基本的な違いを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SGとNACLの違いを解説" />
+  <meta property="og:description" content="AWSのセキュリティグループ（SG）とネットワークACL（NACL）の基本的な違いを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+      min-width: 100px;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 防御レイヤー図 */
+    .layer-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 20px;
+      background: #fff;
+    }
+    .layer-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #fff;
+      padding: 0 8px;
+      color: #64748b;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    
+    .subnet-box {
+      border: 2px solid #3b82f6; /* Blue */
+      background: #eff6ff;
+      border-radius: 8px;
+      padding: 30px 20px 20px;
+      position: relative;
+    }
+    .nacl-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3b82f6;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85em;
+      box-shadow: 0 2px 4px rgba(59,130,246,0.3);
+    }
+    
+    .instance-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .sg-box {
+      border: 2px solid #f59e0b; /* Orange */
+      background: #fffbeb;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      min-width: 120px;
+    }
+    .sg-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f59e0b;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+    .inst-icon { font-size: 2em; display: block; margin-bottom: 4px; }
+
+    /* 2. ステートフル比較図 */
+    .state-compare {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .state-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+    }
+    .sb-sg { border-color: #f59e0b; background: #fffbeb; }
+    .sb-nacl { border-color: #3b82f6; background: #eff6ff; }
+    
+    .sb-title { font-weight: bold; font-size: 1.1em; margin-bottom: 8px; color: #1f2937; }
+    .sb-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .sb-desc { font-size: 0.9em; color: #4b5563; line-height: 1.4; }
+    .arrow-loop { font-size: 1.2em; color: #10b981; font-weight: bold; }
+    .arrow-stop { font-size: 1.2em; color: #ef4444; font-weight: bold; }
+
+    /* 3. マンションの例え */
+    .metaphor-box {
+      background: #fff;
+      border-left: 4px solid #8b5cf6;
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      width: 100%;
+    }
+    .metaphor-title {
+      color: #7c3aed;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .metaphor-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .mi-icon { font-size: 1.5em; width: 40px; text-align: center; }
+    .mi-text { font-size: 0.95em; color: #374151; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .state-compare { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SGとNACLの違いを解説</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#試験対策</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWSのネットワークセキュリティには、<strong>「セキュリティグループ (SG)」と「ネットワークACL (NACL)」</strong>という2つの似た機能があります。
+</p>
+<p>
+  どちらも「通信を通すか・通さないか」を決めるファイアウォールですが、<strong>「守る場所」と「ルール」</strong>が決定的に違います。試験の超頻出ポイントですので、図解で整理しましょう。
+</p>
+
+<h2>1. 守る場所の違い（二重の壁）</h2>
+<p>
+  AWSの防御壁は二重構造になっています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">防御のレイヤー構造</div>
+  <div class="layer-container">
+    <div class="layer-label">VPC (ネットワーク全体)</div>
+    
+    <div class="subnet-box">
+      <div class="nacl-badge">NACL (サブネット単位)</div>
+      
+      <div class="instance-group">
+        <div class="sg-box">
+          <div class="sg-badge">SG (個室)</div>
+          <span class="inst-icon">🖥️</span>
+          EC2 A
+        </div>
+        <div class="sg-box">
+          <div class="sg-badge">SG (個室)</div>
+          <span class="inst-icon">🗄️</span>
+          RDS
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center; margin-top:10px;">
+    外から来た通信は、まず「NACL」を通り、次に「SG」を通ります。
+  </p>
+</div>
+
+<h2>2. セキュリティグループ (SG) の特徴</h2>
+<p>
+  EC2やRDSなどの<strong>「インスタンス（個別のサーバー）」</strong>を守る、最も基本的なファイアウォールです。
+</p>
+<ul>
+  <li><strong>ステートフル (Stateful):</strong> これが最大の特徴です。
+    <ul>
+      <li>「行った通信（送信）」に対する「返事（受信）」は、<strong>自動的に許可</strong>されます。</li>
+      <li>例：Webサーバーから外部にリクエストを送ると、返ってきたレスポンスも自動で通してくれます。わざわざ受信許可設定をする必要はありません。</li>
+    </ul>
+  </li>
+  <li><strong>許可ルールのみ:</strong> 「拒否」の設定はできません。
+    <ul>
+      <li>デフォルトでは「すべて拒否」です。そこに「HTTPは通していいよ」という許可だけを追加していきます。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>3. ネットワークACL (NACL) の特徴</h2>
+<p>
+  <strong>「サブネット（エリア全体）」</strong>を守る門番です。
+</p>
+<ul>
+  <li><strong>ステートレス (Stateless):</strong>
+    <ul>
+      <li>「行き」と「帰り」は別物として扱います。</li>
+      <li>「送信」を許可しても、「受信（戻りの通信）」も明示的に許可しないと通信できません。設定が面倒ですが、厳密な制御が可能です。</li>
+    </ul>
+  </li>
+  <li><strong>許可と拒否の両方が可能:</strong>
+    <ul>
+      <li>「特定のIPアドレス（ブラックリスト）からの通信だけを拒否したい」という場合は、NACLを使います（SGではできません）。</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">ステートフル vs ステートレス</div>
+  <div class="state-compare">
+    <div class="state-box sb-sg">
+      <div class="sb-title">SG (ステートフル)</div>
+      <div class="sb-icon">🤝</div>
+      <div class="sb-desc">
+        「顔パス」<br>
+        一度出かけた人は、<br>
+        <span class="arrow-loop">自動的に</span>帰ってこれる。
+      </div>
+    </div>
+    <div class="state-box sb-nacl">
+      <div class="sb-title">NACL (ステートレス)</div>
+      <div class="sb-icon">👮</div>
+      <div class="sb-desc">
+        「毎回チェック」<br>
+        出かけた人でも、帰る時に<br>
+        <span class="arrow-stop">再度許可証が必要</span>。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 決定的な違いの比較表</h2>
+<p>
+  試験直前のチェック用まとめです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>比較項目</th>
+      <th>セキュリティグループ (SG)</th>
+      <th>ネットワークACL (NACL)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>守る対象</th>
+      <td>インスタンス (EC2など)</td>
+      <td>サブネット (エリア全体)</td>
+    </tr>
+    <tr>
+      <th>状態の保持</th>
+      <td><strong>ステートフル</strong><br><small>(戻りは自動許可)</small></td>
+      <td><strong>ステートレス</strong><br><small>(戻りも設定必要)</small></td>
+    </tr>
+    <tr>
+      <th>ルールの種類</th>
+      <td>許可のみ</td>
+      <td>許可 ＋ <strong>拒否</strong></td>
+    </tr>
+    <tr>
+      <th>適用の順序</th>
+      <td>すべて適用 (OR条件)</td>
+      <td>番号順に適用 (優先順位あり)</td>
+    </tr>
+    <tr>
+      <th>主な用途</th>
+      <td>基本の防御、ポート開放</td>
+      <td>特定IPのブロック (拒否)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>5. 覚えやすい例え話（マンション）</h2>
+<p>
+  両者の関係をマンションのセキュリティに例えると、一発で覚えられます。
+</p>
+
+<div class="metaphor-box">
+  <span class="metaphor-title">マンションのセキュリティ</span>
+  <div class="metaphor-item">
+    <span class="mi-icon">👮</span>
+    <span class="mi-text">
+      <strong>ネットワークACL = 「マンションの入口（守衛）」</strong><br>
+      建物全体を守る。ブラックリスト（不審者）をここで追い返す。
+    </span>
+  </div>
+  <div class="metaphor-item">
+    <span class="mi-icon">🚪</span>
+    <span class="mi-text">
+      <strong>セキュリティグループ = 「各部屋のドア（電子ロック）」</strong><br>
+      部屋ごと（サーバーごと）に、「誰を入れていいか」を個別に設定する。
+    </span>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>基本はSG:</strong> 普段のWebサーバー構築などで設定するのは、主にセキュリティグループです。</li>
+  <li><strong>NACLは補助:</strong> 「特定の攻撃元IPをブロックしたい」など、特別な要件がある時にサブネット単位で設定します。</li>
+  <li><strong>試験のキーワード:</strong>
+    <ul>
+      <li>「インスタンス単位」「ステートフル」 → <strong>SG</strong></li>
+      <li>「サブネット単位」「ステートレス」「拒否ルール」「番号順」 → <strong>NACL</strong></li>
+    </ul>
+  </li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
