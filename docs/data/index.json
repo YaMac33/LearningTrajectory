@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-api-types-and-characteristics",
+    "category": "awscp",
+    "timestamp": "2026-02-04T06:25:42+09:00",
+    "title": "APIの種類と特徴について解説",
+    "summary": "APIの種類を理解することはAWS認定試験において重要です。特にREST、HTTP、WebSocketの3つに焦点を当て、特色や用途を詳述します。",
+    "tags": [
+      "API",
+      "REST",
+      "HTTP",
+      "WebSocket",
+      "AWS",
+      "開発"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "クラウドの特徴"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-api-types-and-characteristics/"
+  },
+  {
     "id": "awscp-amazon-textract-ocr-features",
     "category": "awscp",
     "timestamp": "2026-02-04T06:22:20+09:00",
