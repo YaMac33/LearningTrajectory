@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-training-certification-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T03:40:15+09:00",
+    "title": "AWSトレーニングと認定の概要",
+    "summary": "AWSの学習プログラムと資格試験について解説し、スキルを学び証明する重要性を理解できます。",
+    "tags": [
+      "AWS",
+      "トレーニング",
+      "認定",
+      "資格試験",
+      "スキルアップ"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-training-certification-overview/"
+  },
+  {
     "id": "awscp-aws-prescriptive-guidance",
     "category": "awscp",
     "timestamp": "2026-02-04T03:21:41+09:00",
