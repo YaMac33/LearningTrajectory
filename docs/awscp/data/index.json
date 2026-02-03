@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-amplify-exam-prep",
+    "category": "awscp",
+    "timestamp": "2026-02-03T15:22:00+09:00",
+    "title": "AWS Amplifyの基礎と試験対策",
+    "summary": "AWS Amplifyはフロントエンド開発を簡素化するサービスで、CLF-C02試験ではモバイルアプリやフロントエンドに関する理解が求められます。",
+    "tags": [
+      "AWS",
+      "Amplify",
+      "試験対策",
+      "フロントエンド",
+      "開発"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-amplify-exam-prep/"
+  },
+  {
     "id": "awscp-aws-roles-difference",
     "category": "awscp",
     "timestamp": "2026-02-03T15:13:44+09:00",
