@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Wavelengthの解説</title>
+  <meta name="description" content="AWS Wavelengthは5Gネットワーク内にAWSサーバーを配置し、超低遅延を実現するサービスです。エッジコンピューティングの使い分けを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Wavelengthの解説" />
+  <meta property="og:description" content="AWS Wavelengthは5Gネットワーク内にAWSサーバーを配置し、超低遅延を実現するサービスです。エッジコンピューティングの使い分けを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 5Gネットワーク経路図 */
+    .net-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      padding: 20px 0;
+    }
+    .device-box {
+      text-align: center;
+      z-index: 2;
+    }
+    .tower-icon { font-size: 2.5em; margin-bottom: 4px; }
+    .path-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin: 0 20px;
+      position: relative;
+    }
+    /* 通常ルート */
+    .path-normal {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.6;
+    }
+    .line-slow {
+      flex: 1;
+      height: 2px;
+      background: #94a3b8;
+      position: relative;
+    }
+    .line-slow::after {
+      content: "インターネット経由 (遅い)";
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7em;
+      white-space: nowrap;
+    }
+    /* Wavelengthルート */
+    .path-fast {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .line-fast {
+      flex: 1;
+      height: 4px;
+      background: #f97316; /* Orange */
+      position: relative;
+    }
+    .line-fast::after {
+      content: "5G網内 (爆速)";
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #ea580c;
+      white-space: nowrap;
+    }
+    
+    .dest-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      background: #fff;
+      min-width: 120px;
+    }
+    .db-region { border-color: #94a3b8; color: #64748b; }
+    .db-wavelength { border-color: #f97316; background: #fff7ed; color: #c2410c; font-weight: bold; border-width: 3px; }
+
+    /* 2. エッジ三銃士マップ */
+    .edge-map {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .edge-card {
+      flex: 1;
+      min-width: 180px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .ec-outposts { border-top: 4px solid #10b981; }
+    .ec-local { border-top: 4px solid #f59e0b; }
+    .ec-wave { border-top: 4px solid #f97316; }
+
+    .ec-icon { font-size: 2em; margin-bottom: 8px; }
+    .ec-title { font-weight: bold; font-size: 1em; color: #1e293b; margin-bottom: 4px; }
+    .ec-place { font-size: 0.85em; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; color: #475569; }
+    .ec-desc { font-size: 0.8em; color: #64748b; margin-top: 8px; line-height: 1.4; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .edge-map { flex-direction: column; }
+      .path-container { gap: 20px; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Wavelengthの解説</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Wavelength</span>
+            <span class="tag">#エッジコンピューティング</span>
+            <span class="tag">#5G</span>
+            <span class="tag">#低遅延</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  いよいよ「エッジコンピューティング三銃士」の最後、**AWS Wavelength（ウェーブレングス）**について解説します。
+</p>
+<p>
+  Outpostsが「会社の中」、Local Zonesが「大都市」なら、Wavelengthは**「モバイルネットワークの中」**にあるAWSです。
+</p>
+
+<h2>1. AWS Wavelength とは？</h2>
+<p>
+  一言で言うと、**「通信キャリア（日本ではKDDIなど）の5Gネットワークの中に、AWSのサーバーを置いちゃうサービス」**です。
+</p>
+
+<h3>噛み砕いた解説：スマホ専用の抜け道</h3>
+<p>
+  これを**「高速道路（5G網）のサービスエリア」**に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">インターネットに出ない最短経路</div>
+  <div class="net-flow">
+    <div class="device-box">
+      <span class="tower-icon">📱</span><br>
+      スマホ<br>(5G)
+    </div>
+    
+    <div class="path-container">
+      <!-- 通常ルート -->
+      <div class="path-normal">
+        <div class="line-slow"></div>
+        <div class="dest-box db-region">
+          AWS<br>リージョン
+        </div>
+      </div>
+      
+      <!-- Wavelengthルート -->
+      <div class="path-fast">
+        <div class="line-fast"></div>
+        <div class="dest-box db-wavelength">
+          Wavelength<br>Zone
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center; margin-top:10px;">
+    5G基地局のすぐそば（通信キャリアの施設内）で処理するため、<br>インターネットの渋滞に巻き込まれません。
+  </p>
+</div>
+
+<ul>
+  <li><strong>通常のクラウド：</strong> スマホからインターネットという一般道を通って、遠くのデータセンターまで行かなければなりません。</li>
+  <li><strong>AWS Wavelength：</strong> 5Gという高速道路から**一歩も外に出ることなく**、その中にあるサービスエリア（Wavelength Zone）で用事を済ませられます。</li>
+</ul>
+<p>
+  これにより、**「瞬きするよりも速い」レベル（1桁ミリ秒単位）**の超低遅延が実現します。
+</p>
+
+<h2>2. エッジ三銃士の使い分け（完全版）</h2>
+<p>
+  試験ではこの3つの違いが非常によく問われます。「どこに置くか」と「誰のためか」で整理しましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">エッジサービスの配置マップ</div>
+  <div class="edge-map">
+    <div class="edge-card ec-outposts">
+      <span class="ec-icon">🏠</span>
+      <span class="ec-title">Outposts</span>
+      <span class="ec-place">自社ビル内</span>
+      <div class="ec-desc">
+        工場の機械制御や<br>
+        社外秘データの保管。<br>
+        <strong>自分たち専用。</strong>
+      </div>
+    </div>
+    <div class="edge-card ec-local">
+      <span class="ec-icon">🏙️</span>
+      <span class="ec-title">Local Zones</span>
+      <span class="ec-place">大都市近郊</span>
+      <div class="ec-desc">
+        特定の都市の<br>
+        一般ユーザー向け。<br>
+        <strong>地産地消。</strong>
+      </div>
+    </div>
+    <div class="edge-card ec-wave">
+      <span class="ec-icon">📡</span>
+      <span class="ec-title">Wavelength</span>
+      <span class="ec-place">5G網の中</span>
+      <div class="ec-desc">
+        移動するスマホや<br>
+        コネクテッドカー向け。<br>
+        <strong>モバイル特化。</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>設置場所</th>
+      <th>ターゲット（誰のため？）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>AWS Outposts</th>
+      <td>ユーザーの建物内</td>
+      <td><strong>自社ビル内</strong>の機器やデータを操作したい</td>
+    </tr>
+    <tr>
+      <th>AWS Local Zones</th>
+      <td>特定的大都市圏</td>
+      <td><strong>都市部のユーザー</strong>に広く低遅延を届けたい</td>
+    </tr>
+    <tr>
+      <th>AWS Wavelength</th>
+      <td><strong>5G網の内部</strong></td>
+      <td><strong>スマホ・5Gデバイス</strong>を使うユーザーに極限の速さを届けたい</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 試験で問われやすいポイント</h2>
+<ul>
+  <li><strong>キーワードは「5G」と「モバイル端末」:</strong> 問題文に「5Gネットワーク」「モバイルユーザー向けの超低遅延」とあれば、迷わずWavelengthを選んでください。</li>
+  <li><strong>「通信キャリア」との提携:</strong> AWSの設備が、通信事業者（KDDIなど）のデータセンター内に設置されています。</li>
+  <li><strong>VPCの延長として利用:</strong> 新しく難しいネットワークを組む必要はなく、既存のVPCをWavelength Zoneまで「ビヨーン」と伸ばすイメージで使えます。</li>
+</ul>
+
+<h2>4. 実務イメージ</h2>
+<ul>
+  <li><strong>自動運転・コネクテッドカー:</strong> 車が「前の車が止まった！」という情報をクラウドに送り、判断を仰ぐ際、ネットの遅延があると事故に繋がります。5G網内のWavelengthで処理すれば、瞬時に指示を出せます。</li>
+  <li><strong>スマホAR（拡張現実）:</strong> スマホのカメラに映ったものにリアルタイムで情報を重ねる際、計算をWavelengthで行えば、スマホの電池消費を抑えつつ、ズレのない滑らかなAR体験を提供できます。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
