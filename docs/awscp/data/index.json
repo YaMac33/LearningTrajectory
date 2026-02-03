@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-limited-service-analysis",
+    "category": "awscp",
+    "timestamp": "2026-02-03T13:13:26+09:00",
+    "title": "対象が限定されたAWSサービスの解説",
+    "summary": "AWSには用途が限定されたサービスが多く存在し、試験対策ではこれらのサービスの理解が重要です。特に、サービス名と対象リソースを正確に覚える必要があります。",
+    "tags": [
+      "AWS",
+      "サービス",
+      "セキュリティ",
+      "管理",
+      "監視"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "セキュリティとコンプライアンス"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-limited-service-analysis/"
+  },
+  {
     "id": "awscp-aws-management-level-classification",
     "category": "awscp",
     "timestamp": "2026-02-03T13:09:45+09:00",
