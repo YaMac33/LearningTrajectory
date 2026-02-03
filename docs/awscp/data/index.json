@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-ec2-management",
+    "category": "awscp",
+    "timestamp": "2026-02-03T19:04:31+09:00",
+    "title": "インフラの外側とインスタンスの内側",
+    "summary": "AWS CloudFormationやSSMを用いたEC2内部管理の効率的な方法が解説され、運用管理の観点が理解できる。",
+    "tags": [
+      "EC2",
+      "AWS",
+      "CloudFormation",
+      "運用管理",
+      "SSM"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "運用管理"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-ec2-management/"
+  },
+  {
     "id": "awscp-aws-config-features",
     "category": "awscp",
     "timestamp": "2026-02-03T18:59:56+09:00",
