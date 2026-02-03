@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AP型データベースの特徴と例</title>
+  <meta name="description" content="AP型データベースは可用性重視で、データの整合性を犠牲にする特徴があります。CAP定理とコンビニの例えで解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AP型データベースの特徴と例" />
+  <meta property="og:description" content="AP型データベースは可用性重視で、データの整合性を犠牲にする特徴があります。CAP定理とコンビニの例えで解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+      min-width: 80px;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. CAP定理図 */
+    .cap-wrapper {
+      position: relative;
+      width: 280px;
+      height: 240px;
+      margin: 0 auto;
+    }
+    .cap-circle {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 1.2em;
+      opacity: 0.9;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .c-circle {
+      background: #94a3b8; /* Gray (Selected off) */
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    .a-circle {
+      background: #f59e0b; /* Orange (Active) */
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+    }
+    .p-circle {
+      background: #3b82f6; /* Blue (Active) */
+      bottom: 0;
+      right: 0;
+      z-index: 2;
+    }
+    .cap-label {
+      position: absolute;
+      font-size: 0.8em;
+      color: #475569;
+      text-align: center;
+      width: 100px;
+      font-weight: bold;
+    }
+    .lbl-c { top: -25px; left: 50%; transform: translateX(-50%); }
+    .lbl-a { bottom: -25px; left: -10px; }
+    .lbl-p { bottom: -25px; right: -10px; }
+    
+    .ap-connection {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 2px solid #1e293b;
+      padding: 4px 12px;
+      border-radius: 20px;
+      z-index: 10;
+      font-weight: bold;
+      color: #1e293b;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 2. コンビニ比較図 */
+    .cvs-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .cvs-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .cvs-ap {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+    .cvs-cp {
+      border-color: #64748b;
+      background: #f1f5f9;
+    }
+    .cvs-title {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+      color: #1f2937;
+    }
+    .cvs-situation {
+      font-size: 0.85em;
+      color: #ef4444;
+      font-weight: bold;
+      margin-bottom: 12px;
+      background: #fee2e2;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .cvs-action {
+      font-size: 1.2em;
+      margin-bottom: 8px;
+    }
+    .cvs-desc {
+      font-size: 0.9em;
+      color: #4b5563;
+      line-height: 1.4;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .cvs-container {
+        flex-direction: column;
+      }
+      .article-content th {
+        white-space: normal;
+      }
+      .cap-wrapper {
+        transform: scale(0.9);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AP型データベースの特徴と例</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AP型</span>
+            <span class="tag">#データベース</span>
+            <span class="tag">#CAP定理</span>
+            <span class="tag">#可用性</span>
+            <span class="tag">#整合性</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  「AP型データベース」とは、<strong>「データの厳密な正しさよりも、『システムが絶対に止まらないこと』を最優先したデータベース」</strong>のことです。
+</p>
+<p>
+  これは<strong>「CAP定理（キャップていり）」</strong>という、ITエンジニアにとっての「ジャンケンのルール」のような理論に基づいた分類です。詳しく解説します。
+</p>
+
+<h2>1. 前提知識：CAP定理（3つの願い）</h2>
+<p>
+  分散システム（クラウド上のDBなど）には、以下の3つの理想があります。しかし、<strong>「この3つを同時にすべて満たすことは不可能で、最大で2つしか選べない」</strong>という絶対的なルールがあります。これがCAP定理です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">CAP定理と「AP型」の選択</div>
+  <div class="cap-wrapper">
+    <div class="cap-label lbl-c">Consistency<br>(整合性)</div>
+    <div class="cap-label lbl-a">Availability<br>(可用性)</div>
+    <div class="cap-label lbl-p">Partition Tolerance<br>(分断耐性)</div>
+    
+    <!-- Circles -->
+    <div class="cap-circle c-circle">C</div>
+    <div class="cap-circle a-circle">A</div>
+    <div class="cap-circle p-circle">P</div>
+
+    <!-- Connection Badge -->
+    <div class="ap-connection">AP型</div>
+  </div>
+  <p style="font-size:0.85em; color:#475569; margin-top:20px;">
+    クラウドでは通信断絶のリスクがあるため、<strong>P（分断耐性）は必須</strong>です。<br>
+    実質的に、「C（正しさ）をとるか、A（止まらなさ）をとるか」の二択になります。
+  </p>
+</div>
+
+<ul>
+  <li><strong>C (Consistency：整合性):</strong> いつ、誰が見ても、必ず「最新の正しいデータ」が見えること。（例：銀行の残高）</li>
+  <li><strong>A (Availability：可用性):</strong> システムがダウンせず、「いつでも応答」すること。（例：SNSの「いいね」ボタン）</li>
+  <li><strong>P (Partition Tolerance：分断耐性):</strong> 通信障害が起きてもシステムが動き続けること。（※クラウドでは必須）</li>
+</ul>
+
+<h2>2. AP型データベースの特徴</h2>
+<p>
+  「A（可用性）」と「P（分断耐性）」を選んだデータベースです。
+</p>
+<ul>
+  <li><strong>スローガン:</strong> 「多少データが古くてもいいから、絶対にお客さんを待たせるな！」</li>
+  <li><strong>犠牲にしたもの:</strong> C（即時の整合性）
+    <ul>
+      <li>「書き込んだ直後に読み込むと、まだ古いデータのままかもしれない」という状態を許容します。</li>
+      <li>これを専門用語で<strong>「結果整合性（Eventual Consistency）」</strong>と呼びます。「最終的に（数秒後には）辻褄が合うからOK」という考え方です。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>3. CP型との比較（わかりやすい例え）</h2>
+<p>
+  「コンビニのチェーン店」で通信障害が起きた時の対応で例えます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">通信障害時の対応の違い</div>
+  <div class="cvs-container">
+    <!-- AP型 -->
+    <div class="cvs-box cvs-ap">
+      <div class="cvs-title">AP型 (止まらない)</div>
+      <div class="cvs-situation">⚠ 本部と通信断絶</div>
+      <div class="cvs-action">🛒 とにかく売る！</div>
+      <p class="cvs-desc">
+        手元の価格表でレジを通す。<br>
+        「実は5分前に値上げ」等の<br>
+        データのズレは許容する。<br>
+        <strong>客を帰らせないことを優先。</strong>
+      </p>
+    </div>
+
+    <!-- CP型 -->
+    <div class="cvs-box cvs-cp">
+      <div class="cvs-title">CP型 (正しい)</div>
+      <div class="cvs-situation">⚠ 本部と通信断絶</div>
+      <div class="cvs-action">⛔ レジ休止中</div>
+      <p class="cvs-desc">
+        最新価格が保証できないので<br>
+        販売をストップする。<br>
+        <strong>間違った値段で売らない<br>ことを優先。</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>タイプ</th>
+      <th>AP型 (止まらないこと優先)</th>
+      <th>CP型 (正しさ優先)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>リスク</th>
+      <td>古いデータが見えるかも</td>
+      <td>サービスが止まるかも</td>
+    </tr>
+    <tr>
+      <th>代表的なDB</th>
+      <td><strong>DynamoDB</strong> (デフォルト), Cassandra</td>
+      <td>RDBMS (MySQL, Oracle), Redis</td>
+    </tr>
+    <tr>
+      <th>向いている用途</th>
+      <td>SNS、チャット、IoTデータ、カート</td>
+      <td>銀行システム、決済処理</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. AWSにおける AP型</h2>
+<p>
+  AWSのサービスで言うと、<strong>Amazon DynamoDB</strong> が代表的なAP型データベースです。
+</p>
+<ul>
+  <li><strong>DynamoDBのすごいところ:</strong>
+    <ul>
+      <li>基本は「AP型（結果整合性）」で爆速で動きます。</li>
+      <li>しかし、設定オプションで「強力な整合性（Strongly Consistent Read）」を選ぶことで、無理やり「CP型」のような振る舞いをさせることも可能です（その代わり速度は落ち、コストは上がります）。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AP型:</strong> <strong>Availability（可用性）</strong>重視。「多少データがズレてもいいから、絶対にサービスを止めるな」という設計。</li>
+  <li><strong>CP型:</strong> <strong>Consistency（整合性）</strong>重視。「止めてでもいいから、絶対にデータの矛盾を起こすな」という設計。</li>
+  <li><strong>CAP定理:</strong> 「正しさ(C)」と「止まらなさ(A)」の両立は無理。どっちか選べというルール。</li>
+</ul>
+<p>
+  「AP型」と聞いたら、<strong>「DynamoDBのような、結果整合性を受け入れてスピードと稼働率を極めたデータベース」</strong>と思い出せればOKです！
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
