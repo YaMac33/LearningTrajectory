@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AMIの基本と試験対策</title>
+  <meta name="description" content="AMI（Amazon Machine Image）はEC2を起動するための設計図です。試験で頻出の基礎知識とポイントを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AMIの基本と試験対策" />
+  <meta property="og:description" content="AMI（Amazon Machine Image）はEC2を起動するための設計図です。試験で頻出の基礎知識とポイントを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 設計図メタファー図 */
+    .blueprint-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .ami-card {
+      background: #3b82f6;
+      color: #fff;
+      padding: 16px 32px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4);
+      position: relative;
+    }
+    .ami-card::after {
+      content: "設計図";
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #f59e0b;
+      color: #fff;
+      font-size: 0.7em;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .arrow-down-split {
+      width: 2px;
+      height: 20px;
+      background: #cbd5e1;
+      position: relative;
+    }
+    .arrow-down-split::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 2px;
+      background: #cbd5e1;
+    }
+    .ec2-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ec2-house {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      position: relative;
+      width: 100px;
+    }
+    .ec2-house::before {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 12px;
+      background: #cbd5e1;
+    }
+    .house-icon { font-size: 2em; display: block; margin-bottom: 4px; }
+
+    /* 2. AMIの中身図 */
+    .ami-package {
+      border: 3px solid #6366f1;
+      border-radius: 12px;
+      padding: 20px;
+      background: #eef2ff;
+      position: relative;
+      width: 240px;
+      text-align: center;
+    }
+    .ami-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #6366f1;
+      color: white;
+      font-weight: bold;
+      padding: 2px 12px;
+      border-radius: 16px;
+    }
+    .pkg-item {
+      background: #fff;
+      border: 1px solid #c7d2fe;
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #4338ca;
+      font-size: 0.9em;
+    }
+    .pkg-item:last-child { margin-bottom: 0; }
+
+    /* 3. リージョン制約図 */
+    .region-map {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .region-box {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 16px;
+      width: 140px;
+      text-align: center;
+      position: relative;
+      background: #fff;
+    }
+    .rb-tokyo { border-color: #3b82f6; }
+    .rb-osaka { border-color: #ef4444; }
+    
+    .region-name {
+      font-weight: bold;
+      font-size: 0.85em;
+      color: #64748b;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .ami-icon-small {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #3b82f6;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .ami-missing {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #f1f5f9;
+      color: #cbd5e1;
+      border: 1px dashed #cbd5e1;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .cross-mark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ef4444;
+      font-size: 2em;
+      font-weight: bold;
+      opacity: 0.8;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .arrow-down-split::after { width: 80px; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AMIの基本と試験対策</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AMI</span>
+            <span class="tag">#EC2</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#試験対策</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  **AMI（Amazon Machine Image：アマゾンマシンイメージ）**は、EC2（仮想サーバー）を使う上で最も基本的な要素の一つであり、Cloud Practitioner試験（CLF-C02）でも**超頻出**の用語です。
+</p>
+<p>
+  専門用語っぽくて難しそうに見えますが、要するに**「パソコンのコピー（クローン）を作るためのタネ」**のことです。
+</p>
+
+<h2>1. AMI とは？（かみ砕いた説明）</h2>
+<p>
+  一言でいうと、**「EC2を起動するための『完成済みの設計図』」**です。
+</p>
+<p>
+  「サーバーを立てる」というと、OSをインストールして、設定をして…と大変な作業を想像しますが、AMIを使えば「この設計図でお願いします！」と選ぶだけで、中身が出来上がった状態のサーバーが起動します。
+</p>
+
+<h3>家づくりの例え（重要）</h3>
+<p>
+  AMIとEC2の関係は、**「設計図」と「家」**の関係に似ています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">AMIとEC2の関係</div>
+  <div class="blueprint-flow">
+    <div class="ami-card">
+      <span style="font-size:1.5em;">AMI</span><br>
+      <small>(原本)</small>
+    </div>
+    
+    <div class="arrow-down-split"></div>
+    
+    <div class="ec2-group">
+      <div class="ec2-house">
+        <span class="house-icon">🏠</span>
+        EC2 ①
+      </div>
+      <div class="ec2-house">
+        <span class="house-icon">🏠</span>
+        EC2 ②
+      </div>
+      <div class="ec2-house">
+        <span class="house-icon">🏠</span>
+        EC2 ③
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center; margin-top:10px;">
+    1枚のAMIから、同じ構成のEC2を何台でも量産できます。
+  </p>
+</div>
+
+<h2>2. AMI には何が入っている？</h2>
+<p>
+  AMIの中には、サーバーを動かすために必要な「初期状態」のすべてが詰まっています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">AMIパッケージの中身</div>
+  <div class="ami-package">
+    <div class="ami-label">AMI</div>
+    <div class="pkg-item">💿 OS (Linux/Windows)</div>
+    <div class="pkg-item">⚙️ 初期設定</div>
+    <div class="pkg-item">📦 ソフトウェア</div>
+    <div class="pkg-item">💾 ルートボリューム</div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>OS:</strong> Amazon Linux, Ubuntu, Windows Server など。</li>
+  <li><strong>ソフトウェア:</strong> Webサーバー（Apache）や言語環境（Python）などをインストール済みにしておくことも可能です。</li>
+  <li><strong>注意:</strong> 通常、データベースの中身やユーザー個別のデータは含めません（それは起動後にS3やRDSで管理します）。</li>
+</ul>
+
+<h2>3. AMI の種類と入手方法</h2>
+<p>
+  試験では、以下の3つの入手パターンが出題されます。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>種類</th>
+      <th>説明</th>
+      <th>利用シーン</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>クイックスタート AMI</th>
+      <td>AWSが公式に提供しているAMI</td>
+      <td>まずはここから。Amazon LinuxやWindowsなどの素の状態。</td>
+    </tr>
+    <tr>
+      <th>AWS Marketplace</th>
+      <td>サードパーティ企業が販売しているAMI</td>
+      <td>「WordPress入り」「セキュリティソフト入り」など、特定のソフトが最初から入った有料/無料AMI。</td>
+    </tr>
+    <tr>
+      <th>カスタム AMI</th>
+      <td>自分で作ったAMI (マイAMI)</td>
+      <td>自分で設定したEC2を「保存」して、バックアップや量産に使いたい時。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験の最重要ポイント：リージョン制約</h2>
+<p>
+  ここが一番のひっかけポイントです。
+  **「AMIはリージョン（地域）ごとに存在する」**というルールがあります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">AMIはリージョン限定</div>
+  <div class="region-map">
+    <div class="region-box rb-tokyo">
+      <span class="region-name">東京リージョン</span>
+      <span class="ami-icon-small">AMI-A</span>
+      <p style="font-size:0.7em; color:#3b82f6; margin-top:4px;">ここにある！</p>
+    </div>
+    
+    <div style="align-self:center; font-size:1.5em; color:#cbd5e1;">≠</div>
+
+    <div class="region-box rb-osaka">
+      <span class="region-name">大阪リージョン</span>
+      <span class="ami-missing">AMI-A</span>
+      <div class="cross-mark">×</div>
+      <p style="font-size:0.7em; color:#ef4444; margin-top:4px;">見えない！</p>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center;">
+    東京で作ったAMIは、そのままでは大阪で使えません。<br>
+    使うには<strong>「AMIのコピー」</strong>操作が必要です。
+  </p>
+</div>
+
+<h2>5. 実務での活用シーン（試験対策）</h2>
+<p>
+  どのような場面でAMIが正解になるか、パターンを覚えましょう。
+</p>
+<ul>
+  <li><strong>同じ環境を量産したい:</strong> 「Webサーバーを10台に増やしたい」→ ゴールデンイメージ（完成済みのAMI）から起動すれば一瞬です。</li>
+  <li><strong>バックアップ:</strong> 「EC2の設定を丸ごと保存しておきたい」→ AMIを作成しておけば、いつでもその時点の状態に戻せます。</li>
+  <li><strong>Auto Scaling:</strong> 「負荷が増えたら自動でサーバーを増やす」→ 増やすための「種（AMI）」を指定しておく必要があります。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AMI = 設計図:</strong> EC2を起動するためのテンプレート。</li>
+  <li><strong>中身:</strong> OS、アプリ、設定などがパッケージされている。</li>
+  <li><strong>制約:</strong> リージョン単位のリソース。別のリージョンで使うなら「コピー」が必要。</li>
+  <li><strong>用途:</strong> サーバーの量産、バックアップ、オートスケーリング。</li>
+</ul>
+<p>
+  「EC2を作るには、まずAMIを選ぶところから始まる」。これだけ覚えておけばOKです！
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
