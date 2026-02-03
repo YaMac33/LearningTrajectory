@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS管理レベルの分類</title>
+  <meta name="description" content="AWSサービスを管理レベル（アンマネージド、マネージド、フルマネージド）で分類。責任範囲の違いを「住宅」に例えて解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS管理レベルの分類" />
+  <meta property="og:description" content="AWSサービスを管理レベル（アンマネージド、マネージド、フルマネージド）で分類。責任範囲の違いを「住宅」に例えて解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 住宅メタファー図 */
+    .house-compare {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .house-card {
+      flex: 1;
+      min-width: 220px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .hc-unmanaged { border-color: #ef4444; background: #fef2f2; } /* Red */
+    .hc-managed { border-color: #f59e0b; background: #fffbeb; } /* Orange */
+    .hc-full { border-color: #10b981; background: #ecfdf5; } /* Green */
+
+    .hc-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .hc-title { font-weight: bold; margin-bottom: 8px; color: #1e293b; font-size: 1.1em; }
+    .hc-desc { font-size: 0.9em; color: #475569; margin-bottom: 12px; }
+    .hc-badge { 
+      font-size: 0.75em; 
+      padding: 4px 8px; 
+      border-radius: 4px; 
+      font-weight: bold; 
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* 2. 分類マップ */
+    .level-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+    }
+    .level-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .level-header {
+      padding: 8px 16px;
+      font-weight: bold;
+      font-size: 0.9em;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .lh-un { background: #64748b; }
+    .lh-ma { background: #d97706; }
+    .lh-fu { background: #059669; }
+
+    .level-content {
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .svc-tag {
+      font-size: 0.85em;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: bold;
+      border: 1px solid #e2e8f0;
+    }
+    .svc-desc-text {
+      font-size: 0.8em;
+      color: #64748b;
+      width: 100%;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .house-compare { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS管理レベルの分類</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#マネージドサービス</span>
+            <span class="tag">#IT</span>
+            <span class="tag">#分かりやすい例</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWSのサービスは、利用者（あなた）とAWS側で「どこまで面倒を見るか」という責任範囲によって、大きく3つのレベルに分類できます。
+</p>
+<p>
+  試験では、具体的なサービス名を聞いて「これはOSパッチを自分で当てる必要があるか？（＝アンマネージドか？）」といった判断が求められます。
+</p>
+
+<h2>1. 覚えやすい例え話（住宅）</h2>
+<p>
+  管理レベルの違いは、<strong>「家」</strong>に例えると一発で理解できます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">管理レベルの住宅メタファー</div>
+  <div class="house-compare">
+    <!-- アンマネージド -->
+    <div class="house-card hc-unmanaged">
+      <div class="hc-icon">🔨</div>
+      <div class="hc-title">アンマネージド</div>
+      <div class="hc-desc">
+        <strong>「持ち家 (DIY)」</strong><br>
+        家を建てるところから。<br>
+        修理も掃除も全て自分。
+      </div>
+      <span class="hc-badge">自由度: 高 / 手間: 大</span>
+    </div>
+
+    <!-- マネージド -->
+    <div class="house-card hc-managed">
+      <div class="hc-icon">🏢</div>
+      <div class="hc-title">マネージド</div>
+      <div class="hc-desc">
+        <strong>「家具付き賃貸」</strong><br>
+        建物管理は大家さん。<br>
+        部屋の掃除は自分。
+      </div>
+      <span class="hc-badge">自由度: 中 / 手間: 中</span>
+    </div>
+
+    <!-- フルマネージド -->
+    <div class="house-card hc-full">
+      <div class="hc-icon">🏨</div>
+      <div class="hc-title">フルマネージド</div>
+      <div class="hc-desc">
+        <strong>「ホテル」</strong><br>
+        掃除もメンテも不要。<br>
+        チェックインして寝るだけ。
+      </div>
+      <span class="hc-badge">自由度: 低 / 手間: 小</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. サービス分類一覧</h2>
+<p>
+  主要なAWSサービスを3つのレベルに振り分けたマップです。下にいくほどAWSがやってくれる範囲が広がります（楽になります）。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">AWSサービスの管理レベル分類</div>
+  <div class="level-container">
+    
+    <!-- アンマネージド -->
+    <div class="level-box">
+      <div class="level-header lh-un">
+        <span>アンマネージド</span>
+        <small>ほぼ自分で管理</small>
+      </div>
+      <div class="level-content">
+        <span class="svc-tag">EC2</span>
+        <span class="svc-tag">Lightsail</span>
+        <span class="svc-tag">EBS</span>
+        <span class="svc-tag">VPC</span>
+        <div class="svc-desc-text">
+          OSのパッチ当て、バックアップ、セキュリティ対策はあなたの責任です。
+        </div>
+      </div>
+    </div>
+
+    <!-- マネージド -->
+    <div class="level-box">
+      <div class="level-header lh-ma">
+        <span>マネージド</span>
+        <small>一部AWSが管理</small>
+      </div>
+      <div class="level-content">
+        <span class="svc-tag">RDS</span>
+        <span class="svc-tag">ECS / EKS</span>
+        <span class="svc-tag">Redshift</span>
+        <span class="svc-tag">MSK (Kafka)</span>
+        <span class="svc-tag">Elastic Beanstalk</span>
+        <div class="svc-desc-text">
+          インフラ基盤（OSやホスト）はAWS管理。DBエンジンやコンテナの中身はあなたが管理します。
+        </div>
+      </div>
+    </div>
+
+    <!-- フルマネージド -->
+    <div class="level-box">
+      <div class="level-header lh-fu">
+        <span>フルマネージド</span>
+        <small>ほぼAWSに任せる</small>
+      </div>
+      <div class="level-content">
+        <span class="svc-tag">Lambda</span>
+        <span class="svc-tag">Fargate</span>
+        <span class="svc-tag">DynamoDB</span>
+        <span class="svc-tag">S3</span>
+        <span class="svc-tag">CloudFront</span>
+        <span class="svc-tag">Athena</span>
+        <span class="svc-tag">EventBridge</span>
+        <span class="svc-tag">SNS / SQS</span>
+        <div class="svc-desc-text">
+          サーバー管理不要。スケーリングやパッチ適用は全自動。あなたは「使うだけ」です。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ：試験のポイント</h2>
+<ul>
+  <li><strong>アンマネージド:</strong> 「OS」「パッチ」「バックアップ」という単語が出たら、これらは<strong>ユーザーの責任</strong>です。（例：EC2）</li>
+  <li><strong>マネージド:</strong> インフラ運用が楽になりますが、エンジンのバージョン選択などの管理は残ります。（例：RDS）</li>
+  <li><strong>フルマネージド:</strong> 「サーバーレス」「管理不要」「自動スケーリング」と言われたらこれです。（例：S3, DynamoDB, Lambda）</li>
+</ul>
+<p>
+  AWSの設計思想（Well-Architected）では、可能な限り<strong>「フルマネージド（ホテル）」を活用して、運用負荷を下げること</strong>が推奨されています。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
