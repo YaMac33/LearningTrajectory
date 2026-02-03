@@ -1,5 +1,114 @@
 [
   {
+    "id": "awscp-ap-database-cap",
+    "category": "awscp",
+    "timestamp": "2026-02-03T12:38:21+09:00",
+    "title": "AP型データベースの特徴と例",
+    "summary": "AP型データベースは可用性を重視し、整合性を犠牲にする特徴がある。CAP定理を基にしたデータシステムの理解が深まる。",
+    "tags": [
+      "AP型",
+      "データベース",
+      "CAP定理",
+      "可用性",
+      "整合性",
+      "DynamoDB"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-ap-database-cap/"
+  },
+  {
+    "id": "awscp-aws-rds-database-engine",
+    "category": "awscp",
+    "timestamp": "2026-02-03T06:35:20+09:00",
+    "title": "AWS RDSデータベースエンジンの特徴と選び方",
+    "summary": "AWS RDSで利用可能な6種類のデータベースエンジンの特徴を理解し、適切な選択ができるようになる。試験における重要ポイントも解説。",
+    "tags": [
+      "AWS",
+      "DBエンジン",
+      "Aurora",
+      "MySQL",
+      "PostgreSQL",
+      "SQL Server"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-rds-database-engine/"
+  },
+  {
+    "id": "awscp-core-vs-thread",
+    "category": "awscp",
+    "timestamp": "2026-02-03T05:30:12+09:00",
+    "title": "コアとスレッドの違いを理解しよう",
+    "summary": "コアとスレッドの基本的な違いを理解し、RedisとMemcachedの処理構造についても学べる記事です。",
+    "tags": [
+      "マルチコア",
+      "スレッド",
+      "Redis",
+      "Memcached",
+      "プログラム",
+      "コンピュータ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-core-vs-thread/"
+  },
+  {
+    "id": "awscp-redis-memcached-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-03T05:12:43+09:00",
+    "title": "RedisとMemcachedの違いを理解する",
+    "summary": "インメモリ型データストアのRedisとMemcachedの違いを、シングルスレッドとマルチスレッドの視点から理解できます。",
+    "tags": [
+      "Redis",
+      "Memcached",
+      "キャッシュ",
+      "インメモリ",
+      "ITインフラ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-redis-memcached-difference/"
+  },
+  {
+    "id": "awscp-elasticache-fast-data-processing",
+    "category": "awscp",
+    "timestamp": "2026-02-03T04:50:57+09:00",
+    "title": "ElastiCacheで高速データ処理を学ぼう",
+    "summary": "Amazon ElastiCacheを利用することで、データベースの負荷軽減や読み込み速度の高速化が理解できる。試験においてはRedisとMemcachedの違いを特に重視する。",
+    "tags": [
+      "ElastiCache",
+      "Redis",
+      "Memcached",
+      "データベース",
+      "AWS",
+      "キャッシュ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-elasticache-fast-data-processing/"
+  },
+  {
     "id": "awscp-route-53-traffic-flow",
     "category": "awscp",
     "timestamp": "2026-02-03T04:01:16+09:00",
