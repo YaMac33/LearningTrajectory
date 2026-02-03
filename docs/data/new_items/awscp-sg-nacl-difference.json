@@ -1,0 +1,21 @@
+{
+  "id": "awscp-sg-nacl-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-03T13:17:02+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-sg-nacl-difference/",
+  "meta": {
+    "title": "SGとNACLの違いを解説",
+    "summary": "AWSのセキュリティグループ（SG）とネットワークACL（NACL）の違いを理解し、試験によく出るポイントを押さえることができます。",
+    "tags": [
+      "AWS",
+      "セキュリティ",
+      "ネットワーク",
+      "クラウド",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
