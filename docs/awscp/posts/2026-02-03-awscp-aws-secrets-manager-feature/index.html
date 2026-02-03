@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Secrets Managerの機能解説</title>
+  <meta name="description" content="AWS Secrets Managerで機密情報を安全に管理。自動ローテーション機能が最大の特徴。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Secrets Managerの機能解説" />
+  <meta property="og:description" content="AWS Secrets Managerで機密情報を安全に管理。自動ローテーション機能が最大の特徴。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. ハードコーディング比較図 */
+    .code-comp-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .code-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cb-bad { border-color: #ef4444; background: #fef2f2; }
+    .cb-good { border-color: #10b981; background: #ecfdf5; }
+    
+    .cb-title { font-weight: bold; margin-bottom: 8px; font-size: 1.1em; }
+    .cb-bad .cb-title { color: #b91c1c; }
+    .cb-good .cb-title { color: #047857; }
+    
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85em;
+      width: 100%;
+      position: relative;
+    }
+    .danger-text { color: #ef4444; font-weight: bold; text-decoration: underline; }
+    .safe-text { color: #10b981; font-weight: bold; }
+    
+    .cb-icon { font-size: 2em; margin-bottom: 10px; }
+
+    /* 2. 自動ローテーション図 */
+    .rotation-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      padding: 10px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      background: #fff;
+      width: 100%;
+      max-width: 400px;
+    }
+    .rf-title {
+      position: absolute;
+      top: -12px;
+      background: #fff;
+      padding: 0 10px;
+      color: #64748b;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    
+    .rf-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+    .rf-icon { font-size: 1.5em; width: 40px; text-align: center; }
+    .rf-text { font-size: 0.9em; flex: 1; }
+    .rf-arrow { color: #f59e0b; font-size: 1.2em; font-weight: bold; text-align: center; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .code-comp-container { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Secrets Managerの機能解説</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Secrets Manager</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#自動ローテーション</span>
+            <span class="tag">#ハードコーディング防止</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWS Secrets Manager は、その名の通り<strong>「機密情報（シークレット）を管理するサービス」</strong>です。
+</p>
+<p>
+  データベースのパスワードや、APIキーなどの<strong>「漏れたら終わりの情報」</strong>を安全に保管・管理します。一言で言うと、<strong>「勝手に暗証番号を変えてくれる、全自動のデジタル金庫」</strong>です。
+</p>
+<p>
+  試験では、<strong>「認証情報のハードコーディングを防ぐ」「自動ローテーション」</strong>というキーワードで必ず出題されます。
+</p>
+
+<h2>1. なぜ Secrets Manager が必要なのか？</h2>
+<p>
+  昔ながらの開発では、プログラムのコードの中にパスワードを直接書いてしまうことがありました（これを<strong>ハードコーディング</strong>と呼びます）。これはセキュリティ上、非常に危険です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">パスワード管理のビフォーアフター</div>
+  <div class="code-comp-container">
+    <!-- Bad -->
+    <div class="code-box cb-bad">
+      <div class="cb-icon">💀</div>
+      <div class="cb-title">悪い例 (ハードコーディング)</div>
+      <div class="code-block">
+        Connect(<br>
+        &nbsp;&nbsp;"User=admin",<br>
+        &nbsp;&nbsp;"Pass=<span class="danger-text">pass123</span>"<br>
+        );
+      </div>
+      <p style="font-size:0.8em; color:#b91c1c; margin-top:8px;">
+        コードを見たらパスワードがバレる。<br>変更するにはコード修正が必要。
+      </p>
+    </div>
+
+    <!-- Good -->
+    <div class="code-box cb-good">
+      <div class="cb-icon">🔒</div>
+      <div class="cb-title">良い例 (Secrets Manager)</div>
+      <div class="code-block">
+        // 金庫に聞きに行く<br>
+        secret = <span class="safe-text">GetSecret("DB_PASS")</span>;<br>
+        Connect(user, secret);
+      </div>
+      <p style="font-size:0.8em; color:#047857; margin-top:8px;">
+        コードにパスワードは書かない。<br>いつでも金庫の中身を変えられる。
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>2. Secrets Manager の「最強機能」：自動ローテーション</h2>
+<p>
+  ただの金庫なら他にもありますが、Secrets Managerが最強なのは<strong>「自動ローテーション機能」</strong>があるからです。これが試験の最頻出ポイントです。
+</p>
+<p>
+  「30日ごとにパスワードを変える」と設定しておけば、人間が寝ている間に勝手にやってくれます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">自動ローテーションの流れ</div>
+  <div class="rotation-flow">
+    <div class="rf-title">30日経過...</div>
+    
+    <div class="rf-step">
+      <div class="rf-icon">🔒</div>
+      <div class="rf-text"><strong>Secrets Manager</strong> が期限切れを検知</div>
+    </div>
+    
+    <div class="rf-arrow">↓ 起動</div>
+    
+    <div class="rf-step">
+      <div class="rf-icon">⚡</div>
+      <div class="rf-text"><strong>Lambda関数</strong> が裏で動く</div>
+    </div>
+    
+    <div class="rf-arrow">↓ 変更命令</div>
+    
+    <div class="rf-step">
+      <div class="rf-icon">🛢️</div>
+      <div class="rf-text"><strong>RDS (DB)</strong> のパスワードを書き換える</div>
+    </div>
+    
+    <div class="rf-arrow">↓ 更新</div>
+    
+    <div class="rf-step">
+      <div class="rf-icon">📝</div>
+      <div class="rf-text">金庫の中の「正解」も新パスワードに更新</div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#475569; margin-top:8px;">
+    アプリは常に「金庫の正解」を見に行くので、パスワードが変わっても影響を受けない！
+  </p>
+</div>
+
+<h2>3. よくある比較：SSM パラメータストア との違い</h2>
+<p>
+  AWSにはもう一つ、パスワードなどを保存できる<strong>「AWS Systems Manager (SSM) パラメータストア」</strong>というサービスがあります。試験ではこの2つの使い分けが問われます。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS Secrets Manager</th>
+      <th>SSM パラメータストア</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>主な用途</th>
+      <td>DBのパスワードなど、<strong>超重要機密</strong></td>
+      <td>設定値、URL、単純なパスワード</td>
+    </tr>
+    <tr>
+      <th>コスト</th>
+      <td>有料<br><small>(1つあたり約$0.4/月)</small></td>
+      <td><strong>基本無料</strong><br><small>(標準パラメータ)</small></td>
+    </tr>
+    <tr>
+      <th>ローテーション</th>
+      <td><strong>自動 (機能として内蔵)</strong></td>
+      <td>手動<br><small>(Lambdaを自分で書けば可)</small></td>
+    </tr>
+    <tr>
+      <th>RDS連携</th>
+      <td>超簡単<br><small>(専用の設定画面あり)</small></td>
+      <td>普通</td>
+    </tr>
+    <tr>
+      <th>試験の選び方</th>
+      <td><strong>「パスワードの自動更新」</strong>が必要な時</td>
+      <td><strong>「コストを安くしたい」</strong>時</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>結論：使い分けの指針</h3>
+<ul>
+  <li><strong>Secrets Manager:</strong> 「RDSのパスワードを自動で定期的に変更したい」ときに使う。お金を払ってでも安全を買う。</li>
+  <li><strong>SSM パラメータストア:</strong> 「環境変数やURLなど、設定値を安く管理したい」ときに使う。自動更新がいらないならこっちがお得。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> パスワードやAPIキーなどの機密情報を一元管理するデジタル金庫。</li>
+  <li><strong>脱ハードコーディング:</strong> ソースコードにパスワードを書かなくて済むようになる。</li>
+  <li><strong>自動ローテーション:</strong> Lambda と連携して、DBのパスワードを定期的かつ自動的に変更してくれる（これが最大の特徴）。</li>
+</ul>
+<p>
+  これで、セキュリティの要となるSecrets Managerもバッチリです！
+</p>
+<p style="font-size:0.9em; color:#6b7280; background:#f3f4f6; padding:10px; border-radius:8px;">
+  ※比較表に出てきた<strong>「AWS Systems Manager (SSM)」</strong>ですが、パラメータストア以外にも「大量のサーバーを一括管理する」というすごい機能を持っています。（先ほどのOpsWorksの現代版と言われる機能です）。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <section class="contact-cta">
+          <a id="contactLink" class="contact-cta__link" href="#" target="_blank">✉ お問い合わせ</a>
+        </section>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
