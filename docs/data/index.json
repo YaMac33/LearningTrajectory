@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-detective-role",
+    "category": "awscp",
+    "timestamp": "2026-02-04T05:59:39+09:00",
+    "title": "Amazon Detectiveの役割と機能",
+    "summary": "Amazon Detectiveは、セキュリティ事故の自動調査を行い、原因究明を助けるサービスです。GuardDutyとの役割の違いを理解することで、セキュリティ対応の流れを把握できます。",
+    "tags": [
+      "セキュリティ",
+      "Amazon Detective",
+      "調査",
+      "ログ分析",
+      "AWS"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-detective-role/"
+  },
+  {
     "id": "awscp-aws-online-tech-talks",
     "category": "awscp",
     "timestamp": "2026-02-04T05:55:40+09:00",
