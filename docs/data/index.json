@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-eventbridge-lambda-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-03T13:23:30+09:00",
+    "title": "EventBridgeとLambdaの役割の違い",
+    "summary": "EventBridgeとLambdaの役割について理解し、各サービスの強みを知ることができます。",
+    "tags": [
+      "EventBridge",
+      "AWS Lambda",
+      "処理",
+      "ルーティング",
+      "プログラミング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-eventbridge-lambda-difference/"
+  },
+  {
     "id": "awscp-sg-nacl-difference",
     "category": "awscp",
     "timestamp": "2026-02-03T13:17:02+09:00",
