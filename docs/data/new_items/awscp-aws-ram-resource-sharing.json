@@ -1,0 +1,20 @@
+{
+  "id": "awscp-aws-ram-resource-sharing",
+  "category": "awscp",
+  "timestamp": "2026-02-04T05:36:52+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-ram-resource-sharing/",
+  "meta": {
+    "title": "AWSリソース共有サービスRAMの概要",
+    "summary": "AWS RAMは、複数のAWSアカウント間でリソースを共有できるサービスで、ネットワーク管理の効率化とコスト削減に寄与します。",
+    "tags": [
+      "AWS",
+      "RAM",
+      "リソース共有",
+      "ネットワーク管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
