@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-api-operation-understanding",
+  "category": "awscp",
+  "timestamp": "2026-02-04T06:30:14+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-api-operation-understanding/",
+  "meta": {
+    "title": "AWS操作のAPI理解を深める",
+    "summary": "本記事では、AWS操作がAPIとして処理される仕組みを解説し、画面操作やCLIの違いを理解できます。",
+    "tags": [
+      "AWS",
+      "API",
+      "マネジメントコンソール",
+      "CLI",
+      "CloudTrail"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
