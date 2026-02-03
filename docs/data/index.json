@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-local-zones-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-03T16:32:43+09:00",
+    "title": "AWS Local Zones の概要と試験対策",
+    "summary": "AWS Local Zonesは低遅延通信を実現する小型データセンターであり、特定の都市に設置されます。Outpostsとの違いを理解し、試験における重要ポイントを把握しましょう。",
+    "tags": [
+      "AWS",
+      "Local Zones",
+      "データセンター",
+      "低遅延",
+      "クラウドコンピューティング"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "クラウドの特徴"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-local-zones-overview/"
+  },
+  {
     "id": "awscp-aws-outposts-overview",
     "category": "awscp",
     "timestamp": "2026-02-03T16:27:06+09:00",
