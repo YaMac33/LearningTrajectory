@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-code-services-list",
+  "category": "awscp",
+  "timestamp": "2026-02-03T15:30:12+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-code-services-list/",
+  "meta": {
+    "title": "AWSコード系サービスの役割一覧",
+    "summary": "AWSのCodeシリーズに関する各サービスの役割を明確にし、CI/CDの実現に向けたポイントを理解することができます。",
+    "tags": [
+      "AWS",
+      "Code系",
+      "CI/CD",
+      "サービス一覧",
+      "開発環境"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
