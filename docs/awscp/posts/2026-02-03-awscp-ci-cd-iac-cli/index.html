@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | CI/CD、IaC、CLIの組み合わせ </title>
+  <meta name="description" content="CI/CD、IaC、CLIを組み合わせたAWS運用の実務イメージを整理して初心者にも分かりやすく解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CI/CD、IaC、CLIの組み合わせ" />
+  <meta property="og:description" content="CI/CD、IaC、CLIを組み合わせたAWS運用の実務イメージを整理して初心者にも分かりやすく解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 全体フロー図 */
+    .ops-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      gap: 16px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+    .flow-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.9em;
+      position: relative;
+      min-width: 100px;
+    }
+    .fc-dev { border-color: #64748b; color: #334155; }
+    .fc-repo { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    
+    .pipeline-area {
+      border: 3px dashed #8b5cf6;
+      background: #f5f3ff;
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .pipeline-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #8b5cf6;
+      color: white;
+      font-weight: bold;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.8em;
+    }
+    .pipe-steps {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+    }
+    .fc-build { border-color: #8b5cf6; background: #fff; color: #6d28d9; }
+    .fc-iac { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; font-weight: bold; }
+
+    .env-area {
+      border: 2px solid #10b981;
+      background: #ecfdf5;
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      text-align: center;
+    }
+    .env-title { font-weight: bold; color: #047857; margin-bottom: 8px; }
+    .env-content {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .resource { 
+      background: #fff; 
+      border: 1px solid #10b981; 
+      border-radius: 4px; 
+      padding: 4px 8px; 
+      font-size: 0.8em; 
+      color: #059669; 
+    }
+
+    .cli-box {
+      border: 2px solid #4b5563;
+      background: #1f2937;
+      color: #e5e7eb;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: monospace;
+      font-size: 0.85em;
+      margin-top: -10px;
+      z-index: 10;
+    }
+
+    .arrow-down {
+      width: 0; 
+      height: 0; 
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 10px solid #cbd5e1;
+      margin: 4px 0;
+    }
+
+    /* 2. 3種の神器カード */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+    .tool-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .tc-icon { font-size: 2em; margin-bottom: 8px; display: block; }
+    .tc-name { font-weight: bold; color: #1f2937; display: block; margin-bottom: 4px; }
+    .tc-role { font-size: 0.8em; color: #4b5563; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+    .tc-desc { font-size: 0.85em; color: #6b7280; margin-top: 8px; line-height: 1.4; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .pipe-steps { flex-direction: column; align-items: center; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title"> CI/CD、IaC、CLIの組み合わせ </h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CI/CD</span>
+            <span class="tag">#IaC</span>
+            <span class="tag">#CLI</span>
+            <span class="tag">#運用</span>
+            <span class="tag">#図解</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>「CI/CDパイプライン」「IaC（インフラのコード化）」「CLI」</strong>を組み合わせたAWS運用の実務イメージを図解します。
+</p>
+<p>
+  これらは個別に学ぶと難しく感じますが、<strong>「自動化の川（パイプライン）」</strong>として全体の流れを見ると、それぞれの役割がすっきりと理解できます。
+</p>
+
+<h2>1. 運用の全体像（自動化の川）</h2>
+<p>
+  開発者がコードを保存してから、実際にAWS環境が変更されるまでの流れです。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">モダンなAWS運用フロー</div>
+  <div class="ops-flow">
+    <!-- 開発者 & Git -->
+    <div class="flow-row">
+      <div class="flow-card fc-dev">🧑‍💻 開発者</div>
+      <div style="color:#cbd5e1;">➡ Push ➡</div>
+      <div class="flow-card fc-repo">📦 Git<br><small>(CodeCommit)</small></div>
+    </div>
+
+    <div class="arrow-down"></div>
+
+    <!-- CI/CD パイプライン -->
+    <div class="pipeline-area">
+      <div class="pipeline-label">CI/CD パイプライン (自動化)</div>
+      <div class="pipe-steps">
+        <div class="flow-card fc-build">
+          <span style="font-size:1.5em">🧪</span><br>
+          <strong>テスト・ビルド</strong><br>
+          <small>(CodeBuild)</small>
+        </div>
+        <div style="align-self:center; color:#8b5cf6;">➡</div>
+        <div class="flow-card fc-iac">
+          <span style="font-size:1.5em">🏗️</span><br>
+          <strong>デプロイ (IaC)</strong><br>
+          <small>(CloudFormation)</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down"></div>
+
+    <!-- AWS環境 -->
+    <div class="env-area">
+      <div class="env-title">☁️ AWS 環境 (本番/開発)</div>
+      <div class="env-content">
+        <span class="resource">VPC</span>
+        <span class="resource">EC2</span>
+        <span class="resource">RDS</span>
+        <span class="resource">S3</span>
+      </div>
+    </div>
+
+    <!-- CLI (横槍) -->
+    <div class="cli-box">
+      > aws s3 ls<br>
+      > aws ec2 stop-instances...<br>
+      <small>👆 CLIで日々のメンテ・緊急対応</small>
+    </div>
+  </div>
+</div>
+
+<h2>2. 流れをかみ砕くと</h2>
+<ol>
+  <li><strong>開発者がコードをPush:</strong> プログラムだけでなく、「インフラの設計図（CloudFormationテンプレート）」もGitに保存します。</li>
+  <li><strong>パイプラインが起動:</strong> 保存を検知して、CodePipelineが動き出します。テスト（CodeBuild）を通過したものだけが次へ進みます。</li>
+  <li><strong>IaCで自動構築:</strong> CloudFormationが設計図を読み込み、VPCやEC2を自動で作成・更新します。人間がコンソールをポチポチする必要はありません。</li>
+  <li><strong>CLIで運用:</strong> 自動化しにくい「ログの確認」や「緊急停止」などは、管理者がコマンドライン（CLI）から直接行います。</li>
+</ol>
+
+<h2>3. 「3種の神器」の役割分担</h2>
+<p>
+  それぞれのツールを「道具」に例えると分かりやすくなります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">AWS運用の3つの道具</div>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <span class="tc-icon">📜</span>
+      <span class="tc-name">IaC</span>
+      <span class="tc-role">設計図</span>
+      <div class="tc-desc">
+        CloudFormation / CDK。<br>
+        環境の「あるべき姿」を定義。<br>
+        <strong>構築・変更の自動化</strong>担当。
+      </div>
+    </div>
+    <div class="tool-card">
+      <span class="tc-icon">🏭</span>
+      <span class="tc-name">CI/CD</span>
+      <span class="tc-role">ベルトコンベア</span>
+      <div class="tc-desc">
+        CodePipeline。<br>
+        設計図を現場まで運ぶ。<br>
+        <strong>プロセスの自動化</strong>担当。
+      </div>
+    </div>
+    <div class="tool-card">
+      <span class="tc-icon">🛠️</span>
+      <span class="tc-name">CLI</span>
+      <span class="tc-role">万能ナイフ</span>
+      <div class="tc-desc">
+        AWS CLI。<br>
+        細かい調整や確認を行う。<br>
+        <strong>日々の操作・メンテ</strong>担当。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 試験・実務での重要ポイント</h2>
+<p>
+  この構成にするメリットと、試験で問われるポイントです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>要素</th>
+      <th>メリット・目的</th>
+      <th>試験キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>IaC</th>
+      <td><strong>再現性</strong>。誰がいつやっても同じ環境ができる。</td>
+      <td>CloudFormation, テンプレート, スタック, 自動構築</td>
+    </tr>
+    <tr>
+      <th>CI/CD</th>
+      <td><strong>安全性と速度</strong>。テストを強制し、手作業ミスをゼロにする。</td>
+      <td>CodePipeline, 自動デプロイ, リリースプロセス</td>
+    </tr>
+    <tr>
+      <th>CLI</th>
+      <td><strong>効率性</strong>。繰り返し作業のスクリプト化や、素早い操作。</td>
+      <td>コマンドライン, シェルスクリプト, API操作</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li>大きな変更（構築・更新）は、<strong>IaCとCI/CD</strong>で自動化して安全に行う。</li>
+  <li>小さな操作（確認・メンテ）は、<strong>CLI</strong>で素早く行う。</li>
+</ul>
+<p>
+  この「自動化」と「手動」の使い分けが、モダンなAWS運用の基本形です。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
