@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-codeartifact-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T05:32:17+09:00",
+    "title": "AWS CodeArtifactの理解と利点",
+    "summary": "AWS CodeArtifactは、ソフトウェア開発で使用するライブラリを安全に保管・共有するためのサービスです。試験ではアーティファクトリポジトリや依存関係の管理についての理解が求められます。",
+    "tags": [
+      "AWS",
+      "CodeArtifact",
+      "ソフトウェア",
+      "パッケージ",
+      "ライブラリ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-codeartifact-overview/"
+  },
+  {
     "id": "awscp-aws-trust-safety",
     "category": "awscp",
     "timestamp": "2026-02-04T03:44:46+09:00",
