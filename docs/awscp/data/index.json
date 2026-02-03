@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-config-features",
+    "category": "awscp",
+    "timestamp": "2026-02-03T18:59:56+09:00",
+    "title": "AWS Configの基本と機能",
+    "summary": "AWS ConfigはAWSリソースの設定変更を管理し、コンプライアンス監査や変更履歴の追跡を行うサービスです。試験では構成管理や監査計画に関連する問題が出題されます。",
+    "tags": [
+      "AWS",
+      "Config",
+      "構成管理",
+      "コンプライアンス",
+      "監査",
+      "変更履歴"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-config-features/"
+  },
+  {
     "id": "awscp-aws-systems-manager-basic-functions",
     "category": "awscp",
     "timestamp": "2026-02-03T18:50:20+09:00",
