@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cname-alias-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-04T06:35:47+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-cname-alias-difference/",
+  "meta": {
+    "title": "CNAMEとエイリアスレコードの違い",
+    "summary": "CNAMEの特徴と弱点、AWSのエイリアスレコードを解説します。Route 53における効果的なDNS設定について理解できる内容です。",
+    "tags": [
+      "CNAME",
+      "エイリアス",
+      "AWS",
+      "Route 53",
+      "DNS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
