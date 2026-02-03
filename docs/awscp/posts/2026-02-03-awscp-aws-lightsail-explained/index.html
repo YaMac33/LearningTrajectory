@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Lightsailの魅力</title>
+  <meta name="description" content="初心者向けのAWS仮想サーバー、Amazon LightsailのメリットとEC2との違いを解説。月額固定料金で簡単に始められるAWSの入門セットです。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Lightsailの魅力" />
+  <meta property="og:description" content="初心者向けのAWS仮想サーバー、Amazon LightsailのメリットとEC2との違いを解説。月額固定料金で簡単に始められるAWSの入門セットです。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 定食 vs アラカルト比較図 */
+    .menu-compare {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .menu-box {
+      flex: 1;
+      min-width: 240px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .mb-ec2 { border-color: #94a3b8; border-style: dashed; }
+    .mb-lightsail { border-color: #f97316; background: #fff7ed; } /* Orange */
+
+    .mb-title { font-weight: bold; font-size: 1.1em; color: #1e293b; margin-bottom: 12px; }
+    .mb-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 8px; }
+    .mb-item { 
+      font-size: 0.8em; 
+      padding: 4px 8px; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 4px; 
+      background: #f8fafc;
+    }
+    .mb-set {
+      background: #ffedd5;
+      border: 2px solid #fdba74;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: bold;
+      color: #c2410c;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mb-price {
+      margin-top: auto;
+      font-weight: bold;
+      color: #4b5563;
+      font-size: 0.9em;
+      border-top: 1px dashed #e2e8f0;
+      padding-top: 8px;
+      width: 100%;
+    }
+
+    /* 2. ステップアップ図 */
+    .step-up-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .su-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .su-ls { border-color: #f97316; background: #fff; width: 120px; }
+    .su-ec2 { border-color: #3b82f6; background: #eff6ff; width: 160px; }
+    
+    .su-icon { font-size: 2em; display: block; margin-bottom: 4px; }
+    .su-label { font-weight: bold; font-size: 0.9em; color: #1e293b; }
+    .su-desc { font-size: 0.75em; color: #64748b; }
+    
+    .su-arrow-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #94a3b8;
+    }
+    .su-arrow-text { font-size: 0.7em; font-weight: bold; margin-bottom: -4px; }
+    .su-arrow { font-size: 1.5em; font-weight: bold; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .menu-compare { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Lightsailの魅力</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Lightsail</span>
+            <span class="tag">#VPS</span>
+            <span class="tag">#初心者向け</span>
+            <span class="tag">#固定料金</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>Amazon Lightsail（ライトセール）</strong> は、AWSの中で最も「初心者向け」かつ「シンプル」な仮想サーバー（VPS）サービスです。
+</p>
+<p>
+  一言で言うと、<strong>「難しい設定を全部省いて、月額ワンコインで使える『AWSの入門セット』」</strong>です。EC2が「プロ向けのパーツショップ」なら、Lightsailは「完成品のパソコン」や「定食メニュー」です。
+</p>
+
+<h2>1. Lightsail のコンセプト： 「定食メニュー」</h2>
+<p>
+  AWSの通常のサービス（EC2など）は、あらゆるパーツを自分で選んで組み合わせる「アラカルト（単品注文）」方式です。自由度は高いですが、選ぶのが大変です。
+</p>
+<p>
+  一方、Lightsail は<strong>「定食（セットメニュー）」</strong>です。これらが最初からパッケージ化されています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">EC2 vs Lightsail の選び方</div>
+  <div class="menu-compare">
+    <!-- EC2 -->
+    <div class="menu-box mb-ec2">
+      <div class="mb-title">EC2 (アラカルト)</div>
+      <div class="mb-items">
+        <span class="mb-item">CPU?</span>
+        <span class="mb-item">メモリ?</span>
+        <span class="mb-item">SSD?</span>
+        <span class="mb-item">VPC?</span>
+        <span class="mb-item">IP?</span>
+      </div>
+      <p style="font-size:0.8em; color:#64748b; margin-top:8px;">
+        一つずつ選んで組み立てる。<br>計算が複雑。
+      </p>
+      <div class="mb-price">
+        料金: 使った分だけ (変動)
+      </div>
+    </div>
+
+    <!-- Lightsail -->
+    <div class="menu-box mb-lightsail">
+      <div class="mb-title">Lightsail (定食)</div>
+      <div class="mb-set">
+        <span style="font-size:1.5em;">🍱</span>
+        <span>全部入りセット</span>
+      </div>
+      <ul style="font-size:0.8em; text-align:left; color:#9a3412; margin:8px 0;">
+        <li>・サーバー (CPU/Mem)</li>
+        <li>・ストレージ (SSD)</li>
+        <li>・通信量 (データ転送)</li>
+      </ul>
+      <div class="mb-price" style="color:#c2410c;">
+        料金: 月額固定 (3.5ドル〜)
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. Lightsail の「3つの最強メリット」</h2>
+
+<h3>① 圧倒的な「わかりやすさ」</h3>
+<p>
+  AWSの管理画面（マネジメントコンソール）は非常に複雑ですが、Lightsail専用の画面はとてもシンプルで可愛らしいデザインです。「WordPress」というボタンを選んで起動するだけで、数分後にはブログが書き始められます。
+</p>
+
+<h3>② 料金が「予測可能（固定）」</h3>
+<p>
+  EC2は「使った分だけ課金」なので、うっかり使いすぎると請求額が跳ね上がることがあります。Lightsailは<strong>「月額固定料金」</strong>なので、予算が限られている個人開発や、中小企業の小規模サイトでも安心して使えます。
+</p>
+
+<h3>③ EC2への「ステップアップ」が可能</h3>
+<p>
+  ここが他のVPS業者（ConoHaやさくらVPSなど）との決定的な違いです。
+  Lightsailで小さく始めて、サービスが成長して手狭になったら、データをそのまま「EC2」へ移行（アップグレード）する機能が用意されています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">成長に合わせた移行パス</div>
+  <div class="step-up-flow">
+    <div class="su-box su-ls">
+      <span class="su-icon">🌱</span>
+      <div class="su-label">Lightsail</div>
+      <div class="su-desc">安く始める</div>
+    </div>
+    
+    <div class="su-arrow-container">
+      <span class="su-arrow-text">成長したら</span>
+      <span class="su-arrow">➡</span>
+    </div>
+
+    <div class="su-box su-ec2">
+      <span class="su-icon">🏢</span>
+      <div class="su-label">Amazon EC2</div>
+      <div class="su-desc">プロ向け機能へ<br>簡単移行</div>
+    </div>
+  </div>
+</div>
+
+<h2>3. EC2 との違い（試験・実務の分かれ道）</h2>
+<p>
+  「どっちを使えばいいの？」と迷った時の判断基準です。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon Lightsail (VPS)</th>
+      <th>Amazon EC2 (IaaS)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>ターゲット</th>
+      <td>初心者、個人、小規模サイト</td>
+      <td>プロ、大企業、大規模システム</td>
+    </tr>
+    <tr>
+      <th>構成</th>
+      <td>全部入りセット (変更不可)</td>
+      <td>パーツ単位で自由自在</td>
+    </tr>
+    <tr>
+      <th>料金</th>
+      <td><strong>月額固定</strong> (わかりやすい)</td>
+      <td>従量課金 (複雑だが最適化可能)</td>
+    </tr>
+    <tr>
+      <th>拡張性</th>
+      <td>プラン上げのみ (垂直)</td>
+      <td><strong>オートスケーリング</strong> (水平) 可能</td>
+    </tr>
+    <tr>
+      <th>ネットワーク</th>
+      <td>シンプル (VPC設定は隠蔽)</td>
+      <td>複雑 (VPCを完全制御)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  試験で以下の言葉が出たら、Lightsail が正解の可能性が高いです。
+</p>
+<ul>
+  <li><strong>「VPS (Virtual Private Server)」</strong></li>
+  <li><strong>「予測可能な価格設定 (Predictable pricing)」</strong></li>
+  <li><strong>「シンプルなWebサイトやブログ (Simple web application / Blog)」</strong></li>
+  <li><strong>「WordPressを数クリックで (Launch WordPress in clicks)」</strong></li>
+</ul>
+<p>
+  逆に、**「オートスケーリングが必要」「細かいセキュリティグループ設定が必要」**と言われたら、Lightsailではなく EC2 を選んでください。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Lightsail:</strong> <strong>「簡単・安い・定額」</strong>のオールインワン・パッケージ。WordPressや個人のWebサイトに最適。</li>
+  <li><strong>EC2:</strong> <strong>「自由・高機能・従量制」</strong>のプロ向けパーツ。大規模システムや複雑な構成に最適。</li>
+</ul>
+<p>
+  「とりあえずAWSでWebサーバーを立ててみたい」という場合、最初はLightsailから触ってみるのが一番挫折しません。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
