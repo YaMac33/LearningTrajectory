@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-amazon-opensearch-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T06:15:40+09:00",
+    "title": "Amazon OpenSearch Serviceの概要と特徴",
+    "summary": "Amazon OpenSearch Serviceは、検索エンジンとログ分析の2つの用途を持つ重要なAWSサービスです。試験ではその独自の特性と他のサービスとの違いについて理解しておく必要があります。",
+    "tags": [
+      "OpenSearch",
+      "検索",
+      "ログ分析",
+      "AWS",
+      "Elasticsearch",
+      "可視化"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-opensearch-overview/"
+  },
+  {
     "id": "awscp-aws-activate-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T06:11:59+09:00",
