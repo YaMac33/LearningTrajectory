@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-systems-manager-basic-functions",
+    "category": "awscp",
+    "timestamp": "2026-02-03T18:50:20+09:00",
+    "title": "AWS Systems Managerの基本機能を理解しよう",
+    "summary": "AWS Systems Manager（SSM）の運用自動化機能について学び、Session ManagerやRun Commandの利点を理解することができます。",
+    "tags": [
+      "AWS",
+      "SSM",
+      "運用自動化",
+      "Session Manager",
+      "Run Command",
+      "Patch Manager"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-systems-manager-basic-functions/"
+  },
+  {
     "id": "awscp-aws-secrets-manager-feature",
     "category": "awscp",
     "timestamp": "2026-02-03T18:24:07+09:00",
