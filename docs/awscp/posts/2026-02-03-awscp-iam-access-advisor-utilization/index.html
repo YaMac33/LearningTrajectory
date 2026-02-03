@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | IAMアクセスアドバイザーの活用法</title>
+  <meta name="description" content="IAM Access Advisorを使った権限管理のポイントを解説し、セキュリティを強化する方法を紹介。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="IAMアクセスアドバイザーの活用法" />
+  <meta property="og:description" content="IAM Access Advisorを使った権限管理のポイントを解説し、セキュリティを強化する方法を紹介。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 冷蔵庫メタファー図 */
+    .fridge-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .fridge-box {
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      background: #eff6ff;
+      padding: 16px;
+      width: 100%;
+      position: relative;
+    }
+    .fridge-label {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      background: #3b82f6;
+      color: white;
+      font-weight: bold;
+      padding: 2px 12px;
+      border-radius: 12px;
+      font-size: 0.8em;
+    }
+    .item-list {
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .food-item {
+      background: #fff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      min-width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .fi-fresh { border-color: #10b981; background: #ecfdf5; }
+    .fi-rotten { border-color: #ef4444; background: #fef2f2; position: relative; }
+    
+    .fi-icon { font-size: 2em; margin-bottom: 4px; }
+    .fi-name { font-weight: bold; font-size: 0.9em; color: #1e293b; }
+    .fi-date { font-size: 0.75em; color: #64748b; margin-top: 4px; }
+    
+    .alert-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7em;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 2. Advisor vs Analyzer 比較図 */
+    .vs-diagram {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .vs-card {
+      flex: 1;
+      min-width: 220px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+    }
+    .vc-advisor { border-color: #f59e0b; background: #fffbeb; } /* Orange */
+    .vc-analyzer { border-color: #ef4444; background: #fef2f2; } /* Red */
+
+    .vc-icon { font-size: 2.5em; margin-bottom: 8px; display: block; }
+    .vc-title { font-weight: bold; font-size: 1.1em; color: #1f2937; margin-bottom: 8px; }
+    .vc-arrow { 
+      font-weight: bold; 
+      margin: 8px 0; 
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+    }
+    .ar-internal { background: #fef3c7; color: #d97706; }
+    .ar-external { background: #fee2e2; color: #b91c1c; }
+    .vc-desc { font-size: 0.9em; color: #4b5563; line-height: 1.4; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .vs-diagram { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">IAMアクセスアドバイザーの活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#IAM</span>
+            <span class="tag">#Access Advisor</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#最小権限</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  今回はIAM（アクセス管理）の中でも、セキュリティをより強固にするための「お掃除ツール」である **IAM Access Advisor（アクセスアドバイザー）** について解説します。
+</p>
+
+<h2>1. IAM Access Advisor とは？</h2>
+<p>
+  一言で言うと、**「IAMユーザーやロールが、最後にいつ・どのサービスを使ったかを表示するレポート機能」**です。
+</p>
+
+<h3>噛み砕いた解説：冷蔵庫の食材管理</h3>
+<p>
+  権限管理を「冷蔵庫の食材」に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">権限の「消費期限」チェック</div>
+  <div class="fridge-container">
+    <div class="fridge-box">
+      <div class="fridge-label">IAMポリシー (許可リスト)</div>
+      <div class="item-list">
+        <div class="food-item fi-fresh">
+          <span class="fi-icon">🥩</span>
+          <span class="fi-name">EC2</span>
+          <span class="fi-date">昨日食べた</span>
+        </div>
+        <div class="food-item fi-fresh">
+          <span class="fi-icon">🥗</span>
+          <span class="fi-name">S3</span>
+          <span class="fi-date">今日食べた</span>
+        </div>
+        <div class="food-item fi-rotten">
+          <div class="alert-badge">不要！</div>
+          <span class="fi-icon">🥫</span>
+          <span class="fi-name">RDS</span>
+          <span class="fi-date">3ヶ月未使用...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center;">
+    「あれ、このRDS権限（納豆）、3ヶ月誰も触ってないな…」<br>
+    Access Advisorを使えば、こういった<strong>「腐った（不要な）権限」</strong>を一目で発見できます。
+  </p>
+</div>
+
+<ul>
+  <li><strong>IAMポリシー：</strong> 「何でも食べていいよ（全権限）」という許可証。</li>
+  <li><strong>Access Advisor：</strong> 食材（サービス）の**「最後に食べた日付（最終アクセス日）」**を記録したリスト。</li>
+  <li><strong>メリット：</strong> 使っていない権限を削除（お掃除）することで、乗っ取られた際の被害（食中毒）を最小限に防げます。</li>
+</ul>
+
+<h2>2. なぜこれが必要なの？（最小権限の原則）</h2>
+<p>
+  AWSには**「最小権限の原則（Least Privilege）」**という鉄則があります。「必要最低限の権限だけを渡そう」という考え方です。
+</p>
+<p>
+  実務では、最初は「あれもこれも使うかも」と多めに権限を付けてしまいがちですが、そのまま放置するのは危険です。Access Advisor を使うと、**「実は一度も使っていないサービス」**が客観的なデータとして分かるので、安全に権限を削ぎ落とすことができます。
+</p>
+
+<h2>3. 似ているサービスとの違い（試験対策）</h2>
+<p>
+  試験（CLF-C02）では、名前が似ている「IAM Access Analyzer」との違いが狙われます。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Advisor vs Analyzer</div>
+  <div class="vs-diagram">
+    <!-- Advisor -->
+    <div class="vs-card vc-advisor">
+      <span class="vc-icon">🧹</span>
+      <div class="vc-title">Access Advisor</div>
+      <span class="vc-arrow ar-internal">内側の整理</span>
+      <div class="vc-desc">
+        「どの権限を使っていないか？」<br>
+        無駄な権限を削るためのツール。<br>
+        <strong>断捨離アドバイザー。</strong>
+      </div>
+    </div>
+
+    <!-- Analyzer -->
+    <div class="vs-card vc-analyzer">
+      <span class="vc-icon">🚨</span>
+      <div class="vc-title">Access Analyzer</div>
+      <span class="vc-arrow ar-external">外への漏洩チェック</span>
+      <div class="vc-desc">
+        「外部からアクセス可能か？」<br>
+        S3バケットなどの公開設定を検知。<br>
+        <strong>セキュリティ分析官。</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>ポイントまとめ</h3>
+<table>
+  <thead>
+    <tr>
+      <th>機能名</th>
+      <th>何を見せてくれる？</th>
+      <th>目的</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Access Advisor</th>
+      <td>最終アクセス日時 (Last accessed data)</td>
+      <td><strong>不要な権限の特定・削除</strong><br>(最小権限の実現)</td>
+    </tr>
+    <tr>
+      <th>Access Analyzer</th>
+      <td>外部公開されているリソース</td>
+      <td><strong>意図しない公開設定の検知</strong><br>(情報漏洩の防止)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 実務イメージ</h2>
+<ol>
+  <li>新入社員のAさんに、一旦「AdministratorAccess（管理者権限）」を渡して作業してもらう。</li>
+  <li>1ヶ月後、セキュリティ担当者が <strong>IAM Access Advisor</strong> を確認。</li>
+  <li>Aさんは実際には「S3」と「EC2」しか触っていないことが判明。</li>
+  <li>「よし、他のDB操作や設定変更の権限は危ないから削除しよう」と判断し、Aさんの権限を実態に合わせて絞り込む。</li>
+</ol>
+<p>
+  このように、勘や記憶に頼らず、<strong>「事実（アクセス履歴）」に基づいて権限を管理する</strong>のがAccess Advisorの正しい使い方です。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
