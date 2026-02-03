@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | EventBridgeとLambdaの役割の違い</title>
+  <meta name="description" content="EventBridgeは指示出し、Lambdaは処理担当。役割を例えると、ウェイターとシェフの違いです。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EventBridgeとLambdaの役割の違い" />
+  <meta property="og:description" content="EventBridgeは指示出し、Lambdaは処理担当。役割を例えると、ウェイターとシェフの違いです。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. レストランの比喩図 */
+    .rest-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 600px;
+    }
+    .rest-box {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+    }
+    .rb-waiter { border-color: #ec4899; background: #fdf2f8; } /* Pink */
+    .rb-chef { border-color: #f97316; background: #fff7ed; } /* Orange */
+    
+    .rb-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .rb-role { font-weight: bold; color: #1f2937; margin-bottom: 4px; }
+    .rb-desc { font-size: 0.85em; color: #6b7280; }
+    
+    .rest-arrow { font-size: 1.5em; color: #94a3b8; font-weight: bold; }
+
+    /* 2. 効率性の比較図 */
+    .eff-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+    .eff-row {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      gap: 12px;
+    }
+    .eff-label {
+      font-weight: bold;
+      font-size: 0.9em;
+      min-width: 80px;
+      color: #4b5563;
+    }
+    .eff-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+    }
+    .ev-item {
+      font-size: 1.2em;
+      padding: 4px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 4px;
+    }
+    .ev-chef {
+      background: #ffedd5;
+      border: 1px solid #fdba74;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #c2410c;
+      white-space: nowrap;
+    }
+    .ev-eb {
+      background: #fbcfe8;
+      border: 1px solid #f472b6;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #be185d;
+    }
+    .ev-arrow { color: #94a3b8; font-size: 0.8em; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .rest-container { flex-direction: column; }
+      .rest-arrow { transform: rotate(90deg); margin: 8px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EventBridgeとLambdaの役割の違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#EventBridge</span>
+            <span class="tag">#AWS Lambda</span>
+            <span class="tag">#処理</span>
+            <span class="tag">#ルーティング</span>
+            <span class="tag">#プログラミング</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  EventBridge と Lambda の違いは、<strong>「司令塔（指示出し）」と「実行部隊（作業員）」</strong>の違いです。
+</p>
+<p>
+  一言で言うと、<strong>「EventBridgeは『プログラムを書かずに』行き先を振り分ける係、Lambdaは『プログラムを書いて』複雑な計算や処理をする係」</strong>です。レストランに例えて、その役割の違いを明確にしましょう。
+</p>
+
+<h2>1. レストランでの例え</h2>
+<p>
+  両者の関係は、ホールスタッフと厨房スタッフの関係に似ています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">役割分担のイメージ</div>
+  <div class="rest-container">
+    <div class="rest-box rb-waiter">
+      <div class="rb-icon">💁</div>
+      <div class="rb-role">EventBridge</div>
+      <small>ウェイター</small>
+      <div class="rb-desc">
+        注文伝票を見て<br>
+        「厨房」か「バー」か<br>
+        瞬時に振り分ける。
+      </div>
+    </div>
+    
+    <div class="rest-arrow">→</div>
+
+    <div class="rest-box rb-chef">
+      <div class="rb-icon">👨‍🍳</div>
+      <div class="rb-role">Lambda</div>
+      <small>シェフ</small>
+      <div class="rb-desc">
+        渡された伝票を見て<br>
+        実際に調理（計算）する。<br>
+        指示がないと動かない。
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>EventBridge (ウェイター):</strong> 自分で料理は作れません（コードは書けません）。その代わり、大量の注文を素早く正しい場所へ案内します。</li>
+  <li><strong>Lambda (シェフ):</strong> 注文を取りには行きません（トリガー待ち）。その代わり、手の込んだ複雑な処理（調理）ができます。</li>
+</ul>
+
+<h2>2. 技術的な「できること」の違い</h2>
+<p>
+  エンジニア視点で見ると、以下のような決定的な違いがあります。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon EventBridge</th>
+      <th>AWS Lambda</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>主な仕事</th>
+      <td><strong>ルーティング</strong> (振り分け)</td>
+      <td><strong>コンピューティング</strong> (計算)</td>
+    </tr>
+    <tr>
+      <th>使うもの</th>
+      <td>ルール (JSON形式のフィルタ)</td>
+      <td>コード (Python, Node.jsなど)</td>
+    </tr>
+    <tr>
+      <th>複雑さ</th>
+      <td>単純な条件分岐のみ<br><small>「Aが来たらBへ送る」</small></td>
+      <td>無限大<br><small>「画像を加工してDB保存…」</small></td>
+    </tr>
+    <tr>
+      <th>時間</th>
+      <td>一瞬 (ミリ秒)</td>
+      <td>最長15分まで稼働可能</td>
+    </tr>
+    <tr>
+      <th>関係性</th>
+      <td>トリガー (引き金)</td>
+      <td>ターゲット (弾丸)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. なぜ EventBridge が必要なの？</h2>
+<p>
+  「Lambdaの中に『もしAならBをする』ってif文を書けばいいじゃないか」と思うかもしれません。しかし、EventBridge を手前に置くことには<strong>「コスト削減」</strong>という大きなメリットがあります。
+</p>
+
+<h3>Lambdaを無駄に起こさない</h3>
+<p>
+  Lambdaは「動いた回数と時間」で課金されます。関係ないデータまで全部Lambdaに渡して、プログラムの中で「あ、これ僕の仕事じゃないや」と判断させるのは、<strong>「シェフを叩き起こして伝票を見せたら『これドリンクじゃん』と言わせてまた寝かせる」</strong>ようなもので、無駄な人件費（クラウド利用料）がかかります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">フィルタリングによる効率化</div>
+  <div class="eff-container">
+    <div class="eff-row">
+      <div class="eff-label">悪い例<br><small>(EBなし)</small></div>
+      <div class="eff-visual">
+        <span class="ev-item">🥩</span>
+        <span class="ev-item">🍺</span>
+        <span class="ev-item">🥗</span>
+        <span class="ev-arrow">全部 →</span>
+        <span class="ev-chef">Lambda (全部処理…疲弊)</span>
+      </div>
+    </div>
+    <div class="eff-row">
+      <div class="eff-label">良い例<br><small>(EBあり)</small></div>
+      <div class="eff-visual">
+        <span class="ev-item">🥩</span>
+        <span class="ev-item">🍺</span>
+        <span class="ev-arrow">→</span>
+        <span class="ev-eb">EB</span>
+        <span class="ev-arrow">肉だけ →</span>
+        <span class="ev-chef">Lambda (料理に集中！)</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; text-align:center;">
+    EventBridgeが入り口で不要なデータを弾くことで、Lambdaの起動回数が減り、コストが下がります。
+  </p>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>EventBridge:</strong> 右か左か、道案内をするサービス。（中身はいじらない）</li>
+  <li><strong>Lambda:</strong> 汗をかいて作業をするサービス。（中身を加工する）</li>
+</ul>
+<p>
+  「Aというデータが来たらBを動かしたい」という時、<strong>「つなぐ係」がEventBridgeで、「動くBそのもの」がLambda</strong>です！
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
