@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-wavelength-explanation",
+    "category": "awscp",
+    "timestamp": "2026-02-03T16:36:30+09:00",
+    "title": "AWS Wavelengthの解説と活用法",
+    "summary": "AWS Wavelengthは5Gネットワーク内にAWSサーバーを配置し、超低遅延通信を実現するサービスについて解説します。エッジコンピューティングの特性や活用シナリオが理解できる内容です。",
+    "tags": [
+      "AWS",
+      "Wavelength",
+      "エッジコンピューティング",
+      "5G",
+      "低遅延"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-wavelength-explanation/"
+  },
+  {
     "id": "awscp-aws-local-zones-overview",
     "category": "awscp",
     "timestamp": "2026-02-03T16:32:43+09:00",
