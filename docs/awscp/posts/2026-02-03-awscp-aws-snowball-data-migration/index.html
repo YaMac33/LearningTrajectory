@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Snowballの概要と利点</title>
+  <meta name="description" content="AWS Snowballは大量データを物理的に移行するサービス。ネットワークが弱い場合にも最適。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Snowballの概要と利点" />
+  <meta property="og:description" content="AWS Snowballは大量データを物理的に移行するサービス。ネットワークが弱い場合にも最適。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 転送手段比較（引っ越しの例え） */
+    .compare-transport {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .transport-box {
+      flex: 1;
+      min-width: 240px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tb-internet {
+      border-color: #94a3b8;
+      border-style: dashed;
+    }
+    .tb-snowball {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .tb-icon { font-size: 2.5em; margin-bottom: 8px; }
+    .tb-title { font-weight: bold; margin-bottom: 6px; color: #1e293b; }
+    .tb-desc { font-size: 0.85em; color: #64748b; line-height: 1.4; }
+    
+    /* 2. 物理転送フロー */
+    .snow-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sf-step {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      width: 120px;
+      text-align: center;
+      position: relative;
+    }
+    .sf-icon { font-size: 1.8em; margin-bottom: 4px; display: block; }
+    .sf-label { font-size: 0.8em; font-weight: bold; color: #334155; }
+    .sf-arrow { font-size: 1.2em; color: #94a3b8; font-weight: bold; }
+    
+    .sf-snowball-device {
+      background: #e0e7ff;
+      border-color: #6366f1;
+      color: #4338ca;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .compare-transport, .snow-flow {
+        flex-direction: column;
+      }
+      .sf-arrow { transform: rotate(90deg); margin: 4px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Snowballの概要と利点</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#データ移行</span>
+            <span class="tag">#Snowball</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#試験対策</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>AWS Snowball（スノーボール）</strong> は、一言でいうと<strong>「大量のデータを、インターネットを使わずにAWSへ運ぶための『物理的な箱（ハードウェア）』」</strong>です。
+</p>
+<p>
+  Cloud Practitioner試験（CLF-C02）では、<strong>「データ移行」</strong>や<strong>「ネットワーク回線が遅い場合の解決策」</strong>として頻出のサービスです。
+</p>
+
+<h2>1. なぜ「物理的な箱」が必要なのか？</h2>
+<p>
+  通常、AWSにデータを送るときはインターネット経由でアップロードします。しかし、データ量が「数十テラバイト〜ペタバイト」になると、回線が遅すぎて何週間もかかってしまうことがあります。
+</p>
+<p>
+  そこで、「データを箱に入れて、宅急便（トラック）で送ったほうが速い！」という発想が生まれました。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">引っ越しの例え：どっちが速い？</div>
+  <div class="compare-transport">
+    <div class="transport-box tb-internet">
+      <div class="tb-icon">🚲</div>
+      <div class="tb-title">インターネット転送</div>
+      <div class="tb-desc">
+        <strong>「バイク便」</strong><br>
+        少量なら速いが、<br>家具全部を送るには何万往復も必要。
+      </div>
+    </div>
+    <div class="transport-box tb-snowball">
+      <div class="tb-icon">🚚</div>
+      <div class="tb-title">AWS Snowball</div>
+      <div class="tb-desc">
+        <strong>「引っ越しトラック」</strong><br>
+        家具（大量データ）を<br>一度にまとめて運べる。<br>
+        <strong>結果的に圧倒的に速い。</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 仕組みと利用フロー</h2>
+<p>
+  利用の流れは、Amazonで商品を注文して返品するようなプロセスに似ています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Snowballのデータ転送フロー</div>
+  <div class="snow-flow">
+    <div class="sf-step">
+      <span class="sf-icon">🏢</span>
+      <span class="sf-label">あなたの会社<br>(オンプレミス)</span>
+    </div>
+    <div class="sf-arrow">→</div>
+    <div class="sf-step sf-snowball-device">
+      <span class="sf-icon">🧳</span>
+      <span class="sf-label">Snowball<br>(データコピー)</span>
+    </div>
+    <div class="sf-arrow">→</div>
+    <div class="sf-step">
+      <span class="sf-icon">🚚</span>
+      <span class="sf-label">配送業者<br>(物理輸送)</span>
+    </div>
+    <div class="sf-arrow">→</div>
+    <div class="sf-step">
+      <span class="sf-icon">☁️</span>
+      <span class="sf-label">AWS<br>(S3へ取込)</span>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#475569; margin-top:10px;">
+    データはAWSによってAmazon S3に取り込まれ、端末は初期化されます。
+  </p>
+</div>
+
+<h2>3. 試験で問われるポイント</h2>
+<p>
+  以下のキーワードが出たら、Snowballを疑ってください。
+</p>
+<ul>
+  <li><strong>ネットワークが遅い / 不安定:</strong> ネットを使わないため、回線状況に関係なく移行できます。</li>
+  <li><strong>大量データ (TB〜PB級):</strong> テラバイト、ペタバイトクラスのデータを移行したい時。</li>
+  <li><strong>セキュリティ (暗号化):</strong> 物理的な盗難リスクに備え、データは強力に暗号化されます。端末自体も頑丈なケースに入っています。</li>
+</ul>
+
+<h2>4. 似ているサービスとの違い（ひっかけ注意）</h2>
+<p>
+  「データをAWSに移す」サービスは他にもありますが、Snowballの最大の特徴は<strong>「オフライン（物理転送）」</strong>であることです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>転送手段</th>
+      <th>おすすめの状況</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>AWS Snowball</th>
+      <td><strong>物理デバイス (配送)</strong></td>
+      <td>ネット回線が遅い、データ量が莫大(TB〜PB)。</td>
+    </tr>
+    <tr>
+      <th>AWS DataSync</th>
+      <td>インターネット / 専用線</td>
+      <td>ネット回線が高速、定期的にデータを同期したい。</td>
+    </tr>
+    <tr>
+      <th>Amazon S3 Transfer Acceleration</th>
+      <td>インターネット (AWS独自網)</td>
+      <td>海外拠点など遠くからS3へアップロードするのを速くしたい。</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>試験の合言葉:</strong><br>
+  「回線が遅い」「大量データ」「ネットを使いたくない」<br>
+  👉 <strong>迷わず AWS Snowball</strong></p>
+</blockquote>
+
+<h2>5. ファミリー紹介 (Snow Family)</h2>
+<p>
+  Snowballには、サイズ違いの兄弟がいます。
+</p>
+<ul>
+  <li><strong>Snowcone (スノーコーン):</strong> お弁当箱サイズ（小）。ドローンに積んだり、リュックに入れて運べる。数TB向け。</li>
+  <li><strong>Snowball Edge:</strong> スーツケースサイズ（中）。一番標準的。データ移行だけでなく、その場で簡単な計算（EC2実行）もできる。</li>
+  <li><strong>Snowmobile (スノーモービル):</strong> 本物の巨大トラック（特大）。エクサバイト級のデータ移行用。データセンターごと引っ越すレベル。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> 大量データを物理的にAWSへ運ぶサービス。</li>
+  <li><strong>メリット:</strong> ネットワーク回線が遅くても高速に移行できる。</li>
+  <li><strong>保存先:</strong> 主に Amazon S3 にデータが入る。</li>
+  <li><strong>キーワード:</strong> 「物理デバイス」「オフライン転送」「ペタバイト規模」</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
