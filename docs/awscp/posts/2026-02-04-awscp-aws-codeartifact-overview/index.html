@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS CodeArtifactの概要と利点</title>
+  <meta name="description" content="AWS CodeArtifactは、ソフトウェア開発で使うライブラリやパッケージを安全に保管・共有するためのフルマネージド型アーティファクトリポジトリサービスです。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS CodeArtifactの概要と利点" />
+  <meta property="og:description" content="AWS CodeArtifactは、ソフトウェア開発で使うライブラリやパッケージを安全に保管・共有するためのフルマネージド型アーティファクトリポジトリサービスです。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* CodeCommit vs CodeArtifact */
+    .metaphor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .metaphor-grid { grid-template-columns: 1fr; }
+    }
+    .metaphor-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .metaphor-card.commit {
+      border-top: 4px solid #3b82f6; /* Blue */
+      background: #eff6ff;
+    }
+    .metaphor-card.artifact {
+      border-top: 4px solid #ec4899; /* Pink */
+      background: #fdf2f8;
+    }
+    .metaphor-icon {
+      font-size: 2.5em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .metaphor-title {
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 6px;
+      display: block;
+      font-size: 1.1em;
+    }
+    .metaphor-desc {
+      font-size: 0.9em;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    
+    /* 倉庫の流れ図 */
+    .repo-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: bold;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .flow-box.public {
+      border-color: #94a3b8;
+      color: #64748b;
+      border-style: dashed;
+    }
+    .flow-box.artifact {
+      border-color: #ec4899;
+      color: #be185d;
+      background: #fff1f2;
+      box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.2);
+    }
+    .flow-box.dev {
+      border-color: #3b82f6;
+      color: #1d4ed8;
+      background: #eff6ff;
+    }
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.2em;
+    }
+    .flow-label {
+      font-size: 0.75em;
+      display: block;
+      font-weight: normal;
+      margin-top: 4px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS CodeArtifactの概要と利点</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CodeArtifact</span>
+            <span class="tag">#ソフトウェア</span>
+            <span class="tag">#パッケージ</span>
+            <span class="tag">#ライブラリ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS CodeArtifactは、ライブラリを安全に保存・共有するプライベートリポジトリです。</p>
+<hr>
+<p>
+  <strong>AWS CodeArtifact（コードアーティファクト）</strong>は、ソフトウェア開発で使う「部品（ライブラリやパッケージ）」を安全に保管・共有するための<strong>「社内専用の倉庫」</strong>です。<br>
+  一言で言うと、<strong>「あなた専用のプライベートな npm / pip / Maven リポジトリ」</strong>です。<br>
+  プログラミングをする際、インターネット上にある便利な部品（ライブラリ）をたくさん使いますよね？それを管理するためのサービスです。
+</p>
+
+<h2>1. なぜこれが必要なの？（抱えている課題）</h2>
+<p>
+  通常、開発者は <code>npm install</code> や <code>pip install</code> コマンドを使って、インターネット上の公開倉庫（パブリックリポジトリ）から部品を取ってきます。しかし、これにはリスクがあります。
+</p>
+<ul>
+  <li><strong>外部倉庫がダウンしたら？</strong>: インターネット上のサービスが止まると、開発もストップしてしまいます。</li>
+  <li><strong>部品が消されたら？</strong>: 作者がライブラリを削除してしまうと、あなたのアプリも動かなくなります（有名な「left-pad事件」など）。</li>
+  <li><strong>セキュリティ</strong>: 知らない間に、悪意のあるコードが含まれたバージョンに更新されているかもしれません。</li>
+</ul>
+
+<h2>2. CodeArtifact の役割： 「安全な中間貯蔵庫」</h2>
+<p>
+  CodeArtifact を使うと、一度インターネットから取ってきた部品を、AWS内の<strong>「自社の倉庫」</strong>にコピーして保存しておけます。<br>
+  開発者は、インターネットではなく、この CodeArtifact から部品を取ってくるように設定します。
+</p>
+
+<!-- 図解：倉庫の流れ -->
+<div class="diagram-container">
+  <div class="diagram-title">安全なデータフロー</div>
+  <div class="repo-flow">
+    <div class="flow-box public">
+      ☁️ Public Repo<br>
+      <span class="flow-label">npm / PyPI</span>
+    </div>
+    <div class="flow-arrow">➡ コピー ➡</div>
+    <div class="flow-box artifact">
+      🏢 CodeArtifact<br>
+      <span class="flow-label">自社倉庫 (安全)</span>
+    </div>
+    <div class="flow-arrow">➡ install ➡</div>
+    <div class="flow-box dev">
+      💻 Developer<br>
+      <span class="flow-label">開発者PC</span>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>止まらない</strong>: 外部のインターネットがダウンしても、手元の倉庫にあるので開発を続けられます。</li>
+  <li><strong>消えない</strong>: 誰かが外部で部品を削除しても、あなたの倉庫のコピーは残ります。</li>
+  <li><strong>安全</strong>: 社内で作った非公開のライブラリも、ここに置いてチームだけで共有できます。</li>
+</ul>
+
+<h2>3. CodeCommit との違い（混同注意！）</h2>
+<p>
+  どちらも「コード」に関係しますが、管理するものが違います。
+</p>
+
+<!-- 図解：Commit vs Artifact -->
+<div class="diagram-container">
+  <div class="diagram-title">CodeCommit vs CodeArtifact</div>
+  <div class="metaphor-grid">
+    
+    <!-- CodeCommit -->
+    <div class="metaphor-card commit">
+      <span class="metaphor-icon">📝</span>
+      <span class="metaphor-title">CodeCommit</span>
+      <span class="metaphor-desc">
+        <strong>「レシピノート」</strong><br>
+        ソースコード (テキスト)<br>
+        <code>git push</code> で保存
+      </span>
+    </div>
+
+    <!-- CodeArtifact -->
+    <div class="metaphor-card artifact">
+      <span class="metaphor-icon">🍛</span>
+      <span class="metaphor-title">CodeArtifact</span>
+      <span class="metaphor-desc">
+        <strong>「カレールー (材料)」</strong><br>
+        ビルド済みパッケージ (部品)<br>
+        <code>npm install</code> で取得
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>AWS CodeCommit</th>
+      <th>AWS CodeArtifact</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>管理するもの</strong></td>
+      <td>ソースコード (テキスト)</td>
+      <td>パッケージ / アーティファクト (部品)</td>
+    </tr>
+    <tr>
+      <td><strong>コマンド</strong></td>
+      <td><code>git push</code>, <code>git pull</code></td>
+      <td><code>npm install</code>, <code>pip install</code>, <code>mvn</code></td>
+    </tr>
+    <tr>
+      <td><strong>中身</strong></td>
+      <td>あなたが書いているプログラムそのもの</td>
+      <td>誰かが作ってまとめたライブラリ (jar, whl, tgz)</td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li><strong>CodeCommit</strong>: 「カレーの作り方（ソースコード）」を保存する場所。</li>
+  <li><strong>CodeArtifact</strong>: カレーを作るための「カレールー（ライブラリ）」を買ってきて置いておく棚。</li>
+</ul>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  試験で以下の単語が出たら CodeArtifact が正解です。
+</p>
+<ul>
+  <li>「Maven / Gradle / npm / yarn / twine / pip」 （パッケージ管理ツール）</li>
+  <li>「アーティファクトリポジトリ (Artifact repository)」</li>
+  <li>「依存関係の管理 (Dependency management)」</li>
+  <li>「プライベートなパッケージストア」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>CodeArtifact</strong>: 開発に必要な<strong>「ソフトウェア部品（パッケージ）」</strong>を保管する、社内専用の倉庫。</li>
+  <li><strong>メリット</strong>: 外部の障害に影響されず、安全にライブラリを管理・共有できる。</li>
+</ul>
+<p>
+  「Codeシリーズ」の中でも少しマニアックですが、<strong>「ライブラリの倉庫」</strong>と覚えておけばバッチリです！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
