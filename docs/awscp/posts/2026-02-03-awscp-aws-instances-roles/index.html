@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWSインスタンス役割一覧</title>
+  <meta name="description" content="Web/AP/DB層別のAWSインスタンス役割を整理。試験対策ポイントも含む。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSインスタンス役割一覧" />
+  <meta property="og:description" content="Web/AP/DB層別のAWSインスタンス役割を整理。試験対策ポイントも含む。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+      min-width: 80px;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 3層アーキテクチャ図 */
+    .arch-flow {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .arch-layer {
+      flex: 1;
+      min-width: 160px;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      position: relative;
+    }
+    /* 色分け */
+    .al-web { border-color: #3b82f6; background: #eff6ff; } /* Blue */
+    .al-ap { border-color: #f97316; background: #fff7ed; } /* Orange */
+    .al-db { border-color: #10b981; background: #ecfdf5; } /* Green */
+
+    .layer-name {
+      font-weight: bold;
+      font-size: 1em;
+      margin-bottom: 8px;
+      color: #1f2937;
+      border-bottom: 2px solid rgba(0,0,0,0.1);
+      padding-bottom: 4px;
+      width: 100%;
+      text-align: center;
+    }
+    .layer-desc {
+      font-size: 0.8em;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 12px;
+      height: 2.5em; /* 高さ揃え */
+    }
+    
+    .svc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+    }
+    .svc-item {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.85em;
+      font-weight: bold;
+      text-align: center;
+      color: #334155;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .flow-arrow {
+      align-self: center;
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .arch-flow { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); margin: 4px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSインスタンス役割一覧</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#インスタンス</span>
+            <span class="tag">#試験対策</span>
+            <span class="tag">#Web</span>
+            <span class="tag">#AP</span>
+            <span class="tag">#DB</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  システム構築の基本形である<strong>「Web層・AP層・DB層」の3層構造</strong>に対して、AWSのどのサービス（インスタンス）が使われるのかを整理します。
+</p>
+<p>
+  試験では「Webサーバーとして適切なものは？」「バッチ処理を行うAPサーバーは？」といった問われ方をするため、各層の役割と代表選手を紐づけて覚えることが重要です。
+</p>
+
+<h2>1. 3層アーキテクチャとAWSサービス</h2>
+<p>
+  典型的なWebシステムの構成と、そこに配置される主要なサービスの一覧です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">3層構造と対応サービス</div>
+  <div class="arch-flow">
+    <!-- Web層 -->
+    <div class="arch-layer al-web">
+      <div class="layer-name">Web層 (玄関)</div>
+      <div class="layer-desc">ユーザーからのアクセスを受け付け、画面を返す。</div>
+      <div class="svc-list">
+        <span class="svc-item">EC2</span>
+        <span class="svc-item">Lightsail</span>
+        <span class="svc-item">S3 (静的)</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <!-- AP層 -->
+    <div class="arch-layer al-ap">
+      <div class="layer-name">AP層 (仕事場)</div>
+      <div class="layer-desc">複雑な計算やビジネスロジックを処理する。</div>
+      <div class="svc-list">
+        <span class="svc-item">EC2</span>
+        <span class="svc-item">Lambda</span>
+        <span class="svc-item">ECS / Fargate</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <!-- DB層 -->
+    <div class="arch-layer al-db">
+      <div class="layer-name">DB層 (倉庫)</div>
+      <div class="layer-desc">データを永続的に保存・管理する。</div>
+      <div class="svc-list">
+        <span class="svc-item">RDS</span>
+        <span class="svc-item">DynamoDB</span>
+        <span class="svc-item">ElastiCache</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 各層の詳細と試験ポイント</h2>
+
+<h3>① Webサーバー層（プレゼンテーション層）</h3>
+<p>
+  ユーザーのブラウザに表示される「画面」を配信する役割です。
+</p>
+<ul>
+  <li><strong>EC2:</strong> 最も基本。ApacheやNginxをインストールしてWebサーバーにします。</li>
+  <li><strong>Lightsail:</strong> 「WordPressをすぐに立ち上げたい」といった小規模・個人利用向け。</li>
+</ul>
+
+<h3>② APサーバー層（アプリケーション層）</h3>
+<p>
+  「在庫があるか確認する」「決済処理を行う」といった、システムの頭脳となる処理を行います。
+</p>
+<ul>
+  <li><strong>EC2:</strong> JavaやPHP、Rubyなどのプログラムを動かします。</li>
+  <li><strong>Lambda:</strong> サーバー管理不要（サーバーレス）でコードを実行します。短い処理に最適。</li>
+  <li><strong>ECS / EKS / Fargate:</strong> コンテナ（Docker）を使ってアプリを動かす場合の主役です。</li>
+</ul>
+
+<h3>③ DBサーバー層（データ層）</h3>
+<p>
+  大切なデータを保存する場所です。
+</p>
+<ul>
+  <li><strong>RDS / Aurora:</strong> 顧客情報や注文履歴など、整合性が重要なデータ（RDBMS）。</li>
+  <li><strong>DynamoDB:</strong> カート情報やゲームのログなど、大量・高速なデータ（NoSQL）。</li>
+  <li><strong>ElastiCache:</strong> よく使うデータをメモリに一時保存して、表示を速くする（キャッシュ）。</li>
+</ul>
+
+<h2>3. 一覧まとめ表</h2>
+<p>
+  試験直前のチェック用リストです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>層</th>
+      <th>サービス名</th>
+      <th>役割・キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="2">Web層</th>
+      <td><strong>EC2</strong></td>
+      <td>基本の仮想サーバー。Webサーバーとして構築。</td>
+    </tr>
+    <tr>
+      <td>Lightsail</td>
+      <td>VPS。定額・簡単・小規模向け。</td>
+    </tr>
+    <tr>
+      <th rowspan="3">AP層</th>
+      <td>EC2</td>
+      <td>従来のアプリ実行基盤。</td>
+    </tr>
+    <tr>
+      <td><strong>Lambda</strong></td>
+      <td>サーバーレス。イベント駆動（トリガーで動く）。</td>
+    </tr>
+    <tr>
+      <td>Fargate</td>
+      <td>コンテナ向けサーバーレス。管理不要。</td>
+    </tr>
+    <tr>
+      <th rowspan="3">DB層</th>
+      <td><strong>RDS</strong></td>
+      <td>リレーショナルDB。管理が楽（マネージド）。</td>
+    </tr>
+    <tr>
+      <td>DynamoDB</td>
+      <td>NoSQL。キーバリュー型、高速、スケーラブル。</td>
+    </tr>
+    <tr>
+      <td>Redshift</td>
+      <td>DWH（分析用倉庫）。大量データの分析。</td>
+    </tr>
+    <tr>
+      <th>特化</th>
+      <td>SageMaker</td>
+      <td>機械学習モデルの開発・学習・推論。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<p>
+  ECサイトで例えると、以下のようになります。
+</p>
+<ul>
+  <li><strong>Web層 (EC2/Lightsail):</strong> 「商品ページ」をお客さんに見せる係。</li>
+  <li><strong>AP層 (Lambda/Fargate):</strong> 「在庫確認」や「お会計」を計算する係。</li>
+  <li><strong>DB層 (RDS/DynamoDB):</strong> 「注文台帳」や「商品リスト」を金庫に保管する係。</li>
+</ul>
+<p>
+  この「役割分担」をイメージできれば、どのサービスを選べばよいか自然と導き出せます。
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
