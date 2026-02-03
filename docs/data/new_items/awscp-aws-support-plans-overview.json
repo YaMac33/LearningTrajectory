@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-support-plans-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-03T19:36:43+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-support-plans-overview/",
+  "meta": {
+    "title": "AWSサポートプランの特長と比較",
+    "summary": "AWSのサポートプランの違いを解説し、特にベーシックプランと開発者プランの範囲を理解できます。技術的なサポートの有無や対応時間の違いを確認できます。",
+    "tags": [
+      "AWS",
+      "サポートプラン",
+      "技術サポート",
+      "開発者プラン",
+      "クラウドサポート"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "サポートプラン"
+    ]
+  }
+}
