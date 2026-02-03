@@ -1,0 +1,21 @@
+{
+  "id": "awscp-batch-processing-patch-application",
+  "category": "awscp",
+  "timestamp": "2026-02-03T19:30:10+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-batch-processing-patch-application/",
+  "meta": {
+    "title": "バッチ処理とパッチ適用の違い",
+    "summary": "バッチ処理とパッチ適用の異なる意味を理解し、文脈での識別が重要であることが提示されています。",
+    "tags": [
+      "バッチ処理",
+      "パッチ適用",
+      "AWS",
+      "用語解説",
+      "IT"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
