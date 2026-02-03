@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Detectiveの役割と機能</title>
+  <meta name="description" content="Amazon Detectiveは、セキュリティ事故の調査を自動で行う「名探偵」の役割を担います。GuardDutyとの違いや、セキュリティサービスの使い分けについて解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Detectiveの役割と機能" />
+  <meta property="og:description" content="Amazon Detectiveは、セキュリティ事故の調査を自動で行う「名探偵」の役割を担います。GuardDutyとの違いや、セキュリティサービスの使い分けについて解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 警備員 vs 名探偵 */
+    .role-compare {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+    .role-box {
+      flex: 1;
+      min-width: 260px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .role-box.guard {
+      border-color: #ef4444; /* Red */
+      background: #fef2f2;
+    }
+    .role-box.detective {
+      border-color: #3b82f6; /* Blue */
+      background: #eff6ff;
+    }
+    .role-icon {
+      font-size: 3em;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .role-name {
+      font-weight: 800;
+      font-size: 1.1em;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .role-action {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .role-box.guard .role-action { background: #ef4444; }
+    .role-box.detective .role-action { background: #3b82f6; }
+    
+    .arrow-connect {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      color: #94a3b8;
+    }
+
+    /* 4兄弟グリッド */
+    .brother-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .brother-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      text-align: center;
+    }
+    .brother-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+    .brother-title { font-weight: bold; color: #1e293b; display: block; margin-bottom: 4px; }
+    .brother-sub { font-size: 0.85em; color: #64748b; font-weight: bold; display: block; margin-bottom: 8px; }
+    .brother-desc { font-size: 0.8em; color: #334155; text-align: left; line-height: 1.4; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Detectiveの役割と機能</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#Amazon Detective</span>
+            <span class="tag">#調査</span>
+            <span class="tag">#ログ分析</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon Detectiveは、セキュリティ事故の調査を自動で行う「名探偵」の役割を担います。</p>
+<hr>
+<p>
+  <strong>Amazon Detective（ディテクティブ）</strong>は、その名の通り<strong>「名探偵」</strong>です。<br>
+  セキュリティ上の問題が起きた時に、<strong>「何が起きたのか？」「犯人はどこから来たのか？」「被害はどこまで広がったのか？」という原因究明（調査）</strong>を、グラフや図を使って助けてくれるサービスです。
+</p>
+<p>
+  一言で言うと、<strong>「大量のログを自動で分析して、犯行現場の相関図を作ってくれる『科学捜査班』」</strong>です。
+</p>
+
+<h2>1. なぜこれが必要なの？（GuardDutyとの違い）</h2>
+<p>
+  よく <strong>Amazon GuardDuty（ガードデューティ）</strong> と混同されますが、役割が完全に違います。<br>
+  「警備員が通報し、刑事が現場検証する」という流れで覚えるとスムーズです。
+</p>
+
+<!-- 図解：GuardDuty vs Detective -->
+<div class="diagram-container">
+  <div class="diagram-title">セキュリティ対応の連携プレー</div>
+  <div class="role-compare">
+    
+    <!-- GuardDuty -->
+    <div class="role-box guard">
+      <span class="role-icon">🚨</span>
+      <span class="role-name">GuardDuty</span>
+      <span class="role-action">警備員 / センサー</span>
+      <p style="font-size:0.9em; text-align:left;">
+        <strong>「あ！泥棒が入ったぞ！」</strong><br>
+        <br>
+        異常を検知してアラームを鳴らすのが仕事。<br>
+        <span style="font-size:0.85em; color:#7f1d1d;">(詳しい被害状況まではわからない)</span>
+      </p>
+    </div>
+
+    <div class="arrow-connect">➡</div>
+
+    <!-- Detective -->
+    <div class="role-box detective">
+      <span class="role-icon">🕵️‍♂️</span>
+      <span class="role-name">Detective</span>
+      <span class="role-action">刑事 / 科学捜査</span>
+      <p style="font-size:0.9em; text-align:left;">
+        <strong>「よし、証拠を集めよう」</strong><br>
+        <br>
+        アラーム後に現場へ急行。<br>
+        ログを集めて犯行ルートを特定する。<br>
+        <span style="font-size:0.85em; color:#1e3a8a;">(根本原因をグラフで可視化)</span>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. Detective のすごいところ： 「自動で相関図作成」</h2>
+<p>
+  通常、セキュリティ事故の調査は、何千行ものログ（VPCフローログやCloudTrail）を目で見て、「このIPアドレスがこの時間にここに繋いで…」と手作業でパズルを組み立てる必要があり、数日かかります。
+</p>
+<p>
+  Detectiveを有効にしておくと、これらのログを勝手に吸い上げて、機械学習で分析し、以下のような情報を<strong>「グラフ（絵）」</strong>にしてくれます。
+</p>
+<ul>
+  <li>「このインスタンスは、普段このIPとしか通信しないのに、今日は急に知らない国と大量に通信している（異常な振る舞い）」</li>
+  <li>「このマルウェアは、AサーバーからBサーバーへ感染が広がっている」</li>
+</ul>
+
+<h2>3. AWSセキュリティサービスの「4兄弟」</h2>
+<p>
+  試験では、以下の4つの使い分けが頻出です。混乱しやすいので整理しましょう。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">セキュリティ4兄弟の役割分担</div>
+  <div class="brother-grid">
+    
+    <div class="brother-card" style="border-top: 4px solid #ef4444;">
+      <span class="brother-icon">👮</span>
+      <span class="brother-title">GuardDuty</span>
+      <span class="brother-sub">警備員 (検知)</span>
+      <div class="brother-desc">
+        脅威検知、機械学習、自動。<br>
+        「何か変だ！」と気づく。
+      </div>
+    </div>
+
+    <div class="brother-card" style="border-top: 4px solid #f59e0b;">
+      <span class="brother-icon">👷</span>
+      <span class="brother-title">Inspector</span>
+      <span class="brother-sub">点検業者 (診断)</span>
+      <div class="brother-desc">
+        脆弱性診断、CVE。<br>
+        「この鍵、壊れそうですよ」と事前に直す。
+      </div>
+    </div>
+
+    <div class="brother-card" style="border-top: 4px solid #10b981;">
+      <span class="brother-icon">🏢</span>
+      <span class="brother-title">Security Hub</span>
+      <span class="brother-sub">管理センター (集約)</span>
+      <div class="brother-desc">
+        一元管理、スコア化。<br>
+        全情報をまとめて報告する。
+      </div>
+    </div>
+
+    <div class="brother-card" style="border-top: 4px solid #3b82f6;">
+      <span class="brother-icon">🕵️</span>
+      <span class="brother-title">Detective</span>
+      <span class="brother-sub">名探偵 (調査)</span>
+      <div class="brother-desc">
+        根本原因調査、可視化。<br>
+        「犯人はお前だ！」と突き止める。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  試験で以下の文脈が出たら、Amazon Detective が正解です。
+</p>
+<ul>
+  <li>「セキュリティインシデントの<strong>『根本原因』</strong>を特定したい」</li>
+  <li>「調査プロセスを効率化・可視化したい」</li>
+  <li>「VPCフローログやCloudTrailを分析して、不審な振る舞いの<strong>『グラフ』</strong>を見たい」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Amazon Detective</strong>: セキュリティ事故の<strong>「調査・原因究明」</strong>をするツール。</li>
+  <li><strong>イメージ</strong>: 散らばった証拠（ログ）をまとめて、犯人の行動を<strong>「グラフ（相関図）」</strong>にしてくれる名探偵。</li>
+</ul>
+<p>
+  「GuardDutyで見つけて、Detectiveで調べる」とセットで覚えておけば完璧です！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
