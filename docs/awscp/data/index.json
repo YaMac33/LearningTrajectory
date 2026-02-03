@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-textract-ocr-features",
+    "category": "awscp",
+    "timestamp": "2026-02-04T06:22:20+09:00",
+    "title": "Amazon Textractでの文書処理技術",
+    "summary": "Amazon Textractはスキャン文書から文字や構造を認識し、自動でデータ化するAIサービスで、高精度な手書き文字認識も可能です。試験では具体的な利用シーンを理解することが必要です。",
+    "tags": [
+      "OCR",
+      "AIサービス",
+      "文書データ化",
+      "手書き文字",
+      "機械学習"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-textract-ocr-features/"
+  },
+  {
     "id": "awscp-aws-iot-greengrass-summary",
     "category": "awscp",
     "timestamp": "2026-02-04T06:18:58+09:00",
