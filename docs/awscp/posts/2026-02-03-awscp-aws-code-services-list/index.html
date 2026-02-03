@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWSコード系サービス一覧</title>
+  <meta name="description" content="AWSのCodeシリーズ（CodeCommit, CodeBuild, CodeDeploy, CodePipeline等）の役割一覧と、CI/CD構築のポイントを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSコード系サービス一覧" />
+  <meta property="og:description" content="AWSのCodeシリーズ（CodeCommit, CodeBuild, CodeDeploy, CodePipeline等）の役割一覧と、CI/CD構築のポイントを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. CI/CDパイプライン図 */
+    .pipeline-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      padding: 20px;
+      border: 3px solid #8b5cf6; /* Pipeline Purple */
+      border-radius: 12px;
+      background: #f5f3ff;
+    }
+    .pipeline-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #8b5cf6;
+      color: white;
+      font-weight: bold;
+      padding: 2px 12px;
+      border-radius: 16px;
+      font-size: 0.9em;
+    }
+    
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 8px;
+    }
+    .flow-box {
+      flex: 1;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9em;
+      position: relative;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .fb-commit { border-color: #3b82f6; color: #1e3a8a; } /* Blue */
+    .fb-build { border-color: #f59e0b; color: #78350f; } /* Orange */
+    .fb-deploy { border-color: #10b981; color: #064e3b; } /* Green */
+
+    .fb-icon { font-size: 1.8em; margin-bottom: 4px; display: block; }
+    .fb-name { font-weight: bold; display: block; }
+    
+    .flow-arrow {
+      color: #8b5cf6;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    /* 2. サービス役割カード */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      width: 100%;
+    }
+    .svc-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .sc-icon { font-size: 2em; margin-bottom: 8px; }
+    .sc-title { font-weight: bold; color: #1f2937; margin-bottom: 4px; }
+    .sc-role { 
+      background: #f1f5f9; 
+      color: #475569; 
+      font-size: 0.8em; 
+      padding: 2px 8px; 
+      border-radius: 4px; 
+      margin-bottom: 8px; 
+      font-weight: bold;
+    }
+    .sc-desc { font-size: 0.85em; color: #64748b; line-height: 1.4; }
+    .sc-key {
+      margin-top: auto;
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 8px;
+      font-size: 0.75em;
+      color: #dc2626;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .flow-steps { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); margin: 4px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSコード系サービス一覧</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Code系</span>
+            <span class="tag">#CI/CD</span>
+            <span class="tag">#サービス一覧</span>
+            <span class="tag">#開発環境</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  AWSには、アプリケーション開発を自動化するための「Codeファミリー（Code系サービス）」が多数存在します。
+</p>
+<p>
+  これらは<strong>「CI/CD（継続的インテグレーション／継続的デリバリー）」</strong>を実現するためのツール群です。名前が似ているため、それぞれの役割と「工場の流れ」に例えたイメージで整理しましょう。
+</p>
+
+<h2>1. 全体像：CodePipelineによる自動化の流れ</h2>
+<p>
+  これらをつなぎ合わせて自動化するのが、CodePipelineの役目です。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">開発の自動化フロー (CI/CD)</div>
+  <div class="pipeline-wrapper">
+    <div class="pipeline-label">CodePipeline (司令塔)</div>
+    <div class="flow-steps">
+      <div class="flow-box fb-commit">
+        <span class="fb-icon">📦</span>
+        <span class="fb-name">CodeCommit</span>
+        <small>保存</small>
+      </div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box fb-build">
+        <span class="fb-icon">🔨</span>
+        <span class="fb-name">CodeBuild</span>
+        <small>作成・検査</small>
+      </div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box fb-deploy">
+        <span class="fb-icon">🚚</span>
+        <span class="fb-name">CodeDeploy</span>
+        <small>配布</small>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; margin-top:10px;">
+    CodePipelineが「変更があったら、ビルドして、デプロイしろ」と指示を出します。
+  </p>
+</div>
+
+<h2>2. サービス一覧と役割（試験対策カード）</h2>
+<p>
+  各サービスの役割を、工場のメタファーと試験で出るキーワードでまとめました。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Codeファミリー 役割図鑑</div>
+  <div class="cards-grid">
+    <!-- CodeCommit -->
+    <div class="svc-card">
+      <span class="sc-icon">🗄️</span>
+      <span class="sc-title">CodeCommit</span>
+      <span class="sc-role">倉庫 (Git)</span>
+      <span class="sc-desc">ソースコードを安全に保管する場所。GitHubのAWS版。</span>
+      <div class="sc-key">Key: リポジトリ / Git</div>
+    </div>
+
+    <!-- CodeBuild -->
+    <div class="svc-card">
+      <span class="sc-icon">🏭</span>
+      <span class="sc-title">CodeBuild</span>
+      <span class="sc-role">組立工場</span>
+      <span class="sc-desc">コードをコンパイルし、テストを実行して「完成品」を作る。</span>
+      <div class="sc-key">Key: ビルド / テスト</div>
+    </div>
+
+    <!-- CodeDeploy -->
+    <div class="svc-card">
+      <span class="sc-icon">🚛</span>
+      <span class="sc-title">CodeDeploy</span>
+      <span class="sc-role">配送係</span>
+      <span class="sc-desc">完成したアプリをサーバー（EC2等）に自動で配置・更新する。</span>
+      <div class="sc-key">Key: デプロイ / 自動更新</div>
+    </div>
+
+    <!-- CodePipeline -->
+    <div class="svc-card">
+      <span class="sc-icon">🚦</span>
+      <span class="sc-title">CodePipeline</span>
+      <span class="sc-role">工程管理</span>
+      <span class="sc-desc">各工程をつなぎ、全体の進捗を管理する自動化の主役。</span>
+      <div class="sc-key">Key: パイプライン / 自動化</div>
+    </div>
+
+    <!-- CodeArtifact -->
+    <div class="svc-card">
+      <span class="sc-icon">🔩</span>
+      <span class="sc-title">CodeArtifact</span>
+      <span class="sc-role">部品倉庫</span>
+      <span class="sc-desc">開発に使うライブラリ（npmやMavenパッケージ）を管理する。</span>
+      <div class="sc-key">Key: 依存関係 / パッケージ</div>
+    </div>
+
+    <!-- CodeStar -->
+    <div class="svc-card">
+      <span class="sc-icon">🍱</span>
+      <span class="sc-title">CodeStar</span>
+      <span class="sc-role">スターターキット</span>
+      <span class="sc-desc">上記サービスを一括でセットアップできるテンプレート機能。</span>
+      <div class="sc-key">Key: ひな型 / まとめて開始</div>
+    </div>
+  </div>
+</div>
+
+<h2>3. 比較一覧表</h2>
+<p>
+  試験直前の確認用リストです。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス名</th>
+      <th>主な役割 (一言で)</th>
+      <th>扱うもの</th>
+      <th>試験での見分け方</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>AWS CodeCommit</th>
+      <td>ソースコード保管庫</td>
+      <td>ソースコード</td>
+      <td><strong>Git / リポジトリ</strong></td>
+    </tr>
+    <tr>
+      <th>AWS CodeBuild</th>
+      <td>コードをビルド</td>
+      <td>コンパイル・テスト</td>
+      <td><strong>ビルド・テスト</strong></td>
+    </tr>
+    <tr>
+      <th>AWS CodeDeploy</th>
+      <td>アプリを配布</td>
+      <td>アプリケーション</td>
+      <td><strong>デプロイ</strong></td>
+    </tr>
+    <tr>
+      <th>AWS CodePipeline</th>
+      <td>一連の流れを自動化</td>
+      <td>CI/CD全体</td>
+      <td><strong>パイプライン・連携</strong></td>
+    </tr>
+    <tr>
+      <th>AWS CodeArtifact</th>
+      <td>ライブラリ管理</td>
+      <td>パッケージ</td>
+      <td><strong>依存関係・npm/Maven</strong></td>
+    </tr>
+    <tr>
+      <th>AWS CodeStar</th>
+      <td>開発環境のひな型</td>
+      <td>プロジェクト</td>
+      <td><strong>ダッシュボード・開始</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験でよく出る組み合わせパターン</h2>
+<p>
+  CLF-C02やSAA試験では、単体の機能だけでなく「組み合わせ」が問われます。
+</p>
+<blockquote>
+  <p><strong>問：</strong> 「ソースコードの変更を検知し、自動でビルドを行い、本番環境へデプロイしたい。どのサービスを組み合わせるべきか？」</p>
+  <p><strong>解：</strong> <strong>CodePipeline</strong> (全体管理) + <strong>CodeBuild</strong> (ビルド) + <strong>CodeDeploy</strong> (デプロイ)</p>
+</blockquote>
+
+<h3>ひっかけ注意 ⚠</h3>
+<ul>
+  <li>❌ 「CI/CDを実現する単体のサービスは？」<br>
+    → <strong>ありません</strong>。Pipelineを使って複数のサービスを組み合わせるのが正解です。
+  </li>
+  <li>❌ 「コードを保管するサービスは CodeDeploy である」<br>
+    → <strong>間違い</strong>。保管するのは <strong>CodeCommit</strong> です。
+  </li>
+</ul>
+
+<h2>一発暗記フレーズ</h2>
+<p>
+  <strong>「Commit（保存）して、Build（組立）して、Deploy（配布）する。それをつなぐのが Pipeline。」</strong>
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
