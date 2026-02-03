@@ -1,0 +1,21 @@
+{
+  "id": "awscp-athena-quicksight-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-03T19:27:08+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-athena-quicksight-difference/",
+  "meta": {
+    "title": "AthenaとQuickSightの使い分け解説",
+    "summary": "AthenaとQuickSightの違いを理解することで、データ分析の最適な手法を選択できるようになります。S3データを扱う際のそれぞれの特徴を解説します。",
+    "tags": [
+      "AWS",
+      "データ分析",
+      "可視化",
+      "Athena",
+      "QuickSight"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
