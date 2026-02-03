@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Outpostsの概要と利点</title>
+  <meta name="description" content="AWS Outpostsは、AWSのクラウドを自社に導入するためのサービス。低レイテンシーやデータ保持が可能。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Outpostsの概要と利点" />
+  <meta property="og:description" content="AWS Outpostsは、AWSのクラウドを自社に導入するためのサービス。低レイテンシーやデータ保持が可能。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. 出張シェフメタファー図 */
+    .chef-compare {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .chef-box {
+      flex: 1;
+      min-width: 220px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .cb-normal { border-color: #94a3b8; border-style: dashed; }
+    .cb-outposts { border-color: #10b981; background: #ecfdf5; }
+
+    .cb-icon { font-size: 2.5em; margin-bottom: 8px; display: block; }
+    .cb-title { font-weight: bold; font-size: 1.1em; color: #1e293b; margin-bottom: 8px; display: block; }
+    .cb-desc { font-size: 0.9em; color: #4b5563; line-height: 1.4; }
+    .cb-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: #fff;
+      font-size: 0.75em;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+    }
+
+    /* 2. 接続構成イメージ図 */
+    .rack-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      width: 100%;
+      max-width: 550px;
+    }
+    .region-cloud {
+      background: #eff6ff;
+      border: 2px dashed #3b82f6;
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9em;
+      color: #1d4ed8;
+      font-weight: bold;
+      z-index: 1;
+    }
+    .conn-line {
+      flex: 1;
+      height: 4px;
+      background: #cbd5e1;
+      position: relative;
+      min-width: 50px;
+    }
+    .conn-label {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75em;
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .on-premise {
+      background: #fff;
+      border: 2px solid #475569;
+      border-radius: 8px;
+      padding: 16px;
+      min-width: 200px;
+      text-align: center;
+      position: relative;
+    }
+    .op-title { font-weight: bold; color: #334155; margin-bottom: 12px; display: block; }
+    .rack-box {
+      background: #10b981;
+      color: #fff;
+      padding: 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .rack-note { font-size: 0.7em; margin-top: 4px; display: block; opacity: 0.9; }
+
+    /* 3. メリットアイコン */
+    .merit-list {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .merit-item {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      width: 140px;
+    }
+    .mi-icon { font-size: 1.8em; margin-bottom: 4px; display: block; }
+    .mi-text { font-size: 0.85em; font-weight: bold; color: #334155; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .chef-compare { flex-direction: column; }
+      .rack-diagram { flex-direction: column; gap: 20px; }
+      .conn-line { width: 4px; height: 40px; min-width: 0; }
+      .conn-label { top: 50%; left: 10px; transform: translateY(-50%); }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Outpostsの概要と利点</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#ハイブリッドクラウド</span>
+            <span class="tag">#データセンター</span>
+            <span class="tag">#低レイテンシー</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  今回は、AWSの「究極のハイブリッドクラウド」ソリューションである **AWS Outposts（アウトポスツ）** について解説します。これは、AWSのクラウドを文字通り「あなたの手元」に運んでくるサービスです。
+</p>
+
+<h2>1. AWS Outposts とは？</h2>
+<p>
+  一言で言うと、**「AWSのデータセンターにある本物のサーバーラックを、そのままあなたの会社のオフィスやデータセンターに設置するサービス」**です。
+</p>
+
+<h3>噛み砕いた解説：出張シェフ</h3>
+<p>
+  これを**「お気に入りのレストランの出張シェフ」**に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">レストラン vs Outposts</div>
+  <div class="chef-compare">
+    <div class="chef-box cb-normal">
+      <span class="cb-icon">🍽️</span>
+      <span class="cb-title">通常のAWS</span>
+      <div class="cb-desc">
+        あなたがレストラン<br>(AWSリージョン)<br>
+        へ食べに行く。
+      </div>
+    </div>
+    
+    <div class="chef-box cb-outposts">
+      <div class="cb-badge">Outposts</div>
+      <span class="cb-icon">👨‍🍳</span>
+      <span class="cb-title">出張シェフ</span>
+      <div class="cb-desc">
+        シェフ(AWSラック)が<br>
+        <strong>あなたの家(自社ビル)に来て</strong><br>
+        店と同じ味を作る。
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>通常のAWS：</strong> インターネット越しにAWSを利用します。</li>
+  <li><strong>AWS Outposts：</strong> 自社の建物内にAWSの機材（ラック）を設置します。家から出ずに（自社のネットワーク内で）、AWSと全く同じ味（操作感・ツール・API）を楽しむことができます。</li>
+</ul>
+
+<h2>2. 仕組みと配置イメージ</h2>
+<p>
+  Outpostsは完全に独立しているわけではなく、親となるAWSリージョンと常につながっています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">物理的な設置イメージ</div>
+  <div class="rack-diagram">
+    <div class="region-cloud">
+      AWS<br>リージョン<br>
+      <small>(親)</small>
+    </div>
+    <div class="conn-line">
+      <span class="conn-label">専用線/ネット</span>
+    </div>
+    <div class="on-premise">
+      <span class="op-title">🏢 あなたの会社</span>
+      <div class="rack-box">
+        AWS Outposts Rack
+        <span class="rack-note">※AWSが管理・保守</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; margin-top:10px;">
+    ハードウェアの故障対応やパッチ適用は、AWSがリモート（または現地訪問）で行います。<br>
+    あなたは「場所と電源」を提供するだけです。
+  </p>
+</div>
+
+<h2>3. なぜわざわざ「物理的なラック」を置くの？</h2>
+<p>
+  クラウドが便利なはずなのに、なぜ物理的な機材を置く必要があるのでしょうか？それには3つの大きな理由があります。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Outpostsを選ぶ3つの理由</div>
+  <div class="merit-list">
+    <div class="merit-item">
+      <span class="mi-icon">⚡</span>
+      <span class="mi-text">低レイテンシー</span>
+    </div>
+    <div class="merit-item">
+      <span class="mi-icon">🏭</span>
+      <span class="mi-text">ローカル処理</span>
+    </div>
+    <div class="merit-item">
+      <span class="mi-icon">🔒</span>
+      <span class="mi-text">データ規制</span>
+    </div>
+  </div>
+</div>
+
+<h3>① 超低レイテンシー（通信の遅延を極限まで減らす）</h3>
+<p>
+  工場のロボット制御や、1分1秒を争う金融取引など、物理的な距離によるわずかな遅延も許されない場合に、現場のすぐ横にAWSを置きます。
+</p>
+
+<h3>② ローカルでのデータ処理</h3>
+<p>
+  膨大なビデオデータなどを一度クラウドに送ると時間がかかるため、まずは現場（Outposts）で処理してから必要な分だけクラウドに送ります。
+</p>
+
+<h3>③ データレジデンシー（データの所在地の規制）</h3>
+<p>
+  「機密データは必ず国内の自社ビル内に保管しなければならない」という法律や規則がある場合、AWSの機能を使いつつ、データ自体は手元に置くことができます。
+</p>
+
+<h2>4. 試験で問われるポイント (CLF-C02)</h2>
+<ul>
+  <li><strong>キーワード：</strong> 「ハイブリッドクラウド」「オンプレミスでAWSを使いたい」「低レイテンシー」。</li>
+  <li><strong>責任共有モデルの特例：</strong>
+    <ul>
+      <li>通常、オンプレミスのハードウェア管理はユーザーの責任ですが、Outpostsは**ハードウェアの監視や保守もAWSが行います。**</li>
+      <li>物理的な故障時にはAWSの担当者が修理に来てくれます。</li>
+    </ul>
+  </li>
+  <li><strong>利用できるサービス：</strong> EC2, EBS, S3, RDS, EKS など、主要なサービスを「自分の建物の中」で動かせます。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Outposts:</strong> AWSのハードウェアを自社に設置できるサービス。</li>
+  <li><strong>メリット:</strong> AWSと同じ操作感で、超低レイテンシーやデータ保管場所の要件を満たせる。</li>
+  <li><strong>管理:</strong> ハードウェアの管理はAWSが行う（マネージド）。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
