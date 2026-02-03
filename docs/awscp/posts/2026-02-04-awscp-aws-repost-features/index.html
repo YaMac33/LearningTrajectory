@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS re:Postの特長と利便性</title>
+  <meta name="description" content="AWS re:Postは、AWSユーザー同士が助け合う無料のQ&Aコミュニティです。公式サポートとの違いや、回答が得られる仕組みについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS re:Postの特長と利便性" />
+  <meta property="og:description" content="AWS re:Postは、AWSユーザー同士が助け合う無料のQ&Aコミュニティです。公式サポートとの違いや、回答が得られる仕組みについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* コミュニティ vs サポート */
+    .community-vs-support {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .community-vs-support { grid-template-columns: 1fr; }
+    }
+    .style-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .style-card.repost {
+      border-top: 4px solid #8b5cf6; /* Purple for Community */
+      background: #f5f3ff;
+    }
+    .style-card.support {
+      border-top: 4px solid #64748b; /* Slate for Closed */
+      background: #f8fafc;
+    }
+    .style-icon {
+      font-size: 2.5em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .style-title {
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 6px;
+      display: block;
+      font-size: 1.1em;
+    }
+    .style-desc {
+      font-size: 0.9em;
+      color: #64748b;
+    }
+    
+    /* 回答者リスト */
+    .answerer-list {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .answerer-box {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .answerer-box.expert { border-color: #f59e0b; }
+    .answerer-box.staff { border-color: #ec4899; }
+    .answerer-box.auto { border-color: #3b82f6; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS re:Postの特長と利便性</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Q&A</span>
+            <span class="tag">#コミュニティ</span>
+            <span class="tag">#サポート</span>
+            <span class="tag">#無料</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS re:Postは、AWSユーザー同士が助け合う無料のQ&Aコミュニティです。</p>
+<hr>
+<p>
+  <strong>AWS re:Post（アールイーポスト）は、一言で言うと「AWS版の『知恵袋』や『Stack Overflow』」</strong>です。<br>
+  かつて存在した「AWSフォーラム」の後継として作られた、AWS公式のQ&Aコミュニティサイトです。AWSを使っていてエラーが出たり、設定方法がわからなかったりした時に、ここで質問すると、世界中の親切なユーザーやAWSのプロが答えてくれます。
+</p>
+
+<h2>1. 誰が答えてくれるの？</h2>
+<p>
+  re:Post の最大の特徴は、回答者の質の高さと多様さです。
+</p>
+
+<!-- 図解：回答者の種類 -->
+<div class="diagram-container">
+  <div class="diagram-title">助けてくれる人々</div>
+  <div class="answerer-list">
+    <div class="answerer-box expert">
+      <span>🧙‍♂️</span> コミュニティの達人
+    </div>
+    <div class="answerer-box staff">
+      <span>🏢</span> AWSの従業員
+    </div>
+    <div class="answerer-box auto">
+      <span>🔄</span> 公式サポート(連携時)
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#64748b; margin-top:10px; text-align:center;">
+    ※有料サポート契約者は、未回答の質問が自動でサポートへ転送される機能あり
+  </p>
+</div>
+
+<ul>
+  <li><strong>コミュニティの達人</strong>: AWSに詳しい一般ユーザー（あなたのような学習者から、トップエンジニアまで）。</li>
+  <li><strong>AWSの従業員</strong>: 実はAWSの中の人も参加して回答しています。</li>
+  <li><strong>公式サポートとの連携</strong>: もしあなたが「ビジネスサポート」以上の有料プランに入っている場合、re:Postで質問して誰からも回答がつかないと、自動的にAWSサポートエンジニアに転送されて回答がもらえる仕組みがあります。</li>
+</ul>
+
+<h2>2. AWS Support との違い</h2>
+<p>
+  試験では、<strong>「公式の技術サポート窓口」と「コミュニティ」</strong>の違いが問われます。<br>
+  「個室での相談」か「広場での立ち話」か、というイメージで捉えると分かりやすいです。
+</p>
+
+<!-- 図解：サポート vs コミュニティ -->
+<div class="diagram-container">
+  <div class="diagram-title">相談場所の違い</div>
+  <div class="community-vs-support">
+    
+    <!-- AWS Support -->
+    <div class="style-card support">
+      <span class="style-icon">🔒</span>
+      <span class="style-title">AWS Support</span>
+      <span class="style-desc">
+        <strong>「個室 (クローズド)」</strong><br>
+        1対1のチャット・メール。<br>
+        秘密は守られる。<br>
+        必ず返事が来る (SLAあり)。
+      </span>
+    </div>
+
+    <!-- re:Post -->
+    <div class="style-card repost">
+      <span class="style-icon">📢</span>
+      <span class="style-title">AWS re:Post</span>
+      <span class="style-desc">
+        <strong>「広場 (オープン)」</strong><br>
+        みんなが見ている掲示板。<br>
+        全世界に公開される。<br>
+        返事は善意次第 (保証なし)。
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS Support (技術サポート)</th>
+      <th>AWS re:Post</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>形式</strong></td>
+      <td>1対1 のチャットやメール</td>
+      <td>みんなが見れる 掲示板 (Q&A)</td>
+    </tr>
+    <tr>
+      <td><strong>回答者</strong></td>
+      <td>AWSエンジニアのみ</td>
+      <td>誰でも (ユーザー、AWS社員など)</td>
+    </tr>
+    <tr>
+      <td><strong>確実性</strong></td>
+      <td>SLA (品質保証) あり<br>※プランによる</td>
+      <td>保証なし (あくまで善意の回答)</td>
+    </tr>
+    <tr>
+      <td><strong>料金</strong></td>
+      <td>有料 (Developerプラン以上)</td>
+      <td>無料 (Basicプランでも使える)</td>
+    </tr>
+    <tr>
+      <td><strong>情報の公開</strong></td>
+      <td>非公開 (あなただけの秘密)</td>
+      <td>全世界に公開 (機密情報は書けない)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 試験対策キーワード</h2>
+<p>
+  試験で以下の文脈が出たら、AWS re:Post が正解です。
+</p>
+<ul>
+  <li>「AWSに関する技術的な質問を、コミュニティ主導で解決したい」</li>
+  <li>「AWSフォーラムに代わるサービス」</li>
+  <li>「無料で技術的なアドバイスを得たい（ベストエフォート）」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS re:Post</strong>: AWSユーザー同士で助け合う無料のQ&Aサイト。</li>
+  <li><strong>ポイント</strong>: ただの掲示板ではなく、AWSサポートとも裏で連携している高機能なコミュニティ。</li>
+</ul>
+<p>
+  「エラーが出たけど、有料サポートに入るお金はない…」という時に、真っ先に頼るべき場所です！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
