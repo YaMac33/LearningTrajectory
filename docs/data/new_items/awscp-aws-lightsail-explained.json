@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-lightsail-explained",
+  "category": "awscp",
+  "timestamp": "2026-02-03T17:49:31+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-lightsail-explained/",
+  "meta": {
+    "title": "AWS Lightsailの魅力を学ぶ",
+    "summary": "Amazon Lightsailは初心者向けのシンプルなVPSサービスで、月額固定料金で使えるメリットを理解できる。EC2との違いについても学べる。",
+    "tags": [
+      "AWS",
+      "Lightsail",
+      "VPS",
+      "初心者向け",
+      "固定料金"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
