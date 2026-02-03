@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cloudshell-usage",
+  "category": "awscp",
+  "timestamp": "2026-02-03T23:13:40+09:00",
+  "post_path": "awscp/posts/2026-02-03-awscp-aws-cloudshell-usage/",
+  "meta": {
+    "title": "AWS CloudShellの使い方と特徴",
+    "summary": "AWS CloudShellは、ブラウザで即使用できる無料のコマンド環境で、インストール不要でAWS CLIなどのツールが利用可能です。Cloud9との使い分けを理解することで、運用に役立つスキルを習得できます。",
+    "tags": [
+      "AWS",
+      "CloudShell",
+      "コマンドライン",
+      "無料",
+      "開発環境"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
