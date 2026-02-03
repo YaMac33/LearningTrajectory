@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | CDKでのAWSインフラ構築例</title>
+  <meta name="description" content="PythonとCDKを使ったAWS環境定義の具体例と、CloudFormationとの違いを解説。IaCをプログラム言語で書くメリットとは。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CDKでのAWSインフラ構築例" />
+  <meta property="og:description" content="PythonとCDKを使ったAWS環境定義の具体例と、CloudFormationとの違いを解説。IaCをプログラム言語で書くメリットとは。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. CDKデプロイフロー図 */
+    .cdk-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 600px;
+    }
+    .flow-step {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 120px;
+    }
+    .fs-code { border-color: #3b82f6; background: #eff6ff; } /* Blue */
+    .fs-cfn { border-color: #f59e0b; background: #fffbeb; } /* Orange */
+    .fs-aws { border-color: #10b981; background: #ecfdf5; } /* Green */
+
+    .fs-icon { font-size: 2em; margin-bottom: 8px; }
+    .fs-title { font-weight: bold; font-size: 0.9em; color: #1e293b; }
+    .fs-desc { font-size: 0.75em; color: #64748b; margin-top: 4px; }
+    
+    .flow-arrow-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .arrow-text {
+      font-size: 0.7em;
+      font-family: monospace;
+      background: #1e293b;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .arrow-symbol {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    /* 2. コード量比較図 */
+    .compare-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 24px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .comp-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 120px;
+    }
+    .file-stack {
+      width: 80%;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      position: relative;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    }
+    .fs-small { height: 60px; background: #eff6ff; border-color: #3b82f6; }
+    .fs-large { height: 140px; background: #fffbeb; border-color: #f59e0b; }
+    
+    .comp-label { font-weight: bold; font-size: 0.9em; color: #334155; }
+    .comp-sub { font-size: 0.75em; color: #64748b; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .cdk-flow { flex-direction: column; }
+      .arrow-symbol { transform: rotate(90deg); margin: 4px 0; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CDKでのAWSインフラ構築例</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CDK</span>
+            <span class="tag">#Infrastructure as Code</span>
+            <span class="tag">#Python</span>
+            <span class="tag">#CloudFormation</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>AWS CDK (Cloud Development Kit)</strong> を使って、CloudFormationと同じ構成（VPC + EC2 + S3）をPythonコードで書いた場合の具体例を紹介します。
+</p>
+<p>
+  CloudFormationが「静的な設定ファイル（YAML）」を書くのに対し、CDKは<strong>「プログラミング言語（PythonやTypeScript）」を使って、ロジカルにインフラを定義できる</strong>のが最大の特徴です。
+</p>
+
+<h2>1. Python + CDK での記述例</h2>
+<p>
+  VPC、EC2、S3バケットの3つを作成するコードです。非常に直感的で短い記述で済みます。
+</p>
+
+<pre><code class="language-python">from aws_cdk import (
+    core,
+    aws_ec2 as ec2,
+    aws_s3 as s3
+)
+
+class MyStack(core.Stack):
+
+    def __init__(self, scope: core.Construct, id: str, **kwargs):
+        super().__init__(scope, id, **kwargs)
+        
+        # ① VPCを作成（たったこれだけでサブネット等も自動で作られる）
+        my_vpc = ec2.Vpc(
+            self, "MyVPC",
+            cidr="10.0.0.0/16"
+        )
+
+        # ② EC2インスタンスを作成
+        ec2_instance = ec2.Instance(
+            self, "MyEC2Instance",
+            instance_type=ec2.InstanceType("t2.micro"),
+            machine_image=ec2.MachineImage.latest_amazon_linux(),
+            vpc=my_vpc  # 作成したVPC変数をそのまま渡せる
+        )
+
+        # ③ S3バケットを作成
+        my_bucket = s3.Bucket(
+            self, "MyS3Bucket",
+            bucket_name="my-app-bucket",
+            removal_policy=core.RemovalPolicy.DESTROY
+        )
+
+app = core.App()
+MyStack(app, "MyInfraStack")
+app.synth()</code></pre>
+
+<h2>2. 仕組み：CDKはCloudFormationを生成する</h2>
+<p>
+  CDKは、実は直接AWSリソースを作っているわけではありません。裏側で<strong>「CloudFormationテンプレートを生成（合成）」</strong>しています。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">CDKのデプロイフロー</div>
+  <div class="cdk-flow">
+    <div class="flow-step fs-code">
+      <span class="fs-icon">🐍</span>
+      <span class="fs-title">App Code</span>
+      <span class="fs-desc">Python / TS</span>
+    </div>
+    
+    <div class="flow-arrow-container">
+      <span class="arrow-text">cdk synth</span>
+      <span class="arrow-symbol">➡</span>
+    </div>
+
+    <div class="flow-step fs-cfn">
+      <span class="fs-icon">📄</span>
+      <span class="fs-title">Template</span>
+      <span class="fs-desc">CloudFormation<br>(JSON/YAML)</span>
+    </div>
+
+    <div class="flow-arrow-container">
+      <span class="arrow-text">cdk deploy</span>
+      <span class="arrow-symbol">➡</span>
+    </div>
+
+    <div class="flow-step fs-aws">
+      <span class="fs-icon">☁️</span>
+      <span class="fs-title">AWS Cloud</span>
+      <span class="fs-desc">リソース作成</span>
+    </div>
+  </div>
+</div>
+
+<h3>なぜCDKが人気なのか？（記述量の差）</h3>
+<p>
+  CDKには「L2コンストラクト」と呼ばれる<strong>「気の利いたデフォルト設定」</strong>が大量に含まれています。
+</p>
+<ul>
+  <li><strong>CloudFormation (YAML):</strong> VPCを作るだけで、サブネット、ルートテーブル、ゲートウェイなど数十行の定義が必要。</li>
+  <li><strong>CDK (Python):</strong> <code>ec2.Vpc(...)</code> の1行書くだけで、推奨構成のネットワーク一式が自動展開されます。</li>
+</ul>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">コード記述量のイメージ比較</div>
+  <div class="compare-container">
+    <div class="comp-box">
+      <div class="file-stack fs-small"></div>
+      <span class="comp-label">CDK</span>
+      <span class="comp-sub">20行</span>
+    </div>
+    <div style="font-size:1.5em; color:#94a3b8; font-weight:bold;">vs</div>
+    <div class="comp-box">
+      <div class="file-stack fs-large"></div>
+      <span class="comp-label">CloudFormation</span>
+      <span class="comp-sub">200行以上</span>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; margin-top:10px;">
+    CDKで書くと、生成されるテンプレートは10倍以上の行数になることもザラです。
+  </p>
+</div>
+
+<h2>3. CloudFormation と CDK の違い</h2>
+<p>
+  どちらもIaCツールですが、アプローチが異なります。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>CloudFormation</th>
+      <th>AWS CDK</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>書き方</th>
+      <td><strong>宣言型</strong> (YAML / JSON)</td>
+      <td><strong>手続き型</strong> (Python / TS 等)</td>
+    </tr>
+    <tr>
+      <th>特徴</th>
+      <td>設定ファイルを書く感覚。<br>初心者でも読みやすい。</td>
+      <td>プログラミングそのもの。<br>ループや条件分岐が得意。</td>
+    </tr>
+    <tr>
+      <th>再利用性</th>
+      <td>低い (コピペになりがち)</td>
+      <td>高い (クラスや関数で部品化)</td>
+    </tr>
+    <tr>
+      <th>裏側の動き</th>
+      <td>そのままAWSが解釈</td>
+      <td>CFnテンプレートに変換→反映</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. CLIコマンドでの操作</h2>
+<p>
+  CDKの操作は、ターミナル（コマンドライン）から行います。
+</p>
+<ul>
+  <li><code>cdk synth</code>: コードに間違いがないか確認し、CloudFormationテンプレートを生成（合成）して表示します。</li>
+  <li><code>cdk deploy</code>: 生成したテンプレートをAWSに送信し、実際にリソースを作成します。</li>
+  <li><code>cdk destroy</code>: 作成したリソース（スタック）をきれいに削除します。</li>
+</ul>
+
+<h2>5. 実務での使い分け</h2>
+<ul>
+  <li><strong>開発チーム主導ならCDK:</strong> アプリ開発者が、使い慣れた言語（PythonやTypeScript）でインフラも一緒に書きたい場合。</li>
+  <li><strong>厳密な管理ならCloudFormation:</strong> 生成されるリソースを1つ1つ完全に把握・制御したい場合や、プログラミング環境のセットアップが難しい場合。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>CDK = プログラムで書くIaC。</strong></li>
+  <li><strong>仕組み:</strong> Pythonなどのコードから、CloudFormationテンプレートを自動生成してデプロイする。</li>
+  <li><strong>メリット:</strong> 少ないコードで大量のリソースを定義でき、ループや条件分岐も自由自在。</li>
+</ul>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
