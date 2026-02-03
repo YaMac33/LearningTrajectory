@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-outposts-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-03T16:27:06+09:00",
+    "title": "AWS Outpostsの概要と利点",
+    "summary": "AWS Outpostsは、企業が自社にAWSのハードウェアを設置し、低レイテンシーでデータ処理を可能にするサービスです。ハイブリッドクラウド環境での運用やデータ規制に対応できる点が理解できます。",
+    "tags": [
+      "AWS",
+      "ハイブリッドクラウド",
+      "データセンター",
+      "低レイテンシー",
+      "EC2",
+      "EBS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-03-awscp-aws-outposts-overview/"
+  },
+  {
     "id": "awscp-iam-credential-report-importance",
     "category": "awscp",
     "timestamp": "2026-02-03T16:24:14+09:00",
