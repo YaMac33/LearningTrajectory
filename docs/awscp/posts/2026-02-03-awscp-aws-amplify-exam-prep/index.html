@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META -->
+  <title>Learning Trajectory | AWS Amplifyの基礎と試験対策</title>
+  <meta name="description" content="AWS Amplifyは、フロントエンドアプリを簡単に作成・公開できるサービスです。Elastic Beanstalkとの違いや試験のポイントを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Amplifyの基礎と試験対策" />
+  <meta property="og:description" content="AWS Amplifyは、フロントエンドアプリを簡単に作成・公開できるサービスです。Elastic Beanstalkとの違いや試験のポイントを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- Article Specific Styles (図解・表用) -->
+  <style>
+    /* テーブル装飾 */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th,
+    .article-content td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      line-height: 1.5;
+    }
+    .article-content th {
+      background-color: #f9fafb;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .article-content td {
+      background-color: #fff;
+    }
+
+    /* 図解エリア共通 */
+    .art-diagram {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+    }
+    .art-diagram-title {
+      font-weight: 700;
+      color: #4b5563;
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+
+    /* 1. Amplify機能マップ */
+    .amp-box {
+      border: 3px solid #f97316; /* Orange */
+      background: #fff7ed;
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .amp-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #f97316;
+      color: white;
+      font-weight: bold;
+      padding: 2px 12px;
+      border-radius: 16px;
+    }
+    .amp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .amp-item {
+      background: #fff;
+      border: 1px solid #fdba74;
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.9em;
+      color: #9a3412;
+    }
+    .amp-icon { font-size: 1.5em; margin-bottom: 4px; }
+    .amp-sub { font-size: 0.75em; color: #fb923c; margin-top: 2px; }
+
+    /* 2. モールのメタファー図 */
+    .mall-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .mall-box {
+      flex: 1;
+      min-width: 240px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+    }
+    .mb-manual { border-color: #94a3b8; border-style: dashed; }
+    .mb-amplify { border-color: #f59e0b; background: #fffbeb; }
+
+    .mb-title { font-weight: bold; font-size: 1.1em; color: #1f2937; margin-bottom: 8px; }
+    .mb-icon { font-size: 2.5em; margin-bottom: 8px; display: block; }
+    .mb-desc { font-size: 0.9em; color: #6b7280; line-height: 1.4; }
+
+    /* スマホ対応 */
+    @media (max-width: 600px) {
+      .mall-container { flex-direction: column; }
+      .article-content th { white-space: normal; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-03">
+            2026.02.03
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Amplifyの基礎と試験対策</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Amplify</span>
+            <span class="tag">#試験対策</span>
+            <span class="tag">#フロントエンド</span>
+            <span class="tag">#開発</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>
+  <strong>AWS Amplify（アンプリファイ）</strong>は、Webやモバイルアプリの開発者が、<strong>「バックエンド（裏側の仕組み）を意識せずに、フロントエンド（画面）の開発に集中できるようにするサービス」</strong>です。
+</p>
+<p>
+  CLF-C02（AWS認定クラウドプラクティショナー）試験では、**「フロントエンド開発」「モバイルアプリの構築」**といったキーワードで頻出します。
+</p>
+
+<h2>1. AWS Amplify とは？（全部入りセット）</h2>
+<p>
+  通常、Webアプリを作るには、「認証機能を作る」「APIを作る」「データベースを用意する」「公開用サーバーを立てる」…と、画面を作る以外に膨大なインフラ作業が必要です。
+</p>
+<p>
+  Amplifyは、これらを**「コマンド一つで自動生成・連携」**してくれるツールセットです。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">Amplifyパッケージの中身</div>
+  <div class="amp-box">
+    <div class="amp-label">AWS Amplify</div>
+    <div class="amp-grid">
+      <div class="amp-item">
+        <span class="amp-icon">🌐</span>
+        Hosting
+        <span class="amp-sub">Web公開</span>
+      </div>
+      <div class="amp-item">
+        <span class="amp-icon">🔐</span>
+        Auth
+        <span class="amp-sub">認証 (Cognito)</span>
+      </div>
+      <div class="amp-item">
+        <span class="amp-icon">🔌</span>
+        API
+        <span class="amp-sub">通信 (AppSync)</span>
+      </div>
+      <div class="amp-item">
+        <span class="amp-icon">💾</span>
+        Storage
+        <span class="amp-sub">保存 (S3/DDB)</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#6b7280; margin-top:10px;">
+    裏側ではCognitoやS3が動いていますが、開発者はAmplify経由で簡単に扱えます。
+  </p>
+</div>
+
+<h2>2. 例え話で理解する（ショッピングモール）</h2>
+<p>
+  アプリ開発を「お店を開くこと」に例えてみましょう。
+</p>
+
+<div class="art-diagram">
+  <div class="art-diagram-title">開発スタイルの比較</div>
+  <div class="mall-container">
+    <div class="mall-box mb-manual">
+      <div class="mb-icon">🔨</div>
+      <div class="mb-title">通常 (路面店)</div>
+      <div class="mb-desc">
+        土地探し、建物の建築、<br>
+        警備員の契約、駐車場の整備…<br>
+        <strong>本業以外の手間が膨大。</strong>
+      </div>
+    </div>
+    
+    <div class="mall-box mb-amplify">
+      <div class="mb-icon">🛍️</div>
+      <div class="mb-title">Amplify (モール)</div>
+      <div class="mb-desc">
+        テナントに入居するだけ。<br>
+        警備（認証）や設備（API）は<br>
+        <strong>最初から完備されている。</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. Elastic Beanstalk との違い（試験の鉄板）</h2>
+<p>
+  「アプリを簡単に作れる」という点で混同されやすい Elastic Beanstalk との違いを整理します。
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>AWS Amplify</th>
+      <th>Elastic Beanstalk</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>主な対象</th>
+      <td><strong>フロントエンド</strong><br><small>(Web画面, スマホアプリ)</small></td>
+      <td><strong>バックエンド</strong><br><small>(PHP, Java, Python等のロジック)</small></td>
+    </tr>
+    <tr>
+      <th>得意なこと</th>
+      <td>認証、API連携、静的ホスティング</td>
+      <td>EC2オートスケーリング、Webサーバー管理</td>
+    </tr>
+    <tr>
+      <th>キーワード</th>
+      <td>React, Vue, iOS, Android, 認証機能</td>
+      <td>Tomcat, Docker, PHP, アプリのデプロイ</td>
+    </tr>
+    <tr>
+      <th>難易度</th>
+      <td>初心者・少人数開発向け</td>
+      <td>インフラ知識が少し必要</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験で問われやすいポイント</h2>
+<p>
+  以下のキーワードが出たら Amplify が正解の可能性が高いです。
+</p>
+<ul>
+  <li><strong>「モバイルアプリケーション」:</strong> iOSやAndroidアプリのバックエンドをAWSで構築したい。</li>
+  <li><strong>「フロントエンド開発」:</strong> ReactやVue.jsで作ったサイトを最速で公開したい。</li>
+  <li><strong>「認証機能の実装」:</strong> ログイン機能を数行のコードで追加したい。</li>
+  <li><strong>「CI/CD」:</strong> Gitにプッシュしたら自動でサイトが更新されるようにしたい（Amplify Hosting）。</li>
+</ul>
+
+<h3>ひっかけ注意 ⚠</h3>
+<ul>
+  <li>❌ 「サーバーのOS設定を細かくチューニングしたい」 → Amplifyではありません（EC2やBeanstalk）。</li>
+  <li>❌ 「Dockerコンテナを管理したい」 → Amplifyではありません（ECS/Fargate）。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>役割:</strong> フロントエンド開発（Web/モバイル）のための「全部入りツールキット」。</li>
+  <li><strong>機能:</strong> ホスティング、認証、API、ストレージなどを簡単に統合。</li>
+  <li><strong>メリット:</strong> インフラ構築の時間を短縮し、アプリの中身（UI/UX）作りに集中できる。</li>
+</ul>
+<p>
+  <strong>「Amplify = フロントエンド開発の加速装置」</strong>と覚えておけばOKです！
+</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
