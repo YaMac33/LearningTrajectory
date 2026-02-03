@@ -1,11 +1,11 @@
 {
   "id": "awscp-aws-prescriptive-guidance",
   "category": "awscp",
-  "timestamp": "2026-02-03T23:18:30+09:00",
-  "post_path": "awscp/posts/2026-02-03-awscp-aws-prescriptive-guidance/",
+  "timestamp": "2026-02-04T03:21:41+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-prescriptive-guidance/",
   "meta": {
-    "title": "AWS Prescriptive Guidanceの概要と活用法",
-    "summary": "AWS Prescriptive Guidanceは、移行やモダナイゼーションの成功に向けた実証済みの戦略を提供します。具体的な手順やシナリオを理解することで、試験対策にも役立ちます。",
+    "title": "AWS Prescriptive Guidanceの概要と役割",
+    "summary": "AWSの移行やモダナイゼーションを成功させるための実証済みの攻略法について理解できる。APGは具体的な手順や戦略を提供するガイドである。",
     "tags": [
       "AWS",
       "移行",
@@ -14,8 +14,8 @@
       "戦略"
     ],
     "taxonomy": [
-      "クラウドの概念",
-      "IaaS/PaaS/SaaS"
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
     ]
   }
 }
