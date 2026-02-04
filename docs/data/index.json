@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-zone-apex-naked-domain",
+    "category": "awscp",
+    "timestamp": "2026-02-04T14:35:23+09:00",
+    "title": "Zone ApexとNaked Domainの理解",
+    "summary": "Zone ApexとNaked Domainの概念、DNSのルール及びAWS Route 53による解決策を理解します。特にCNAME設定の制限について解説します。",
+    "tags": [
+      "Zone Apex",
+      "Naked Domain",
+      "DNS",
+      "CNAME",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-zone-apex-naked-domain/"
+  },
+  {
     "id": "awscp-aws-route-53-domain-basics",
     "category": "awscp",
     "timestamp": "2026-02-04T14:31:27+09:00",
