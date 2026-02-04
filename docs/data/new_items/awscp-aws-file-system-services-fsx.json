@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-file-system-services-fsx",
+  "category": "awscp",
+  "timestamp": "2026-02-04T21:43:40+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-file-system-services-fsx/",
+  "meta": {
+    "title": "AWSファイルシステムサービスFSxの基礎",
+    "summary": "Amazon FSxはWindows向けのファイルサーバーサービスで、EFSとの使い分けなどを習得することができます。",
+    "tags": [
+      "AWS",
+      "FSx",
+      "ファイルサーバー",
+      "Windows",
+      "HPC"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
