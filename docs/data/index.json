@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-migration-service-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T21:51:41+09:00",
+    "title": "AWS Application Migration Serviceの概要",
+    "summary": "AWS MGNはサーバーを丸ごとAWSに移行するサービスであり、リフト＆シフトを簡単に実現できます。このサービスの仕組みや他のサービスとの違いを理解できます。",
+    "tags": [
+      "AWS",
+      "MGN",
+      "サーバー移行",
+      "リフト＆シフト",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-migration-service-overview/"
+  },
+  {
     "id": "awscp-aws-dms-introduction",
     "category": "awscp",
     "timestamp": "2026-02-04T21:48:40+09:00",
