@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-trainium-points",
+  "category": "awscp",
+  "timestamp": "2026-02-04T16:27:25+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-trainium-points/",
+  "meta": {
+    "title": "AWS Trainiumの特徴とメリット解説",
+    "summary": "AWS TrainiumはAI学習専用のチップで、コストを最大50%削減し、特に大規模モデル開発に適しています。Inferentiaとの違いも理解することができます。",
+    "tags": [
+      "AWS",
+      "Trainium",
+      "AI",
+      "機械学習",
+      "コスト削減"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
