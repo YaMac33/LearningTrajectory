@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Elastic Disaster Recoveryの魅力</title>
+  <meta name="description" content="低コストで迅速なシステム復旧が可能なAWS DRSの特徴と利点を解説。普段は最小限のリソースで待機し、災害時だけ本番環境を立ち上げる「賢いDR」の仕組みについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Elastic Disaster Recoveryの魅力" />
+  <meta property="og:description" content="低コストで迅速なシステム復旧が可能なAWS DRSの特徴と利点を解説。普段は最小限のリソースで待機し、災害時だけ本番環境を立ち上げる「賢いDR」の仕組みについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* コスト比較図 */
+    .cost-compare {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 30px;
+      padding-bottom: 10px;
+      height: 180px;
+    }
+    .cost-bar {
+      width: 100px;
+      border-radius: 8px 8px 0 0;
+      text-align: center;
+      color: #fff;
+      font-weight: bold;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .cost-bar.legacy {
+      height: 100%;
+      background: #94a3b8;
+    }
+    .cost-bar.drs {
+      height: 30%;
+      background: #f59e0b; /* Orange */
+    }
+    .bar-label {
+      position: absolute;
+      bottom: -30px;
+      width: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #1e293b;
+      font-size: 0.85em;
+      line-height: 1.2;
+    }
+    .bar-value {
+      font-size: 1.2em;
+    }
+
+    /* ステージングエリアの仕組み */
+    .staging-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .flow-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+      flex: 1;
+    }
+    .box-onprem { border-color: #64748b; color: #1e293b; }
+    .box-staging { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .box-recovery { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    .flow-arrow { font-size: 1.5em; color: #94a3b8; }
+    .status-badge {
+      display: inline-block;
+      font-size: 0.75em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Backup vs DRS */
+    .vs-metaphor {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .vs-metaphor { grid-template-columns: 1fr; }
+    }
+    .metaphor-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+    }
+    .metaphor-card.backup { border-top: 4px solid #64748b; }
+    .metaphor-card.drs { border-top: 4px solid #f59e0b; }
+    .metaphor-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .metaphor-head { font-weight: bold; color: #1e293b; margin-bottom: 4px; display: block; }
+    .metaphor-text { font-size: 0.9em; color: #475569; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Elastic Disaster Recoveryの魅力</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Disaster Recovery</span>
+            <span class="tag">#低コスト</span>
+            <span class="tag">#復旧時間</span>
+            <span class="tag">#DRS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>低コストで迅速なシステム復旧が可能なAWS DRSの特徴と利点を解説します。</p>
+<hr>
+<p>
+  <strong>AWS Elastic Disaster Recovery (DRS)</strong> は、<strong>「災害が起きた時だけ、AWS上にコピー環境を立ち上げるサービス」</strong>です。<br>
+  一言で言うと、<strong>「維持費が激安な『スペアタイヤ』」</strong>です。オンプレミスのサーバーが壊れたり、データセンターが停電したりした時（災害時）に、数分でAWS上にシステムを復旧（フェイルオーバー）させることができます。
+</p>
+
+<h2>1. 従来のDR（災害対策）との違い</h2>
+<p>
+  これまでの災害対策（DR）は「お金」との戦いでした。「いつ起こるかわからない災害」のために、高いコストを払い続ける必要があったからです。
+</p>
+
+<!-- 図解：コスト比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">維持コストのイメージ比較</div>
+  <div class="cost-compare">
+    <div class="cost-bar legacy">
+      <span class="bar-value">$$$</span>
+      <span class="bar-label">
+        <strong>従来 (ホットスタンバイ)</strong><br>
+        本番と同じ全設備を<br>予備として常時稼働
+      </span>
+    </div>
+    <div class="cost-bar drs">
+      <span class="bar-value">$</span>
+      <span class="bar-label">
+        <strong>AWS DRS</strong><br>
+        普段は「データ」と<br>「極小サーバー」だけ
+      </span>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>従来の方式（ホットスタンバイなど）</strong>:
+    <ul>
+      <li>本番と同じスペックのサーバーを、予備として常に起動しておく必要があります。</li>
+      <li><strong>デメリット</strong>: 何も起きていない平和な時も、2倍の料金がかかり続けます。</li>
+    </ul>
+  </li>
+  <li><strong>AWS DRSの方式（パイロットライトの進化版）</strong>:
+    <ul>
+      <li>普段は、データを保存する「ディスク（EBS）」と、データを受け取る「極小のサーバー」しか使いません。</li>
+      <li>本番スペックのEC2は、災害が起きて「復旧ボタン」を押すまで起動しません。</li>
+      <li><strong>メリット</strong>: 平常時のコストを激安（従来の数分の一）に抑えられます。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>2. 仕組み： 「ステージングエリア」が肝</h2>
+<p>
+  このサービスの賢いところは、<strong>「ステージングエリア（準備室）」</strong>という考え方です。
+</p>
+
+<!-- 図解：ステージングエリアのフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">DRSの動作フロー</div>
+  <div class="staging-flow">
+    <!-- 平常時 -->
+    <div class="flow-row">
+      <div style="width:80px; font-size:0.8em; font-weight:bold; color:#64748b;">平常時<br>(同期)</div>
+      <div class="flow-box box-onprem">
+        🏢 オンプレミス<br>
+        <span class="status-badge">稼働中</span>
+      </div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box box-staging">
+        📦 ステージングエリア<br>
+        <span class="status-badge">軽量リソースで待機</span>
+      </div>
+    </div>
+    
+    <!-- 災害時 -->
+    <div class="flow-row">
+      <div style="width:80px; font-size:0.8em; font-weight:bold; color:#ef4444;">災害時<br>(復旧)</div>
+      <div class="flow-box" style="border:2px dashed #cbd5e1; background:#f1f5f9; color:#94a3b8;">
+        💥 ダウン
+      </div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box box-recovery">
+        🚀 AWS本番環境<br>
+        <span class="status-badge" style="background:#dcfce7; color:#166534;">自動変換・起動</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>平常時（レプリケーション）</strong>:
+    <ul>
+      <li>オンプレミスや他社のクラウドにあるサーバーに「エージェント」を入れます。</li>
+      <li>データは常にAWSの「ステージングエリア」に同期され続けます。ここは軽量・安価なリソースで動いています。</li>
+    </ul>
+  </li>
+  <li><strong>災害時（フェイルオーバー）</strong>:
+    <ul>
+      <li>あなたがAWSコンソールで「復旧」ボタンを押します。</li>
+      <li>AWS DRSが、ステージングエリアのデータを使い、自動的に本番スペックのEC2インスタンスへと変換・起動します。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>3. AWS Backup との違い（試験のポイント）</h2>
+<p>
+  「データを守る」という意味では似ていますが、<strong>「復旧スピード（RPO/RTO）」</strong>が段違いです。
+</p>
+
+<!-- 図解：アルバム vs 影武者 -->
+<div class="diagram-container">
+  <div class="diagram-title">守り方のメタファー</div>
+  <div class="vs-metaphor">
+    
+    <div class="metaphor-card backup">
+      <span class="metaphor-icon">📷</span>
+      <span class="metaphor-head">AWS Backup</span>
+      <div class="metaphor-text">
+        <strong>「アルバム (過去の記録)」</strong><br>
+        昨日の夜の状態に戻す。<br>
+        復旧には時間がかかる。
+      </div>
+    </div>
+
+    <div class="metaphor-card drs">
+      <span class="metaphor-icon">🥷</span>
+      <span class="metaphor-head">AWS DRS</span>
+      <div class="metaphor-text">
+        <strong>「影武者 (常時待機)」</strong><br>
+        今の状態を常にコピー。<br>
+        数分で入れ替われる。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS Backup</th>
+      <th>AWS Elastic Disaster Recovery (DRS)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>仕組み</strong></td>
+      <td>定期的に「写真（スナップショット）」を撮る</td>
+      <td>常にデータを「同期（レプリケーション）」し続ける</td>
+    </tr>
+    <tr>
+      <td><strong>データロス (RPO)</strong></td>
+      <td>数時間〜1日分 失うかも<br>(バックアップ時点まで戻る)</td>
+      <td><strong>数秒分</strong> しか失わない<br>(ほぼリアルタイム)</td>
+    </tr>
+    <tr>
+      <td><strong>復旧時間 (RTO)</strong></td>
+      <td>数時間 かかる<br>(データの書き戻しが必要)</td>
+      <td><strong>数分</strong> で完了<br>(すでにデータはAWSにある)</td>
+    </tr>
+    <tr>
+      <td><strong>コスト</strong></td>
+      <td>安い</td>
+      <td>Backupより高いが、DRとしては破格</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  試験で以下の要件が出たら、AWS Elastic Disaster Recovery (DRS) が正解です。
+</p>
+<ul>
+  <li>「オンプレミスのサーバーをAWSへ迅速に復旧（フェイルオーバー）させたい」</li>
+  <li>「RPO（目標復旧時点）は数秒、RTO（目標復旧時間）は数分以内にしたい」</li>
+  <li>「災害対策のコストを最小限に抑えたい（アイドル状態のインスタンスにお金を払いたくない）」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Elastic Disaster Recovery (DRS)</strong>: 低コスト・爆速復旧を実現するDRサービス。</li>
+  <li><strong>ポイント</strong>: 普段は「更地（ディスクのみ）」で待機し、災害時だけ「ビル（EC2）」を建てるから安い。</li>
+</ul>
+<p>
+  「AWS Backupじゃ復旧が間に合わない！でも常時2台動かすお金はない！」という時の切り札です。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
