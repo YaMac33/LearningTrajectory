@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-dms-introduction",
+  "category": "awscp",
+  "timestamp": "2026-02-04T21:48:40+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-dms-introduction/",
+  "meta": {
+    "title": "AWS DMSの概要とデータ移行方法",
+    "summary": "AWS DMSを活用して、データベースの移行をダウンタイムを最小限に行う方法が理解できる。SCTとの連携により異種間移行の課題も解決可能。",
+    "tags": [
+      "AWS",
+      "DMS",
+      "移行",
+      "データベース",
+      "SCT"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
