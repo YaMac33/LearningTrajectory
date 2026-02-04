@@ -1,0 +1,20 @@
+{
+  "id": "awscp-aws-route-53-domain-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-04T14:31:27+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-route-53-domain-basics/",
+  "meta": {
+    "title": "ルートドメインとサブドメインの基本",
+    "summary": "AWSにおけるルートドメインとサブドメインの役割を理解し、試験対策に活用できます。",
+    "tags": [
+      "AWS",
+      "ドメイン",
+      "Route 53",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
