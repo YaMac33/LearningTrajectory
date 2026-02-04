@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-ai-code-transformation",
+    "category": "awscp",
+    "timestamp": "2026-02-04T21:56:28+09:00",
+    "title": "AIによるコード変換の解説",
+    "summary": "Amazon Q Developer Agentを用いたコード変換機能の概要と利点について解説します。特に、レガシーコードの自動化されたアップグレードプロセスに焦点を当てます。",
+    "tags": [
+      "Amazon Q",
+      "AIツール",
+      "コード変換",
+      "レガシーコード",
+      "Javaアップグレード"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-ai-code-transformation/"
+  },
+  {
     "id": "awscp-cloud-cost-model-comparison",
     "category": "awscp",
     "timestamp": "2026-02-04T21:55:57+09:00",
