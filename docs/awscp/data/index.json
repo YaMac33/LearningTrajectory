@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-amazon-translate-features-benefits",
+    "category": "awscp",
+    "timestamp": "2026-02-04T12:46:23+09:00",
+    "title": "Amazon Translateの機能と利点",
+    "summary": "AWSの高精度な自動翻訳サービス「Amazon Translate」は、文脈理解やカスタム用語機能を通じて、試験での重要なポイントを網羅しています。",
+    "tags": [
+      "AI翻訳",
+      "解説",
+      "AWS",
+      "NMT",
+      "自動翻訳",
+      "多言語対応"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-translate-features-benefits/"
+  },
+  {
     "id": "awscp-aws-appconfig-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T12:42:30+09:00",
