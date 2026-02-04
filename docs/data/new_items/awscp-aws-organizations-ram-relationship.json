@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-organizations-ram-relationship",
+  "category": "awscp",
+  "timestamp": "2026-02-04T12:05:23+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-organizations-ram-relationship/",
+  "meta": {
+    "title": "AWS OrganizationsとRAMの関係を学ぶ",
+    "summary": "AWS OrganizationsとRAMの役割や連携について解説し、効率的なマルチアカウント管理の方法を学べます。",
+    "tags": [
+      "AWS",
+      "Organizations",
+      "RAM",
+      "クラウド",
+      "リソース管理"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
