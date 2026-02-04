@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-elemental-mediapackage-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-04T13:50:19+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-elemental-mediapackage-overview/",
+  "meta": {
+    "title": "AWS Elemental MediaPackageの概要",
+    "summary": "AWS Elemental MediaPackageは、ライブ映像を視聴者が再生できる形式に変換して配信するサービスです。試験では主に配信準備や形式の違いなどが理解できることが重要です。",
+    "tags": [
+      "AWS",
+      "MediaPackage",
+      "ライブ配信",
+      "動画配信",
+      "ストリーミング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
