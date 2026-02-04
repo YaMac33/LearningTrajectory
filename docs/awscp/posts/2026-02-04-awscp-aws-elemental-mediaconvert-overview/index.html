@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Elemental MediaConvertの概要</title>
+  <meta name="description" content="動画変換サービスMediaConvertの機能や用途、試験ポイントを解説。オンデマンド動画を多様なデバイス向けに最適化する仕組みについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Elemental MediaConvertの概要" />
+  <meta property="og:description" content="動画変換サービスMediaConvertの機能や用途、試験ポイントを解説。オンデマンド動画を多様なデバイス向けに最適化する仕組みについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 家具のメタファー */
+    .furniture-metaphor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .furniture-box {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .furniture-box.large {
+      width: 120px;
+      height: 120px;
+      border-color: #64748b;
+      background: #f1f5f9;
+    }
+    .furniture-box.process {
+      border-color: #f97316; /* Orange */
+      background: #fff7ed;
+      padding: 15px;
+      font-weight: bold;
+      color: #c2410c;
+      box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+    }
+    .output-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .furniture-box.small {
+      width: 80px;
+      height: 60px;
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .furniture-box.medium {
+      width: 100px;
+      height: 80px;
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    
+    .furniture-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+    .furniture-arrow { font-size: 1.5em; color: #94a3b8; }
+    .furniture-label { font-size: 0.8em; font-weight: bold; color: #334155; }
+
+    /* 処理フロー */
+    .convert-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+      position: relative;
+      min-width: 110px;
+    }
+    .flow-step.s3 { border-top: 4px solid #10b981; } /* S3 Green */
+    .flow-step.convert { border-top: 4px solid #f97316; } /* Convert Orange */
+    .flow-step.play { border-top: 4px solid #3b82f6; } /* Play Blue */
+    
+    .flow-icon { font-size: 1.8em; display: block; margin-bottom: 4px; }
+    .flow-text { font-size: 0.9em; font-weight: bold; color: #1e293b; }
+    .flow-sub { font-size: 0.75em; color: #64748b; display: block; margin-top: 2px; }
+
+    .check-list {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px 20px;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.95em;
+    }
+    .check-item:last-child { margin-bottom: 0; }
+    .check-mark { font-weight: bold; }
+    .mark-ok { color: #10b981; }
+    .mark-ng { color: #ef4444; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Elemental MediaConvertの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#動画変換</span>
+            <span class="tag">#MediaConvert</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#トランスコード</span>
+            <span class="tag">#配信</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>動画変換サービスMediaConvertの機能や用途、試験ポイントを解説します。</p>
+<hr>
+<p>
+  <strong>AWS Elemental MediaConvert（メディアコンバート）</strong>は、保存された動画ファイルを、配信用に自動変換してくれるサービスです。<br>
+  一言で言うと、<strong>「アップロードした動画を、スマホ・PC・テレビなどで見やすい形式に作り直してくれる『動画料理人』」</strong>です。
+</p>
+
+<h2>1. なぜこれが必要なの？（課題と解決）</h2>
+<p>
+  撮影したままの「元動画」は、そのままではインターネット配信に向いていません。
+</p>
+<ul>
+  <li><strong>ファイルが重すぎる</strong>: 4Kの高画質動画はデータ量が大きく、スマホの回線では止まってしまいます。</li>
+  <li><strong>再生できない</strong>: ファイル形式によっては、特定の端末（iPhoneや古いAndroidなど）で再生できないことがあります。</li>
+</ul>
+<p>
+  MediaConvert は、動画の形式を変えたり（MP4など）、解像度を軽くしたり（フルHDなど）、ストリーミング用の形式に変換することでこれを解決します。
+</p>
+
+<h2>2. わかりやすいイメージ：「家具のサイズ調整」</h2>
+<p>
+  動画変換（トランスコード）を「引っ越しの家具」に例えると分かりやすくなります。
+</p>
+
+<!-- 図解：家具リサイズ -->
+<div class="diagram-container">
+  <div class="diagram-title">MediaConvertの役割イメージ</div>
+  <div class="furniture-metaphor">
+    
+    <div class="furniture-box large">
+      <span class="furniture-icon">🛋️</span>
+      <span class="furniture-label">元動画<br>(巨大なソファ)</span>
+    </div>
+
+    <div class="furniture-arrow">➡</div>
+
+    <div class="furniture-box process">
+      <span class="furniture-icon">🔨</span>
+      MediaConvert<br>
+      <span style="font-size:0.8em; font-weight:normal;">リサイズ業者</span>
+    </div>
+
+    <div class="furniture-arrow">➡</div>
+
+    <div class="output-group">
+      <div class="furniture-box medium">
+        <span class="furniture-icon">🪑</span>
+        <span class="furniture-label">PC用<br>(中サイズ)</span>
+      </div>
+      <div class="furniture-box small">
+        <span class="furniture-icon">🪑</span>
+        <span class="furniture-label">スマホ用<br>(小サイズ)</span>
+      </div>
+    </div>
+
+  </div>
+  <p style="font-size:0.85em; color:#64748b; text-align:center; margin-top:10px;">
+    部屋（デバイス）の大きさに合わせて、最適なサイズに作り直してくれます。
+  </p>
+</div>
+
+<h2>3. 実務での利用フロー</h2>
+<p>
+  動画配信サービスなどでよく使われる構成です。
+</p>
+
+<!-- 図解：処理フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">動画配信の準備フロー</div>
+  <div class="convert-flow">
+    <div class="flow-step s3">
+      <span class="flow-icon">🗂️</span>
+      <span class="flow-text">Amazon S3</span>
+      <span class="flow-sub">元動画を保存</span>
+    </div>
+    
+    <div class="furniture-arrow">➡</div>
+
+    <div class="flow-step convert">
+      <span class="flow-icon">🎞️</span>
+      <span class="flow-text">MediaConvert</span>
+      <span class="flow-sub">変換処理</span>
+    </div>
+
+    <div class="furniture-arrow">➡</div>
+
+    <div class="flow-step s3">
+      <span class="flow-icon">📦</span>
+      <span class="flow-text">Amazon S3</span>
+      <span class="flow-sub">配信動画を保存</span>
+    </div>
+
+    <div class="furniture-arrow">➡</div>
+
+    <div class="flow-step play">
+      <span class="flow-icon">📱</span>
+      <span class="flow-text">デバイス</span>
+      <span class="flow-sub">Web/アプリ</span>
+    </div>
+  </div>
+</div>
+
+<ol>
+  <li><strong>保存</strong>: 撮影した高画質な動画を Amazon S3 にアップロードします。</li>
+  <li><strong>変換</strong>: MediaConvert がS3から動画を取り出し、指定された形式（スマホ用、PC用など）に変換します。</li>
+  <li><strong>配信</strong>: 変換された動画を再び S3 に保存し、そこから（またはCloudFront経由で）ユーザーに配信します。</li>
+</ol>
+
+<h2>4. 試験で問われやすいポイント（超重要）</h2>
+<p>
+  CLF-C02などの試験では、他のサービスとの混同を狙った問題が出ます。以下の○×を覚えておきましょう。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">よくある誤解と正解</div>
+  <div class="check-list">
+    <div class="check-item">
+      <span class="check-mark mark-ok">✅ 正解</span>
+      <span><strong>「動画の変換（トランスコード）」</strong>をするサービス。</span>
+    </div>
+    <div class="check-item">
+      <span class="check-mark mark-ok">✅ 正解</span>
+      <span><strong>「オンデマンド動画（録画済み）」</strong>向け。（生放送ではない）</span>
+    </div>
+    <div class="check-item">
+      <span class="check-mark mark-ng">❌ 間違い</span>
+      <span>動画を保存するサービスではない（保存は <strong>S3</strong>）。</span>
+    </div>
+    <div class="check-item">
+      <span class="check-mark mark-ng">❌ 間違い</span>
+      <span>生放送（ライブ配信）ではない（生放送は <strong>MediaLive</strong>）。</span>
+    </div>
+    <div class="check-item">
+      <span class="check-mark mark-ng">❌ 間違い</span>
+      <span>配信（CDN）ではない（配信は <strong>CloudFront</strong>）。</span>
+    </div>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>MediaConvert</strong> = 動画ファイルの変換（トランスコード）。</li>
+  <li><strong>対象</strong>: オンデマンド動画（録画済みのもの）。</li>
+  <li><strong>役割</strong>: 配信ではなく、配信のための<strong>「下準備」</strong>をする職人。</li>
+</ul>
+<p>
+  試験で「事前に録画された動画を、複数のデバイス向けに変換したい」と来たら、迷わず <strong>AWS Elemental MediaConvert</strong> を選んでください！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
