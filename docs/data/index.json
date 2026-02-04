@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-memorydb-redis-inmemory",
+    "category": "awscp",
+    "timestamp": "2026-02-04T21:33:43+09:00",
+    "title": "MemoryDBの特長とElastiCacheとの違い",
+    "summary": "MemoryDBは、高速処理を維持しつつデータを永続的に保持するインメモリデータベースです。本記事では、ElastiCacheとの違いや、試験対策に必要な知識を解説します。",
+    "tags": [
+      "MemoryDB",
+      "Redis",
+      "データベース",
+      "ElastiCache",
+      "インメモリ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-memorydb-redis-inmemory/"
+  },
+  {
     "id": "awscp-aws-inferentia-summary",
     "category": "awscp",
     "timestamp": "2026-02-04T16:30:15+09:00",
