@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-ssm-parameter-store",
+    "category": "awscp",
+    "timestamp": "2026-02-04T12:59:52+09:00",
+    "title": "AWS SSMパラメータストアの活用法",
+    "summary": "AWS SSMパラメータストアでは、設定値や機密情報を安全に管理でき、ハードコーディングのリスクを回避できます。",
+    "tags": [
+      "AWS",
+      "SSM",
+      "Parameter Store",
+      "セキュリティ",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-ssm-parameter-store/"
+  },
+  {
     "id": "awscp-aws-api-gateway-comparison",
     "category": "awscp",
     "timestamp": "2026-02-04T12:55:34+09:00",
