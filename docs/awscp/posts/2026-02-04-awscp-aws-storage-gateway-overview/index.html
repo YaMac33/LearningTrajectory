@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Storage Gatewayの概要</title>
+  <meta name="description" content="AWS Storage Gatewayは、オンプレミスとクラウドを接続するハイブリッドクラウドストレージサービスです。3つのゲートウェイタイプ（ファイル、ボリューム、テープ）の使い分けについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Storage Gatewayの概要" />
+  <meta property="og:description" content="AWS Storage Gatewayは、オンプレミスとクラウドを接続するハイブリッドクラウドストレージサービスです。3つのゲートウェイタイプ（ファイル、ボリューム、テープ）の使い分けについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* トンネルのメタファー */
+    .tunnel-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 20px 0;
+    }
+    .location-box {
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      background: #fff;
+      border: 2px solid;
+      width: 140px;
+      z-index: 2;
+    }
+    .loc-onprem { border-color: #64748b; color: #1e293b; }
+    .loc-aws { border-color: #f59e0b; color: #b45309; }
+    
+    .gateway-tunnel {
+      background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #fef3c7 100%);
+      height: 40px;
+      flex: 1;
+      max-width: 150px;
+      margin: 0 -10px;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 2px dashed #94a3b8;
+      border-bottom: 2px dashed #94a3b8;
+    }
+    .tunnel-label {
+      background: #3b82f6;
+      color: #fff;
+      font-size: 0.75em;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    /* 3つのタイプグリッド */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .type-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fff;
+      text-align: left;
+    }
+    .type-card.file { border-top: 4px solid #10b981; }   /* Green */
+    .type-card.volume { border-top: 4px solid #3b82f6; } /* Blue */
+    .type-card.tape { border-top: 4px solid #64748b; }   /* Gray */
+    
+    .type-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+    .type-icon { font-size: 1.8em; }
+    .proto-tag {
+      display: inline-block;
+      font-size: 0.75em;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    .type-desc { font-size: 0.9em; color: #475569; line-height: 1.4; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Storage Gatewayの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Storage Gateway</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#ハイブリッド</span>
+            <span class="tag">#ソリューション</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>企業のオンプレとAWSを繋ぐハイブリッドクラウドの橋渡しサービスの詳細。</p>
+<hr>
+<p>
+  <strong>AWS Storage Gateway</strong> は、一言で言うと<strong>「会社のオフィス（オンプレミス）と、AWSの倉庫（S3など）を繋ぐ『魔法のトンネル』」</strong>です。<br>
+  これは<strong>「ハイブリッドクラウド（半分オンプレ、半分クラウド）」</strong>を実現するための最も代表的なサービスです。
+</p>
+
+<h2>1. なぜこれが必要なの？（抱えている課題）</h2>
+<p>
+  企業には、「どうしても社内に置いておかなければならない古いサーバー」や「大容量のファイルサーバー」があります。しかし、ハードディスクを買い足すのは高いし、バックアップも面倒です。<br>
+  「容量無制限のクラウド（S3）を使いたいけど、社内のシステムを書き換えるのは無理…」という悩みに対し、このサービスが解決策となります。
+</p>
+
+<h2>2. Storage Gateway の解決策： 「騙して繋ぐ」</h2>
+<p>
+  Storage Gateway は、社内に<strong>「仮想のアプライアンス（ソフトウェア）」</strong>として設置します。
+</p>
+
+<!-- 図解：トンネルのイメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">ハイブリッド接続のイメージ</div>
+  <div class="tunnel-diagram">
+    <div class="location-box loc-onprem">
+      🏢 オンプレミス<br>
+      <span style="font-size:0.8em;">(普通のHDDに見える)</span>
+    </div>
+    <div class="gateway-tunnel">
+      <span class="tunnel-label">Gateway</span>
+    </div>
+    <div class="location-box loc-aws">
+      ☁️ AWS (S3)<br>
+      <span style="font-size:0.8em;">(実は無限の容量)</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:5px;">
+    プロトコル変換を行い、裏側でクラウドに転送する。
+  </p>
+</div>
+
+<ul>
+  <li><strong>社内のPCから見ると</strong>: 普通の「ファイルサーバー」や「外付けハードディスク」に見えます。いつも通りにファイルを保存します。</li>
+  <li><strong>裏側の動き</strong>: Gatewayが受け取ったデータを、裏でこっそりAWS（S3など）に転送・保存します。ユーザーはクラウドを使っている意識なく、容量無制限のストレージを使えるようになります。</li>
+</ul>
+
+<h2>3. 試験に出る「3つのタイプ」（超重要！）</h2>
+<p>
+  試験では、<strong>「プロトコル（通信の言葉）」と「用途」</strong>でどのタイプを使うか選ばされます。
+</p>
+
+<!-- 図解：3つのタイプ -->
+<div class="diagram-container">
+  <div class="diagram-title">ゲートウェイの種類と用途</div>
+  <div class="type-grid">
+    
+    <!-- S3 File Gateway -->
+    <div class="type-card file">
+      <div class="type-head">
+        <span class="type-icon">📂</span>
+        S3 File Gateway
+      </div>
+      <span class="proto-tag">NFS / SMB</span>
+      <div class="type-desc">
+        普通の<strong>ファイルサーバー</strong>として使う。<br>
+        保存したファイルは、そのままS3のオブジェクトになる。<br>
+        データ分析の前処理などに最適。
+      </div>
+    </div>
+
+    <!-- Volume Gateway -->
+    <div class="type-card volume">
+      <div class="type-head">
+        <span class="type-icon">💽</span>
+        Volume Gateway
+      </div>
+      <span class="proto-tag">iSCSI</span>
+      <div class="type-desc">
+        サーバーの<strong>外付けディスク</strong>として使う。<br>
+        データはEBSスナップショットとしてバックアップ。<br>
+        保管型(Stored)とキャッシュ型(Cached)がある。
+      </div>
+    </div>
+
+    <!-- Tape Gateway -->
+    <div class="type-card tape">
+      <div class="type-head">
+        <span class="type-icon">📼</span>
+        Tape Gateway
+      </div>
+      <span class="proto-tag">iSCSI VTL</span>
+      <div class="type-desc">
+        昔ながらの<strong>磁気テープ装置</strong>のフリをする。<br>
+        バックアップソフトから見える。<br>
+        データはGlacierへ安価に長期保存。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h3>① S3 File Gateway （ファイルゲートウェイ）</h3>
+<p>
+  社内のファイルサーバーをS3に移行したい場合に使います。ファイルとして読み書きでき、S3上でもそのまま扱えるのが特徴です。
+</p>
+
+<h3>② Volume Gateway （ボリュームゲートウェイ）</h3>
+<p>
+  サーバーのディスク容量拡張や、災害対策（DR）に使います。
+</p>
+<ul>
+  <li><strong>保管型 (Stored)</strong>: データ全部をローカルに持ち、AWSはバックアップ用。</li>
+  <li><strong>キャッシュ型 (Cached)</strong>: データの実体はS3に置き、よく使うデータだけローカルに持つ（容量節約）。</li>
+</ul>
+
+<h3>③ Tape Gateway （テープゲートウェイ）</h3>
+<p>
+  物理的なテープの管理をやめたい場合に使います。既存のバックアップソフトを変更せずに導入できます。
+</p>
+
+<h2>4. Snow Family との違い</h2>
+<p>
+  「データを運ぶ」という意味では AWS Snow Family (Snowballなど) と似ていますが、使い分けは明確です。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>接続方法</th>
+      <th>頻度</th>
+      <th>たとえ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWS Storage Gateway</strong></td>
+      <td>オンライン (ネット回線)</td>
+      <td>日常的・継続的</td>
+      <td><strong>「水道管」</strong> (常に流れている)</td>
+    </tr>
+    <tr>
+      <td><strong>AWS Snow Family</strong></td>
+      <td>オフライン (配送トラック)</td>
+      <td>一回限り (大容量)</td>
+      <td><strong>「給水車」</strong> (大量に運んでくる)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Storage Gateway</strong>: オンプレミスから、プロトコルを変換してAWSストレージを使うための橋渡し。</li>
+  <li><strong>S3 File Gateway</strong>: ファイル (SMB/NFS) として読み書きし、S3に置く。</li>
+  <li><strong>Volume Gateway</strong>: ディスク (iSCSI) として使い、バックアップする。</li>
+  <li><strong>Tape Gateway</strong>: テープ の代わりに Glacier に保存する。</li>
+</ul>
+<p>
+  「社内のサーバー容量が足りない！でもクラウド移行は大変！」という時に、「とりあえずこのゲートウェイを置いておけば、裏側は無限のS3に繋がりますよ」と提案するサービスです！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
