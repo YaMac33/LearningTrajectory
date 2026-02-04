@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Zone ApexとNaked Domainの理解</title>
+  <meta name="description" content="Zone Apex (Naked Domain) とは何か？なぜCNAMEを設定できないのか？DNSの仕組みと、AWS Route 53のエイリアスレコードによる解決策を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Zone ApexとNaked Domainの理解" />
+  <meta property="og:description" content="Zone Apex (Naked Domain) とは何か？なぜCNAMEを設定できないのか？DNSの仕組みと、AWS Route 53のエイリアスレコードによる解決策を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 木の根っこメタファー */
+    .tree-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding-top: 20px;
+    }
+    .tree-leaves {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
+    .leaf-box {
+      background: #dcfce7;
+      border: 2px solid #16a34a;
+      color: #15803d;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9em;
+      position: relative;
+    }
+    .leaf-box::after {
+      content: "";
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      width: 2px;
+      height: 12px;
+      background: #854d0e;
+    }
+    .tree-trunk {
+      background: #fef3c7;
+      border: 2px solid #854d0e;
+      color: #713f12;
+      padding: 15px 30px;
+      font-weight: 800;
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    .tree-root-label {
+      font-size: 0.8em;
+      color: #92400e;
+      margin-top: 4px;
+      display: block;
+    }
+    
+    /* 登記と貼り紙 */
+    .conflict-diagram {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    .building-box {
+      border: 4px solid #1e293b;
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 4px;
+      width: 200px;
+      text-align: center;
+      position: relative;
+    }
+    .building-title {
+      font-weight: 800;
+      margin-bottom: 15px;
+      display: block;
+      border-bottom: 2px solid #cbd5e1;
+      padding-bottom: 5px;
+    }
+    .record-plate {
+      display: block;
+      margin: 5px auto;
+      padding: 6px;
+      width: 80%;
+      font-weight: bold;
+      font-size: 0.9em;
+      border: 1px solid;
+    }
+    .plate-must {
+      background: #e0f2fe;
+      border-color: #3b82f6;
+      color: #1e40af;
+    }
+    .plate-cname {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+      position: relative;
+    }
+    .cross-mark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2em;
+      color: #ef4444;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+    .plate-alias {
+      background: #dcfce7;
+      border-color: #16a34a;
+      color: #166534;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Zone ApexとNaked Domainの理解</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Zone Apex</span>
+            <span class="tag">#Naked Domain</span>
+            <span class="tag">#DNS</span>
+            <span class="tag">#CNAME</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Zone Apexはドメインの根っこで、CNAMEは設定できないルールがあります。</p>
+<hr>
+<p>
+  <strong>「Zone Apex（ゾーンエイペックス）」</strong>または<strong>「Naked Domain（ネイキッドドメイン）」</strong>とは、一言で言うと<strong>「ドメインの根っこ（本体）」</strong>のことです。<br>
+  例でいうと、<code>www.example.com</code> ではなく、<code>example.com</code> そのもののことです。
+</p>
+<p>
+  DNSの世界には、<strong>「この根っこには、CNAMEレコード（別名設定）を使ってはいけない」</strong>という絶対的なルールがあります。なぜダメなのか、そしてAWSではどう解決するのかを解説します。
+</p>
+
+<h2>1. Zone Apex / Naked Domain とは？</h2>
+<p>
+  ドメイン名を木に例えると分かりやすいです。
+</p>
+
+<!-- 図解：木の根っこ -->
+<div class="diagram-container">
+  <div class="diagram-title">ドメインの構造</div>
+  <div class="tree-visual">
+    <div class="tree-leaves">
+      <div class="leaf-box">www</div>
+      <div class="leaf-box">api</div>
+      <div class="leaf-box">blog</div>
+    </div>
+    <div class="tree-trunk">
+      example.com
+      <span class="tree-root-label">↑ これが Zone Apex / Naked Domain</span>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>Naked（裸）</strong>: 「www」などの服（サブドメイン）を着ていない、裸の状態だから「Naked Domain」と呼ばれます。</li>
+  <li><strong>Apex（頂点/根源）</strong>: そのゾーン（管理領域）の最上位であるため「Zone Apex」と呼ばれます。</li>
+</ul>
+
+<h2>2. なぜ「根っこ」にCNAMEは置けないのか？</h2>
+<p>
+  DNSの仕様（RFC）で決まっているルールだからです。これを<strong>「本社ビルと登記」</strong>に例えてみましょう。
+</p>
+
+<!-- 図解：本社ビルと貼り紙 -->
+<div class="diagram-container">
+  <div class="diagram-title">DNSレコードの共存ルール</div>
+  <div class="conflict-diagram">
+    
+    <!-- Zone Apex (NG) -->
+    <div class="building-box">
+      <span class="building-title">🏢 本社ビル<br>(example.com)</span>
+      
+      <div class="record-plate plate-must">📜 NSレコード (必須)</div>
+      <div class="record-plate plate-must">📜 SOAレコード (必須)</div>
+      
+      <div class="record-plate plate-cname">
+        🏷️ CNAME (別名)
+        <span class="cross-mark">❌</span>
+      </div>
+      
+      <p style="font-size:0.8em; color:#ef4444; margin-top:10px;">
+        <strong>ルール違反！</strong><br>
+        「登記情報」と「移転の貼り紙」は<br>
+        同時に存在できない。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h3>理由の解説</h3>
+<ol>
+  <li><strong>Zone Apexには「必須情報」がある</strong><br>
+    ドメインの根っこには、必ず<strong>「NSレコード（管理DNSサーバーはどこか？）」と「SOAレコード（管理情報）」</strong>が存在しなければなりません。これは会社の「登記情報」のようなものです。</li>
+  <li><strong>CNAMEは「独占」したがる</strong><br>
+    CNAMEレコードは、「この名前は別名のエイリアスです（ここには実体はありません）」という宣言です。<br>
+    DNSのルール上、<strong>CNAMEを設定する場所には、他のレコード（NSやSOA含む）を一切置いてはいけない</strong>ことになっています。</li>
+  <li><strong>矛盾が発生する</strong><br>
+    「登記情報（実体）がある」のに、「ここは別名のエイリアスです（実体はない）」という貼り紙を貼ることはできません。だから、Zone ApexにCNAMEは設定できないのです。</li>
+</ol>
+
+<h2>3. AWS Route 53 の解決策：「Aliasレコード」</h2>
+<p>
+  しかし、現代のWebサイトでは「<code>example.com</code> にアクセスしたら、AWSのELB（ロードバランサー）やCloudFrontに飛ばしたい」という需要が山ほどあります。<br>
+  そこでAWS Route 53が用意した裏技が<strong>「エイリアス（Alias）レコード」</strong>です。
+</p>
+
+<!-- 図解：Aliasによる解決 -->
+<div class="diagram-container">
+  <div class="diagram-title">AliasレコードならOK</div>
+  <div class="conflict-diagram">
+    
+    <!-- Zone Apex (OK) -->
+    <div class="building-box" style="border-color:#16a34a; background:#f0fdf4;">
+      <span class="building-title" style="color:#166534;">🏢 本社ビル<br>(Route 53)</span>
+      
+      <div class="record-plate plate-must">📜 NSレコード (必須)</div>
+      <div class="record-plate plate-must">📜 SOAレコード (必須)</div>
+      
+      <div class="record-plate plate-alias">
+        ✨ Alias (Aレコード)
+      </div>
+      
+      <p style="font-size:0.8em; color:#166534; margin-top:10px;">
+        <strong>共存OK！</strong><br>
+        見た目は「Aレコード」として振る舞うため、<br>
+        ルール違反にならない。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h3>Aliasレコードの仕組み</h3>
+<ul>
+  <li>DNSの世界（外部）に対しては、普通の<strong>「Aレコード（IPアドレス）」</strong>として振る舞います。だからNSやSOAと共存してもルール違反になりません。</li>
+  <li>しかし内部的には、AWSのリソース（ELBやCloudFront）のIPアドレスの変化を自動追尾してくれます（CNAMEのような便利さ）。</li>
+  <li>さらに、Route 53内でのクエリになるため、<strong>クエリ料金が無料</strong>になる場合が多いというメリットもあります。</li>
+</ul>
+
+<h2>まとめ</h2>
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>レコードタイプ</th>
+      <th>Zone Apexへの設定</th>
+      <th>他のレコードとの共存</th>
+      <th>主な用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CNAME</strong></td>
+      <td style="color:#ef4444; font-weight:bold;">× 不可</td>
+      <td style="color:#ef4444; font-weight:bold;">× 不可</td>
+      <td>サブドメイン (wwwなど) を別名に向ける</td>
+    </tr>
+    <tr>
+      <td><strong>Alias (Route 53)</strong></td>
+      <td style="color:#16a34a; font-weight:bold;">◎ 可能</td>
+      <td style="color:#16a34a; font-weight:bold;">◎ 可能</td>
+      <td>Zone Apex を ELB/CloudFront/S3に向ける</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  試験で<strong>「<code>example.com</code>（ルートドメイン）を CloudFront に向けたい。ただしCNAMEは使用できない。どうすればいいか？」</strong>と聞かれたら、迷わず<strong>「Route 53のエイリアスレコードを使用する」</strong>と答えてください！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
