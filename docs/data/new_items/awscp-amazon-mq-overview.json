@@ -1,0 +1,22 @@
+{
+  "id": "awscp-amazon-mq-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-04T22:58:02+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-amazon-mq-overview/",
+  "meta": {
+    "title": "AWSにおけるAmazon MQの特長と利点",
+    "summary": "Amazon MQは、既存システムをAWSに移行するためのメッセージングサービスです。SQSとの違いを理解し、プログラムを書き換えずに移行できるポイントが重要です。",
+    "tags": [
+      "Amazon MQ",
+      "メッセージング",
+      "AWS",
+      "移行",
+      "ActiveMQ",
+      "RabbitMQ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
