@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-opensearch-service-review",
+    "category": "awscp",
+    "timestamp": "2026-02-04T23:01:52+09:00",
+    "title": "AWS-CP対策：Amazon OpenSearch Serviceの概要",
+    "summary": "Amazon OpenSearch Serviceは、AWSが提供するログ分析と検索のマネージドサービスで、試験ではKinesisなどと組み合わせた実用性が重要視されます。",
+    "tags": [
+      "AWS",
+      "OpenSearch",
+      "ログ分析",
+      "マネージドサービス",
+      "Kinesis"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-opensearch-service-review/"
+  },
+  {
     "id": "awscp-amazon-mq-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T22:58:02+09:00",
