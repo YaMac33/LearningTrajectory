@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Elemental MediaConnectの概要</title>
+  <meta name="description" content="AWS Elemental MediaConnectの機能と役割を解説。ライブ映像を安全・確実に転送するための「プロ向け専用回線」サービスの仕組みと用途について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Elemental MediaConnectの概要" />
+  <meta property="og:description" content="AWS Elemental MediaConnectの機能と役割を解説。ライブ映像を安全・確実に転送するための「プロ向け専用回線」サービスの仕組みと用途について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 公衆電話 vs ホットライン */
+    .line-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .line-compare { grid-template-columns: 1fr; }
+    }
+    .line-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .line-card.public {
+      border-top: 4px solid #94a3b8; /* Gray */
+      background: #f1f5f9;
+    }
+    .line-card.private {
+      border-top: 4px solid #10b981; /* Green */
+      background: #ecfdf5;
+    }
+    
+    .line-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .line-title { font-weight: 800; margin-bottom: 6px; font-size: 1.1em; display: block; color: #1e293b; }
+    .line-desc { font-size: 0.9em; color: #475569; }
+    
+    /* 転送フロー */
+    .transfer-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .transfer-box {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+      font-weight: bold;
+      min-width: 100px;
+    }
+    .transfer-box.source { border-color: #64748b; color: #334155; }
+    .transfer-box.connect { 
+      border-color: #3b82f6; 
+      background: #eff6ff; 
+      color: #1d4ed8; 
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+    }
+    .transfer-box.dest { border-color: #f97316; color: #c2410c; }
+    .transfer-arrow { color: #94a3b8; font-size: 1.5em; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Elemental MediaConnectの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#MediaConnect</span>
+            <span class="tag">#ライブ映像</span>
+            <span class="tag">#放送</span>
+            <span class="tag">#安全</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>高品質なライブ映像を安全に転送するAWSサービス。放送・業務向けで低遅延な特性を持ちます。</p>
+<hr>
+<p>
+  <strong>AWS Elemental MediaConnect（メディアコネクト）</strong>は、高品質なライブ映像を、安全に別の場所へ送るためのサービスです。<br>
+  一言で言うと、<strong>「プロ向けのライブ映像専用ネットワーク（中継回線）」</strong>です。<br>
+  テレビ放送や大規模なイベント中継など、絶対に映像を途切れさせてはいけない現場で使われます。
+</p>
+
+<h2>1. なぜこれが必要なの？（インターネット配信との違い）</h2>
+<p>
+  YouTubeなどで誰でも動画配信できる時代ですが、業務用の映像転送にはもっと厳しい要件があります。
+</p>
+<ul>
+  <li><strong>盗聴防止</strong>: 発売前の製品発表会など、第三者に覗き見されてはいけない映像があります。</li>
+  <li><strong>安定性</strong>: ネット回線が混雑して映像がカクついたり、止まったりしては放送事故になります。</li>
+</ul>
+
+<!-- 図解：公衆電話 vs ホットライン -->
+<div class="diagram-container">
+  <div class="diagram-title">通信品質のイメージ</div>
+  <div class="line-compare">
+    
+    <!-- 一般ネット -->
+    <div class="line-card public">
+      <span class="line-icon">📞</span>
+      <span class="line-title">一般の配信</span>
+      <div class="line-desc">
+        <strong>「公衆電話」</strong><br>
+        誰でも使えるが、混雑する。<br>
+        途切れたり、盗み聞きされるリスクあり。
+      </div>
+    </div>
+
+    <!-- MediaConnect -->
+    <div class="line-card private">
+      <span class="line-icon">☎️</span>
+      <span class="line-title">MediaConnect</span>
+      <div class="line-desc">
+        <strong>「専用の直通回線」</strong><br>
+        ホットライン。<br>
+        暗号化され、特定の人とだけ繋がる。<br>
+        途切れにくく、超高速。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. MediaConnect の役割とフロー</h2>
+<p>
+  スタジアム（撮影現場）から、放送局やクラウド上の編集システムへ映像を送り届ける「橋渡し」をします。
+</p>
+
+<!-- 図解：転送フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">映像の中継ルート</div>
+  <div class="transfer-flow">
+    <div class="transfer-box source">
+      🏟️ 撮影現場<br>
+      <span style="font-size:0.8em; font-weight:normal;">(カメラ・中継車)</span>
+    </div>
+    <div class="transfer-arrow">➡</div>
+    <div class="transfer-box connect">
+      🔗 MediaConnect<br>
+      <span style="font-size:0.8em; font-weight:normal;">安全な中継網</span>
+    </div>
+    <div class="transfer-arrow">➡</div>
+    <div class="transfer-box dest">
+      🏢 放送局 / AWS<br>
+      <span style="font-size:0.8em; font-weight:normal;">(編集・配信)</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    暗号化・低遅延で「素材」を確実に送り届けます。
+  </p>
+</div>
+
+<ul>
+  <li><strong>暗号化</strong>: 映像データを暗号化し、信頼できる相手にだけ届けます。</li>
+  <li><strong>分岐</strong>: 1つの映像ソースを、複数の宛先（放送局A、放送局B、クラウド編集所）へ同時に転送できます。</li>
+</ul>
+
+<h2>3. 試験で問われやすいポイント（CLF-C02）</h2>
+<p>
+  他のメディアサービスとの違いを明確にしておくことが重要です。MediaConnectは<strong>「視聴者向けではない」</strong>という点が最大のポイントです。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>役割</th>
+      <th>対象</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>MediaConnect</strong></td>
+      <td><strong>「素材」の転送</strong><br>(中継回線)</td>
+      <td>放送局、編集スタジオ、別システム</td>
+    </tr>
+    <tr>
+      <td><strong>MediaLive</strong></td>
+      <td><strong>「変換」処理</strong><br>(エンコード工場)</td>
+      <td>生放送システム</td>
+    </tr>
+    <tr>
+      <td><strong>CloudFront</strong></td>
+      <td><strong>「視聴者」への配信</strong><br>(放送網)</td>
+      <td>スマホ、PC、テレビを見ている人</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>典型的な出題パターン</h3>
+<p>
+  <strong>Q. 「放送品質のライブ映像を、安全かつ低遅延で別拠点（放送局など）に転送したい。最適なAWSサービスは？」</strong>
+</p>
+<ul>
+  <li>❌ MediaConvert（録画ファイルの変換だから違う）</li>
+  <li>❌ MediaLive（映像を変換するもので、転送が主目的ではない）</li>
+  <li>❌ CloudFront（一般視聴者への配信だから違う）</li>
+  <li><strong>✅ AWS Elemental MediaConnect（正解！）</strong></li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Elemental MediaConnect</strong>: ライブ映像の<strong>「安全な転送（中継）」</strong>サービス。</li>
+  <li><strong>キーワード</strong>: 「高品質」「低遅延」「放送・業務向け」「暗号化」。</li>
+  <li><strong>位置づけ</strong>: 視聴者に届ける前段階の、プロ同士のやり取りに使う回線。</li>
+</ul>
+<p>
+  これで、Elementalファミリーの役割分担（Convert=ファイル変換、Live=生変換、Connect=生転送）が見えてきましたね！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
