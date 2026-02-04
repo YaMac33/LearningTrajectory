@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-elemental-mediaconnect-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-04T13:46:16+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-elemental-mediaconnect-overview/",
+  "meta": {
+    "title": "AWS Elemental MediaConnectの概要",
+    "summary": "高品質なライブ映像を安全に転送するAWSサービスであり、特にプロ向けの用途において必要不可欠な機能と役割を理解できます。",
+    "tags": [
+      "AWS",
+      "MediaConnect",
+      "ライブ映像",
+      "放送",
+      "安全"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
