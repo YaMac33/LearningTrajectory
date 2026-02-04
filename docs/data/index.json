@@ -1,5 +1,28 @@
 [
   {
+    "id": "awscp-responsibility-model-security",
+    "category": "awscp",
+    "timestamp": "2026-02-04T15:03:15+09:00",
+    "title": "責任共有モデルと5つのセキュリティサービス",
+    "summary": "AWSの責任共有モデルを理解し、各サービスにおける責任分担を明確にすることで、試験対策に役立てることができる。",
+    "tags": [
+      "AWS",
+      "セキュリティ",
+      "責任共有",
+      "KMS",
+      "CloudHSM",
+      "Secrets Manager",
+      "ACM"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "責任共有モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-responsibility-model-security/"
+  },
+  {
     "id": "awscp-aws-cryptography-management",
     "category": "awscp",
     "timestamp": "2026-02-04T14:53:11+09:00",
