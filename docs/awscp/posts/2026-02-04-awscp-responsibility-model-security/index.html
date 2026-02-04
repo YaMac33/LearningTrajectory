@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 責任共有モデルと5つのセキュリティ</title>
+  <meta name="description" content="AWSの責任共有モデルを理解し、KMSなど5つのセキュリティサービス（KMS, CloudHSM, Secrets Manager, Parameter Store, ACM）における責任分担を整理して解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="責任共有モデルと5つのセキュリティ" />
+  <meta property="og:description" content="AWSの責任共有モデルを理解し、KMSなど5つのセキュリティサービス（KMS, CloudHSM, Secrets Manager, Parameter Store, ACM）における責任分担を整理して解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 責任共有モデル図 */
+    .shared-model {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .model-box {
+      padding: 15px;
+      text-align: center;
+      border: 2px solid;
+      border-radius: 8px;
+      position: relative;
+    }
+    .model-box.customer {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #1d4ed8;
+    }
+    .model-box.aws {
+      background: #fff7ed;
+      border-color: #f97316;
+      color: #c2410c;
+    }
+    .model-title {
+      font-weight: 800;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.1em;
+    }
+    .model-list {
+      text-align: left;
+      font-size: 0.85em;
+      margin: 0 auto;
+      display: inline-block;
+      list-style: disc;
+      padding-left: 20px;
+    }
+    .boundary-line {
+      text-align: center;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #64748b;
+      margin: 5px 0;
+      position: relative;
+    }
+    .boundary-line::before, .boundary-line::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background: #cbd5e1;
+    }
+    .boundary-line::before { left: 0; }
+    .boundary-line::after { right: 0; }
+
+    /* 責任の重さスケール */
+    .scale-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+    }
+    .scale-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+    .scale-bar {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .scale-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+    }
+    .scale-label {
+      font-weight: bold;
+      width: 120px;
+      font-size: 0.9em;
+      color: #1e293b;
+    }
+    .scale-desc {
+      font-size: 0.8em;
+      color: #64748b;
+      width: 80px;
+      text-align: right;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">責任共有モデルと5つのセキュリティ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#責任共有</span>
+            <span class="tag">#KMS</span>
+            <span class="tag">#CloudHSM</span>
+            <span class="tag">#Secrets Manager</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSの責任共有モデルを理解し、KMSなど5サービスでの責任範囲を整理します。</p>
+<hr>
+<p>
+  <strong>「責任共有モデル (Shared Responsibility Model)」</strong> は、AWSを利用する上での最も基本的なルールです。<br>
+  セキュリティ系のサービス（KMS, CloudHSM, Secrets Manager, Parameter Store, ACM）は、このモデルにおいて「AWSがどこまでやってくれるか」がそれぞれ異なります。ここを整理すると、試験での正答率がグッと上がります。
+</p>
+
+<h2>1. 責任共有モデルの基本図解</h2>
+<p>
+  大原則は以下の通りです。
+</p>
+
+<!-- 図解：責任共有モデル -->
+<div class="diagram-container">
+  <div class="diagram-title">責任の境界線</div>
+  <div class="shared-model">
+    
+    <div class="model-box customer">
+      <span class="model-title">利用者の責任</span>
+      IN the Cloud (クラウドの中身)
+      <ul class="model-list">
+        <li>データの中身</li>
+        <li>暗号化の設定</li>
+        <li>アクセス権限 (IAM)</li>
+      </ul>
+    </div>
+
+    <div class="boundary-line">責任分界点</div>
+
+    <div class="model-box aws">
+      <span class="model-title">AWSの責任</span>
+      OF the Cloud (クラウドそのもの)
+      <ul class="model-list">
+        <li>物理データセンター</li>
+        <li>ハードウェア / ネットワーク</li>
+        <li>ハイパーバイザー</li>
+      </ul>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    AWSは「土台」を守り、利用者はその上で扱う「データ」を守ります。
+  </p>
+</div>
+
+<h2>2. 各サービスにおける責任分担</h2>
+<p>
+  以下の5つのサービスは、<strong>「利用者が果たすべき責任（データの保護など）」を助けるための道具</strong>です。<br>
+  しかし、道具によって「手動でやる部分（自分）」と「全自動の部分（AWS）」の割合が違います。
+</p>
+
+<h3>① AWS KMS (Key Management Service)</h3>
+<ul>
+  <li><strong>AWSの責任</strong>: 鍵を作るハードウェア（HSM）の管理、物理セキュリティ。</li>
+  <li><strong>利用者の責任</strong>: 「どの鍵を使って暗号化するか」「誰に鍵を使わせるか（キーポリシー）」の設定。</li>
+  <li><strong>試験ポイント</strong>: 物理的な鍵管理はAWSに任せられます。</li>
+</ul>
+
+<h3>② AWS CloudHSM</h3>
+<ul>
+  <li><strong>AWSの責任</strong>: ハードウェアの電源が入っていること、物理的に壊れていないこと。</li>
+  <li><strong>利用者の責任</strong>: <strong>鍵の生成、保管、バックアップ、OSのユーザー管理など、ほぼ全て</strong>。</li>
+  <li><strong>試験ポイント</strong>: 「オンプレミスの専用機」を借りているのに近いため、利用者責任が非常に重くなります。</li>
+</ul>
+
+<h3>③ AWS Secrets Manager</h3>
+<ul>
+  <li><strong>AWSの責任</strong>: サービスの稼働、パスワード保存時の暗号化。</li>
+  <li><strong>利用者の責任</strong>: 「どのパスワードを保存するか」「ローテーション（変更）の頻度設定」。</li>
+  <li><strong>試験ポイント</strong>: 秘密情報の「管理方法（どう回すか）」は利用者が決めます。</li>
+</ul>
+
+<h3>④ SSM Parameter Store</h3>
+<ul>
+  <li><strong>AWSの責任</strong>: パラメータを保存するデータベースの維持。</li>
+  <li><strong>利用者の責任</strong>: 「暗号化するかどうか（SecureStringを選ぶか）」、「誰に見せるか」。</li>
+  <li><strong>試験ポイント</strong>: 暗号化を忘れて平文で保存してしまった場合、それは利用者の責任です。</li>
+</ul>
+
+<h3>⑤ AWS Certificate Manager (ACM)</h3>
+<ul>
+  <li><strong>AWSの責任</strong>: 証明書の発行システム維持、<strong>更新期限の管理と自動更新</strong>。</li>
+  <li><strong>利用者の責任</strong>: 証明書をどのロードバランサー（ELB）やCloudFrontにセットするか。</li>
+  <li><strong>試験ポイント</strong>: 証明書の「更新作業」という面倒な運用責任を、AWSが肩代わりしてくれます。</li>
+</ul>
+
+<h2>3. サービス別「利用者責任の重さ」比較</h2>
+<p>
+  試験で「運用負荷を減らしたい（＝責任をAWSに寄せたい）」のか、「統制を効かせたい（＝責任を自分で持ちたい）」のかで選び方が変わります。
+</p>
+
+<!-- 図解：責任の重さスケール -->
+<div class="diagram-container">
+  <div class="diagram-title">利用者の負担（責任）レベル</div>
+  <div class="scale-wrapper">
+    
+    <div class="scale-item">
+      <span class="scale-label">CloudHSM</span>
+      <div class="scale-bar"><div class="scale-fill" style="width: 100%;"></div></div>
+      <span class="scale-desc">激重 (ほぼ自前)</span>
+    </div>
+
+    <div class="scale-item">
+      <span class="scale-label">Secrets Manager</span>
+      <div class="scale-bar"><div class="scale-fill" style="width: 60%;"></div></div>
+      <span class="scale-desc">中 (設定必要)</span>
+    </div>
+
+    <div class="scale-item">
+      <span class="scale-label">KMS</span>
+      <div class="scale-bar"><div class="scale-fill" style="width: 40%;"></div></div>
+      <span class="scale-desc">軽め (管理委任)</span>
+    </div>
+
+    <div class="scale-item">
+      <span class="scale-label">ACM</span>
+      <div class="scale-bar"><div class="scale-fill" style="width: 20%;"></div></div>
+      <span class="scale-desc">楽 (自動更新)</span>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 試験での典型的な出題パターン</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>要件（ユーザーの要望）</th>
+      <th>正解のサービス</th>
+      <th>理由</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>「暗号鍵の管理責任をできるだけAWSに任せたい」</td>
+      <td><strong>AWS KMS</strong></td>
+      <td>物理管理や冗長化をAWSがやってくれるから。</td>
+    </tr>
+    <tr>
+      <td>「コンプライアンス要件により、鍵の管理を完全に自社で制御したい」</td>
+      <td><strong>AWS CloudHSM</strong></td>
+      <td>AWSすら鍵にアクセスできない環境を作れるから。</td>
+    </tr>
+    <tr>
+      <td>「SSL証明書の更新作業を忘れないように自動化したい」</td>
+      <td><strong>ACM</strong></td>
+      <td>更新責任をAWSにオフロードできるから。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>責任共有モデル</strong>: AWSは「クラウド自体の安全性」、利用者は「クラウド内の設定とデータ」に責任を持つ。</li>
+  <li><strong>CloudHSM</strong>: 利用者の責任範囲が最も広い（自由だが大変）。</li>
+  <li><strong>KMS / ACM</strong>: 利用者の責任範囲をAWSが肩代わりしてくれる（制約はあるが楽）。</li>
+</ul>
+<p>
+  試験では<strong>「誰が（AWSか利用者か）何をやる必要があるか？」</strong>という視点で問題文を読むと、正解が見えてきます。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
