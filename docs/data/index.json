@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-backup-advantages",
+    "category": "awscp",
+    "timestamp": "2026-02-04T21:40:23+09:00",
+    "title": "AWS Backupの利点と機能について",
+    "summary": "AWS Backupを使用することで、全サービスのバックアップを一元管理し、自動化によるミスの防止とセキュリティ強化が実現できます。",
+    "tags": [
+      "AWS Backup",
+      "バックアップ",
+      "自動化",
+      "セキュリティ",
+      "データ管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-backup-advantages/"
+  },
+  {
     "id": "awscp-aws-elastic-disaster-recovery",
     "category": "awscp",
     "timestamp": "2026-02-04T21:37:28+09:00",
