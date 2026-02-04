@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cloudhsm-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T15:29:04+09:00",
+    "title": "AWS CloudHSMの概要",
+    "summary": "AWS CloudHSMは、暗号鍵を自分専用で完全に管理できるサービスで、他者のアクセスを許さないセキュリティが特徴です。特に金融機関や政府の厳しい要件に対応可能です。",
+    "tags": [
+      "AWS",
+      "CloudHSM",
+      "暗号鍵",
+      "セキュリティ",
+      "金融"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "暗号化(KMS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-cloudhsm-overview/"
+  },
+  {
     "id": "awscp-responsibility-model-security",
     "category": "awscp",
     "timestamp": "2026-02-04T15:03:15+09:00",
