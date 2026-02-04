@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-cryptography-management",
+    "category": "awscp",
+    "timestamp": "2026-02-04T14:53:11+09:00",
+    "title": "AWSの暗号・秘密情報管理サービスの整理",
+    "summary": "AWSの暗号鍵や秘密情報を効果的に管理する各サービスの違いを理解できます。試験対策として役立つ情報も提供します。",
+    "tags": [
+      "AWS",
+      "暗号管理",
+      "Secrets Manager",
+      "KMS",
+      "ACM",
+      "CloudHSM"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-cryptography-management/"
+  },
+  {
     "id": "awscp-amazon-inspector-ecr-image-scan",
     "category": "awscp",
     "timestamp": "2026-02-04T14:42:51+09:00",
