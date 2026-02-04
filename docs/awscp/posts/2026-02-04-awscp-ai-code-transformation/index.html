@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AIによるコード変換の解説</title>
+  <meta name="description" content="Amazon Q Developer Agent for Code Transformationの概要とメリットを解説。AIがレガシーコードを分析し、自動で最新バージョンへリフォームする機能について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AIによるコード変換の解説" />
+  <meta property="og:description" content="Amazon Q Developer Agent for Code Transformationの概要とメリットを解説。AIがレガシーコードを分析し、自動で最新バージョンへリフォームする機能について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* リフォームのメタファー */
+    .reform-compare {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    .house-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+      min-width: 140px;
+    }
+    .house-old {
+      border-color: #94a3b8;
+      background: #f1f5f9;
+      color: #475569;
+    }
+    .house-new {
+      border-color: #10b981;
+      background: #ecfdf5;
+      color: #047857;
+    }
+    .house-icon {
+      font-size: 3em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .house-label {
+      font-weight: 800;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .house-desc {
+      font-size: 0.8em;
+    }
+    .reform-process {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #8b5cf6;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .reform-arrow {
+      font-size: 2em;
+      line-height: 1;
+    }
+
+    /* AIエージェントの仕事フロー */
+    .agent-workflow {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      gap: 15px;
+    }
+    .wf-icon {
+      font-size: 1.8em;
+      width: 40px;
+      text-align: center;
+    }
+    .wf-content h4 {
+      margin: 0 0 4px 0;
+      color: #1e293b;
+      font-size: 1em;
+    }
+    .wf-content p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #475569;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AIによるコード変換の解説</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Amazon Q</span>
+            <span class="tag">#AIツール</span>
+            <span class="tag">#コード変換</span>
+            <span class="tag">#レガシーコード</span>
+            <span class="tag">#Javaアップグレード</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>古いプログラムをAIが最新バージョンに自動で変換する機能について解説します。</p>
+<hr>
+<p>
+  <strong>Amazon Q Developer Agent for Code Transformation</strong>（コード・トランスフォーメーション）機能について解説します。<br>
+  これは、一言で言うと<strong>「古くなったプログラムを、AIが全自動で最新バージョンに『リフォーム（改修）』してくれる機能」</strong>です。<br>
+  現在は <strong>Amazon Q Developer</strong> という開発者支援サービスの一部として提供されています。
+</p>
+
+<h2>1. なぜこれが必要なの？（「Javaの塩漬け」問題）</h2>
+<p>
+  企業には、昔作った古いプログラム（レガシーコード）がたくさん眠っています。特に「Java 8」や「Java 11」といった古いバージョンで作られたシステムは、セキュリティ的にも古く、新しい機能も使えません。<br>
+  しかし、これを最新の「Java 17」などに書き換えるのは地獄のような作業です。
+</p>
+<ul>
+  <li><strong>手間</strong>: 何千個ものファイルを手作業で修正しないといけません。</li>
+  <li><strong>依存関係の罠</strong>: 「Aを新しくしたらBが動かなくなった」というパズルが無限に発生します。</li>
+  <li><strong>リスク</strong>: 人間が直すと、うっかりバグを生む可能性があります。</li>
+</ul>
+
+<h2>2. Code Transformation の仕事： 「AIリフォーム業者」</h2>
+<p>
+  この機能を使うと、AI（Amazon Q）が「古民家」を「最新スマートホーム」にリフォームしてくれます。
+</p>
+
+<!-- 図解：リフォームのイメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">Before / After</div>
+  <div class="reform-compare">
+    
+    <div class="house-box house-old">
+      <span class="house-icon">🏚️</span>
+      <span class="house-label">Java 8 (塩漬け)</span>
+      <span class="house-desc">
+        古い、遅い、危険。<br>
+        手作業での改修は困難。
+      </span>
+    </div>
+
+    <div class="reform-process">
+      <span class="reform-arrow">➡</span>
+      <span>Amazon Q<br>が施工</span>
+      <span class="reform-arrow">➡</span>
+    </div>
+
+    <div class="house-box house-new">
+      <span class="house-icon">🏡</span>
+      <span class="house-label">Java 17 (最新)</span>
+      <span class="house-desc">
+        高速、安全。<br>
+        自動で書き換え完了。
+      </span>
+    </div>
+
+  </div>
+</div>
+
+<h3>具体的な作業フロー</h3>
+<p>
+  人間は「アップグレードして」と指示するだけ。あとはAIエージェントが自律的に働きます。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">AIエージェントの作業工程</div>
+  <div class="agent-workflow">
+    <div class="workflow-step">
+      <span class="wf-icon">🩺</span>
+      <div class="wf-content">
+        <h4>1. 診断 (Analyze)</h4>
+        <p>コード全体を読み込み、「どこが古くて、何を直すべきか」を依存関係まで含めて分析します。</p>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <span class="wf-icon">📋</span>
+      <div class="wf-content">
+        <h4>2. 計画 (Plan)</h4>
+        <p>「このライブラリはこっちに置き換えて、この書き方はこう直そう」という改修プランを立てます。</p>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <span class="wf-icon">🔨</span>
+      <div class="wf-content">
+        <h4>3. 施工 (Transform)</h4>
+        <p>実際にコードを書き換えます。ここが凄いです。人間がやるような修正をAIが高速で行います。</p>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <span class="wf-icon">✅</span>
+      <div class="wf-content">
+        <h4>4. 確認 (Verify)</h4>
+        <p>ビルド（組み立て）して、ちゃんと動くかテストします。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. 具体的に何ができるの？</h2>
+<p>
+  現時点（2024年以降）での主な用途は以下の通りです。
+</p>
+<ul>
+  <li><strong>Javaのアップグレード</strong>:
+    <ul>
+      <li>Java 8 や 11 のコードを \to <strong>Java 17</strong> に変換。</li>
+      <li>最も需要が高く、効果が大きいユースケースです。</li>
+    </ul>
+  </li>
+  <li><strong>WindowsからLinuxへの移行</strong>:
+    <ul>
+      <li>.NET Framework（Windows専用）のアプリを \to <strong>.NET Core</strong>（Linuxでも動く最新版） に変換。</li>
+      <li>これにより、ライセンス料の高いWindowsサーバーをやめて、安価なLinuxサーバーに移行できます。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>4. 試験・実務でのポイント</h2>
+<p>
+  この機能は、単独のサービス名ではなく<strong>「Amazon Q Developer」の機能の一つ</strong>として登場することが多いです。
+</p>
+<ul>
+  <li><strong>キーワード</strong>:
+    <ul>
+      <li>「言語のバージョンアップ（Language version upgrade）」</li>
+      <li>「レガシーコードのモダナイゼーション」</li>
+      <li>「Javaの移行」「依存関係（Dependencies）の更新」</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Code Transformation</strong>: 古いプログラム言語を、AIが最新バージョンに書き換えてくれる機能。</li>
+  <li><strong>たとえ</strong>: 「ボロボロの古民家（古いコード）」を、AI大工さんが一晩で「最新のスマートホーム」にリフォームしてくれるサービス。</li>
+</ul>
+<p>
+  「Javaのバージョン上げなきゃ…面倒だな…」と思ったら、こいつの出番です！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
