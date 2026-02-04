@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-storage-gateway-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T23:29:44+09:00",
+    "title": "AWS Storage Gatewayの概要と種類",
+    "summary": "AWS Storage Gatewayは、オンプレミスとクラウドを接続するためのハイブリッドクラウドストレージサービスです。ファイル、ボリューム、テープの3つのゲートウェイタイプを理解することが重要です。",
+    "tags": [
+      "AWS",
+      "Storage Gateway",
+      "クラウド",
+      "ハイブリッド",
+      "ソリューション"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-storage-gateway-overview/"
+  },
+  {
     "id": "awscp-aws-health-api-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T23:22:08+09:00",
