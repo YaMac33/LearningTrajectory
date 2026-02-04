@@ -1,0 +1,21 @@
+{
+  "id": "awscp-amazon-bedrock-generative-ai",
+  "category": "awscp",
+  "timestamp": "2026-02-04T16:15:00+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-amazon-bedrock-generative-ai/",
+  "meta": {
+    "title": "Amazon Bedrock: 生成AIの強力なサービス",
+    "summary": "AWSのAmazon Bedrockは、最先端の生成AIモデルをAPI経由で利用できるサービスです。これにより、アプリ開発者は複雑なインフラ管理やAIモデルの構築をせずに、高性能なAIを手軽に活用できます。",
+    "tags": [
+      "Amazon",
+      "生成AI",
+      "API",
+      "Bedrock",
+      "AIモデル"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
