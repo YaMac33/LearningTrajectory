@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-cloud-cost-model-comparison",
+    "category": "awscp",
+    "timestamp": "2026-02-04T21:55:57+09:00",
+    "title": "クラウドの費用モデル比較",
+    "summary": "CapEx、OpEx、PAYG の違いと AWS の利点を理解することができる。特に、クラウド化による財務的なメリットを解説。",
+    "tags": [
+      "クラウド",
+      "AWS",
+      "CapEx",
+      "OpEx",
+      "PAYG"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "クラウドの特徴"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-cloud-cost-model-comparison/"
+  },
+  {
     "id": "awscp-aws-migration-service-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T21:51:41+09:00",
