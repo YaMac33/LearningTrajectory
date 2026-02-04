@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-elemental-medialive-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T12:50:02+09:00",
+    "title": "AWS Elemental MediaLiveの概要",
+    "summary": "AWS Elemental MediaLiveは、リアルタイムで生放送映像をエンコードするクラウドサービスであり、MediaConvertとの違いが重要な試験ポイントです。",
+    "tags": [
+      "AWS",
+      "MediaLive",
+      "ライブ配信",
+      "エンコード",
+      "クラウドサービス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-elemental-medialive-overview/"
+  },
+  {
     "id": "awscp-amazon-translate-features-benefits",
     "category": "awscp",
     "timestamp": "2026-02-04T12:46:23+09:00",
