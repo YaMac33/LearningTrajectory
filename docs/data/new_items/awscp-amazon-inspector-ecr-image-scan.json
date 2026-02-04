@@ -1,0 +1,21 @@
+{
+  "id": "awscp-amazon-inspector-ecr-image-scan",
+  "category": "awscp",
+  "timestamp": "2026-02-04T14:42:51+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-amazon-inspector-ecr-image-scan/",
+  "meta": {
+    "title": "AWS-CP試験対策：InspectorとECRスキャン",
+    "summary": "Amazon InspectorとECRイメージスキャンの違いと、それぞれの役割を理解し、脆弱性管理の全体像を把握することができます。",
+    "tags": [
+      "AWS",
+      "セキュリティ",
+      "脆弱性管理",
+      "ECR",
+      "Amazon Inspector"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
