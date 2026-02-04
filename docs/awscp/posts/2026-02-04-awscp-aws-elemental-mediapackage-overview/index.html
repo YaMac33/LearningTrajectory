@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Elemental MediaPackage 概要</title>
+  <meta name="description" content="AWS Elemental MediaPackageは、ライブ動画を視聴者が再生可能な形式に変換・梱包して配信するサービスです。MediaLiveやCloudFrontとの連携フローを解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Elemental MediaPackage 概要" />
+  <meta property="og:description" content="AWS Elemental MediaPackageは、ライブ動画を視聴者が再生可能な形式に変換・梱包して配信するサービスです。MediaLiveやCloudFrontとの連携フローを解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* お弁当メタファー */
+    .bento-flow {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .bento-card {
+      flex: 1;
+      min-width: 140px;
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .bento-card.chef { border-color: #ef4444; background: #fef2f2; }
+    .bento-card.pack { 
+      border-color: #f97316; /* Orange */
+      background: #fff7ed;
+      box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);
+      transform: scale(1.05);
+    }
+    .bento-card.delivery { border-color: #3b82f6; background: #eff6ff; }
+    
+    .bento-icon { font-size: 2.5em; margin-bottom: 5px; }
+    .bento-role { font-weight: 800; color: #1e293b; font-size: 1em; margin-bottom: 4px; }
+    .bento-desc { font-size: 0.85em; color: #64748b; }
+    .bento-arrow { font-size: 1.5em; color: #cbd5e1; align-self: center; }
+
+    /* 配信フロー */
+    .stream-chain {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chain-box {
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+      padding: 8px 12px;
+      background: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      text-align: center;
+      color: #334155;
+    }
+    .chain-box.core {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #2563eb;
+    }
+    .chain-arrow { color: #94a3b8; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Elemental MediaPackage 概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#MediaPackage</span>
+            <span class="tag">#ライブ配信</span>
+            <span class="tag">#動画配信</span>
+            <span class="tag">#ストリーミング</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Elemental MediaPackageはライブ動画を視聴者向けに配信するサービスです。</p>
+<hr>
+<p>
+  <strong>AWS Elemental MediaPackage（メディアパッケージ）</strong>は、ライブ動画を、視聴者のスマホやPCで見られる形に整えて配信準備をするサービスです。<br>
+  一言で言うと、<strong>「ライブ配信を『視聴可能な形』に仕上げて送り出す『配信窓口』」</strong>です。<br>
+  MediaLiveで作られた映像を受け取り、iPhoneでもAndroidでも再生できるように「梱包（パッケージング）」します。
+</p>
+
+<h2>1. なぜこれが必要なの？（課題と解決）</h2>
+<p>
+  MediaLiveで作った映像データは、そのままではまだ「不完全」です。
+</p>
+<ul>
+  <li><strong>形式の違い</strong>: iPhoneはHLS、AndroidやPCはDASHなど、端末ごとに見れる形式が違います。</li>
+  <li><strong>機能不足</strong>: 「追っかけ再生（最初から見る）」や「著作権保護（DRM）」などの機能がありません。</li>
+</ul>
+<p>
+  MediaPackageを通すことで、これらを自動で付与し、どんな端末でも安定して見られるようにします。
+</p>
+
+<h2>2. わかりやすいイメージ：「お弁当屋さん」</h2>
+<p>
+  ライブ配信の流れを「お弁当屋さん」に例えると役割がはっきりします。
+</p>
+
+<!-- 図解：お弁当メタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">役割分担のイメージ</div>
+  <div class="bento-flow">
+    
+    <!-- 料理人 -->
+    <div class="bento-card chef">
+      <span class="bento-icon">👨‍🍳</span>
+      <span class="bento-role">MediaLive</span>
+      <span class="bento-desc">料理人<br>(素材を調理する)</span>
+    </div>
+
+    <div class="bento-arrow">➡</div>
+
+    <!-- 盛り付け -->
+    <div class="bento-card pack">
+      <span class="bento-icon">🍱</span>
+      <span class="bento-role">MediaPackage</span>
+      <span class="bento-desc"><strong>盛り付け係</strong><br>(食べやすく詰める)</span>
+    </div>
+
+    <div class="bento-arrow">➡</div>
+
+    <!-- 配達 -->
+    <div class="bento-card delivery">
+      <span class="bento-icon">🚚</span>
+      <span class="bento-role">CloudFront</span>
+      <span class="bento-desc">配達員<br>(みんなに届ける)</span>
+    </div>
+
+  </div>
+  <p style="font-size:0.85em; color:#64748b; text-align:center; margin-top:10px;">
+    料理（映像）を、客（デバイス）に合わせてお弁当箱に詰めるのがMediaPackageの仕事です。
+  </p>
+</div>
+
+<h2>3. 典型的な構成（鉄板フロー）</h2>
+<p>
+  試験では、以下の順序がよく問われます。
+</p>
+
+<!-- 図解：配信フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">ライブ配信のデータフロー</div>
+  <div class="stream-chain">
+    <div class="chain-box">🎥 撮影</div>
+    <div class="chain-arrow">➡</div>
+    <div class="chain-box">MediaLive<br><span style="font-size:0.8em; font-weight:normal;">(変換)</span></div>
+    <div class="chain-arrow">➡</div>
+    <div class="chain-box core">MediaPackage<br><span style="font-size:0.8em; font-weight:normal;">(梱包・保護)</span></div>
+    <div class="chain-arrow">➡</div>
+    <div class="chain-box">CloudFront<br><span style="font-size:0.8em; font-weight:normal;">(配信)</span></div>
+    <div class="chain-arrow">➡</div>
+    <div class="chain-box">📱 視聴者</div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>MediaLive</strong>: 映像信号をデジタルデータに変換する。</li>
+  <li><strong>MediaPackage</strong>: それを受け取り、HLSやDASHなどの配信形式に変換し、DRM（コピーガード）をかけたり、追っかけ再生用のバッファを持たせたりする。</li>
+  <li><strong>CloudFront</strong>: 世界中の視聴者にキャッシュして高速配信する。</li>
+</ul>
+
+<h2>4. 試験で問われやすいポイント</h2>
+<p>
+  CLF-C02やSAA試験では、以下の特徴を押さえておけば正解できます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>ポイント</th>
+      <th>解説</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>役割</strong></td>
+      <td>ライブ動画の<strong>「配信準備（パッケージング）」</strong>。</td>
+    </tr>
+    <tr>
+      <td><strong>対象</strong></td>
+      <td><strong>「ライブ配信」</strong>向け。（オンデマンドはS3+CloudFrontで十分な場合が多い）</td>
+    </tr>
+    <tr>
+      <td><strong>機能</strong></td>
+      <td>ジャストインタイムパッケージング、DVR（録画・追っかけ再生）、DRM保護。</td>
+    </tr>
+    <tr>
+      <td><strong>セット</strong></td>
+      <td>前には <strong>MediaLive</strong>、後ろには <strong>CloudFront</strong> がいる。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>典型的な出題パターン</h3>
+<p>
+  <strong>Q. 「ライブ映像を、スマホやPCなど多様なデバイスで安定して視聴できる形式（HLS/DASH）で配信したい。また、追っかけ再生機能も実装したい。どのサービスを使うべきか？」</strong>
+</p>
+<ul>
+  <li>❌ MediaConvert（録画用だから違う）</li>
+  <li>❌ MediaLive（映像を作るだけで、配信形式への梱包は専門外）</li>
+  <li><strong>✅ AWS Elemental MediaPackage（正解！）</strong></li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>MediaPackage</strong>: ライブ配信の受け皿＆梱包担当。</li>
+  <li><strong>役割</strong>: 視聴者が「見られる形」に整えて、CloudFrontへ渡す。</li>
+</ul>
+<p>
+  これで Elementalファミリー（Connect, Live, Convert, Package）の役割分担がコンプリートしましたね！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
