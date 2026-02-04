@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-inferentia-summary",
+  "category": "awscp",
+  "timestamp": "2026-02-04T16:30:15+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-inferentia-summary/",
+  "meta": {
+    "title": "AWS Inferentiaの概要とメリット",
+    "summary": "AWS InferentiaはAI推論に特化した専用チップで、コスト削減と高速処理を実現します。推論コストの多くを占めるため、その最適化が重要です。",
+    "tags": [
+      "AWS",
+      "Inferentia",
+      "AI",
+      "推論",
+      "機械学習"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
