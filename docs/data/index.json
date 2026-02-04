@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-msk-kafka-relation",
+    "category": "awscp",
+    "timestamp": "2026-02-04T22:02:51+09:00",
+    "title": "Amazon MSKとKafkaの違いと利点",
+    "summary": "Amazon MSKはApache KafkaをAWSが管理するフルマネージドサービスです。MSKの利用により運用の負担を軽減し、Kinesisとの明確な使い分けが理解できます。",
+    "tags": [
+      "MSK",
+      "Kafka",
+      "AWS",
+      "データストリーミング",
+      "クラウドサービス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-msk-kafka-relation/"
+  },
+  {
     "id": "awscp-ai-code-transformation",
     "category": "awscp",
     "timestamp": "2026-02-04T21:56:28+09:00",
