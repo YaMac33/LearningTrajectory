@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Comprehendの概要</title>
+  <meta name="description" content="テキストの感情や意味を読み取るAI「Amazon Comprehend」の解説。NLP機能で個人情報も自動検出する仕組みや、Macieとの違いについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Comprehendの概要" />
+  <meta property="og:description" content="テキストの感情や意味を読み取るAI「Amazon Comprehend」の解説。NLP機能で個人情報も自動検出する仕組みや、Macieとの違いについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* NLPの脳みそ図 */
+    .nlp-process {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .text-input {
+      border: 2px dashed #94a3b8;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85em;
+      color: #334155;
+      max-width: 150px;
+    }
+    .ai-brain {
+      background: #8b5cf6; /* Purple */
+      color: #fff;
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(139, 92, 246, 0.3);
+      position: relative;
+    }
+    .ai-brain::after {
+      content: "⚡";
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 1.5em;
+    }
+    .result-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .result-item {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .res-sentiment { border-color: #ef4444; color: #b91c1c; }
+    .res-entity { border-color: #3b82f6; color: #1e40af; }
+    .res-pii { border-color: #f59e0b; color: #b45309; }
+    
+    .arrow-right { font-size: 1.5em; color: #cbd5e1; }
+
+    /* 速読家の比較 */
+    .speed-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .speed-compare { grid-template-columns: 1fr; }
+    }
+    .speed-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+    }
+    .speed-card.human { border-top: 4px solid #94a3b8; }
+    .speed-card.ai { border-top: 4px solid #8b5cf6; background: #f5f3ff; }
+    
+    .speed-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .speed-title { font-weight: 800; display: block; margin-bottom: 4px; color: #1e293b; }
+    .speed-time { font-size: 1.2em; font-weight: bold; color: #1e293b; }
+    .speed-desc { font-size: 0.85em; color: #64748b; margin-top: 6px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Comprehendの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Amazon Comprehend</span>
+            <span class="tag">#自然言語処理</span>
+            <span class="tag">#AI</span>
+            <span class="tag">#感情分析</span>
+            <span class="tag">#エンティティ認識</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>テキストの感情や意味を読み取るAI。NLP機能で個人情報も自動検出します。</p>
+<hr>
+<p>
+  <strong>Amazon Comprehend（コンプリヘンド）</strong>は、一言で言うと<strong>「文章（テキスト）の意味や感情を読み取る『読解AI』」</strong>です。<br>
+  AWSの<strong>自然言語処理（NLP）</strong>サービスです。人間が文章を読んだ時に「あ、この人は怒ってるな」とか「ここに住所が書いてあるな」と理解するのを、AIが代わりに超高速でやってくれます。
+</p>
+
+<h2>1. 何ができるの？（主な機能）</h2>
+<p>
+  Comprehendにテキストを投げると、中身を分解して以下のことを分析してくれます。
+</p>
+
+<!-- 図解：NLPの脳みそ -->
+<div class="diagram-container">
+  <div class="diagram-title">Comprehendの処理イメージ</div>
+  <div class="nlp-process">
+    
+    <div class="text-input">
+      "最悪だ！<br>
+      金返せ！<br>
+      私は東京の<br>
+      田中です"
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="ai-brain">
+      🧠 NLP<br>
+      読解中
+    </div>
+
+    <div class="arrow-right">➡</div>
+
+    <div class="result-list">
+      <div class="result-item res-sentiment">😡 感情: Negative</div>
+      <div class="result-item res-entity">📍 地名: 東京</div>
+      <div class="result-item res-pii">👤 PII: 田中</div>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>感情分析 (Sentiment Analysis)</strong>:
+    <ul>
+      <li>「この商品の使い勝手は最悪だ」 → <strong>「Negative（否定的）」</strong>と判定。</li>
+      <li>SNSの投稿やカスタマーレビューが、好評か不評かを自動で仕分けられます。</li>
+    </ul>
+  </li>
+  <li><strong>エンティティ認識 (Entity Recognition)</strong>:
+    <ul>
+      <li>文章の中から<strong>「固有名詞（人名、地名、組織名）」や「日付」「数量」</strong>を抜き出します。</li>
+    </ul>
+  </li>
+  <li><strong>キーフレーズ抽出</strong>:
+    <ul>
+      <li>「何について書かれているか」という重要な単語（トピック）を抜き出します。</li>
+    </ul>
+  </li>
+  <li><strong>PII（個人情報）の検出とマスキング</strong>: ★試験で重要
+    <ul>
+      <li>文章の中に「クレジットカード番号」や「住所」「メールアドレス」が含まれていないかチェックし、<strong>自動で隠す（マスキングする）</strong>ことができます。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>2. わかりやすいイメージ： 「超高速の速読家」</h2>
+<p>
+  あなたが1万件のアンケート結果を持っているとします。
+</p>
+
+<!-- 図解：速読比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">1万件のアンケート分析</div>
+  <div class="speed-compare">
+    
+    <div class="speed-card human">
+      <span class="speed-icon">😫</span>
+      <span class="speed-title">人間</span>
+      <span class="speed-time">1ヶ月</span>
+      <div class="speed-desc">
+        全部読んで分類する。<br>
+        途中で疲れて精度が落ちる。
+      </div>
+    </div>
+
+    <div class="speed-card ai">
+      <span class="speed-icon">🤖</span>
+      <span class="speed-title">Comprehend</span>
+      <span class="speed-time">数分</span>
+      <div class="speed-desc">
+        一瞬で読み終わる。<br>
+        「70%が価格に不満」と即答。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 試験対策： Macie との違い（超頻出！）</h2>
+<p>
+  「個人情報（PII）を見つける」という機能は Amazon Macie にもあります。ここで引っ掛け問題がよく出ます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>Amazon Comprehend</th>
+      <th>Amazon Macie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>対象データ</strong></td>
+      <td><strong>「テキストデータ（文章）」</strong><br>(メール、SNS、文書)</td>
+      <td><strong>「S3バケット内のファイル」</strong><br>(Excel, CSV, PDF等)</td>
+    </tr>
+    <tr>
+      <td><strong>得意技</strong></td>
+      <td>意味を理解する (NLP)</td>
+      <td>パターンで探す (セキュリティ)</td>
+    </tr>
+    <tr>
+      <td><strong>利用目的</strong></td>
+      <td>「アンケートやメールの<strong>中身を分析</strong>したい」<br>(マーケティング・業務効率化)</td>
+      <td>「S3に個人情報が<strong>漏れてないか監査</strong>したい」<br>(セキュリティ・コンプライアンス)</td>
+    </tr>
+    <tr>
+      <td><strong>アクション</strong></td>
+      <td>感情分析、PIIマスキング</td>
+      <td>セキュリティアラート発報</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  試験で以下の文脈が出たら、Amazon Comprehend が正解です。
+</p>
+<ul>
+  <li>「SNSの投稿や商品レビューを分析して、ユーザーの<strong>『感情（センチメント）』</strong>を知りたい」</li>
+  <li>「サポートへの問い合わせメールを、内容（トピック）ごとに自動で分類したい」</li>
+  <li>「テキストデータから、個人特定情報（PII）を見つけて<strong>墨消し（Redaction/マスキング）</strong>したい」</li>
+  <li>「自然言語処理 (NLP) を使いたい」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Amazon Comprehend</strong>: テキストの意味・感情・個人情報を読み取るAI。</li>
+  <li><strong>ポジション</strong>: Translate (翻訳) / Transcribe (文字起こし) / Polly (読み上げ) と並ぶ、AWSの言語系AIの一つ。</li>
+</ul>
+<p>
+  「文章を読んで『空気』や『中身』を理解してくれるAI」と覚えておけばバッチリです！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
