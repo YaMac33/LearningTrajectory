@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-api-gateway-comparison",
+    "category": "awscp",
+    "timestamp": "2026-02-04T12:55:34+09:00",
+    "title": "API Gatewayと他のAWSサービスの比較",
+    "summary": "API GatewayとQuickSight、Systems Managerの違いや役割を解説し、試験観点で必要な知識を理解することができます。",
+    "tags": [
+      "AWS",
+      "API Gateway",
+      "QuickSight",
+      "Systems Manager",
+      "サービス比較"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-api-gateway-comparison/"
+  },
+  {
     "id": "awscp-aws-elemental-medialive-overview",
     "category": "awscp",
     "timestamp": "2026-02-04T12:50:02+09:00",
