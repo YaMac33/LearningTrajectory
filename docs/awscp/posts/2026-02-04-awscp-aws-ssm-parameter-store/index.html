@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS SSMパラメータストアの活用法</title>
+  <meta name="description" content="AWS Systems Manager Parameter Storeは、安全に設定値やパスワードを管理するサービスです。ハードコーディングのリスクを回避し、セキュアな構成を実現する方法を解説。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS SSMパラメータストアの活用法" />
+  <meta property="og:description" content="AWS Systems Manager Parameter Storeは、安全に設定値やパスワードを管理するサービスです。ハードコーディングのリスクを回避し、セキュアな構成を実現する方法を解説。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* ハードコーディング vs パラメータストア */
+    .code-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .code-comparison { grid-template-columns: 1fr; }
+    }
+    .code-box {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85em;
+      position: relative;
+      border: 2px solid transparent;
+    }
+    .code-box.bad {
+      border-color: #ef4444;
+    }
+    .code-box.good {
+      border-color: #10b981;
+    }
+    .code-label {
+      position: absolute;
+      top: -10px;
+      left: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #fff;
+    }
+    .bad .code-label { background: #ef4444; }
+    .good .code-label { background: #10b981; }
+    .highlight-red { color: #fca5a5; font-weight: bold; }
+    .highlight-green { color: #86efac; font-weight: bold; }
+
+    /* ロッカーのメタファー */
+    .locker-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+    }
+    .locker-icon {
+      font-size: 3em;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .locker-box {
+      border: 2px solid #3b82f6;
+      background: #eff6ff;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      min-width: 120px;
+    }
+    .app-box {
+      border: 2px dashed #94a3b8;
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      min-width: 120px;
+    }
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    /* 階層構造 */
+    .tree-view {
+      font-family: monospace;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      color: #334155;
+    }
+    .tree-item { margin-bottom: 4px; }
+    .tree-dir { color: #3b82f6; font-weight: bold; }
+    .tree-val { color: #10b981; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS SSMパラメータストアの活用法</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#SSM</span>
+            <span class="tag">#Parameter Store</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#クラウド</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Systems Manager Parameter Storeは、安全に設定値やパスワードを管理するサービスです。</p>
+<hr>
+<p>
+  <strong>AWS Systems Manager (SSM) Parameter Store</strong> は、システムの設定値（URLやデータベースの接続先など）や、機密情報（パスワードやAPIキー）を、<strong>「一箇所でまとめて管理する『金庫』兼『メモ帳』」</strong>です。<br>
+  一言で言うと、<strong>「パスワードや設定値を、プログラムの中に直書き（ハードコーディング）するのをやめて、クラウド上の『安全なロッカー』に預けるサービス」</strong>です。
+</p>
+
+<h2>1. なぜこれが必要なの？（抱えている課題）</h2>
+<p>
+  プログラムの中にパスワードを直接書いてしまうと、ソースコードを見られた瞬間に情報漏洩になります（セキュリティ事故）。また、変更のたびにコードを修正するのは非効率です。
+</p>
+
+<!-- 図解：ハードコーディング vs パラメータストア -->
+<div class="diagram-container">
+  <div class="diagram-title">コードの比較</div>
+  <div class="code-comparison">
+    
+    <!-- Bad -->
+    <div class="code-box bad">
+      <div class="code-label">❌ 危険 (ハードコーディング)</div>
+      <br>
+      const db_host = "10.0.0.1";<br>
+      const db_password = <span class="highlight-red">"mySecret123"</span>;<br>
+      <br>
+      // コード流出 ＝ パスワード流出
+    </div>
+
+    <!-- Good -->
+    <div class="code-box good">
+      <div class="code-label">✅ 安全 (パラメータストア)</div>
+      <br>
+      // AWSに問い合わせる<br>
+      const password = await <span class="highlight-green">ssm.getParameter</span>(<br>
+      &nbsp;&nbsp;"/db/password"<br>
+      );<br>
+      // コードを見てもパスワードは不明
+    </div>
+
+  </div>
+</div>
+
+<h2>2. Parameter Store の解決策： 「必要な時に取りに行く」</h2>
+<p>
+  以下のフローにすることで、セキュリティと管理性を向上させます。
+</p>
+
+<!-- 図解：取得フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">実行時のデータ取得フロー</div>
+  <div class="locker-flow">
+    <div class="app-box">
+      💻 アプリ<br>
+      (EC2 / Lambda)
+    </div>
+    <div class="flow-arrow">➡ 問い合わせ ➡</div>
+    <div class="locker-box">
+      🔐 Parameter Store<br>
+      <span style="font-size:0.8em; color:#64748b;">(暗号化された金庫)</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    アプリは「動く瞬間」にだけ、金庫からパスワードを取り出して使います。
+  </p>
+</div>
+
+<ul>
+  <li><strong>保存</strong>: パスワードを Parameter Store に保存します（KMSで暗号化可能）。</li>
+  <li><strong>取得</strong>: プログラムは、起動時や実行時に「AWSさん、今のパスワード教えて？」と問い合わせます。</li>
+  <li><strong>利用</strong>: 取得した値を使ってデータベースへログインします。</li>
+</ul>
+
+<h2>3. 特徴的な機能</h2>
+
+<h3>① 階層構造（Hierarchy）で管理できる</h3>
+<p>
+  設定値にファイルパスのような名前をつけることで、環境やアプリごとにきれいに整理できます。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">名前空間の整理例</div>
+  <div class="tree-view">
+    <div class="tree-item">/production</div>
+    <div class="tree-item">&nbsp;├─ <span class="tree-dir">/db</span></div>
+    <div class="tree-item">&nbsp;│&nbsp;&nbsp;└─ <span class="tree-val">password</span> (本番用)</div>
+    <div class="tree-item">&nbsp;└─ <span class="tree-dir">/app</span></div>
+    <div class="tree-item">&nbsp;&nbsp;&nbsp;&nbsp;└─ <span class="tree-val">api_url</span></div>
+    <div class="tree-item"><br></div>
+    <div class="tree-item">/dev</div>
+    <div class="tree-item">&nbsp;└─ <span class="tree-dir">/db</span></div>
+    <div class="tree-item">&nbsp;&nbsp;&nbsp;&nbsp;└─ <span class="tree-val">password</span> (開発用)</div>
+  </div>
+</div>
+
+<h3>② 2種類の保存方法</h3>
+<ul>
+  <li><strong>String（文字列）</strong>: URLやユーザーIDなど、見えてもいい設定値。</li>
+  <li><strong>SecureString（安全な文字列）</strong>: パスワードやAPIキーなど、<strong>KMS</strong>という鍵を使って暗号化して保存するもの。コンソール上でも「******」と表示され、権限がないと見れません。</li>
+</ul>
+
+<h2>4. Secrets Manager との違い（試験の最頻出ポイント！）</h2>
+<p>
+  「パスワードを保存する」というと、<strong>AWS Secrets Manager</strong> というサービスもあります。試験では「どっちを使えばいいの？」が定番です。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>SSM Parameter Store</th>
+      <th>AWS Secrets Manager</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>主な役割</strong></td>
+      <td><strong>設定値全般</strong> の管理<br>(URL, ID, パスワードなど)</td>
+      <td><strong>機密情報 (Secret) 専用</strong> の管理<br>(DBパスワード、APIキー)</td>
+    </tr>
+    <tr>
+      <td><strong>料金</strong></td>
+      <td><strong>無料</strong> (標準階層)<br>※ここが最強のメリット</td>
+      <td>有料<br>(1つあたり月額約40円 + 利用料)</td>
+    </tr>
+    <tr>
+      <td><strong>自動ローテーション</strong><br>(パスワード自動変更)</td>
+      <td>できない<br>(自分でやる必要がある)</td>
+      <td><strong>できる</strong><br>(Lambdaと連携して勝手に変えてくれる)</td>
+    </tr>
+    <tr>
+      <td><strong>イメージ</strong></td>
+      <td>「会社のロッカー」<br>(無料、鍵付き、手動管理)</td>
+      <td>「銀行の貸金庫」<br>(有料、超高機能、自動化対応)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>SSM Parameter Store</strong>: 設定値やパスワードを一元管理するサービス。</li>
+  <li><strong>メリット</strong>: ソースコードからパスワードを排除できる。<strong>無料で使える</strong>。</li>
+  <li><strong>選び方</strong>:
+    <ul>
+      <li>「コストをかけずにパスワードを管理したい」 → <strong>Parameter Store</strong>。</li>
+      <li>「RDSのパスワードを定期的に<strong>自動ローテーション（変更）</strong>させたい」 → <strong>Secrets Manager</strong>。</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  「無料で使える安全なメモ帳」として、現場でも非常によく使われます！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
