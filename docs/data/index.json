@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-amazon-q-ai-assistant",
+    "category": "awscp",
+    "timestamp": "2026-02-04T16:18:11+09:00",
+    "title": "Amazon Q: 仕事専用の生成AIアシスタント",
+    "summary": "Amazon Qは、開発者とビジネスユーザー向けの生成AIアシスタントです。AWS環境でのエラー解決や社内資料の検索など、多様なニーズをサポートします。",
+    "tags": [
+      "Amazon Q",
+      "生成AI",
+      "AWS",
+      "ビジネス",
+      "開発者",
+      "アシスタント"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-q-ai-assistant/"
+  },
+  {
     "id": "awscp-amazon-bedrock-generative-ai",
     "category": "awscp",
     "timestamp": "2026-02-04T16:15:00+09:00",
