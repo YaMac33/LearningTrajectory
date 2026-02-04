@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-data-exchange-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T23:12:23+09:00",
+    "title": "AWS Data Exchangeの概要と特徴",
+    "summary": "AWS Data Exchangeは外部データを簡単に購入・購読できるマーケットプレイスです。このサービスを理解することでデータの活用方法が明確になります。",
+    "tags": [
+      "AWS",
+      "Data Exchange",
+      "データ購入",
+      "クラウド",
+      "分析"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-data-exchange-overview/"
+  },
+  {
     "id": "awscp-amazon-opensearch-service-review",
     "category": "awscp",
     "timestamp": "2026-02-04T23:01:52+09:00",
