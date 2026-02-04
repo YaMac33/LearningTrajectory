@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-comprehend-summary",
+    "category": "awscp",
+    "timestamp": "2026-02-04T16:21:42+09:00",
+    "title": "Amazon Comprehendの機能と概要",
+    "summary": "Amazon Comprehendはテキストの感情や個人情報を解析するAIサービスであり、自然言語処理の機能を提供します。試験では、識別した情報の種類が理解できることが求められます。",
+    "tags": [
+      "Amazon Comprehend",
+      "自然言語処理",
+      "AI",
+      "感情分析",
+      "エンティティ認識"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-amazon-comprehend-summary/"
+  },
+  {
     "id": "awscp-amazon-q-ai-assistant",
     "category": "awscp",
     "timestamp": "2026-02-04T16:18:11+09:00",
