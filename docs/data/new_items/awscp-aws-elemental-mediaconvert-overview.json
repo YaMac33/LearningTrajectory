@@ -1,0 +1,22 @@
+{
+  "id": "awscp-aws-elemental-mediaconvert-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-04T13:43:27+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-elemental-mediaconvert-overview/",
+  "meta": {
+    "title": "AWS Elemental MediaConvertの概要と試験対策",
+    "summary": "AWS Elemental MediaConvertの機能と用途を理解し、試験に向けた重要なポイントを押さえることができます。",
+    "tags": [
+      "AWS",
+      "動画変換",
+      "MediaConvert",
+      "クラウド",
+      "トランスコード",
+      "配信"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
