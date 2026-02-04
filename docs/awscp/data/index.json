@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-appconfig-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-04T12:42:30+09:00",
+    "title": "AWS AppConfigの概要と利点",
+    "summary": "AWS AppConfigは、アプリの設定を再デプロイなしで安全に変更できるサービスです。設定管理や機能フラグについて理解が深まります。",
+    "tags": [
+      "AWS",
+      "AppConfig",
+      "設定管理",
+      "機能フラグ",
+      "デプロイ戦略"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-appconfig-overview/"
+  },
+  {
     "id": "awscp-aws-organizations-ram-relationship",
     "category": "awscp",
     "timestamp": "2026-02-04T12:05:23+09:00",
