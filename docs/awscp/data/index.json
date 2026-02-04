@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-elastic-disaster-recovery",
+    "category": "awscp",
+    "timestamp": "2026-02-04T21:37:28+09:00",
+    "title": "AWS Elastic Disaster Recoveryの特徴と利点",
+    "summary": "AWS DRSは低コストで迅速なシステム復旧を実現するサービスです。災害時に「復旧ボタン」を押すだけで、数分でEC2インスタンスが立ち上がります。",
+    "tags": [
+      "AWS",
+      "Disaster Recovery",
+      "低コスト",
+      "復旧時間",
+      "DRS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-04-awscp-aws-elastic-disaster-recovery/"
+  },
+  {
     "id": "awscp-memorydb-redis-inmemory",
     "category": "awscp",
     "timestamp": "2026-02-04T21:33:43+09:00",
