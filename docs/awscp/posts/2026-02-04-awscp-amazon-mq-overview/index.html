@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon MQの概要と特徴</title>
+  <meta name="description" content="既存システムをAWSに移行するためのメッセージングサービス、Amazon MQの特徴を解説。SQSとの違いや、プログラムを書き換えずに移行する「リフト＆シフト」について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon MQの概要と特徴" />
+  <meta property="og:description" content="既存システムをAWSに移行するためのメッセージングサービス、Amazon MQの特徴を解説。SQSとの違いや、プログラムを書き換えずに移行する「リフト＆シフト」について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 移行のイメージ */
+    .migration-diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    .system-box {
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+      min-width: 140px;
+    }
+    .system-app { border-color: #3b82f6; background: #eff6ff; }
+    .system-mq { border-color: #f97316; background: #fff7ed; }
+    .connection-line {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #64748b;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .arrow-right { font-size: 1.5em; line-height: 1; }
+    
+    /* 言語の違い */
+    .lang-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .lang-compare { grid-template-columns: 1fr; }
+    }
+    .lang-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .lang-card.sqs { border-top: 4px solid #ef4444; }
+    .lang-card.mq { border-top: 4px solid #10b981; }
+    
+    .lang-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .lang-name { font-weight: 800; color: #1e293b; margin-bottom: 8px; display: block; font-size: 1.1em; }
+    .speech-bubble {
+      display: inline-block;
+      background: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #475569;
+      margin-top: 5px;
+      position: relative;
+    }
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 0 6px 6px;
+      border-style: solid;
+      border-color: transparent transparent #f1f5f9 transparent;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-04">
+            2026.02.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon MQの概要と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Amazon MQ</span>
+            <span class="tag">#メッセージング</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#移行</span>
+            <span class="tag">#ActiveMQ</span>
+            <span class="tag">#RabbitMQ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>既存システムをAWSに移行するためのメッセージングサービス、Amazon MQの特徴を解説します。</p>
+<hr>
+<p>
+  <strong>Amazon MQ</strong> は、一言で言うと<strong>「既存のシステムをAWSに引っ越し（移行）させるための、メッセージングサービスの『受け皿』」</strong>です。<br>
+  具体的には、オープンソースの <strong>Apache ActiveMQ</strong> や <strong>RabbitMQ</strong> を、AWSが管理してくれるマネージドサービスです。
+</p>
+<p>
+  SQS や SNS と役割は同じ（メッセージを届ける）ですが、<strong>「使う場面（新規か移行か）」</strong>が明確に違います。
+</p>
+
+<h2>1. なぜこれが必要なの？（「SQS」ではダメな理由）</h2>
+<p>
+  多くの企業は、オンプレミス（自社サーバー）で、昔ながらのメッセージングソフト（ActiveMQなど）を使ってシステムを作っています。
+</p>
+<ul>
+  <li><strong>課題</strong>: これをAWSの SQS に移行しようとすると、プログラムを「AWS専用の言葉（API）」で話すように大幅に書き直す必要があり、コストがかかります。</li>
+  <li><strong>Amazon MQの解決策</strong>: Amazon MQは、昔ながらの「標準的な言葉（プロトコル）」を理解できます。つまり、<strong>「プログラムを書き換えずに、接続先をAWSに向けるだけ」</strong>で移行が完了します。</li>
+</ul>
+
+<!-- 図解：リフト＆シフトのイメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">リフト＆シフトの実現</div>
+  <div class="migration-diagram">
+    <div class="system-box system-app">
+      既存アプリ<br>
+      <span style="font-size:0.8em; color:#1e40af;">(JMS等で会話)</span>
+    </div>
+    <div class="connection-line">
+      <span style="margin-bottom:4px;">接続先変更のみ</span>
+      <span class="arrow-right">➡</span>
+    </div>
+    <div class="system-box system-mq">
+      <strong>Amazon MQ</strong><br>
+      <span style="font-size:0.8em; color:#9a3412;">(標準語対応)</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    アプリのコードを書き直す必要がないので、移行が簡単。
+  </p>
+</div>
+
+<h2>2. SQS/SNS との決定的な違い</h2>
+<p>
+  試験で「メッセージングサービスを選べ」と言われたら、<strong>「話せる言葉（プロトコル）」</strong>で判断します。
+</p>
+
+<!-- 図解：言語の違い -->
+<div class="diagram-container">
+  <div class="diagram-title">話せる「言葉」の違い</div>
+  <div class="lang-compare">
+    
+    <!-- SQS -->
+    <div class="lang-card sqs">
+      <span class="lang-icon">☁️</span>
+      <span class="lang-name">Amazon SQS</span>
+      <div style="font-size:0.9em; color:#64748b;">AWSネイティブ</div>
+      <div class="speech-bubble">AWS専用API語</div>
+      <p style="font-size:0.85em; margin-top:10px; color:#b91c1c;">
+        AWS以外とは話せない。<br>
+        (書き換え必須)
+      </p>
+    </div>
+
+    <!-- MQ -->
+    <div class="lang-card mq">
+      <span class="lang-icon">🐰</span>
+      <span class="lang-name">Amazon MQ</span>
+      <div style="font-size:0.9em; color:#64748b;">オープンソース互換</div>
+      <div class="speech-bubble">JMS, AMQP, MQTT...</div>
+      <p style="font-size:0.85em; margin-top:10px; color:#166534;">
+        標準語がペラペラ。<br>
+        (書き換え不要)
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Amazon SQS / SNS</th>
+      <th>Amazon MQ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>生い立ち</strong></td>
+      <td>AWS生まれのクラウドネイティブ</td>
+      <td>OSS (ActiveMQ/RabbitMQ) のマネージド版</td>
+    </tr>
+    <tr>
+      <td><strong>スケーラビリティ</strong></td>
+      <td>無限大 (自動で勝手に伸びる)</td>
+      <td>有限 (インスタンスの性能に依存)</td>
+    </tr>
+    <tr>
+      <td><strong>プロトコル</strong></td>
+      <td>HTTPS (AWS独自API)</td>
+      <td><strong>JMS, NMS, AMQP, STOMP, MQTT, WebSocket</strong></td>
+    </tr>
+    <tr>
+      <td><strong>選び方</strong></td>
+      <td>「新しくクラウドで作るならこれ」</td>
+      <td>「既存アプリを<strong>書き換えずに移行</strong>するならこれ」</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 試験対策キーワード</h2>
+<p>
+  試験で以下の呪文（プロトコル名）が出てきたら、Amazon MQ が正解です。
+</p>
+<ul>
+  <li>「JMS (Java Message Service)」</li>
+  <li>「NMS (.NET Message Service)」</li>
+  <li>「AMQP」「STOMP」「MQTT」「WebSocket」</li>
+  <li>「業界標準のAPI / プロトコル」</li>
+  <li>「既存のアプリケーションコードを書き換えることなく、クラウドへ移行したい」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Amazon MQ</strong>: 既存のメッセージングシステム（ActiveMQ/RabbitMQ）からの<strong>「引っ越し用」</strong>サービス。</li>
+  <li><strong>メリット</strong>: <strong>標準プロトコル（JMS等）</strong>に対応しており、アプリのコード修正が不要。</li>
+</ul>
+<p>
+  「SQSはAWS語しか喋れないけど、MQは標準語（業界用語）が喋れる帰国子女」みたいなイメージで覚えておきましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
