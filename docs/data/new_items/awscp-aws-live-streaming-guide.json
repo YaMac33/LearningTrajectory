@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-live-streaming-guide",
+  "category": "awscp",
+  "timestamp": "2026-02-04T14:07:48+09:00",
+  "post_path": "awscp/posts/2026-02-04-awscp-aws-live-streaming-guide/",
+  "meta": {
+    "title": "AWSでのライブ動画配信ガイド",
+    "summary": "AWS Elemental Media Servicesを利用したライブ動画配信の流れや各サービスの役割を理解することができます。",
+    "tags": [
+      "ライブ配信",
+      "AWS",
+      "動画配信",
+      "MediaServices",
+      "技術ガイド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
