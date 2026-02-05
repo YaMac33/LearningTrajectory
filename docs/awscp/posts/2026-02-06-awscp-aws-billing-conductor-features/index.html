@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Billing Conductorの特徴</title>
+  <meta name="description" content="AWS Billing Conductorは請求書のカスタマイズが主な役割。AWS BudgetsやCost Explorerとの役割分担を理解し混同を避けよう。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Billing Conductorの特徴" />
+  <meta property="og:description" content="AWS Billing Conductorは請求書のカスタマイズが主な役割。AWS BudgetsやCost Explorerとの役割分担を理解し混同を避けよう。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 3つの役割カード */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .role-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .role-card.maker { border-top: 4px solid #f59e0b; } /* Orange */
+    .role-card.watcher { border-top: 4px solid #ef4444; } /* Red */
+    .role-card.viewer { border-top: 4px solid #3b82f6; } /* Blue */
+    
+    .role-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .role-name { font-weight: 800; color: #1e293b; margin-bottom: 4px; display: block; }
+    .role-job {
+      display: inline-block;
+      font-size: 0.8em;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .role-card.maker .role-job { background: #f59e0b; }
+    .role-card.watcher .role-job { background: #ef4444; }
+    .role-card.viewer .role-job { background: #3b82f6; }
+    
+    .role-desc { font-size: 0.85em; color: #64748b; line-height: 1.4; }
+
+    /* データ連携フロー */
+    .data-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-weight: bold;
+      background: #fff;
+      text-align: center;
+      min-width: 120px;
+    }
+    .box-abc { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .box-ce { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .box-budgets { border-color: #ef4444; background: #fef2f2; color: #b91c1c; }
+    
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      line-height: 1;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-06">
+            2026.02.06
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Billing Conductorの特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Billing Conductor</span>
+            <span class="tag">#Cost Management</span>
+            <span class="tag">#サービス比較</span>
+            <span class="tag">#役割分担</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Billing Conductorは請求書のカスタマイズが主な役割。役割分担を理解し混同を避けよう。</p>
+<hr>
+<p>
+  AWSのコスト管理系サービスは名前も機能も似ていて、非常に紛らわしいです。<br>
+  「AWS Billing Conductor」と「AWS Budgets」と「AWS Cost Explorer」。<br>
+  この3つは仲が良く、連携して動くため混同されがちですが、<strong>「役割（ポジション）」</strong>が明確に違います。ここを整理すれば、試験のひっかけ問題も怖くありません。
+</p>
+
+<h2>1. 役割分担：「作る・守る・見る」</h2>
+<p>
+  この3つをサッカーチームや会社の部署のような「役割」で覚えるとスッキリします。
+</p>
+
+<!-- 図解：3つの役割 -->
+<div class="diagram-container">
+  <div class="diagram-title">コスト管理トリオの役割分担</div>
+  <div class="role-grid">
+    
+    <!-- Billing Conductor -->
+    <div class="role-card maker">
+      <span class="role-icon">🧮</span>
+      <span class="role-name">Billing Conductor</span>
+      <span class="role-job">作る人 (計算係)</span>
+      <div class="role-desc">
+        請求データを<strong>「加工・計算」</strong>する。<br>
+        値上げや割引を適用して<br>
+        「見せかけの請求書」を作る。
+      </div>
+    </div>
+
+    <!-- Cost Explorer -->
+    <div class="role-card viewer">
+      <span class="role-icon">🔮</span>
+      <span class="role-name">Cost Explorer</span>
+      <span class="role-job">見る人 (分析官)</span>
+      <div class="role-desc">
+        データを<strong>「可視化・予測」</strong>する。<br>
+        グラフを描いたり、<br>
+        来月のコストを占ったりする。
+      </div>
+    </div>
+
+    <!-- Budgets -->
+    <div class="role-card watcher">
+      <span class="role-icon">🚨</span>
+      <span class="role-name">AWS Budgets</span>
+      <span class="role-job">守る人 (警備員)</span>
+      <div class="role-desc">
+        予算を<strong>「監視・通知」</strong>する。<br>
+        「使いすぎだぞ！」と<br>
+        アラートメールを飛ばす。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. なぜ混同しやすいのか？（連携の仕組み）</h2>
+<p>
+  これらは独立して動くのではなく、<strong>バケツリレーのようにデータを渡して連携</strong>しています。<br>
+  「Billing Conductorの設定画面でCost Explorerを見る」ことがあるため、「Billing Conductorが分析機能を持っている」と勘違いしやすいのです。
+</p>
+
+<!-- 図解：データフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">データの流れ</div>
+  <div class="data-flow">
+    <div class="flow-box box-abc">
+      Billing<br>Conductor
+      <div style="font-size:0.75em; font-weight:normal;">カスタム料金計算</div>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-ce">
+      Cost<br>Explorer
+      <div style="font-size:0.75em; font-weight:normal;">グラフ表示</div>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-budgets">
+      AWS<br>Budgets
+      <div style="font-size:0.75em; font-weight:normal;">予算監視</div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    ABCで作った「カスタム料金」を、CEで見て、Budgetsで守る。
+  </p>
+</div>
+
+<ul>
+  <li><strong>Billing Conductor</strong>: 「Cost Explorerさん、表示する金額を『100円』じゃなくて『110円（手数料込み）』に変えて表示してね」とデータを渡します。</li>
+  <li><strong>Cost Explorer</strong>: 渡されたデータを使って、実際に棒グラフを描画します。</li>
+  <li><strong>Budgets</strong>: 渡されたデータが「予算」を超えたらアラートを鳴らします。</li>
+</ul>
+
+<h2>3. 試験での見分け方（キーワード）</h2>
+<p>
+  問題文に含まれるキーワードで、即座にサービスを特定できます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>キーワード・要件</th>
+      <th>正解のサービス</th>
+      <th>理由</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>「カスタマイズ」「分配」「プロフォーマ（見積もり）」</strong><br>「特定のアカウントに割引/手数料を適用したい」</td>
+      <td><strong>Billing Conductor</strong></td>
+      <td>請求額そのものをいじるのはこいつの仕事。</td>
+    </tr>
+    <tr>
+      <td><strong>「視覚的分析」「予測 (Forecast)」「グラフ」</strong><br>「過去の傾向から来月のコストを知りたい」</td>
+      <td><strong>Cost Explorer</strong></td>
+      <td>分析や可視化（Visualization）はこいつの仕事。</td>
+    </tr>
+    <tr>
+      <td><strong>「アラート」「通知」「予算 (Budget)」</strong><br>「設定額を超えたらメールしたい」</td>
+      <td><strong>AWS Budgets</strong></td>
+      <td>監視と通知はこいつの仕事。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Billing Conductor</strong> は、分析もしないし通知もしません。ひたすら<strong>「計算機を叩いて、請求金額の数字を書き換える（カスタマイズする）」</strong>ための裏方サービスです。</li>
+  <li>分析したければ <strong>Cost Explorer</strong>、通知が欲しければ <strong>Budgets</strong> を使います。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
