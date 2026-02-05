@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-billing-conductor-features",
+  "category": "awscp",
+  "timestamp": "2026-02-06T07:34:09+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-aws-billing-conductor-features/",
+  "meta": {
+    "title": "AWS Billing Conductorの特徴と役割分担",
+    "summary": "AWS Billing Conductorは請求書のカスタマイズを担い、AWS BudgetsやCost Explorerとの役割を理解することで試験対策が可能となります。",
+    "tags": [
+      "AWS",
+      "Billing Conductor",
+      "Cost Management",
+      "AWS Budgets",
+      "Cost Explorer"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "料金モデル"
+    ]
+  }
+}
