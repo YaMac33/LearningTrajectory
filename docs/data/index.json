@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-datasync-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-06T07:30:49+09:00",
+    "title": "AWS DataSyncの概要と特徴",
+    "summary": "AWS DataSyncは、高速データ転送サービスで、オンプレミスからAWSへ大量のデータを短期間で送信・同期できることを理解できます。",
+    "tags": [
+      "AWS",
+      "DataSync",
+      "データ転送",
+      "高速",
+      "同期"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-aws-datasync-overview/"
+  },
+  {
     "id": "awscp-api-gateway-sqs-role",
     "category": "awscp",
     "timestamp": "2026-02-06T07:27:25+09:00",
