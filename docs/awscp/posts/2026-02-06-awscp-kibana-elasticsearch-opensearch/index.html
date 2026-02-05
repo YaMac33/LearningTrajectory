@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Kibanaの基本とELKスタック</title>
+  <meta name="description" content="ログ分析の可視化ツール「Kibana」と、それを支える「ELKスタック」の役割分担について解説。AWSでの呼び名（OpenSearch Dashboards）との関係も整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Kibanaの基本とELKスタック" />
+  <meta property="og:description" content="ログ分析の可視化ツール「Kibana」と、それを支える「ELKスタック」の役割分担について解説。AWSでの呼び名（OpenSearch Dashboards）との関係も整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* ビフォーアフター */
+    .viz-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .viz-compare { grid-template-columns: 1fr; }
+    }
+    .viz-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .viz-card.log {
+      border-top: 4px solid #64748b; /* Gray */
+      background: #1e293b;
+      color: #e2e8f0;
+      font-family: monospace;
+      text-align: left;
+      font-size: 0.8em;
+      line-height: 1.4;
+    }
+    .viz-card.kibana {
+      border-top: 4px solid #ec4899; /* Pink/Magenta for Kibana */
+      background: #fff;
+    }
+    .chart-mock {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 5px;
+      height: 60px;
+      margin-top: 10px;
+    }
+    .chart-bar {
+      width: 10px;
+      background: #ec4899;
+      border-radius: 2px 2px 0 0;
+    }
+    
+    /* ELKスタック */
+    .elk-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .elk-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-align: center;
+      font-weight: bold;
+      width: 200px;
+      background: #fff;
+      position: relative;
+    }
+    .elk-k { border-color: #ec4899; color: #be185d; background: #fdf2f8; }
+    .elk-e { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    .elk-l { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    
+    .stack-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      line-height: 0.8;
+    }
+    .role-note {
+      font-size: 0.8em;
+      font-weight: normal;
+      display: block;
+      margin-top: 2px;
+      color: #64748b;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-05">
+            2026.02.05
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Kibanaの基本とELKスタック</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#Kibana</span>
+            <span class="tag">#ELKスタック</span>
+            <span class="tag">#可視化</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#OpenSearch</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Kibanaはログデータを可視化するツール。AWSではOpenSearch Dashboardsとして利用されます。</p>
+<hr>
+<p>
+  <strong>Kibana（キバナ）</strong>は、一言で言うと<strong>「データの『可視化（見える化）』ツール」</strong>です。<br>
+  膨大な文字の羅列である「ログデータ」を、綺麗なグラフ、円グラフ、地図、表に変えて、人間が見やすくするためのWeb画面（ダッシュボード）です。
+</p>
+<p>
+  AWSの試験や実務では、先ほど解説した <strong>Amazon OpenSearch Service</strong>（旧 Elasticsearch Service） とセットで必ず登場します。
+</p>
+
+<h2>1. なぜこれが必要なの？（文字の羅列は読みたくない）</h2>
+<p>
+  サーバーのログデータは、通常ただのテキストファイルです。
+</p>
+
+<!-- 図解：ビフォーアフター -->
+<div class="diagram-container">
+  <div class="diagram-title">データの見え方の違い</div>
+  <div class="viz-compare">
+    
+    <!-- Before -->
+    <div class="viz-card log">
+      <div style="font-weight:bold; margin-bottom:10px; color:#94a3b8; text-align:center;">生ログ (Raw Data)</div>
+      INFO 2024-02-05 10:00 start<br>
+      ERROR 2024-02-05 10:01 500<br>
+      WARN 2024-02-05 10:02 high<br>
+      INFO 2024-02-05 10:03 end...
+      <p style="margin-top:10px; text-align:center; color:#fca5a5;">読むのが辛い😫</p>
+    </div>
+
+    <!-- After -->
+    <div class="viz-card kibana">
+      <div style="font-weight:bold; margin-bottom:10px; color:#be185d;">Kibana (可視化)</div>
+      <div class="chart-mock">
+        <div class="chart-bar" style="height:30%"></div>
+        <div class="chart-bar" style="height:80%"></div>
+        <div class="chart-bar" style="height:50%"></div>
+        <div class="chart-bar" style="height:20%"></div>
+        <div class="chart-bar" style="height:60%"></div>
+      </div>
+      <p style="margin-top:10px; font-weight:bold; color:#166534;">一瞬で状況把握🤩</p>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  これが何百万行もあったら、人間には「いつ、何が起きたか」全くわかりません。<br>
+  Kibanaを使うと、このデータを読み込んで、<strong>「エラーの発生件数を棒グラフにする」「アクセス元の国を世界地図にプロットする」</strong>といったことが、マウス操作だけで簡単にできます。
+</p>
+
+<h2>2. 「ELKスタック」という黄金トリオ</h2>
+<p>
+  IT業界には、ログ分析の鉄板の組み合わせとして<strong>「ELK（エルク）」</strong>という言葉があります。これは3つのソフトの頭文字です。
+</p>
+
+<!-- 図解：ELKスタック -->
+<div class="diagram-container">
+  <div class="diagram-title">ELKスタックの構成</div>
+  <div class="elk-stack">
+    
+    <div class="elk-box elk-k">
+      Kibana
+      <span class="role-note">見る (可視化)</span>
+    </div>
+    
+    <div class="stack-arrow">⬆</div>
+    
+    <div class="elk-box elk-e">
+      Elasticsearch
+      <span class="role-note">溜める (検索エンジン)</span>
+    </div>
+    
+    <div class="stack-arrow">⬆</div>
+    
+    <div class="elk-box elk-l">
+      Logstash
+      <span class="role-note">運ぶ (収集・加工)</span>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    ※AWSでは Logstash の代わりに Kinesis Firehose を使うことが多いです。
+  </p>
+</div>
+
+<ul>
+  <li><strong>E (Elasticsearch)</strong>: データの<strong>「検索・保存」</strong>担当（エンジン）。頭脳です。</li>
+  <li><strong>L (Logstash)</strong>: データの<strong>「収集・加工」</strong>担当（運び屋）。</li>
+  <li><strong>K (Kibana)</strong>: データの<strong>「表示・可視化」</strong>担当（画面）。顔です。</li>
+</ul>
+
+<h2>3. AWS試験での注意点（名前が変わった！？）</h2>
+<p>
+  ここが少しややこしいのですが、非常に重要です。<br>
+  元々、AWSのサービスでも「Kibana」がそのまま使われていました。しかし、ライセンス（大人の事情）の問題で、AWSはKibanaを独自に改良（フォーク）しました。
+</p>
+<p>
+  そのため、現在のAWS（Amazon OpenSearch Service）では、Kibanaとほぼ同じ機能を持つツールのことを<strong>「OpenSearch Dashboards」</strong>と呼んでいます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>文脈</th>
+      <th>ツールの名前</th>
+      <th>実態</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>一般的なOSSの話</td>
+      <td><strong>Kibana</strong></td>
+      <td>本家本元</td>
+    </tr>
+    <tr>
+      <td>今のAWSサービス</td>
+      <td><strong>OpenSearch Dashboards</strong></td>
+      <td>AWS版Kibana</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  試験対策としては、<strong>「Kibana ≒ OpenSearch Dashboards」</strong>と脳内で変換してOKです。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Kibana</strong>: ログデータを<strong>「グラフや地図にして見やすくする」</strong>ためのツール。</li>
+  <li><strong>役割</strong>: 検索エンジン（Elasticsearch）に入っているデータを人間が分析するための「画面」。</li>
+  <li><strong>AWSでは</strong>: 現在は <strong>OpenSearch Dashboards</strong> という名前で提供されている。</li>
+</ul>
+<p>
+  「Kibana ＝ かっこいいグラフを作るダッシュボード」というイメージで覚えましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
