@@ -1,0 +1,22 @@
+{
+  "id": "awscp-kinesis-data-firehose",
+  "category": "awscp",
+  "timestamp": "2026-02-06T07:52:18+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-kinesis-data-firehose/",
+  "meta": {
+    "title": "Kinesis Data Firehoseの基本を理解する",
+    "summary": "Kinesis Data Firehoseは、ストリーミングデータを迅速に目的地に配送するサービスです。試験では、データの配送先やStreamsとの違いを理解することが重要です。",
+    "tags": [
+      "Kinesis",
+      "Firehose",
+      "ストリーミングデータ",
+      "AWS",
+      "データ処理",
+      "配送サービス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
