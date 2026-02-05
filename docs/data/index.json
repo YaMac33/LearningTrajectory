@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-ssm-patch-manager",
+    "category": "awscp",
+    "timestamp": "2026-02-06T07:13:22+09:00",
+    "title": "AWS SSMパッチマネージャーの全貌",
+    "summary": "SSM Patch Managerを利用することで、自動でサーバーのOSアップデートを管理し手動の限界を克服します。試験観点として、運用の効率化やセキュリティ管理の知識が深まります。",
+    "tags": [
+      "AWS",
+      "パッチ管理",
+      "自動化",
+      "セキュリティ",
+      "サーバー管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-aws-ssm-patch-manager/"
+  },
+  {
     "id": "awscp-kibana-elasticsearch-opensearch",
     "category": "awscp",
     "timestamp": "2026-02-06T07:08:52+09:00",
