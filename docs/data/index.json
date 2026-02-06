@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cloud9-ui-features",
+    "category": "awscp",
+    "timestamp": "2026-02-06T11:36:02+09:00",
+    "title": "Cloud9のUIと特徴を理解しよう",
+    "summary": "AWS Cloud9は、ブラウザ上で動作する開発環境で、VS Codeに似たUIを持っています。共同編集機能やEC2ベースの仕組みが特徴です。",
+    "tags": [
+      "Cloud9",
+      "VS Code",
+      "UI",
+      "共同編集",
+      "開発環境"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-aws-cloud9-ui-features/"
+  },
+  {
     "id": "awscp-aws-cdk-development-environment",
     "category": "awscp",
     "timestamp": "2026-02-06T11:19:37+09:00",
