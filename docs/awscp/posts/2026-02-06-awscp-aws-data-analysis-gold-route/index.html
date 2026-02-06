@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSデータ分析の黄金の流れ</title>
+  <meta name="description" content="S3、Glue、Redshift、QuickSightを連携させたAWSデータ分析の「黄金ルート」を解説。データの収集から可視化までの全体像と、Athenaの使い分けについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSデータ分析の黄金の流れ" />
+  <meta property="og:description" content="S3、Glue、Redshift、QuickSightを連携させたAWSデータ分析の「黄金ルート」を解説。データの収集から可視化までの全体像と、Athenaの使い分けについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 黄金のフロー図 */
+    .flow-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    .main-stream {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .flow-card {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+      min-width: 120px;
+    }
+    .card-s3 { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .card-etl { border-color: #f97316; background: #fff7ed; color: #c2410c; }
+    .card-dwh { border-color: #8b5cf6; background: #f5f3ff; color: #6d28d9; }
+    .card-bi { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    .card-athena { border-color: #059669; border-style: dashed; color: #047857; }
+    
+    .card-icon {
+      font-size: 2em;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .card-role {
+      font-size: 0.75em;
+      font-weight: bold;
+      color: #64748b;
+      margin-bottom: 2px;
+      display: block;
+    }
+    .card-name {
+      font-weight: 800;
+      font-size: 1em;
+    }
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    
+    /* Athenaの分岐 */
+    .sub-stream {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      margin-top: -10px;
+    }
+    .connector-line {
+      width: 2px;
+      height: 30px;
+      background: #cbd5e1;
+      position: absolute;
+      top: -30px;
+      left: 50%;
+    }
+    .athena-box {
+      border: 2px dashed #64748b;
+      border-radius: 8px;
+      padding: 10px 20px;
+      background: #f8fafc;
+      text-align: center;
+      margin-left: -200px; /* S3の下に来るように調整 */
+    }
+    @media (max-width: 700px) {
+      .athena-box { margin-left: 0; margin-top: 10px; }
+      .main-stream { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-06">
+            2026.02.06
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSデータ分析の黄金の流れ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#データ分析</span>
+            <span class="tag">#QuickSight</span>
+            <span class="tag">#Redshift</span>
+            <span class="tag">#Glue</span>
+            <span class="tag">#Athena</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>S3からRedshift、QuickSightまでのデータ分析の流れを解説します。</p>
+<hr>
+<p>
+  AWSでビッグデータ分析基盤を構築する際には、いくつかのサービスを組み合わせる「定石（黄金ルート）」が存在します。<br>
+  <strong>「貯める(S3) → 加工する(Glue) → 保管する(Redshift) → 見る(QuickSight)」</strong><br>
+  この流れを理解しておくと、個々のサービスの役割がパズルのようにカチッとハマります。
+</p>
+
+<h2>1. データの旅（完全版フロー）</h2>
+<p>
+  データが生まれてから、人間が意思決定に使うまでの流れを図解します。
+</p>
+
+<!-- 図解：黄金のフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">AWSデータ分析パイプライン</div>
+  <div class="flow-wrapper">
+    
+    <!-- メインストリーム -->
+    <div class="main-stream">
+      <div class="flow-card card-s3">
+        <span class="card-role">① 貯める</span>
+        <span class="card-icon">🌊</span>
+        <span class="card-name">Amazon S3</span>
+        <div style="font-size:0.75em;">データレイク</div>
+      </div>
+      
+      <div class="flow-arrow">➡</div>
+      
+      <div class="flow-card card-etl">
+        <span class="card-role">② 加工・運ぶ</span>
+        <span class="card-icon">🤖</span>
+        <span class="card-name">Glue / EMR</span>
+        <div style="font-size:0.75em;">ETL処理</div>
+      </div>
+      
+      <div class="flow-arrow">➡</div>
+      
+      <div class="flow-card card-dwh">
+        <span class="card-role">③ 分析・保管</span>
+        <span class="card-icon">🏙️</span>
+        <span class="card-name">Redshift</span>
+        <div style="font-size:0.75em;">DWH</div>
+      </div>
+      
+      <div class="flow-arrow">➡</div>
+      
+      <div class="flow-card card-bi">
+        <span class="card-role">④ 見る</span>
+        <span class="card-icon">📊</span>
+        <span class="card-name">QuickSight</span>
+        <div style="font-size:0.75em;">可視化・BI</div>
+      </div>
+    </div>
+
+    <!-- Athena (脇道) -->
+    <div class="athena-box">
+      <span style="font-size:1.5em;">🔍</span> <strong>Amazon Athena</strong>
+      <p style="font-size:0.8em; margin:4px 0; color:#475569;">
+        S3を直接SQLで覗く<br>(簡易分析ルート)
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<ol>
+  <li><strong>Amazon S3 (データレイク)</strong>:
+    <ul>
+      <li>あらゆる生データ（ログ、CSV、画像）をとりあえずここに投げ込みます。容量無制限で安価です。</li>
+    </ul>
+  </li>
+  <li><strong>AWS Glue / Amazon EMR (加工)</strong>:
+    <ul>
+      <li>S3からデータを取り出し、汚れを取り除いたり、分析しやすい形に整えたりして、次の場所へ運びます。これをETL（抽出・変換・ロード）と呼びます。</li>
+    </ul>
+  </li>
+  <li><strong>Amazon Redshift (データウェアハウス)</strong>:
+    <ul>
+      <li>きれいに整理されたデータを大量に保管し、超高速で集計できるように待機させます。</li>
+    </ul>
+  </li>
+  <li><strong>Amazon QuickSight (可視化)</strong>:
+    <ul>
+      <li>Redshiftのデータを読み込み、人間が見やすいグラフやダッシュボードにして表示します。</li>
+    </ul>
+  </li>
+</ol>
+
+<h2>2. QuickSight の役割： 「レストランのメニュー表」</h2>
+<p>
+  Redshift（DWH）は、下ごしらえが済んだ食材が並ぶ「巨大な冷蔵庫」です。<br>
+  しかし、冷蔵庫の中身（数字の羅列）を直接見ても、ビジネスの状況は分かりにくいものです。
+</p>
+<p>
+  <strong>Amazon QuickSight</strong> は、その食材を使って、経営者やマネージャーがひと目で状況を理解できる<strong>「きれいな盛り付け（グラフや表）」</strong>にしてテーブルに運んでくれる役割（BIツール）です。
+</p>
+
+<h2>3. 「Athena」と「QuickSight」の使い分け</h2>
+<p>
+  どちらも「分析」に使われますが、用途が明確に違います。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>Amazon Athena</th>
+      <th>Amazon QuickSight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>対象データ</strong></td>
+      <td><strong>S3上のファイル</strong>を直接</td>
+      <td>S3, Athena, Redshift, RDSなど様々</td>
+    </tr>
+    <tr>
+      <td><strong>操作方法</strong></td>
+      <td><strong>SQLクエリ</strong>を書く</td>
+      <td>マウスでドラッグ＆ドロップ</td>
+    </tr>
+    <tr>
+      <td><strong>出力結果</strong></td>
+      <td>表計算のような「文字データ」</td>
+      <td>棒グラフや円グラフなどの「絵」</td>
+    </tr>
+    <tr>
+      <td><strong>シチュエーション</strong></td>
+      <td>「とりあえずS3の中身をサクッと確認したい」「エラーログを調査したい」</td>
+      <td>「売上の推移をグラフにして、チームで共有したい」「経営ダッシュボードを作りたい」</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ：試験対策キーワード</h2>
+<ul>
+  <li><strong>Amazon QuickSight</strong>: 「ダッシュボード」「視覚化」「BI（ビジネスインテリジェンス）」という言葉が出たらこれです。</li>
+  <li><strong>AWS Glue</strong>: 「ETL（Extract/Transform/Load）」「データカタログ（データの索引）」という言葉が出たらこれです。</li>
+  <li><strong>Amazon Athena</strong>: 「サーバーレス」「S3上のデータに対して標準SQLを実行」という言葉が出たらこれです。</li>
+</ul>
+<p>
+  この「データの流れ」を頭の中に描けるようになれば、分析系の問題は怖くありません！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
