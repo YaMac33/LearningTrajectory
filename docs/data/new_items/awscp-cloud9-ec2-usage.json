@@ -1,0 +1,22 @@
+{
+  "id": "awscp-cloud9-ec2-usage",
+  "category": "awscp",
+  "timestamp": "2026-02-06T12:01:45+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-cloud9-ec2-usage/",
+  "meta": {
+    "title": "Cloud9とEC2の正しい使い方",
+    "summary": "AWS Cloud9を活用した開発環境構築の理解を深め、EC2の利用を自動化する方法が学べます。",
+    "tags": [
+      "Cloud9",
+      "EC2",
+      "AWS",
+      "CDK",
+      "CloudFormation",
+      "開発環境"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
