@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-data-analysis-gold-route",
+    "category": "awscp",
+    "timestamp": "2026-02-06T11:09:25+09:00",
+    "title": "AWSデータ分析の黄金の流れ",
+    "summary": "AWSにおけるデータ分析の流れを理解し、各サービスの役割や連携を把握することができます。",
+    "tags": [
+      "AWS",
+      "データ分析",
+      "QuickSight",
+      "Redshift",
+      "Glue",
+      "Athena"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-aws-data-analysis-gold-route/"
+  },
+  {
     "id": "awscp-emr-data-lake-understanding",
     "category": "awscp",
     "timestamp": "2026-02-06T11:02:46+09:00",
