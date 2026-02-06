@@ -1,0 +1,19 @@
+{
+  "id": "blog-server-issues",
+  "category": "blog",
+  "timestamp": "2026-02-06T19:30:04+09:00",
+  "post_path": "blog/posts/2026-02-06-blog-server-issues/",
+  "meta": {
+    "title": "サーバーが落ちる状態についての考察",
+    "summary": "サーバーが落ちる理由とGitHub Pagesの特性についてまとめました。",
+    "tags": [
+      "#サーバー",
+      "#GitHub",
+      "#障害"
+    ],
+    "taxonomy": [
+      "journal",
+      "note"
+    ]
+  }
+}
