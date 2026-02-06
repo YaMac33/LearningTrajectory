@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-big-data-data-processing",
+    "category": "awscp",
+    "timestamp": "2026-02-06T11:57:32+09:00",
+    "title": "ビッグデータとAWSサービスの役割",
+    "summary": "この内容では、ビッグデータの定義とAWSサービス（S3、EMR）の役割分担について説明します。試験対策として、ビッグデータを扱う上での重要なポイントが理解できます。",
+    "tags": [
+      "ビッグデータ",
+      "データレイク",
+      "EMR",
+      "AWS",
+      "データ処理"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "クラウドの特徴"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-big-data-data-processing/"
+  },
+  {
     "id": "awscp-aws-cloud9-ui-features",
     "category": "awscp",
     "timestamp": "2026-02-06T11:36:02+09:00",
