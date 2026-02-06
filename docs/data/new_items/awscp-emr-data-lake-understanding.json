@@ -1,0 +1,21 @@
+{
+  "id": "awscp-emr-data-lake-understanding",
+  "category": "awscp",
+  "timestamp": "2026-02-06T11:02:46+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-emr-data-lake-understanding/",
+  "meta": {
+    "title": "EMRとデータレイクの正しい理解",
+    "summary": "EMRはデータレイクではなく加工エンジンです。S3、EMR、Redshiftの役割分担とデータの流れを明確にすることが重要です。",
+    "tags": [
+      "データレイク",
+      "EMR",
+      "Redshift",
+      "AWS",
+      "データ処理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
