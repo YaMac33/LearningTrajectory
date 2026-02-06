@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | EMRとデータレイクの正しい理解</title>
+  <meta name="description" content="EMRはデータレイクではなく加工エンジンです。S3（データレイク）、EMR（加工）、Redshift（DWH）の正しい役割分担とデータの流れについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EMRとデータレイクの正しい理解" />
+  <meta property="og:description" content="EMRはデータレイクではなく加工エンジンです。S3（データレイク）、EMR（加工）、Redshift（DWH）の正しい役割分担とデータの流れについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 3つの役割メタファー */
+    .role-trio {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .role-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .role-card.lake { border-top: 4px solid #3b82f6; background: #eff6ff; } /* S3 Blue */
+    .role-card.engine { border-top: 4px solid #f97316; background: #fff7ed; } /* EMR Orange */
+    .role-card.dwh { border-top: 4px solid #8b5cf6; background: #f5f3ff; } /* Redshift Purple */
+    
+    .role-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .role-title { font-weight: 800; color: #1e293b; margin-bottom: 4px; display: block; }
+    .role-sub { font-size: 0.85em; font-weight: bold; color: #64748b; margin-bottom: 8px; display: block; }
+    .role-desc { font-size: 0.9em; color: #334155; line-height: 1.4; }
+
+    /* データフロー */
+    .data-pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .pipe-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-weight: bold;
+      background: #fff;
+      text-align: center;
+      min-width: 100px;
+    }
+    .box-s3 { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .box-emr { border-color: #f97316; color: #c2410c; background: #fff7ed; }
+    .box-red { border-color: #8b5cf6; color: #6d28d9; background: #f5f3ff; }
+    .box-athena { border-color: #059669; color: #047857; background: #ecfdf5; }
+    
+    .pipe-arrow {
+      color: #94a3b8;
+      font-size: 1.2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .arrow-txt { font-size: 0.7em; font-weight: bold; color: #64748b; }
+
+    /* ワンポイント */
+    .one-point {
+      border: 2px dashed #10b981;
+      background: #f0fdf4;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .point-title {
+      font-weight: bold;
+      color: #15803d;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-06">
+            2026.02.06
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EMRとデータレイクの正しい理解</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#データレイク</span>
+            <span class="tag">#EMR</span>
+            <span class="tag">#Redshift</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#データ処理</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>EMRはデータレイクではなく加工エンジン。データの貯蔵と処理を正しく分けよう。</p>
+<hr>
+<p>
+  <strong>Q. EMRは「データレイク」、Redshiftは「DWH」という認識で合ってる？</strong><br>
+  <strong>A. その認識は「半分正解で、半分は少しだけ修正が必要」です！</strong>
+</p>
+<p>
+  非常に惜しいところですので、試験で迷わないように「データレイク」という言葉の定義と、各サービスの役割分担を整理しましょう。
+</p>
+
+<h2>1. 正しい位置づけ：3つの役割</h2>
+<p>
+  実は、AWSにおいて「データレイク（貯める場所）」という役割を担うのは、EMRではなく <strong>Amazon S3</strong> なのです。
+</p>
+
+<!-- 図解：役割メタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">データ分析基盤の3大要素</div>
+  <div class="role-trio">
+    
+    <!-- S3 -->
+    <div class="role-card lake">
+      <span class="role-icon">🌊</span>
+      <span class="role-title">Amazon S3</span>
+      <span class="role-sub">データレイク</span>
+      <div class="role-desc">
+        何でも放り込める<br><strong>「巨大な湖」</strong>。<br>
+        (貯蔵)
+      </div>
+    </div>
+
+    <!-- EMR -->
+    <div class="role-card engine">
+      <span class="role-icon">⚙️</span>
+      <span class="role-title">Amazon EMR</span>
+      <span class="role-sub">加工エンジン</span>
+      <div class="role-desc">
+        水を汲み上げて<br><strong>「ろ過・加工する工場」</strong>。<br>
+        (計算)
+      </div>
+    </div>
+
+    <!-- Redshift -->
+    <div class="role-card dwh">
+      <span class="role-icon">🏙️</span>
+      <span class="role-title">Amazon Redshift</span>
+      <span class="role-sub">DWH</span>
+      <div class="role-desc">
+        整理された水が入った<br><strong>「巨大な貯水タンク」</strong>。<br>
+        (分析)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h3>実務でのデータフロー</h3>
+<p>
+  これらは以下のように連携して動きます。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">データの流れ</div>
+  <div class="data-pipeline">
+    <div class="pipe-box box-s3">
+      S3<br>(Raw)
+    </div>
+    <div class="pipe-arrow">
+      <span class="arrow-txt">読み込み</span>
+      ➡
+    </div>
+    <div class="pipe-box box-emr">
+      EMR<br>(加工)
+    </div>
+    <div class="pipe-arrow">
+      <span class="arrow-txt">書き戻し</span>
+      ➡
+    </div>
+    <div class="pipe-box box-s3">
+      S3<br>(Clean)
+    </div>
+    <div class="pipe-arrow">
+      <span class="arrow-txt">ロード</span>
+      ➡
+    </div>
+    <div class="pipe-box box-red">
+      Redshift<br>(分析)
+    </div>
+  </div>
+</div>
+
+<ol>
+  <li><strong>S3 (データレイク)</strong>: ログ、画像、CSVなど、あらゆる生データをそのまま貯めます。</li>
+  <li><strong>EMR (加工)</strong>: S3にある生データを取り出し、不要なデータを削除したり形を整えたりして、またS3に戻します。</li>
+  <li><strong>Redshift (DWH)</strong>: 加工済みのきれいなデータを溜め込み、ビジネス分析（BIツールなど）に利用します。</li>
+</ol>
+
+<h2>2. なぜ「EMR ＝ データレイク」と混同しやすいのか？</h2>
+<p>
+  それは、EMRが<strong>「データレイク（S3）にあるデータを直接処理するのが得意だから」</strong>です。<br>
+  昔のビッグデータ技術（オンプレミスのHadoopなど）では、データを溜める場所（HDFS）と処理する場所が一体化していました。<br>
+  しかしAWSでは、<strong>「貯める場所（S3）」と「計算する場所（EMR）」を切り離して考える</strong>のが鉄則です。これを「ストレージとコンピューティングの分離」と呼び、コスト削減の大きな鍵となります。
+</p>
+
+<h2>3. Redshift は間違いなく「DWH」です</h2>
+<p>
+  こちらはあなたの認識通り、100%正解です！<br>
+  Redshiftは、数ペタバイトという途方もない量の「整理されたデータ（構造化データ）」を、SQLを使って高速に検索するための専用サービスです。
+</p>
+
+<h2>4. 試験で問われやすいポイント</h2>
+<p>
+  試験問題では、以下のようなキーワードでサービスを出し分けてきます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>要件・キーワード</th>
+      <th>正解のサービス</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>「あらゆる形式のデータを安価に、無制限に貯めたい」<br>「データレイクを構築したい」</td>
+      <td><strong>Amazon S3</strong></td>
+    </tr>
+    <tr>
+      <td>「HadoopやSparkなどのフレームワークを使いたい」<br>「大量のデータを加工・処理したい」</td>
+      <td><strong>Amazon EMR</strong></td>
+    </tr>
+    <tr>
+      <td>「標準的なSQLを使って、大規模データの集計・分析を行いたい」<br>「DWH (データウェアハウス) が必要」</td>
+      <td><strong>Amazon Redshift</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="one-point">
+  <div class="point-title">💡 講師のワンポイントアドバイス</div>
+  <p>
+    最近の試験では <strong>Amazon Athena</strong> というサービスもよく出ます。<br>
+    これは<strong>「データレイク（S3）にあるデータに対して、EMRやRedshiftを使わずに、直接SQLを投げて分析できる」</strong>サービスです。<br>
+    「サーバーレスで手軽に分析」という言葉が出たら Athena を疑ってください。
+  </p>
+</div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
