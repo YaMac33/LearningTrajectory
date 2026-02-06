@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-direct-connect-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-06T12:41:56+09:00",
+    "title": "AWS Direct Connectの概要と特性",
+    "summary": "AWS Direct Connectとは、オンプレミスとAWSを専用線で接続するサービスです。VPNとの違いや、災害時の冗長化構成について理解できます。",
+    "tags": [
+      "AWS",
+      "Direct Connect",
+      "VPN",
+      "災害耐性",
+      "冗長化",
+      "通信"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-aws-direct-connect-overview/"
+  },
+  {
     "id": "awscp-cloud9-ec2-usage",
     "category": "awscp",
     "timestamp": "2026-02-06T12:01:45+09:00",
