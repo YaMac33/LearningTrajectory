@@ -1,0 +1,21 @@
+{
+  "id": "awscp-reserved-instances-aws-exam",
+  "category": "awscp",
+  "timestamp": "2026-02-06T19:08:39+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-reserved-instances-aws-exam/",
+  "meta": {
+    "title": "リザーブドインスタンスの基本を解説",
+    "summary": "EC2のリザーブドインスタンス（RI）について、スタンダードとコンバーティブルの違いを明確に理解できます。",
+    "tags": [
+      "リザーブドインスタンス",
+      "EC2",
+      "スタンダード",
+      "コンバーティブル",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
