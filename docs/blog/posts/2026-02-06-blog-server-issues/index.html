@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | サーバーが落ちるとは？</title>
+  <meta name="description" content="「サーバーが落ちる」原因と状態を解説し、GitHub Pagesがなぜ落ちにくいのか、その仕組み（CDN）と制約についてまとめました。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="サーバーが落ちるとは？" />
+  <meta property="og:description" content="「サーバーが落ちる」原因と状態を解説し、GitHub Pagesがなぜ落ちにくいのか、その仕組み（CDN）と制約についてまとめました。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+  
+  <style>
+    /* 図解用追加スタイル */
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin: 32px 0;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .diagram-section {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .diagram-title {
+      font-weight: 800;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      display: block;
+      color: #111827;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.95em;
+      font-weight: 600;
+    }
+    .flow-box.highlight {
+      background: #eef2ff;
+      border-color: #818cf8;
+      color: #3730a3;
+    }
+    .flow-arrow {
+      color: #9ca3af;
+      font-weight: bold;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #fff;
+    }
+    .status-ng { background: #ef4444; }
+    .status-ok { background: #10b981; }
+    
+    @media (max-width: 600px) {
+      .flow-row { flex-direction: column; gap: 8px; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-06">
+            2026.02.06
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">サーバーが落ちるとは？</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#サーバー</span>
+            <span class="tag">#GitHub</span>
+            <span class="tag">#障害</span>
+            <span class="tag">#アクセス集中</span>
+            <span class="tag">#技術</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「サーバーが落ちる」という言葉をよく耳にしますが、具体的に内部で何が起きているのでしょうか。その原因と、GitHub Pagesのような静的ホスティングサービスの実情について解説します。</p>
+
+<h2>「サーバーが落ちる」状態と原因</h2>
+<p>一言でいうと、<strong>サーバーが処理能力の限界を超えてしまい、リクエストに対して正常に応答できなくなった状態</strong>を指します。利用者から見ると「ページが開かない」「503エラーが出る」といった現象になります。</p>
+
+<p>主な原因は以下の4つに分類されます。</p>
+<ul>
+  <li><strong>アクセス集中（過負荷）</strong>：チケット発売時などに同時アクセスが殺到し、CPUやメモリを使い切る。</li>
+  <li><strong>プロセス停止</strong>：プログラムのバグやメモリリークで、Webサーバーソフト自体がクラッシュする。</li>
+  <li><strong>インフラ障害</strong>：データセンターの停電や、物理的なネットワーク切断。</li>
+  <li><strong>意図的攻撃</strong>：DDoS攻撃など、悪意を持って大量の通信を送りつける行為。</li>
+</ul>
+
+<h2>GitHub Pagesは「サーバー」を使っていない？</h2>
+<p>「GitHub Pagesはサーバーを立てずに公開できる」と言われますが、これは「サーバーが存在しない」わけではありません。<strong>「ユーザーが管理すべきサーバーがない」だけで、裏側ではGitHubの巨大なインフラが動いています。</strong></p>
+<p>通常のWebサーバーとGitHub Pages（CDN配信）の違いを図で比較してみましょう。</p>
+
+<div class="diagram-container">
+  <!-- パターンA: 通常の動的サーバー -->
+  <div class="diagram-section">
+    <span class="diagram-title">通常の動的サーバー (EC2等)</span>
+    <div class="flow-row">
+      <div class="flow-box">ユーザー</div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box">サーバー<br><span style="font-size:0.8em; font-weight:normal;">(計算・DB処理)</span></div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box" style="border-color:#ef4444; background:#fef2f2;">限界・ダウン<br><span class="status-badge status-ng">Load Error</span></div>
+    </div>
+    <p style="font-size: 0.9em; color: #6b7280; margin-top: 10px;">
+      1台のサーバーで計算するため、アクセス集中で負荷が高まると落ちやすい
+    </p>
+  </div>
+
+  <!-- パターンB: GitHub Pages -->
+  <div class="diagram-section">
+    <span class="diagram-title">GitHub Pages (静的 + CDN)</span>
+    <div class="flow-row">
+      <div class="flow-box">ユーザー</div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box highlight">CDN (配信網)<br><span style="font-size:0.8em; font-weight:normal;">(世界の各拠点)</span></div>
+      <div class="flow-arrow">➡</div>
+      <div class="flow-box highlight">正常表示<br><span class="status-badge status-ok">Fast</span></div>
+    </div>
+    <p style="font-size: 0.9em; color: #6b7280; margin-top: 10px;">
+      計算処理をせず、コピーされたファイルを配るだけなので非常に落ちにくい
+    </p>
+  </div>
+</div>
+
+<h3>GitHub Pagesが強い理由</h3>
+<p>GitHub Pagesの実体は、<strong>CDN（コンテンツ・デリバリー・ネットワーク）</strong>に近い仕組みです。世界中に配置されたサーバーがあなたのWebサイトのコピー（キャッシュ）を持っており、ユーザーに最も近い場所からファイルを渡します。</p>
+<ul>
+  <li><strong>計算しない</strong>：データベース接続や複雑な計算を行わず、ファイルを渡すだけです。</li>
+  <li><strong>分散される</strong>：アクセスが集中しても、世界中のサーバーが分担して処理します。</li>
+</ul>
+<p>そのため、個人のブログやポートフォリオレベルのアクセス集中で「落ちる」ことは、理論上ほぼありません。</p>
+
+<h2>「落ちない」代わりの制約</h2>
+<p>GitHub Pagesは強力ですが、その仕組み上、できないこともあります。</p>
+<ul>
+  <li><strong>動的な処理ができない</strong>：お問い合わせフォームの送信処理、ログイン機能、データベースへの保存などは単体ではできません。</li>
+  <li><strong>リアルタイム生成不可</strong>：アクセスごとに表示内容を変える（例：検索結果の動的生成）ことは苦手です。</li>
+</ul>
+
+<h2>まとめ</h2>
+<p>「サーバーが落ちる」とは、処理能力オーバーや障害のことです。GitHub Pagesは「落ちない魔法」ではなく、<strong>「負荷がかかりにくい配信構造（CDN）」を採用している</strong>ため、結果として非常に安定しています。</p>
+<p>AWSのS3 + CloudFrontのような構成もこれと同じ考え方です。「落ちないサイト」を作りたい場合、サーバーのスペックを上げるよりも、こうした「静的配信」の仕組みを活用するのが現代的なアプローチと言えます。</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
