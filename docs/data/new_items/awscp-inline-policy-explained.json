@@ -1,0 +1,21 @@
+{
+  "id": "awscp-inline-policy-explained",
+  "category": "awscp",
+  "timestamp": "2026-02-06T19:26:31+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-inline-policy-explained/",
+  "meta": {
+    "title": "インラインポリシーの解説",
+    "summary": "インラインポリシーは特定のプリンシパルに埋め込まれる権限設定で、共有ができない。試験ではその特徴を理解することが求められる。",
+    "tags": [
+      "ポリシー",
+      "AWS",
+      "インラインポリシー",
+      "IAM",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
