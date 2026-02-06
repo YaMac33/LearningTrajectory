@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-codeguru-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-06T19:48:10+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-aws-codeguru-overview/",
+  "meta": {
+    "title": "AWS CodeGuruの機能と使用法",
+    "summary": "AWS CodeGuruは機械学習を活用し、コードの品質と性能を分析します。ReviewerとProfilerの機能を理解し、どのようにITチームを支援するかが重要です。",
+    "tags": [
+      "AWS",
+      "CodeGuru",
+      "機械学習",
+      "コードレビュー",
+      "パフォーマンス分析"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
