@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-schema-conversion-tool",
+    "category": "awscp",
+    "timestamp": "2026-02-06T19:36:32+09:00",
+    "title": "AWSスキーマ変換ツールの概要",
+    "summary": "AWS Schema Conversion Tool (SCT) は異なるデータベース間でスキーマを変換するためのツールで、主に設計図の変換を担当します。DMSとの役割分担も理解することが重要です。",
+    "tags": [
+      "AWS",
+      "SCT",
+      "DB移行",
+      "データベース",
+      "テクノロジー"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-06-awscp-aws-schema-conversion-tool/"
+  },
+  {
     "id": "blog-server-issues",
     "category": "blog",
     "timestamp": "2026-02-06T19:30:04+09:00",
