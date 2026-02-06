@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cdk-development-environment",
+  "category": "awscp",
+  "timestamp": "2026-02-06T11:19:37+09:00",
+  "post_path": "awscp/posts/2026-02-06-awscp-aws-cdk-development-environment/",
+  "meta": {
+    "title": "AWS CDK開発環境の選び方",
+    "summary": "AWS CDKを用いると、VS CodeやCloud9などの環境でプログラミング言語を用いてインフラを定義できます。その特徴や運用方法について詳しく解説します。",
+    "tags": [
+      "AWS",
+      "CDK",
+      "VS Code",
+      "Cloud9",
+      "プログラミング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
