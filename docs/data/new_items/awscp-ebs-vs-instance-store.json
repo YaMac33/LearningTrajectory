@@ -1,0 +1,44 @@
+{
+  "id": "awscp-ebs-vs-instance-store",
+  "category": "awscp",
+  "timestamp": "2026-02-07T23:42:40+09:00",
+  "post_path": "awscp/posts/2026-02-07-awscp-ebs-vs-instance-store/",
+  "meta": {
+    "openai_id": "ebs-vs-instance-store",
+    "title": "EBSとインスタンスストアの違いと選び方",
+    "summary": "EC2のブロックストレージ比較。EBSは永続・スナップショット可、インスタンスストアは高速だが停止/終了で消失が頻出ポイント。",
+    "tags": [
+      "Amazon EBS",
+      "Amazon EC2",
+      "Instance Store",
+      "スナップショット",
+      "永続ストレージ",
+      "一時ストレージ"
+    ],
+    "taxonomy": [
+      "core_services",
+      "storage"
+    ],
+    "dr": "2026-02-07_ebs-vs-instance-store",
+    "status": "public",
+    "review": {
+      "ok": true,
+      "scores": {
+        "diagram": 65,
+        "keypoints": 75
+      },
+      "issues": [
+        {
+          "level": "warning",
+          "code": "DIAGRAM_NOT_REFERENCED",
+          "message": "図はありますが本文中の参照（例: 図1参照）が見当たりません。"
+        },
+        {
+          "level": "warning",
+          "code": "AWSCP_KEYPOINTS_THIN",
+          "message": "AWS-CP観点（料金/セキュリティ/設計/責任共有など）が薄い可能性があります。"
+        }
+      ]
+    }
+  }
+}
