@@ -1,0 +1,50 @@
+{
+  "id": "awscp-db-backups-rds-redshift-redis",
+  "category": "awscp",
+  "timestamp": "2026-02-08T00:59:47+09:00",
+  "post_path": "awscp/posts/2026-02-08-awscp-db-backups-rds-redshift-redis/",
+  "meta": {
+    "openai_id": "db-backups-rds-redshift-redis",
+    "title": "RDS/Redshift/Redisの自動バックアップ要点",
+    "summary": "RDS/Redshift/ElastiCache（Redis）の自動バックアップと保持期間、PITR可否をCLF-C02観点で整理。Memcachedはバックアップ不可というひっかけに注意。",
+    "tags": [
+      "RDS",
+      "Redshift",
+      "ElastiCache",
+      "Redis",
+      "バックアップ",
+      "PITR",
+      "CLF-C02"
+    ],
+    "taxonomy": [
+      "core_services",
+      "database"
+    ],
+    "dr": "2026-02-08_db-backups-rds-redshift-redis",
+    "status": "public",
+    "review": {
+      "ok": true,
+      "scores": {
+        "diagram": 65,
+        "keypoints": 83
+      },
+      "issues": [
+        {
+          "level": "warning",
+          "code": "HTML_EXTERNAL_REF",
+          "message": "外部参照（http/https）が 5 件あります。方針的にOKか確認してください。"
+        },
+        {
+          "level": "warning",
+          "code": "DIAGRAM_NOT_REFERENCED",
+          "message": "図はありますが本文中の参照（例: 図1参照）が見当たりません。"
+        },
+        {
+          "level": "warning",
+          "code": "AWSCP_KEYPOINTS_THIN",
+          "message": "AWS-CP観点（料金/セキュリティ/設計/責任共有など）が薄い可能性があります。"
+        }
+      ]
+    }
+  }
+}
