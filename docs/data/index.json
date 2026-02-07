@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-neptune-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-07T21:54:43+09:00",
+    "title": "Amazon Neptuneの概要と特徴",
+    "summary": "Amazon Neptuneは、データ同士の「関係性」を高速に扱うグラフ型データベースです。RDSやDynamoDBとの比較を通じて、試験観点が理解できます。",
+    "tags": [
+      "AWS",
+      "Neptune",
+      "データベース",
+      "グラフDB",
+      "フルマネージド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-07-awscp-amazon-neptune-overview/"
+  },
+  {
     "id": "awscp-s3-cloudfront-comparison",
     "category": "awscp",
     "timestamp": "2026-02-07T20:24:44+09:00",
