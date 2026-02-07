@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon Neptuneの概要と特徴</title>
+  <meta name="description" content="Amazon Neptuneは、データ同士の「関係性」を高速に扱うためのグラフ型データベースです。リレーショナルDBとの違いや、SNS・レコメンドなどのユースケースについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon Neptuneの概要と特徴" />
+  <meta property="og:description" content="Amazon Neptuneは、データ同士の「関係性」を高速に扱うためのグラフ型データベースです。リレーショナルDBとの違いや、SNS・レコメンドなどのユースケースについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 構造比較（表 vs グラフ） */
+    .structure-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .structure-compare { grid-template-columns: 1fr; }
+    }
+    .db-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .db-card.rds {
+      border-top: 4px solid #3b82f6; /* Blue */
+      background: #eff6ff;
+    }
+    .db-card.neptune {
+      border-top: 4px solid #8b5cf6; /* Purple */
+      background: #f5f3ff;
+    }
+    
+    /* 擬似テーブル */
+    .mini-table {
+      width: 80%;
+      margin: 10px auto;
+      border-collapse: collapse;
+      font-size: 0.7em;
+      background: #fff;
+    }
+    .mini-table td, .mini-table th {
+      border: 1px solid #94a3b8;
+      padding: 4px;
+    }
+    .mini-table th { background: #e2e8f0; }
+    
+    /* 擬似グラフ */
+    .mini-graph {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .node {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #8b5cf6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.8em;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .edge {
+      height: 2px;
+      background: #94a3b8;
+      width: 40px;
+      position: relative;
+    }
+    .edge::after {
+      content: "▶";
+      position: absolute;
+      right: -4px;
+      top: -7px;
+      color: #94a3b8;
+      font-size: 0.8em;
+    }
+    .edge-label {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6em;
+      color: #64748b;
+      white-space: nowrap;
+    }
+
+    .db-title { font-weight: 800; color: #1e293b; margin-bottom: 5px; display: block; }
+    .db-desc { font-size: 0.9em; color: #475569; }
+
+    /* 探索イメージ */
+    .search-depth {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+    .depth-center {
+      z-index: 2;
+      border: 3px solid #f59e0b;
+      background: #fffbeb;
+      color: #b45309;
+    }
+    .depth-layer1 {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 50%;
+      z-index: 1;
+    }
+    .depth-layer2 {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border: 2px dashed #e2e8f0;
+      border-radius: 50%;
+      z-index: 0;
+    }
+    .connected-node {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #e2e8f0;
+      border-radius: 50%;
+      font-size: 0.7em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-07">
+            2026.02.07
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon Neptuneの概要と特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Neptune</span>
+            <span class="tag">#データベース</span>
+            <span class="tag">#グラフDB</span>
+            <span class="tag">#フルマネージド</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Amazon Neptuneは、データ同士の「関係性」を高速に扱うためのグラフ型データベースです。</p>
+<hr>
+<p>
+  <strong>Amazon Neptune（ネプチューン）</strong> は、一言で言うと<strong>「人やモノ同士の『関係（つながり）』を高速に扱うためのグラフ型データベース」</strong>です。<br>
+  RDS（リレーショナルデータベース）や DynamoDB（NoSQL）とは「発想」が根本的に異なります。ここを理解すると、試験での正答率が一気に上がります。
+</p>
+
+<h2>1. 「グラフデータベース」って何？</h2>
+<p>
+  普通のデータベース（RDS）とグラフデータベース（Neptune）の最大の違いは、<strong>「何が主役か」</strong>です。
+</p>
+
+<!-- 図解：RDS vs Neptune -->
+<div class="diagram-container">
+  <div class="diagram-title">データ構造の違い</div>
+  <div class="structure-compare">
+    
+    <!-- RDS -->
+    <div class="db-card rds">
+      <span class="db-title">RDS (表)</span>
+      <div class="db-desc">データそのものが主役</div>
+      
+      <table class="mini-table">
+        <tr><th>ID</th><th>Name</th></tr>
+        <tr><td>1</td><td>Alice</td></tr>
+        <tr><td>2</td><td>Bob</td></tr>
+      </table>
+      <div style="font-size:0.8em; color:#ef4444; margin-top:5px;">
+        関係はJOINで計算<br>(複雑になると遅い)
+      </div>
+    </div>
+
+    <!-- Neptune -->
+    <div class="db-card neptune">
+      <span class="db-title">Neptune (グラフ)</span>
+      <div class="db-desc">関係性が主役</div>
+      
+      <div class="mini-graph">
+        <div class="node">A</div>
+        <div class="edge"><span class="edge-label">Friend</span></div>
+        <div class="node">B</div>
+      </div>
+      <div style="font-size:0.8em; color:#166534; margin-top:5px;">
+        つながりを直接保存<br>(たどるのが爆速)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>普通のDB（RDSなど）</strong>: 「表（テーブル）」でデータを管理します。AさんとBさんの関係を知るには、テーブル同士をくっつける計算（JOIN）が必要です。</li>
+  <li><strong>グラフDB（Neptune）</strong>: 「点（ノード）」と「線（エッジ）」で管理します。「Aさん →（友達）→ Bさん」という<strong>「つながり」そのものをデータとして持っている</strong>のが特徴です。</li>
+</ul>
+
+<h2>2. Neptuneが得意なこと</h2>
+<p>
+  Neptuneは<strong>「関係をたどる処理（トラバーサル）」</strong>が爆速です。
+</p>
+
+<!-- 図解：関係の探索 -->
+<div class="diagram-container">
+  <div class="diagram-title">多段階の関係探索</div>
+  <div class="search-depth">
+    <div class="depth-layer2"></div>
+    <div class="depth-layer1"></div>
+    <div class="node depth-center">You</div>
+    
+    <!-- つながり -->
+    <div class="connected-node" style="top:20%; left:50%;">A</div>
+    <div class="connected-node" style="bottom:20%; left:30%;">B</div>
+    <div class="connected-node" style="top:10%; right:20%;">C</div>
+    <div class="connected-node" style="bottom:10%; right:10%;">D</div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b;">
+    「友達の、友達の、そのまた友達が買った商品」のような<br>
+    深い探索を一瞬で行える。
+  </p>
+</div>
+
+<h3>典型的なユースケース</h3>
+<ul>
+  <li><strong>SNS</strong>: 「友達の友達を探す」「知り合いかも？を表示する」</li>
+  <li><strong>レコメンドエンジン</strong>: 「この商品を買った人が、次に買った商品」を提案する。</li>
+  <li><strong>不正検知</strong>: 「怪しいアカウントと繋がっている別のアカウント」を芋づる式に見つける。</li>
+</ul>
+
+<h2>3. 対応モデルと構成</h2>
+<p>
+  Neptuneはフルマネージドサービスなので、バックアップや冗長化（マルチAZ）はAWSがやってくれます。RDSに近い安心感があります。<br>
+  また、以下の2つのグラフモデルに対応しています（試験では「2種類ある」ことだけ覚えればOK）。
+</p>
+<ul>
+  <li><strong>プロパティグラフ (Gremlin)</strong>: ノードやエッジに自由に属性を持たせる。SNS向き。</li>
+  <li><strong>RDF (SPARQL)</strong>: 主語・述語・目的語で厳密に定義する。学術・知識グラフ向き。</li>
+</ul>
+
+<h2>4. RDS / DynamoDB との使い分け（試験対策）</h2>
+<p>
+  試験で迷わないための比較表です。「データ構造」と「やりたいこと」で見分けます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>RDS</th>
+      <th>DynamoDB</th>
+      <th>Amazon Neptune</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>データ構造</strong></td>
+      <td>表 (Table)</td>
+      <td>Key-Value</td>
+      <td><strong>グラフ (Graph)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>得意な処理</strong></td>
+      <td>集計・JOIN</td>
+      <td>単純な高速検索</td>
+      <td><strong>関係探索・深掘り</strong></td>
+    </tr>
+    <tr>
+      <td><strong>典型用途</strong></td>
+      <td>業務システム</td>
+      <td>ゲーム・Web</td>
+      <td><strong>SNS・レコメンド</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>試験での「Neptune即答ワード」</h3>
+<p>
+  問題文に以下の単語が出たら、Neptuneを疑ってください。
+</p>
+<ul>
+  <li>「関係性 (Relationships)」</li>
+  <li>「グラフ (Graph)」</li>
+  <li>「つながりを辿る」</li>
+  <li>「レコメンデーション (Recommendation)」</li>
+  <li>「ソーシャルネットワーク」</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Amazon Neptune</strong>: データ同士の<strong>「関係性」</strong>をグラフ構造で保持し、高速に探索できるフルマネージドDB。</li>
+  <li><strong>使い所</strong>: 「友達の友達」のような<strong>「多段階のつながり」</strong>を調べる時に最強。</li>
+</ul>
+<p>
+  「複雑なデータ構造だからNeptune」は間違いです。「関係をたどる必要があるからNeptune」が正解です！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
