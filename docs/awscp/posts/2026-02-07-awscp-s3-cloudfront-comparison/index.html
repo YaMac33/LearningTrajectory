@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | S3単体とCloudFront併用の違い</title>
+  <meta name="description" content="CloudFrontをS3の前に配置することで得られる4つのメリット（高速化、セキュリティ、アクセス制御、コスト削減）について、図解とメタファーを用いて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="S3単体とCloudFront併用の違い" />
+  <meta property="og:description" content="CloudFrontをS3の前に配置することで得られる4つのメリット（高速化、セキュリティ、アクセス制御、コスト削減）について、図解とメタファーを用いて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 経路比較 */
+    .route-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .route-compare { grid-template-columns: 1fr; }
+    }
+    .route-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      background: #fff;
+      text-align: center;
+      position: relative;
+    }
+    .route-box.s3only {
+      border-top: 4px solid #64748b;
+      background: #f8fafc;
+    }
+    .route-box.cf {
+      border-top: 4px solid #3b82f6;
+      background: #eff6ff;
+    }
+    .route-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+      font-size: 1.5em;
+    }
+    .arrow-long {
+      flex: 1;
+      height: 2px;
+      background: #94a3b8;
+      position: relative;
+    }
+    .arrow-long::after {
+      content: "▶";
+      position: absolute;
+      right: -5px;
+      top: -10px;
+      color: #94a3b8;
+      font-size: 0.8em;
+    }
+    .speed-icon { font-size: 1.5em; }
+    
+    /* 玄関メタファー */
+    .security-metaphor {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 20px 0;
+    }
+    .door-box {
+      text-align: center;
+      position: relative;
+    }
+    .door-icon { font-size: 3em; display: block; margin-bottom: 5px; }
+    .door-label { font-weight: bold; font-size: 0.9em; color: #1e293b; }
+    .door-sub { font-size: 0.75em; color: #64748b; }
+    .block-line {
+      position: absolute;
+      top: 40%;
+      left: -20px;
+      font-size: 1.5em;
+      color: #ef4444;
+      font-weight: bold;
+    }
+
+    /* キャッシュ効果 */
+    .cache-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      background: #fff;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .flow-step { font-weight: bold; color: #3b82f6; width: 60px; }
+    .flow-content { flex: 1; font-size: 0.9em; color: #475569; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .good-mark { color: #10b981; font-weight: bold; }
+    .bad-mark { color: #64748b; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-07">
+            2026.02.07
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">S3単体とCloudFront併用の違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#CloudFront</span>
+            <span class="tag">#S3</span>
+            <span class="tag">#CDN</span>
+            <span class="tag">#高速化</span>
+            <span class="tag">#セキュリティ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>CloudFrontを挟むことで、S3のコンテンツを高速・安全・制御付きで配信できます。</p>
+<hr>
+<p>
+  S3は単体でもWebサーバーとして機能しますが、実務や試験では<strong>「CloudFront（CDN）」と組み合わせて使う</strong>のが鉄則です。<br>
+  なぜわざわざ別のサービスを挟むのか？ 変わるのは主に以下の4点です。
+</p>
+<ol>
+  <li><strong>表示・ダウンロードが速くなる</strong></li>
+  <li><strong>S3を直接公開しなくてよくなる（安全）</strong></li>
+  <li><strong>アクセス制御が柔軟になる</strong></li>
+  <li><strong>負荷とコストをコントロールしやすくなる</strong></li>
+</ol>
+
+<h2>全体像： 経路の違い</h2>
+<p>まずはイメージで掴みましょう。</p>
+
+<!-- 図解：経路比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">アクセス経路の違い</div>
+  <div class="route-compare">
+    
+    <!-- S3単体 -->
+    <div class="route-box s3only">
+      <strong>S3単体</strong><br>
+      <div class="route-img">
+        👤
+        <div class="arrow-long"></div>
+        🐢 🪣
+      </div>
+      <p style="font-size:0.85em; color:#64748b;">
+        遠いリージョンまで<br>わざわざ取りに行く
+      </p>
+    </div>
+
+    <!-- CF併用 -->
+    <div class="route-box cf">
+      <strong>CloudFront + S3</strong><br>
+      <div class="route-img">
+        👤
+        <div class="arrow-long" style="flex:0.3;"></div>
+        ⚡ ☁️
+        <div class="arrow-long"></div>
+        🪣
+      </div>
+      <p style="font-size:0.85em; color:#1d4ed8;">
+        最寄りのエッジで<br>高速に受け取る
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>① 速くなる理由（超重要）</h2>
+<p>
+  S3は<strong>「特定のリージョン（場所）」</strong>に固定されています。例えば「東京リージョン」にあるS3バケットのデータは、ブラジルのユーザーも東京まで取りに来ないといけません。物理的に遠いので遅くなります。
+</p>
+<p>
+  CloudFrontを使うと、世界中に点在する<strong>「エッジロケーション（出張所）」</strong>にデータがコピー（キャッシュ）されます。<br>
+  ユーザーは<strong>「自分に一番近い拠点」</strong>からデータを取得できるため、爆速になります。
+</p>
+
+<h2>② セキュリティが激変する</h2>
+<p>
+  S3を直接公開するのは、「家の裏口を開けっ放しにする」ようなリスクがあります。URLさえ知っていれば誰でもアクセスできてしまうからです。
+</p>
+
+<!-- 図解：セキュリティメタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">公開範囲の制御</div>
+  <div class="security-metaphor">
+    
+    <div class="door-box">
+      <span class="door-icon">🚪</span>
+      <span class="door-label">CloudFront</span>
+      <span class="door-sub">正面玄関</span>
+      <p style="font-size:0.8em; margin-top:5px; color:#166534;">
+        <strong>入ってヨシ！</strong><br>
+        (ガードマンによる検査)
+      </p>
+    </div>
+
+    <div class="door-box" style="opacity:0.6;">
+      <span class="block-line">🚫</span>
+      <span class="door-icon">🏚️</span>
+      <span class="door-label">S3</span>
+      <span class="door-sub">裏口 (Origin)</span>
+      <p style="font-size:0.8em; margin-top:5px; color:#475569;">
+        <strong>立入禁止</strong><br>
+        (OAC / OAIでロック)
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  CloudFrontを挟む構成では、S3側で<strong>「CloudFrontからのアクセス以外は全部拒否する」</strong>という設定（OAC/OAI）を行います。<br>
+  これにより、S3は完全に隠蔽され、CloudFrontという「警備員のいる正面玄関」を通らないとデータに触れなくなります。
+</p>
+<ul>
+  <li><strong>CloudFront側でできる制御</strong>: IP制限、国制限（ジオブロッキング）、署名付きURL（会員限定公開）など。</li>
+</ul>
+
+<h2>③ 「RESTだけど直接触らせない」ができる</h2>
+<p>
+  前回の記事で「S3はRESTful（URLで操作できる）」と学びましたが、URLで直接操作できるということは、裏を返せば<strong>「リソースの場所がバレバレ」</strong>ということでもあります。
+</p>
+<p>
+  CloudFrontを挟むと、ユーザーに見えるのは「CloudFrontのURL」だけです。<br>
+  裏にある「本当のS3のURL」は隠蔽されるため、攻撃の対象になりにくくなります。
+</p>
+
+<h2>④ 負荷・コストの面でも有利</h2>
+<p>
+  S3への直接アクセスは、アクセス数に応じたリクエスト料金がかかります。アクセスが集中するとS3の負荷も上がります。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">キャッシュによる効率化</div>
+  <div class="cache-flow">
+    <div class="flow-row">
+      <div class="flow-step">1回目</div>
+      <div class="flow-content">S3からデータを取得し、エッジに<strong>キャッシュ（保存）</strong>する。</div>
+    </div>
+    <div class="flow-row" style="background:#eff6ff; border-color:#3b82f6;">
+      <div class="flow-step">2回目~</div>
+      <div class="flow-content">エッジにあるコピーを返す。<strong>S3には行かない！</strong></div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    結果：S3へのアクセスが減り、安定性が増し、転送コストも下がる場合が多い。
+  </p>
+</div>
+
+<h2>S3直 vs CloudFront併用（比較表）</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>S3だけ</th>
+      <th>CloudFront + S3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>速度</strong></td>
+      <td><span class="bad-mark">△</span> 距離に依存</td>
+      <td><span class="good-mark">◎</span> 最寄りで爆速</td>
+    </tr>
+    <tr>
+      <td><strong>セキュリティ</strong></td>
+      <td><span class="bad-mark">△</span> バケット公開リスク</td>
+      <td><span class="good-mark">◎</span> オリジン隠蔽</td>
+    </tr>
+    <tr>
+      <td><strong>アクセス制御</strong></td>
+      <td><span class="bad-mark">△</span> 基本的なもののみ</td>
+      <td><span class="good-mark">◎</span> WAF連携、地理制限</td>
+    </tr>
+    <tr>
+      <td><strong>試験での正解感</strong></td>
+      <td><span class="bad-mark">微妙</span></td>
+      <td><span class="good-mark">強い</span> (推奨構成)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>試験での鉄板フレーズ</h2>
+<p>
+  AWS試験では、以下の要件が来たら <strong>CloudFront</strong> 即答でOKです。
+</p>
+<ul>
+  <li>「世界中のユーザーに高速配信したい」</li>
+  <li>「S3のコンテンツを安全に配信したい（オリジンアクセスアイデンティティ/コントロール）」</li>
+  <li>「静的コンテンツ（画像・動画・HTML）の配信負荷を下げたい」</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
