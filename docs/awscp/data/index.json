@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-s3-restful-architecture",
+    "category": "awscp",
+    "timestamp": "2026-02-07T20:18:50+09:00",
+    "title": "S3とRESTfulアーキテクチャの関係",
+    "summary": "S3がRESTfulアーキテクチャであることを説明し、URLでの一意なリソース識別とHTTPメソッドによる操作の仕組みを理解できる。",
+    "tags": [
+      "AWS",
+      "S3",
+      "RESTful",
+      "HTTP",
+      "アーキテクチャ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-07-awscp-s3-restful-architecture/"
+  },
+  {
     "id": "awscp-aws-codeguru-overview",
     "category": "awscp",
     "timestamp": "2026-02-06T19:48:10+09:00",
