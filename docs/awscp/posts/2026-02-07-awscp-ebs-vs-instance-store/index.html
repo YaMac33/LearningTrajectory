@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Learning Trajectory | EBSとインスタンスストアの違い</title>
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+</head>
+<body>
+<nav class="post-nav">
+  <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+  <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+</nav>
+
+<main class="post">
+  <article class="post__article" data-category="awscp" data-date="2026-02-07" data-tags="#EBS #インスタンスストア #クラウドストレージ #AWS #データ保存">
+    <header class="post__header">
+      <h1>EBSとインスタンスストアの違い</h1>
+      <div class="post__meta">
+        <span class="post__category">カテゴリ: awscp</span>
+        <time class="post__date" datetime="2026-02-07">2026-02-07 15:00</time>
+        <ul class="post__tags">
+          <li>#EBS</li>
+          <li>#インスタンスストア</li>
+          <li>#クラウドストレージ</li>
+          <li>#AWS</li>
+          <li>#データ保存</li>
+        </ul>
+      </div>
+    </header>
+
+    <section>
+      <h2>1行要約</h2>
+      <p>EBSは「消えにくい外付けディスク」、インスタンスストアは「電源を切ると消える一時ディスク」。</p>
+    </section>
+
+    <section>
+      <h2>やさしい解説（まずは感覚）</h2>
+      <p>EC2 には 2種類の保存場所があります。</p>
+      <ul>
+        <li>EBS: USB外付けHDD・SSDのイメージ</li>
+        <li>インスタンスストア: ノートPC内蔵の作業用メモ帳のイメージ</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>図でイメージ</h2>
+      <pre>
+【EBS】
+   EC2インスタンス
+        │
+        │（ネットワーク越し）
+        ▼
+   EBSボリューム（別サービス）
+        ↑
+   インスタンス停止しても残る
+      </pre>
+      <pre>
+【インスタンスストア】
+   EC2インスタンス
+        │
+        ▼
+   ローカルディスク
+   （インスタンスと運命共同体）
+      </pre>
+    </section>
+
+    <section>
+      <h2>それぞれを詳しく</h2>
+
+      <h3>EBS（Elastic Block Store）</h3>
+      <p><strong>特徴</strong></p>
+      <ul>
+        <li>EC2とは別サービス</li>
+        <li>インスタンスを停止・再起動してもデータは残る</li>
+        <li>スナップショットをS3に保存できる</li>
+        <li>SSD / HDD など種類がある</li>
+      </ul>
+      <p><strong>実務イメージ</strong></p>
+      <ul>
+        <li>WebサーバのOSディスク</li>
+        <li>アプリケーションデータ</li>
+        <li>データベースの保存領域</li>
+      </ul>
+      <p>👉 「消えたら困るもの」は基本EBS</p>
+
+      <h3>インスタンスストア</h3>
+      <p><strong>特徴</strong></p>
+      <ul>
+        <li>EC2ホストに物理的に直結</li>
+        <li>停止・終了するとデータは消える</li>
+        <li>高速だが永続性なし</li>
+        <li>バックアップ不可</li>
+      </ul>
+      <p><strong>実務イメージ</strong></p>
+      <ul>
+        <li>一時ファイル</li>
+        <li>キャッシュ</li>
+        <li>一時的な計算結果</li>
+      </ul>
+      <p>👉 「消えてもいい作業場」</p>
+    </section>
+
+    <section>
+      <h2>超重要：試験で問われやすいポイント（ここ出る）</h2>
+      <ul>
+        <li>✅ インスタンス停止時のデータ
+          <ul>
+            <li>EBS → 残る</li>
+            <li>インスタンスストア → 消える</li>
+          </ul>
+        </li>
+        <li>✅ バックアップ
+          <ul>
+            <li>EBS → スナップショット可能</li>
+            <li>インスタンスストア → 不可</li>
+          </ul>
+        </li>
+        <li>✅ 用途
+          <ul>
+            <li>永続データ → EBS</li>
+            <li>一時データ → インスタンスストア</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>ひっかけ・間違えやすい点 ⚠️</h2>
+      <ul>
+        <li>❌「EC2に付いてるから、どっちも同じ」→ 違います</li>
+        <li>❌「高速＝EBSじゃない」→ 高速なのはインスタンスストア</li>
+        <li>❌「再起動＝消える」→ 再起動では消えない。消えるのは 停止 or 終了</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>覚え方（試験直前用）</h2>
+      <ul>
+        <li>🧠 EBS = External（外付け）</li>
+        <li>🧠 インスタンスストア = 一時メモ帳</li>
+      </ul>
+    </section>
+
+    <p class="article-contact"><a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a></p>
+  </article>
+</main>
+
+<script src="../../../assets/post.js"></script>
+</body>
+</html>
