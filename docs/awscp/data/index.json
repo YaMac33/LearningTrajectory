@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-s3-cloudfront-comparison",
+    "category": "awscp",
+    "timestamp": "2026-02-07T20:24:44+09:00",
+    "title": "S3とCloudFrontの活用法まとめ",
+    "summary": "S3とCloudFrontを組み合わせることで得られるメリットと試験への影響を理解できます。特に速度、セキュリティ、アクセス制御に関する重要なポイントを解説します。",
+    "tags": [
+      "AWS",
+      "CloudFront",
+      "S3",
+      "CDN",
+      "速度",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-07-awscp-s3-cloudfront-comparison/"
+  },
+  {
     "id": "awscp-s3-restful-architecture",
     "category": "awscp",
     "timestamp": "2026-02-07T20:18:50+09:00",
