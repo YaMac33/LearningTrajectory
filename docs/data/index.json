@@ -1,5 +1,28 @@
 [
   {
+    "id": "awscp-db-backups-rds-redshift-redis",
+    "category": "awscp",
+    "timestamp": "2026-02-08T00:59:47+09:00",
+    "title": "RDS/Redshift/Redisの自動バックアップ要点",
+    "summary": "RDS/Redshift/ElastiCache（Redis）の自動バックアップと保持期間、PITR可否をCLF-C02観点で整理。Memcachedはバックアップ不可というひっかけに注意。",
+    "tags": [
+      "RDS",
+      "Redshift",
+      "ElastiCache",
+      "Redis",
+      "バックアップ",
+      "PITR",
+      "CLF-C02"
+    ],
+    "taxonomy": [
+      "core_services",
+      "database"
+    ],
+    "dr": "2026-02-08_db-backups-rds-redshift-redis",
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-08-awscp-db-backups-rds-redshift-redis/"
+  },
+  {
     "id": "awscp-ebs-vs-instance-store",
     "category": "awscp",
     "timestamp": "2026-02-07T23:42:40+09:00",
