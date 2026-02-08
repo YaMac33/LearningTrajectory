@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-rds-multi-az-failover",
+    "category": "awscp",
+    "timestamp": "2026-02-09T07:35:18+09:00",
+    "title": "RDSマルチAZで実現する自動フェールオーバー",
+    "summary": "RDSでプライマリ障害時に自動フェールオーバーを提供するのはマルチAZです。高可用性目的での同期レプリケーションとスタンバイへの自動切替が試験の要点です。",
+    "tags": [
+      "RDS",
+      "マルチAZ",
+      "フェールオーバー",
+      "高可用性",
+      "リードレプリカ",
+      "同期レプリケーション"
+    ],
+    "taxonomy": [
+      "architecture_design",
+      "high_availability"
+    ],
+    "dr": "2026-02-09_rds-multi-az-failover",
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-09-awscp-rds-multi-az-failover/"
+  },
+  {
     "id": "awscp-db-backups-rds-redshift-redis",
     "category": "awscp",
     "timestamp": "2026-02-08T00:59:47+09:00",
