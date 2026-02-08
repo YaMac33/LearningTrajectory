@@ -332,6 +332,64 @@ a:hover{ opacity: .92; }
 }
 
 /* =========================
+   Diagram UI (common)
+   - Use: <div class="diagram">...</div>
+========================= */
+.diagram{
+  margin: 22px 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #f8fafc;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+.diagram__title{
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.diagram__grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 12px;
+}
+@media (max-width: 640px){
+  .diagram__grid{ grid-template-columns: 1fr; }
+}
+.diagram__card{
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  background: #fff;
+}
+.diagram__head{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 800;
+  color: #111827;
+}
+.diagram__badge{
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+}
+.diagram__note{
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+/* =========================
    Tags
 ========================= */
 .tags{
