@@ -1,0 +1,49 @@
+{
+  "id": "awscp-rds-multi-az-failover",
+  "category": "awscp",
+  "timestamp": "2026-02-09T07:35:18+09:00",
+  "post_path": "awscp/posts/2026-02-09-awscp-rds-multi-az-failover/",
+  "meta": {
+    "openai_id": "rds-multi-az-failover",
+    "title": "RDSマルチAZで実現する自動フェールオーバー",
+    "summary": "RDSでプライマリ障害時に自動フェールオーバーを提供するのはマルチAZです。高可用性目的での同期レプリケーションとスタンバイへの自動切替が試験の要点です。",
+    "tags": [
+      "RDS",
+      "マルチAZ",
+      "フェールオーバー",
+      "高可用性",
+      "リードレプリカ",
+      "同期レプリケーション"
+    ],
+    "taxonomy": [
+      "architecture_design",
+      "high_availability"
+    ],
+    "dr": "2026-02-09_rds-multi-az-failover",
+    "status": "public",
+    "review": {
+      "ok": true,
+      "scores": {
+        "diagram": 55,
+        "keypoints": 83
+      },
+      "issues": [
+        {
+          "level": "warning",
+          "code": "HTML_EXTERNAL_REF",
+          "message": "外部参照（http/https）が 4 件あります。方針的にOKか確認してください。"
+        },
+        {
+          "level": "warning",
+          "code": "DIAGRAM_NOT_REFERENCED",
+          "message": "図はありますが本文中の参照（例: 図1参照）が見当たりません。"
+        },
+        {
+          "level": "warning",
+          "code": "AWSCP_KEYPOINTS_THIN",
+          "message": "AWS-CP観点（料金/セキュリティ/設計/責任共有など）が薄い可能性があります。"
+        }
+      ]
+    }
+  }
+}
