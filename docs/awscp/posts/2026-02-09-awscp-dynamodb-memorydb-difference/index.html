@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DynamoDBとMemoryDBの違い</title>
+  <meta name="description" content="DynamoDBとMemoryDBの違いを図解で解説。SSDベースの永続ストレージと、メモリベースの超高速処理の使い分けや、両者を組み合わせた王道のアーキテクチャについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DynamoDBとMemoryDBの違い" />
+  <meta property="og:description" content="DynamoDBとMemoryDBの違いを図解で解説。SSDベースの永続ストレージと、メモリベースの超高速処理の使い分けや、両者を組み合わせた王道のアーキテクチャについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 仕組み比較 */
+    .mech-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .mech-compare { grid-template-columns: 1fr; }
+    }
+    .mech-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .mech-card.dynamo {
+      border-top: 4px solid #3b82f6; /* Blue */
+      background: #eff6ff;
+    }
+    .mech-card.memory {
+      border-top: 4px solid #ef4444; /* Red */
+      background: #fef2f2;
+    }
+    .mech-icon {
+      font-size: 3em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .mech-title {
+      font-weight: 800;
+      color: #1e293b;
+      font-size: 1.2em;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .mech-spec {
+      font-family: monospace;
+      font-weight: bold;
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px dashed #94a3b8;
+      display: inline-block;
+      margin: 8px 0;
+    }
+    .mech-desc {
+      font-size: 0.9em;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    /* 連携フロー */
+    .combo-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+    }
+    .user-box {
+      font-size: 2em;
+    }
+    .cache-layer {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      justify-content: center;
+    }
+    .db-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 20px;
+      text-align: center;
+      background: #fff;
+      font-weight: bold;
+      min-width: 140px;
+      position: relative;
+    }
+    .box-mem { border-color: #ef4444; color: #b91c1c; background: #fff5f5; }
+    .box-dyn { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    
+    .arrow-down {
+      font-size: 1.5em;
+      color: #94a3b8;
+      line-height: 0.8;
+    }
+    .miss-arrow {
+      border-left: 2px dashed #94a3b8;
+      height: 30px;
+      position: absolute;
+      left: 50%;
+      bottom: -30px;
+    }
+    .miss-label {
+      font-size: 0.75em;
+      color: #64748b;
+      background: #fff;
+      padding: 2px;
+      position: relative;
+      top: 10px;
+    }
+
+    /* 判定チャート */
+    .judge-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .judge-step {
+      background: #1e293b;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      text-align: center;
+      width: 80%;
+    }
+    .branch-group {
+      display: flex;
+      gap: 40px;
+      width: 100%;
+      justify-content: center;
+      position: relative;
+    }
+    .branch-line {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 2px;
+      height: 10px;
+      background: #cbd5e1;
+    }
+    .branch-choice {
+      text-align: center;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #64748b;
+    }
+    .result-box {
+      border: 2px solid;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      background: #fff;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-09">
+            2026.02.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DynamoDBとMemoryDBの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#DynamoDB</span>
+            <span class="tag">#MemoryDB</span>
+            <span class="tag">#データベース</span>
+            <span class="tag">#インメモリ</span>
+            <span class="tag">#NoSQL</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>DynamoDBとMemoryDBの基本的な違いと用途を図解で説明します。</p>
+<hr>
+<p>
+  <strong>Amazon DynamoDB</strong> と <strong>Amazon MemoryDB for Redis</strong> は、どちらも「NoSQL」に分類されるデータベースですが、中身の作り（アーキテクチャ）が全く違います。<br>
+  一言で言うと、<strong>「速いデータベース（DynamoDB）」</strong>と<strong>「超速いメモリ（MemoryDB）」</strong>の違いです。
+</p>
+
+<h2>1. 仕組みの違い（中身の考え方）</h2>
+<p>
+  データが「どこ」に置かれているかを見れば、性能の違いがわかります。
+</p>
+
+<!-- 図解：SSD vs メモリ -->
+<div class="diagram-container">
+  <div class="diagram-title">保存場所とスピード</div>
+  <div class="mech-compare">
+    
+    <!-- DynamoDB -->
+    <div class="mech-card dynamo">
+      <span class="mech-icon">💽</span>
+      <span class="mech-title">DynamoDB</span>
+      <div class="mech-desc">
+        データを <strong>SSD</strong> に保存。<br>
+        (永続ストレージ)
+      </div>
+      <span class="mech-spec">ミリ秒 (ms)</span>
+      <p style="font-size:0.85em; margin-top:8px; color:#1d4ed8;">
+        再起動しても消えない。<br>容量無制限。
+      </p>
+    </div>
+
+    <!-- MemoryDB -->
+    <div class="mech-card memory">
+      <span class="mech-icon">🧠</span>
+      <span class="mech-title">MemoryDB</span>
+      <div class="mech-desc">
+        データを <strong>メモリ(RAM)</strong> に保存。<br>
+        (インメモリ)
+      </div>
+      <span class="mech-spec">マイクロ秒 (μs)</span>
+      <p style="font-size:0.85em; margin-top:8px; color:#b91c1c;">
+        爆速アクセス。<br>
+        (※ログ保存で消えない工夫あり)
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>DynamoDB (SSDベース)</strong>: データをディスク（SSD）に書き込みます。物理的に残るので、何もしなくてもデータは消えません。速度は「ミリ秒（0.001秒）」単位です。</li>
+  <li><strong>MemoryDB (RAMベース)</strong>: データをメモリ上に展開します。ディスクへのアクセスがない分、速度は「マイクロ秒（0.000001秒）」単位と桁違いに速いです。</li>
+</ul>
+
+<h2>2. 性能と用途の違い（比較表）</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>DynamoDB</th>
+      <th>MemoryDB for Redis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>データ保存</strong></td>
+      <td>永続 (SSD)</td>
+      <td>インメモリ (RAM) + ログ保存</td>
+    </tr>
+    <tr>
+      <td><strong>レイテンシ</strong></td>
+      <td>一桁ミリ秒 (ms)</td>
+      <td><strong>マイクロ秒 (μs) - 爆速</strong></td>
+    </tr>
+    <tr>
+      <td><strong>データ構造</strong></td>
+      <td>Key-Value / ドキュメント</td>
+      <td>Redis構造 (List, Set, Sorted Set等)</td>
+    </tr>
+    <tr>
+      <td><strong>主な用途</strong></td>
+      <td>メインの台帳、ユーザー情報</td>
+      <td>キャッシュ、ランキング、リアルタイム集計</td>
+    </tr>
+    <tr>
+      <td><strong>コスト</strong></td>
+      <td>比較的安価 (ストレージ単価)</td>
+      <td>高め (メモリ単価)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. ユースケースでの使い分け</h2>
+<p>
+  「データの役割」によって使い分けます。
+</p>
+
+<!-- 図解：判定チャート -->
+<div class="diagram-container">
+  <div class="diagram-title">使い分けフロー</div>
+  <div class="judge-chart">
+    <div class="judge-step">Q. データの役割は？</div>
+    <div class="branch-group">
+      <div class="branch-choice">
+        長期保存・正確性<br>
+        ↓<br>
+        <div class="result-box" style="border-color:#3b82f6; color:#1d4ed8;">DynamoDB</div>
+        <div style="font-size:0.7em; margin-top:4px;">(ユーザー情報, 注文履歴)</div>
+      </div>
+      <div class="branch-choice">
+        超低遅延・一時的<br>
+        ↓<br>
+        <div class="result-box" style="border-color:#ef4444; color:#b91c1c;">MemoryDB</div>
+        <div style="font-size:0.7em; margin-top:4px;">(ランキング, セッション)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 一緒に使うパターン（王道）</h2>
+<p>
+  実は「どっちか」ではなく<strong>「両方使う」</strong>のが、大規模システムの王道パターンです。
+</p>
+<ul>
+  <li><strong>MemoryDB</strong> を「最前線の受付（キャッシュ）」として使い、超高速に反応する。</li>
+  <li><strong>DynamoDB</strong> を「奥の金庫（正本データ）」として使い、確実にデータを守る。</li>
+</ul>
+
+<!-- 図解：連携フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">王道の連携アーキテクチャ</div>
+  <div class="combo-flow">
+    
+    <div class="user-box">👤 ユーザー</div>
+    
+    <div class="arrow-down">⬇ アクセス</div>
+    
+    <div class="db-box box-mem">
+      🧠 MemoryDB<br>
+      <span style="font-size:0.8em; font-weight:normal;">(キャッシュ)</span>
+      <div class="miss-arrow"></div>
+    </div>
+
+    <div style="height:30px; position:relative; width:100%;">
+      <span class="miss-label" style="position:absolute; left:60%; top:5px;">無ければ取得 (Cache Miss)</span>
+    </div>
+
+    <div class="db-box box-dyn">
+      💽 DynamoDB<br>
+      <span style="font-size:0.8em; font-weight:normal;">(正本データ)</span>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>DynamoDB</strong>: 速い「データベース」。消えては困るデータを置く場所。</li>
+  <li><strong>MemoryDB</strong>: 超速い「メモリ」。一瞬で反応が必要なデータや、ランキング情報を置く場所。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
