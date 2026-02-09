@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-sts-role-and-usage",
+    "category": "awscp",
+    "timestamp": "2026-02-10T07:45:01+09:00",
+    "title": "STSの役割と利用法を理解する",
+    "summary": "AWSのSTSは、一時的な認証情報を発行し、セキュリティを強化する重要なサービスです。試験ではIAMロールやクロスアカウントアクセスとの関連が理解できます。",
+    "tags": [
+      "STS",
+      "AWS",
+      "IAM",
+      "クレデンシャル",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-10-awscp-sts-role-and-usage/"
+  },
+  {
     "id": "awscp-aws-application-discovery-service",
     "category": "awscp",
     "timestamp": "2026-02-10T07:19:41+09:00",
