@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 小選挙区と比例代表の違い</title>
+  <meta name="description" content="衆議院選挙における「小選挙区単独」と「比例代表重複」の違いを解説。復活当選（ゾンビ当選）の仕組みや、あえて退路を断つ戦略的理由についてまとめました。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="小選挙区と比例代表の違い" />
+  <meta property="og:description" content="衆議院選挙における「小選挙区単独」と「比例代表重複」の違いを解説。復活当選（ゾンビ当選）の仕組みや、あえて退路を断つ戦略的理由についてまとめました。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+  
+  <style>
+    /* 図解用追加スタイル */
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin: 32px 0;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .diagram-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .diagram-card {
+      flex: 1;
+      min-width: 260px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .diagram-card.highlight {
+      border-color: #818cf8;
+      background: #eef2ff;
+    }
+    .diagram-title {
+      font-weight: 800;
+      font-size: 1.1em;
+      margin-bottom: 16px;
+      display: block;
+      color: #111827;
+      border-bottom: 2px solid #f3f4f6;
+      padding-bottom: 8px;
+    }
+    .flow-step {
+      margin: 12px 0;
+      padding: 8px;
+      background: #f3f4f6;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+    .flow-arrow {
+      color: #9ca3af;
+      font-weight: bold;
+      margin: 4px 0;
+      display: block;
+    }
+    .result-box {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .result-ng { background: #6b7280; }
+    .result-ok { background: #10b981; }
+    .result-warn { background: #f59e0b; }
+
+    /* 惜敗率のバー */
+    .bar-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9em;
+    }
+    .bar-bg {
+      flex-grow: 1;
+      background: #e5e7eb;
+      height: 24px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bar-fill {
+      height: 100%;
+      background: #6366f1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+      color: #fff;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .bar-label {
+      width: 60px;
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 24px 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .comparison-table th, .comparison-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: 700;
+      color: #111827;
+      white-space: nowrap;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    @media (max-width: 600px) {
+      .diagram-row { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-09">
+            2026.02.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">小選挙区と比例代表の違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#日本の選挙</span>
+            <span class="tag">#重複立候補</span>
+            <span class="tag">#比例代表</span>
+            <span class="tag">#小選挙区</span>
+            <span class="tag">#政治戦略</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>衆議院議員総選挙において、「小選挙区でも出るし、比例代表でも出る人」と「小選挙区だけで出る人」がいます。有権者からすると「二段構えでズルい」と感じることもあれば、「潔い」と映ることもあるこの違い。実は各陣営の深刻な戦略に基づいています。</p>
+
+<h2>1. 復活当選（ゾンビ当選）の権利</h2>
+<p>最大の違いは、小選挙区で負けた時の「セーフティネット」があるかどうかです。</p>
+
+<div class="diagram-container">
+  <div class="diagram-row">
+    <!-- パターンA: 小選挙区のみ -->
+    <div class="diagram-card">
+      <span class="diagram-title">小選挙区のみ（単独）</span>
+      <div class="flow-step">小選挙区で投票</div>
+      <span class="flow-arrow">⬇ 負けたら...</span>
+      <div class="result-box result-ng">即・落選確定</div>
+      <p style="margin-top:10px; font-size:0.85em; color:#6b7280;">後がない「背水の陣」</p>
+    </div>
+
+    <!-- パターンB: 重複立候補 -->
+    <div class="diagram-card highlight">
+      <span class="diagram-title">小選挙区 ＋ 比例（重複）</span>
+      <div class="flow-step">小選挙区で投票</div>
+      <span class="flow-arrow">⬇ 負けても...</span>
+      <div class="result-box result-warn">比例で復活チャンス</div>
+      <p style="margin-top:10px; font-size:0.85em; color:#6b7280;">党の獲得議席数と惜敗率次第で当選</p>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>重複立候補</strong>：小選挙区で敗れても、一定の票（供託金没収点以上）を取っていれば、比例代表の名簿順位によって復活当選する可能性があります。</li>
+  <li><strong>単独立候補</strong>：小選挙区で1位にならなければ、その時点で議員への道は閉ざされます。</li>
+</ul>
+
+<h2>2. なぜ「小選挙区のみ」で勝負するのか？</h2>
+<p>復活のチャンスがあるなら全員が重複立候補すれば良さそうですが、あえて単独を選ぶケースには以下の理由があります。</p>
+<ul>
+  <li><strong>党の公認調整</strong>：同じ選挙区に有力者が2人いる場合、「今回はAさんが小選挙区、Bさんは比例単独」と住み分ける（コスタリカ方式など）ため。</li>
+  <li><strong>「退路を断つ」アピール</strong>：ベテランや党幹部が「比例には甘えない。負けたら引退する」と宣言し、本気度を示して票を固める戦略。</li>
+  <li><strong>重複禁止のルール</strong>：党の内規（「73歳定年制」や「連続落選者は重複不可」など）により、重複立候補が認められない場合。</li>
+</ul>
+
+<h2>3. 当選順位と「惜敗率」の仕組み</h2>
+<p>重複立候補者の順位付けに使われるのが<strong>「惜敗率（せきはいりつ）」</strong>です。比例名簿で「同一順位（全員1位など）」に並んでいる候補者同士は、この率で優劣が決まります。</p>
+
+<p><strong>惜敗率 ＝（自分の得票数 ÷ 当選者の得票数）× 100</strong></p>
+<p>つまり、「どれだけ相手に肉薄して負けたか（善戦したか）」の指標です。</p>
+
+<div class="diagram-container">
+  <span class="diagram-title">惜敗率による復活イメージ（比例枠が残り1つの場合）</span>
+  <div class="bar-chart">
+    <div class="bar-row">
+      <span class="bar-label">候補A</span>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width: 95%;">惜敗率 95%</div>
+      </div>
+      <span style="font-size:0.8em; font-weight:bold; color:#4f46e5;">復活当選！</span>
+    </div>
+    <div style="font-size:0.8em; color:#6b7280; margin-left: 70px;">当選者にあと少しまで迫った</div>
+    
+    <div class="bar-row">
+      <span class="bar-label">候補B</span>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width: 60%; background:#9ca3af;">惜敗率 60%</div>
+      </div>
+      <span style="font-size:0.8em; color:#6b7280;">落選...</span>
+    </div>
+    <div style="font-size:0.8em; color:#6b7280; margin-left: 70px;">大差で負けてしまった</div>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<p>選挙公報やポスターを見た際、「比例」の文字があるかどうかで、その候補者の置かれた立場が見えてきます。</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>小選挙区 ＋ 比例（重複）</th>
+      <th>小選挙区のみ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>復活の権利</strong></td>
+      <td>あり（惜敗率勝負）</td>
+      <td>なし（一発勝負）</td>
+    </tr>
+    <tr>
+      <td><strong>主な対象</strong></td>
+      <td>若手、中堅、接戦区の候補</td>
+      <td>党幹部、ベテラン、ペナルティ中</td>
+    </tr>
+    <tr>
+      <td><strong>印象</strong></td>
+      <td>手堅い、議席確保優先</td>
+      <td>背水の陣、潔い（または強気）</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
