@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-monitoring-services-differences",
+  "category": "awscp",
+  "timestamp": "2026-02-10T06:38:04+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-monitoring-services-differences/",
+  "meta": {
+    "title": "AWS監視サービスの違いを理解する",
+    "summary": "AWSの監視サービスであるCloudWatch、CloudTrail、Config、OpenSearchの役割分担と利用シーンについて学べます。",
+    "tags": [
+      "AWS",
+      "監視",
+      "ログ分析",
+      "アプリモニタリング",
+      "サービス比較"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
