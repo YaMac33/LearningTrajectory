@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-migration-hub",
+  "category": "awscp",
+  "timestamp": "2026-02-10T07:56:01+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-migration-hub/",
+  "meta": {
+    "title": "AWS Migration Hubの役割と機能",
+    "summary": "AWS Migration Hubは移行プロジェクトの進捗を可視化し、管理するためのダッシュボードです。各ツールの進捗状況を集約し、全体のステータスを表示する役割を果たします。",
+    "tags": [
+      "AWS",
+      "Migration Hub",
+      "移行管理",
+      "進捗可視化",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
