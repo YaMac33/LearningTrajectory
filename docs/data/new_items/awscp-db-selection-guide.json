@@ -1,0 +1,22 @@
+{
+  "id": "awscp-db-selection-guide",
+  "category": "awscp",
+  "timestamp": "2026-02-09T16:43:38+09:00",
+  "post_path": "awscp/posts/2026-02-09-awscp-db-selection-guide/",
+  "meta": {
+    "title": "AWSのデータベース選定ガイド",
+    "summary": "AWSにおけるRDS、DynamoDB、ElastiCache、MemoryDBの役割分担を整理し、各データベースサービスの選定基準を理解します。",
+    "tags": [
+      "データベース",
+      "システム設計",
+      "エンタープライズ",
+      "AWS",
+      "RDS",
+      "DynamoDB"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
