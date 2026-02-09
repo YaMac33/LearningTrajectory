@@ -1,0 +1,21 @@
+{
+  "id": "awscp-dynamodb-memorydb-use-cases",
+  "category": "awscp",
+  "timestamp": "2026-02-09T16:32:47+09:00",
+  "post_path": "awscp/posts/2026-02-09-awscp-dynamodb-memorydb-use-cases/",
+  "meta": {
+    "title": "DynamoDBとMemoryDBの活用事例",
+    "summary": "DynamoDBとMemoryDBを組み合わせたシステム構成の具体例を解説します。試験対策には、データベースの特性や活用方法を理解することが求められます。",
+    "tags": [
+      "DynamoDB",
+      "MemoryDB",
+      "システム構成",
+      "ECサイト",
+      "リアルタイム"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
