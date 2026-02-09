@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 供託金の重複立候補の影響</title>
+  <meta name="description" content="重複立候補時の供託金は割引があり、没収リスクもあり複雑。「セット価格」の仕組みと、得票率による没収・復活権利喪失のルールを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="供託金の重複立候補の影響" />
+  <meta property="og:description" content="重複立候補時の供託金は割引があり、没収リスクもあり複雑。「セット価格」の仕組みと、得票率による没収・復活権利喪失のルールを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+  
+  <style>
+    /* 図解用追加スタイル */
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin: 32px 0;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .diagram-title {
+      font-weight: 800;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      display: block;
+      color: #111827;
+      text-align: center;
+    }
+    
+    /* 金額比較カード */
+    .price-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .price-card {
+      flex: 1;
+      min-width: 220px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .price-card.highlight {
+      border-color: #818cf8;
+      background: #eef2ff;
+      border-width: 2px;
+    }
+    .price-label {
+      font-size: 0.9em;
+      color: #6b7280;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .price-value {
+      font-size: 1.4em;
+      font-weight: 800;
+      color: #111827;
+    }
+    .price-calc {
+      font-size: 0.8em;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .discount-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.75em;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 999px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* 没収フロー図 */
+    .flow-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .flow-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+    .flow-start {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+    }
+    .flow-branch {
+      display: flex;
+      width: 100%;
+      max-width: 500px;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .branch-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .branch-label {
+      font-size: 0.8em;
+      color: #4b5563;
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #e5e7eb;
+    }
+    .result-box {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+    .result-safe {
+      background: #10b981;
+    }
+    .result-danger {
+      background: #ef4444;
+    }
+
+    @media (max-width: 600px) {
+      .price-row { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-09">
+            2026.02.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">供託金の重複立候補の影響</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#供託金</span>
+            <span class="tag">#重複立候補</span>
+            <span class="tag">#日本の選挙</span>
+            <span class="tag">#政治</span>
+            <span class="tag">#選挙戦略</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>衆議院選挙で「小選挙区」と「比例代表」の両方に立候補する場合、供託金はそれぞれ全額必要なのでしょうか。実は、重複立候補には特別な「セット割引」のような仕組みと、それと表裏一体の厳しい「没収ルール」が存在します。</p>
+
+<h2>供託金の金額構造（割引の仕組み）</h2>
+<p>本来、選挙に出るには以下の供託金が必要です。<br>
+・小選挙区単独：300万円<br>
+・比例代表単独：600万円</p>
+<p>しかし、<strong>重複立候補をする場合、比例代表分の供託金が半額（300万円）になる</strong>という特例があります。</p>
+
+<div class="diagram-container">
+  <span class="diagram-title">出馬形態による供託金合計</span>
+  <div class="price-row">
+    <!-- 小選挙区のみ -->
+    <div class="price-card">
+      <span class="price-label">小選挙区のみ</span>
+      <div class="price-value">300万円</div>
+      <div class="price-calc">（小300 + 比例0）</div>
+    </div>
+    
+    <!-- 比例のみ -->
+    <div class="price-card">
+      <span class="price-label">比例のみ</span>
+      <div class="price-value">600万円</div>
+      <div class="price-calc">（小0 + 比例600）</div>
+    </div>
+
+    <!-- 重複立候補 -->
+    <div class="price-card highlight">
+      <div class="discount-badge">セット割引</div>
+      <span class="price-label">重複立候補</span>
+      <div class="price-value">600万円</div>
+      <div class="price-calc">（小300 + <strong>比例300</strong>）</div>
+    </div>
+  </div>
+  <p style="font-size: 0.9em; color: #6b7280; text-align: center; margin: 0;">
+    重複立候補は、比例単独と同じ600万円で「2つのチャンス」が得られる計算になります。
+  </p>
+</div>
+
+<h2>「安くなる」けれど「没収」のリスクも二重</h2>
+<p>供託金は一定の得票数を獲得すれば返還されますが、票が取れないと没収されます。重複立候補の場合、この没収ルールが「復活当選の権利」にも直結します。</p>
+<p>特に重要なのが、<strong>小選挙区で大敗すると、比例での復活チャンス自体が消滅する</strong>という点です。</p>
+
+<div class="diagram-container">
+  <span class="diagram-title">小選挙区での得票と没収・復活判定</span>
+  <div class="flow-chart">
+    <div class="flow-box flow-start">小選挙区の選挙結果</div>
+    
+    <div class="flow-branch">
+      <!-- 大敗ルート -->
+      <div class="branch-item">
+        <span class="branch-label">得票数 10%未満</span>
+        <div class="result-box result-danger">
+          <strong>【没収 ＆ 権利喪失】</strong><br>
+          ・小選挙区の300万没収<br>
+          ・<strong>比例での復活資格も失う</strong>
+        </div>
+      </div>
+      
+      <!-- 善戦ルート -->
+      <div class="branch-item">
+        <span class="branch-label">得票数 10%以上</span>
+        <div class="result-box result-safe">
+          <strong>【返還 ＆ 復活チャンス】</strong><br>
+          ・小選挙区の300万返還<br>
+          ・惜敗率次第で<strong>復活当選あり</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size: 0.9em; color: #6b7280; margin-top: 10px;">
+    ※ここでの10%は「有効投票総数」に対する割合です（供託金没収点）。
+  </p>
+</div>
+
+<p>つまり、重複立候補は「300万円を追加して当選確率を上げる保険」ですが、小選挙区であまりに票が取れないと、その保険自体が無効になってしまうのです。</p>
+
+<h3>誰が払っているの？</h3>
+<p>個人で600万円を用意するのは容易ではありませんが、政党に所属している候補者の場合、多くのケースで<strong>党が供託金を肩代わり（または貸し付け）</strong>しています。そのため、誰を重複立候補させるかは、個人の意思だけでなく、党の資金力や全体戦略によって決められています。</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
