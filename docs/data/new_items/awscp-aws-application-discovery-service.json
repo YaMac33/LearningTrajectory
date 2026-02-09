@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-application-discovery-service",
+  "category": "awscp",
+  "timestamp": "2026-02-10T07:19:41+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-application-discovery-service/",
+  "meta": {
+    "title": "AWSのアプリケーション発見サービスの理解",
+    "summary": "AWS Application Discovery Serviceは、オンプレミス環境のサーバー構成や依存関係を自動で可視化し、移行計画を支援するサービスです。移行フェーズでの状況把握を容易にします。",
+    "tags": [
+      "AWS",
+      "Application Discovery Service",
+      "移行",
+      "クラウド",
+      "サーバー管理"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
