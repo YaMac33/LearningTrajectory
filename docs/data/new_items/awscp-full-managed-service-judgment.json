@@ -1,0 +1,21 @@
+{
+  "id": "awscp-full-managed-service-judgment",
+  "category": "awscp",
+  "timestamp": "2026-02-09T12:36:50+09:00",
+  "post_path": "awscp/posts/2026-02-09-awscp-full-managed-service-judgment/",
+  "meta": {
+    "title": "フルマネージドサービスの判断法",
+    "summary": "AWSにおけるフルマネージドサービスの見分け方を解説。試験対策として思考フレームを活用し、適切なサービスを判断するスキルを身につけよう。",
+    "tags": [
+      "AWS",
+      "フルマネージド",
+      "試験対策",
+      "クラウド",
+      "サーバーレス"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
