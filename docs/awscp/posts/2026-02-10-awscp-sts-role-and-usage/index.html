@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | STSの役割と利用法</title>
+  <meta name="description" content="AWS Security Token Service (STS) は、一時的な認証情報を発行し、セキュリティを強化する重要なサービスです。IAMロールやクロスアカウントアクセスの裏側で動く仕組みを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="STSの役割と利用法" />
+  <meta property="og:description" content="AWS Security Token Service (STS) は、一時的な認証情報を発行し、セキュリティを強化する重要なサービスです。IAMロールやクロスアカウントアクセスの裏側で動く仕組みを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 社員証 vs 仮入館証 */
+    .id-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .id-compare { grid-template-columns: 1fr; }
+    }
+    .id-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .id-card.permanent {
+      border-top: 4px solid #ef4444; /* Red */
+    }
+    .id-card.temp {
+      border-top: 4px solid #10b981; /* Green */
+    }
+    .id-icon {
+      font-size: 3em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .id-title {
+      font-weight: 800;
+      color: #1e293b;
+      font-size: 1.1em;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .id-desc {
+      font-size: 0.9em;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .badge-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .badge-safe {
+      background: #dcfce7;
+      color: #166534;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+
+    /* STS発行フロー */
+    .sts-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .step-num {
+      background: #3b82f6;
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    .step-text {
+      font-size: 0.95em;
+      color: #334155;
+    }
+    .token-box {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-family: monospace;
+      font-size: 0.85em;
+      color: #b45309;
+    }
+    
+    /* ユースケースグリッド */
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .usecase-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .uc-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+    .uc-title { font-weight: bold; color: #1e293b; font-size: 0.95em; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-10">
+            2026.02.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">STSの役割と利用法</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#STS</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#IAM</span>
+            <span class="tag">#クレデンシャル</span>
+            <span class="tag">#セキュリティ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSのSTSは、一時的な認証情報を発行し、セキュリティを強化する重要なサービスです。</p>
+<hr>
+<p>
+  <strong>AWS Security Token Service (STS)</strong> は、一言で言うと<strong>「AWS内で使える『時間制限付きの合鍵（一時クレデンシャル）』を発行してくれるサービス」</strong>です。<br>
+  IAMロールやクロスアカウントアクセスといった高度な機能の「裏側」で必ず動いている、非常に重要な黒子（裏方）サービスです。
+</p>
+
+<h2>1. なぜこれが必要なの？（恒久的な鍵の危険性）</h2>
+<p>
+  IAMユーザーを作ると「アクセスキー」が発行されますが、これは有効期限がなく、漏洩したら終わりです。
+  AWSのセキュリティ思想は<strong>「強い権限は、必要な時だけ、短時間だけ持たせる」</strong>ことです。これを実現するのが STS です。
+</p>
+
+<!-- 図解：社員証 vs 仮入館証 -->
+<div class="diagram-container">
+  <div class="diagram-title">認証情報の考え方</div>
+  <div class="id-compare">
+    
+    <!-- IAMユーザー -->
+    <div class="id-card permanent">
+      <span class="id-icon">🪪</span>
+      <span class="id-title">IAMユーザー</span>
+      <span class="badge-danger">常設の社員証</span>
+      <div class="id-desc" style="margin-top:10px;">
+        ずっと使える。<br>
+        落としたら大変なことになる。<br>
+        (長期的なリスク)
+      </div>
+    </div>
+
+    <!-- STS -->
+    <div class="id-card temp">
+      <span class="id-icon">⏱️</span>
+      <span class="id-title">STS (一時認証)</span>
+      <span class="badge-safe">ゲスト入館証</span>
+      <div class="id-desc" style="margin-top:10px;">
+        数時間で失効する。<br>
+        必要な時だけ発行される。<br>
+        (安全・推奨)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. STSがやっていること（発行フロー）</h2>
+<p>
+  STSの仕事はシンプルです。「権限を貸して」と言われたら、チェックして、期限付きの鍵を渡すだけです。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">一時クレデンシャルの発行プロセス</div>
+  <div class="sts-flow">
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <div class="step-text"><strong>リクエスト:</strong> 誰かが「このロールを使わせて」と頼む。</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">2</div>
+      <div class="step-text"><strong>チェック:</strong> STSが「君にはその権限があるね」と確認する。</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <strong>発行:</strong> 以下の3点セット（一時クレデンシャル）を渡す。
+        <div class="token-box">
+          1. Access Key ID<br>
+          2. Secret Access Key<br>
+          3. Session Token (重要!)
+        </div>
+      </div>
+    </div>
+    <div class="flow-step" style="border-color:#f59e0b; background:#fffbeb;">
+      <span style="font-size:1.5em;">⏰</span>
+      <div class="step-text"><strong>期限切れ:</strong> 時間が来たら、この鍵は自動的にゴミになる。</div>
+    </div>
+  </div>
+</div>
+
+<h2>3. 代表的な利用シーン（9割はこれ）</h2>
+<p>
+  私たちが意識しなくても、裏では頻繁にSTSが使われています。
+</p>
+
+<!-- 図解：ユースケース -->
+<div class="diagram-container">
+  <div class="diagram-title">STSが使われる場面</div>
+  <div class="usecase-grid">
+    
+    <div class="usecase-item">
+      <span class="uc-icon">🎭</span>
+      <span class="uc-title">IAMロール</span>
+      <p style="font-size:0.85em; color:#64748b;">EC2やLambdaが権限を使う時、裏でSTSから一時キーをもらっています。</p>
+    </div>
+
+    <div class="usecase-item">
+      <span class="uc-icon">🤝</span>
+      <span class="uc-title">クロスアカウント</span>
+      <p style="font-size:0.85em; color:#64748b;">別のアカウントのS3を見たい時、一時的に向こうの権限を借ります。</p>
+    </div>
+
+    <div class="usecase-item">
+      <span class="uc-icon">🏢</span>
+      <span class="uc-title">外部ID連携 (SSO)</span>
+      <p style="font-size:0.85em; color:#64748b;">Googleアカウントなどでログインした後、AWS操作用の一時キーを発行します。</p>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 試験での重要ポイント</h2>
+<p>
+  「認証」と「認可（トークン発行）」の役割分担を理解しましょう。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>役割</th>
+      <th>たとえ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>IAM / IdP</strong></td>
+      <td><strong>認証 (Authentication)</strong></td>
+      <td>「あなたは誰ですか？」を確認する受付。<br>(社員名簿)</td>
+    </tr>
+    <tr>
+      <td><strong>STS</strong></td>
+      <td><strong>トークン発行</strong></td>
+      <td>「どうぞ」と入館証を渡す機械。<br>(発券機)</td>
+    </tr>
+    <tr>
+      <td><strong>CloudTrail</strong></td>
+      <td><strong>記録 (Audit)</strong></td>
+      <td>「誰がいつ鍵を借りたか」を記録するカメラ。<br>(監視カメラ)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>STS</strong>: 一時的な認証情報（Access Key, Secret Key, <strong>Session Token</strong>）を発行するサービス。</li>
+  <li><strong>IAMロールの正体</strong>: 実は「STSを使って一時キーを発行し、それを使って操作する」仕組みのこと。</li>
+  <li><strong>メリット</strong>: 鍵の漏洩リスクを最小限にできる（時間が来れば無効になるから）。</li>
+</ul>
+<p>
+  「IAMロールを使う＝裏でSTSが働いている」と覚えておけば、AWSのセキュリティ設計がぐっと理解しやすくなります！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
