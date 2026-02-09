@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSのアプリケーション発見サービス</title>
+  <meta name="description" content="AWS Application Discovery Serviceは、オンプレミス環境のサーバー構成や依存関係を自動で可視化する、移行準備のためのサービスです。エージェント有無による違いやMigration Hubとの連携について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSのアプリケーション発見サービス" />
+  <meta property="og:description" content="AWS Application Discovery Serviceは、オンプレミス環境のサーバー構成や依存関係を自動で可視化する、移行準備のためのサービスです。エージェント有無による違いやMigration Hubとの連携について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 全体フロー */
+    .migration-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      text-align: center;
+      background: #fff;
+      font-weight: bold;
+      min-width: 120px;
+      position: relative;
+    }
+    .box-onprem { border-color: #64748b; color: #1e293b; background: #f1f5f9; }
+    .box-ads { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .box-hub { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .box-plan { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+    }
+    
+    /* 収集方法の比較 */
+    .method-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .method-compare { grid-template-columns: 1fr; }
+    }
+    .method-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+    }
+    .method-card.agent { border-top: 4px solid #3b82f6; }
+    .method-card.less { border-top: 4px solid #64748b; }
+    
+    .method-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .method-title { font-weight: 800; margin-bottom: 5px; display: block; color: #1e293b; }
+    .method-desc { font-size: 0.9em; color: #475569; text-align: left; }
+    .check-mark { color: #10b981; font-weight: bold; margin-right: 4px; }
+    
+    /* フェーズの違い */
+    .phase-bar {
+      display: flex;
+      margin-top: 10px;
+      border-radius: 20px;
+      overflow: hidden;
+      font-size: 0.85em;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+    }
+    .phase-item {
+      padding: 8px 0;
+      flex: 1;
+    }
+    .p-migration { background: #f59e0b; } /* Discoveryの領域 */
+    .p-operation { background: #cbd5e1; color: #64748b; } /* 範囲外 */
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-10">
+            2026.02.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSのアプリケーション発見サービス</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Application Discovery Service</span>
+            <span class="tag">#移行</span>
+            <span class="tag">#クラウド</span>
+            <span class="tag">#サーバー管理</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Application Discovery Serviceは、オンプレからAWSへの移行に向けた自動可視化サービスです。</p>
+<hr>
+<p>
+  <strong>AWS Application Discovery Service (ADS)</strong> は、AWSへの移行フェーズでのみ活躍する、特殊なサービスです。<br>
+  一言で言うと、<strong>「オンプレミス環境にあるサーバーやアプリの構成・依存関係を自動で洗い出し、可視化する『調査員』」</strong>です。
+</p>
+<p>
+  移行プロジェクトの初期段階で、「そもそも今の環境に何台サーバーがあって、どれとどれが通信しているのか？」という現状把握（アセスメント）を行うために使います。
+</p>
+
+<h2>1. なぜこれが必要なの？（ブラックボックス問題）</h2>
+<p>
+  長年運用されているオンプレミス環境は、ドキュメントが古かったり、担当者が退職していたりして、「中身がよくわからない（ブラックボックス化）」状態になっていることがよくあります。
+</p>
+<ul>
+  <li>「このサーバー、何のアプリが動いてるの？」</li>
+  <li>「このDBサーバーを止めたら、どのWebサーバーが動かなくなるの？」</li>
+</ul>
+<p>
+  これを手作業やExcelで調査しようとすると、膨大な時間とミスが発生します。Application Discovery Service はこれを自動化します。
+</p>
+
+<h2>2. データの流れと全体像</h2>
+<p>
+  このサービスは単体で完結するのではなく、<strong>AWS Migration Hub</strong> という「移行の司令塔」にデータを送るのが仕事です。
+</p>
+
+<!-- 図解：全体フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">移行準備のデータフロー</div>
+  <div class="migration-flow">
+    <div class="flow-box box-onprem">
+      🏢 オンプレミス<br>
+      <span style="font-size:0.8em; font-weight:normal;">(調査対象)</span>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-ads">
+      🕵️ ADS<br>
+      <span style="font-size:0.8em; font-weight:normal;">(収集・調査)</span>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-hub">
+      📊 Migration Hub<br>
+      <span style="font-size:0.8em; font-weight:normal;">(集約・可視化)</span>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-plan">
+      📝 移行計画
+    </div>
+  </div>
+</div>
+
+<h2>3. 2つの収集方法（試験のポイント）</h2>
+<p>
+  情報を集める方法には「エージェントを入れる」か「入れない」かの2パターンがあります。
+</p>
+
+<!-- 図解：収集方法の比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">エージェントあり vs なし</div>
+  <div class="method-compare">
+    
+    <!-- エージェントあり -->
+    <div class="method-card agent">
+      <span class="method-icon">🕵️‍♂️</span>
+      <span class="method-title">エージェントベース</span>
+      <div class="method-desc">
+        サーバー1台ずつにソフトをインストールする。<br>
+        <br>
+        <span class="check-mark">✔</span> <strong>詳細情報</strong> (プロセス、通信)<br>
+        <span class="check-mark">✔</span> 依存関係が見える<br>
+        <span style="color:#64748b;">⚠ 導入の手間がかかる</span>
+      </div>
+    </div>
+
+    <!-- エージェントなし -->
+    <div class="method-card less">
+      <span class="method-icon">👻</span>
+      <span class="method-title">エージェントレス</span>
+      <div class="method-desc">
+        VMware (vCenter) 経由でまとめて情報を抜く。<br>
+        <br>
+        <span class="check-mark">✔</span> <strong>手軽</strong> (インストール不要)<br>
+        <span class="check-mark">✔</span> 仮想マシンの基本スペック<br>
+        <span style="color:#64748b;">⚠ 通信の中身までは見えない</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. CloudWatch との違い</h2>
+<p>
+  「サーバーの情報を集める」という意味では似ていますが、<strong>「使う時期」と「場所」</strong>が違います。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Application Discovery Service</th>
+      <th>Amazon CloudWatch</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>対象の場所</strong></td>
+      <td><strong>オンプレミス</strong> (移行元)</td>
+      <td>主に <strong>AWS上</strong> (移行先)</td>
+    </tr>
+    <tr>
+      <td><strong>目的</strong></td>
+      <td><strong>移行前の調査</strong>・計画</td>
+      <td><strong>運用中の監視</strong>・アラート</td>
+    </tr>
+    <tr>
+      <td><strong>時期</strong></td>
+      <td>移行プロジェクト中のみ</td>
+      <td>ずっと使う</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="diagram-container">
+  <div class="diagram-title">活躍するフェーズ</div>
+  <div class="phase-bar">
+    <div class="phase-item p-migration">移行前 (調査・設計)</div>
+    <div class="phase-item p-operation">移行後 (AWS運用)</div>
+  </div>
+  <div style="display:flex; justify-content:space-around; font-size:0.85em; margin-top:5px; font-weight:bold;">
+    <span style="color:#d97706;">⬆ Discovery Service</span>
+    <span style="color:#64748b;">⬆ CloudWatch</span>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Application Discovery Service</strong>: オンプレミス環境を自動調査して、サーバー構成や依存関係を可視化するツール。</li>
+  <li><strong>連携</strong>: 収集したデータは <strong>Migration Hub</strong> に集約される。</li>
+  <li><strong>使い分け</strong>: 「移行前の調査」ならこれ。「運用中の監視」なら CloudWatch。</li>
+</ul>
+<p>
+  普段のAWS運用では使いませんが、「移行計画を立てたい」「何が動いているかわからないオンプレを調査したい」という時に登場する専門家です。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
