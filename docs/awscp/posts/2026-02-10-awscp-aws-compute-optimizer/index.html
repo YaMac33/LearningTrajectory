@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSのCompute Optimizerとは</title>
+  <meta name="description" content="AWS Compute Optimizerは、過去の利用データを分析してEC2などの最適なサイズを提案するサービスです。CloudWatchやCost Explorerとの違い、コスト削減の仕組みについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSのCompute Optimizerとは" />
+  <meta property="og:description" content="AWS Compute Optimizerは、過去の利用データを分析してEC2などの最適なサイズを提案するサービスです。CloudWatchやCost Explorerとの違い、コスト削減の仕組みについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 診断フロー */
+    .diagnosis-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+    }
+    .flow-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+      background: #fff;
+      font-weight: bold;
+      position: relative;
+    }
+    .box-cw { border-color: #ec4899; color: #be185d; background: #fdf2f8; }
+    .box-opt { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .box-user { border-color: #64748b; color: #334155; }
+    
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+    }
+    .data-label {
+      font-size: 0.75em;
+      color: #64748b;
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      background: #f8fafc;
+      padding: 2px 6px;
+    }
+
+    /* 役割比較 */
+    .role-trio {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .role-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .role-card.cw { border-top: 4px solid #ec4899; }
+    .role-card.opt { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    .role-card.ce { border-top: 4px solid #10b981; }
+    
+    .role-icon { font-size: 2.5em; display: block; margin-bottom: 8px; }
+    .role-title { font-weight: 800; color: #1e293b; margin-bottom: 4px; display: block; }
+    .role-metaphor {
+      display: inline-block;
+      font-size: 0.85em;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+    }
+    .role-desc { font-size: 0.9em; color: #475569; line-height: 1.4; }
+
+    /* 提案イメージ */
+    .proposal-box {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .proposal-card {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px;
+      width: 140px;
+      text-align: center;
+    }
+    .prop-over { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+    .prop-under { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+    .prop-arrow { font-size: 1.5em; margin: 5px 0; color: #64748b; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-10">
+            2026.02.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSのCompute Optimizerとは</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Compute Optimizer</span>
+            <span class="tag">#最適化</span>
+            <span class="tag">#コスト削減</span>
+            <span class="tag">#EC2</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Compute Optimizerはリソースの最適化を提案するサービスです。</p>
+<hr>
+<p>
+  <strong>AWS Compute Optimizer（コンピュート・オプティマイザー）</strong> は、一言で言うと<strong>「今の構成、もったいなくない？」をAWSが勝手に診断してくれるAIアドバイザー</strong>です。<br>
+  過去の利用実績（CPU使用率など）を分析して、「このサーバー、大きすぎますよ」とか「ここはもっと性能が必要です」といった、具体的な改善案を提示してくれます。
+</p>
+
+<h2>1. 仕組み： CloudWatch のデータを再利用</h2>
+<p>
+  Compute Optimizer は、ゼロからデータを集めるわけではありません。すでに稼働している <strong>CloudWatch（監視サービス）</strong> のデータを読み込んで分析します。
+</p>
+
+<!-- 図解：診断フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">最適化のプロセス</div>
+  <div class="diagnosis-flow">
+    <div class="flow-box box-cw">
+      CloudWatch<br>Metrics
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-opt">
+      Compute<br>Optimizer
+      <div class="data-label">過去14日間の実績</div>
+    </div>
+    <div class="flow-arrow">➡</div>
+    <div class="flow-box box-user">
+      📝 推奨事項<br>
+      <span style="font-size:0.8em; font-weight:normal;">(レポート)</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    机上の空論ではなく、あなたの「実測データ」に基づいて診断する。
+  </p>
+</div>
+
+<ul>
+  <li><strong>見るデータ</strong>: CPU使用率、メモリ使用率、ネットワーク転送量、ディスクI/Oなど。</li>
+  <li><strong>対象リソース</strong>:
+    <ul>
+      <li>EC2 インスタンス</li>
+      <li>Auto Scaling グループ</li>
+      <li>EBS ボリューム</li>
+      <li>Lambda 関数</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>2. 何を提案してくれるの？</h2>
+<p>
+  主に「過剰（もったいない）」と「過少（足りない）」の2つを見つけてくれます。
+</p>
+
+<!-- 図解：提案イメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">診断結果の例</div>
+  <div class="proposal-box">
+    
+    <!-- 過剰 -->
+    <div class="proposal-card prop-over">
+      <strong>過剰</strong><br>
+      (Over-provisioned)
+      <div style="margin:10px 0; font-size:0.8em;">
+        m5.4xlarge<br>
+        (CPU 5%使用)
+      </div>
+      <div class="prop-arrow">⬇</div>
+      <div style="font-weight:bold;">m5.large</div>
+      <span style="font-size:0.75em;">コスト削減！</span>
+    </div>
+
+    <!-- 過少 -->
+    <div class="proposal-card prop-under">
+      <strong>過少</strong><br>
+      (Under-provisioned)
+      <div style="margin:10px 0; font-size:0.8em;">
+        t3.micro<br>
+        (CPU 99%使用)
+      </div>
+      <div class="prop-arrow">⬆</div>
+      <div style="font-weight:bold;">t3.medium</div>
+      <span style="font-size:0.75em;">性能向上！</span>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>過剰プロビジョニング (Over-provisioned)</strong>: サイズが大きすぎて無駄遣いしている状態。「サイズを下げれば月◯万円浮きますよ」と教えてくれます。</li>
+  <li><strong>過少プロビジョニング (Under-provisioned)</strong>: サイズが小さすぎて性能が出ていない状態。「ボトルネックになっています。サイズを上げましょう」と警告してくれます。</li>
+</ul>
+
+<h2>3. 他のサービスとの違い（重要）</h2>
+<p>
+  「監視」「分析」「コスト」のサービスは混同しやすいので、役割（キャラクター）で区別しましょう。
+</p>
+
+<!-- 図解：役割分担 -->
+<div class="diagram-container">
+  <div class="diagram-title">サービスの役割比較</div>
+  <div class="role-trio">
+    
+    <!-- CloudWatch -->
+    <div class="role-card cw">
+      <span class="role-icon">☁️</span>
+      <span class="role-title">CloudWatch</span>
+      <span class="role-metaphor">メーター</span>
+      <div class="role-desc">
+        今の状態（数値）を表示する。<br>
+        「良いか悪いか」は判断しない。
+      </div>
+    </div>
+
+    <!-- Compute Optimizer -->
+    <div class="role-card opt">
+      <span class="role-icon">🤖</span>
+      <span class="role-title">Compute Optimizer</span>
+      <span class="role-metaphor">整備士</span>
+      <div class="role-desc">
+        メーターを見て<strong>「診断・提案」</strong>する。<br>
+        「このままじゃ壊れますよ」
+      </div>
+    </div>
+
+    <!-- Cost Explorer -->
+    <div class="role-card ce">
+      <span class="role-icon">💰</span>
+      <span class="role-title">Cost Explorer</span>
+      <span class="role-metaphor">家計簿</span>
+      <div class="role-desc">
+        <strong>「お金（請求額）」</strong>を分析する。<br>
+        「先月より電気代が高いな」
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>見ているもの</th>
+      <th>アウトプット</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CloudWatch</strong></td>
+      <td>リソースの状態 (CPU%)</td>
+      <td>グラフ、アラーム (事実の通知)</td>
+    </tr>
+    <tr>
+      <td><strong>Compute Optimizer</strong></td>
+      <td>リソースの効率</td>
+      <td><strong>推奨事項 (Recommendation)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Cost Explorer</strong></td>
+      <td>利用料金 ($)</td>
+      <td>コストの推移グラフ、予算管理</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Compute Optimizer</strong>: リソースの無駄遣いや性能不足を見つけて、最適な設定を<strong>「提案」</strong>してくれるサービス。</li>
+  <li><strong>メリット</strong>: 「経験と勘」ではなく、実際のデータに基づいてコスト削減や性能向上ができる。</li>
+</ul>
+<p>
+  試験で「過剰プロビジョニング」「適切なサイズ（Right Sizing）」「推奨事項」という言葉が出たら、Compute Optimizer を選びましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
