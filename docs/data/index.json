@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-throughput-ec2-cluster",
+    "category": "awscp",
+    "timestamp": "2026-02-11T08:17:19+09:00",
+    "title": "スループットとEC2の仕組み",
+    "summary": "スループットの意味とEC2のクラスタープレイスメントグループの利点が学べます。HPCやビッグデータ解析におけるネットワーク性能について理解が深まる内容です。",
+    "tags": [
+      "スループット",
+      "EC2",
+      "クラスタープレイスメント",
+      "AWS",
+      "ネットワーク"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-11-awscp-throughput-ec2-cluster/"
+  },
+  {
     "id": "awscp-kendra-and-generative-ai-role-sharing",
     "category": "awscp",
     "timestamp": "2026-02-11T08:06:50+09:00",
