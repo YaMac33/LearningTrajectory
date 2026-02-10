@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-compute-optimizer",
+  "category": "awscp",
+  "timestamp": "2026-02-10T12:42:34+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-compute-optimizer/",
+  "meta": {
+    "title": "AWSのCompute Optimizerの概要と利点",
+    "summary": "AWS Compute Optimizerは、リソースの最適なサイズを提案し、コスト削減や性能向上を実現するAIサービスです。試験では、過剰プロビジョニングや推奨事項に焦点を当てることが重要です。",
+    "tags": [
+      "AWS",
+      "Compute Optimizer",
+      "最適化",
+      "コスト削減",
+      "EC2"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
