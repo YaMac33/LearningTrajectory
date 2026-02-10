@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-control-tower-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-10T12:36:45+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-control-tower-overview/",
+  "meta": {
+    "title": "AWS Control Towerの概要と役割",
+    "summary": "AWS Control Towerは、マルチアカウント環境の初期セットアップと統制を自動化し、ガバナンスを強化するサービスです。試験ではガバナンスやベストプラクティスに基づく構成の理解が求められます。",
+    "tags": [
+      "AWS",
+      "Control Tower",
+      "ガバナンス",
+      "自動化",
+      "アカウント管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
