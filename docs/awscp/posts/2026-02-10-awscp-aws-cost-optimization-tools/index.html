@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSコスト最適化トリオの使い分け</title>
+  <meta name="description" content="AWS Trusted Advisor、Cost Explorer、Compute Optimizerの役割分担と使い分けを解説。「健康診断」「家計簿」「処方箋」の例えでコスト最適化のフローを整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSコスト最適化トリオの使い分け" />
+  <meta property="og:description" content="AWS Trusted Advisor、Cost Explorer、Compute Optimizerの役割分担と使い分けを解説。「健康診断」「家計簿」「処方箋」の例えでコスト最適化のフローを整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 3つの役割カード */
+    .trio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .trio-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .trio-card.ta { border-top: 4px solid #10b981; } /* Green */
+    .trio-card.ce { border-top: 4px solid #3b82f6; } /* Blue */
+    .trio-card.co { border-top: 4px solid #f97316; } /* Orange */
+    
+    .trio-icon {
+      font-size: 2.5em;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .trio-name {
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 5px;
+      display: block;
+      font-size: 1.1em;
+    }
+    .trio-metaphor {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .trio-card.ta .trio-metaphor { background: #10b981; }
+    .trio-card.ce .trio-metaphor { background: #3b82f6; }
+    .trio-card.co .trio-metaphor { background: #f97316; }
+    
+    .trio-desc {
+      font-size: 0.9em;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    /* 最適化フロー */
+    .optimize-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .flow-step {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      position: relative;
+    }
+    .step-ta { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    .step-ce { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .step-co { border-color: #f97316; background: #fff7ed; color: #9a3412; }
+    
+    .step-num {
+      font-weight: 800;
+      font-size: 1.5em;
+      margin-right: 15px;
+      opacity: 0.5;
+    }
+    .step-text strong { display: block; font-size: 1.1em; }
+    .step-text span { font-size: 0.9em; }
+    
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      line-height: 0.8;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-10">
+            2026.02.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSコスト最適化トリオの使い分け</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#コスト最適化</span>
+            <span class="tag">#Trusted Advisor</span>
+            <span class="tag">#Cost Explorer</span>
+            <span class="tag">#Compute Optimizer</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSの3つのツールの役割を整理。最適なコスト管理と技術的提案を提供します。</p>
+<hr>
+<p>
+  AWSのコスト最適化や管理に関わる3つのサービスは、名前や機能が似ていて「どっちを見ればいいの？」と混乱しがちです。<br>
+  結論から言うと、それぞれ<strong>「見てる世界」</strong>が全く違います。
+</p>
+<ul>
+  <li><strong>Trusted Advisor</strong> ＝ 健康診断のチェックリスト</li>
+  <li><strong>Cost Explorer</strong> ＝ お金の家計簿</li>
+  <li><strong>Compute Optimizer</strong> ＝ 技術的な処方箋</li>
+</ul>
+
+<h2>1. 役割分担の図解</h2>
+<p>
+  それぞれのサービスが得意とする領域をイメージで掴みましょう。
+</p>
+
+<!-- 図解：3つの役割カード -->
+<div class="diagram-container">
+  <div class="diagram-title">最適化トリオのキャラクター</div>
+  <div class="trio-grid">
+    
+    <!-- Trusted Advisor -->
+    <div class="trio-card ta">
+      <span class="trio-icon">🩺</span>
+      <span class="trio-name">Trusted Advisor</span>
+      <span class="trio-metaphor">チェックリスト</span>
+      <div class="trio-desc">
+        AWS全体をざっと点検。<br>
+        「無駄なEBSありますよ」<br>
+        「セキュリティ甘いですよ」
+      </div>
+    </div>
+
+    <!-- Cost Explorer -->
+    <div class="trio-card ce">
+      <span class="trio-icon">💰</span>
+      <span class="trio-name">Cost Explorer</span>
+      <span class="trio-metaphor">家計簿</span>
+      <div class="trio-desc">
+        お金の動きを可視化。<br>
+        「先月より高いですね」<br>
+        「来月はこれくらいです」
+      </div>
+    </div>
+
+    <!-- Compute Optimizer -->
+    <div class="trio-card co">
+      <span class="trio-icon">💊</span>
+      <span class="trio-name">Compute Optimizer</span>
+      <span class="trio-metaphor">処方箋</span>
+      <div class="trio-desc">
+        データに基づく改善案。<br>
+        「m5.xlargeは大きすぎ」<br>
+        「m5.largeに下げましょう」
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 各サービスの守備範囲</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>Trusted Advisor</th>
+      <th>Cost Explorer</th>
+      <th>Compute Optimizer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>見てるもの</strong></td>
+      <td>AWS全体のルール</td>
+      <td><strong>利用料金 ($)</strong></td>
+      <td><strong>性能データ (CPU等)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>主な質問</strong></td>
+      <td>「設定はちゃんとしてる？」</td>
+      <td>「いくら使ってる？」</td>
+      <td>「サイズは合ってる？」</td>
+    </tr>
+    <tr>
+      <td><strong>判断基準</strong></td>
+      <td>ベストプラクティス</td>
+      <td>過去の請求実績</td>
+      <td>機械学習 (ML)</td>
+    </tr>
+    <tr>
+      <td><strong>コスト削減</strong></td>
+      <td>△ (気づきを与える)</td>
+      <td>◎ (無駄の発見)</td>
+      <td>◎ (具体的な削減)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>① Trusted Advisor： 「健康診断」</h3>
+<p>
+  コストだけでなく、セキュリティ、耐障害性など5つの柱でAWS環境をチェックします。「使っていないEIPがある」「S3が一般公開されている」といった、<strong>「明らかな無駄や危険」</strong>を見つけるのが得意です。まずはここを見ます。
+</p>
+
+<h3>② Cost Explorer： 「家計簿＋分析」</h3>
+<p>
+  「いつ、どのサービスで、いくら使ったか」をグラフで見ます。「先月よりEC2代が急増している」といった<strong>お金の流れの異常</strong>に気づくためのツールです。将来の予測もできます。
+</p>
+
+<h3>③ Compute Optimizer： 「技術的な最適化」</h3>
+<p>
+  CloudWatchのメトリクス（CPU使用率など）をAIが分析し、「このサーバーは過去2週間、CPUを5%しか使っていません。1ランク下のサイズに下げれば月50ドル安くなります」といった<strong>具体的な変更案（推奨事項）</strong>を出してくれます。
+</p>
+
+<h2>3. 正しい使い分けフロー</h2>
+<p>
+  実務では、この順番で使うとスムーズにコスト削減ができます。
+</p>
+
+<!-- 図解：最適化フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">コスト削減の3ステップ</div>
+  <div class="optimize-flow">
+    
+    <div class="flow-step step-ta">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <strong>Trusted Advisor</strong>
+        <span>「何か怪しいところ（無駄なEIPなど）ある？」</span>
+      </div>
+    </div>
+    
+    <div class="flow-arrow">⬇</div>
+    
+    <div class="flow-step step-ce">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <strong>Cost Explorer</strong>
+        <span>「全体的に高いな... どのサービスが高い？」</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow">⬇</div>
+
+    <div class="flow-step step-co">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <strong>Compute Optimizer</strong>
+        <span>「じゃあ、具体的にどのサイズに直せばいい？」</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. よくある誤解（ここ注意）</h2>
+<ul>
+  <li>❌ <strong>「Cost Explorerで最適サイズが分かる？」</strong>
+    <ul>
+      <li>分かりません。Cost Explorerは「高い」という事実は教えてくれますが、「CPUが余っているから高い」のか「単に台数が多いから高い」のかまでは分かりません。</li>
+    </ul>
+  </li>
+  <li>❌ <strong>「Trusted Advisorだけ見ればOK？」</strong>
+    <ul>
+      <li>不十分です。Trusted Advisorは「使用率が極端に低いもの」は警告してくれますが、Compute Optimizerほど高精度な「適切なサイズへの変更案」までは出してくれません。</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>まとめ：試験での即答ルール</h2>
+<ul>
+  <li>ベストプラクティス違反？ → <strong>Trusted Advisor</strong></li>
+  <li>コストの内訳・推移・予測？ → <strong>Cost Explorer</strong></li>
+  <li>適切なインスタンスタイプ？ → <strong>Compute Optimizer</strong></li>
+</ul>
+<p>
+  「Trusted Advisorが異常を見つけ、Cost Explorerがお金を示し、Compute Optimizerが直し方を教える」と覚えましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
