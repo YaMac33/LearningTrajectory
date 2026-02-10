@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Launch Wizardの基本</title>
+  <meta name="description" content="AWS Launch Wizardは、特定アプリケーションのワークロードをベストプラクティスに基づいて自動プロビジョニングするサービスです。用語の定義と試験でのポイントを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Launch Wizardの基本" />
+  <meta property="og:description" content="AWS Launch Wizardは、特定アプリケーションのワークロードをベストプラクティスに基づいて自動プロビジョニングするサービスです。用語の定義と試験でのポイントを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 用語定義カード */
+    .term-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .term-grid { grid-template-columns: 1fr; }
+    }
+    .term-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .term-card.workload { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    .term-card.provision { border-top: 4px solid #10b981; background: #ecfdf5; }
+    
+    .term-icon { font-size: 2.5em; display: block; margin-bottom: 10px; }
+    .term-word { font-weight: 800; font-size: 1.2em; color: #1e293b; margin-bottom: 5px; display: block; }
+    .term-desc { font-size: 0.9em; color: #475569; line-height: 1.5; }
+
+    /* ウィザードのフロー */
+    .wizard-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .wizard-step {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 450px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      position: relative;
+    }
+    .step-q { border-color: #64748b; color: #334155; }
+    .step-magic { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .step-done { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    
+    .step-icon { font-size: 1.5em; margin-right: 15px; width: 30px; text-align: center; }
+    .step-text strong { display: block; font-size: 1.05em; }
+    .step-text span { font-size: 0.85em; }
+    
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      line-height: 0.8;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .ok-mark { color: #10b981; font-weight: bold; }
+    .ng-mark { color: #ef4444; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-10">
+            2026.02.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Launch Wizardの基本</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Launch Wizard</span>
+            <span class="tag">#プロビジョニング</span>
+            <span class="tag">#ワークロード</span>
+            <span class="tag">#自動化</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Launch Wizardは特定アプリのワークロードを自動でプロビジョニングするサービスです。</p>
+<hr>
+<p>
+  <strong>Q. 「特定のアプリケーションのワークロードをAWS上に迅速にデプロイできる」サービスはどれですか？</strong><br>
+  <strong>A. 正解は AWS Launch Wizard です。</strong>
+</p>
+<p>
+  この問題を解く鍵は、「ワークロード」と「プロビジョニング」という2つの専門用語をイメージできているかどうかにあります。<br>
+  Launch Wizard は一言で言うと、<strong>「『このアプリを使いたい』と言うだけで、AWS側が正解の構成（ベストプラクティス）を自動で作ってくれる魔法使い」</strong>です。
+</p>
+
+<h2>1. まず用語を整理（ここが一番大事）</h2>
+<p>
+  カタカナ語の意味をはっきりさせておきましょう。
+</p>
+
+<!-- 図解：用語の定義 -->
+<div class="diagram-container">
+  <div class="diagram-title">重要なキーワード</div>
+  <div class="term-grid">
+    
+    <!-- ワークロード -->
+    <div class="term-card workload">
+      <span class="term-icon">📦</span>
+      <span class="term-word">ワークロード</span>
+      <div class="term-desc">
+        <strong>「アプリを動かすための一式」</strong><br>
+        アプリ本体だけでなく、DB、サーバー、ネットワーク設定まで含めた「システムのかたまり」。
+      </div>
+    </div>
+
+    <!-- プロビジョニング -->
+    <div class="term-card provision">
+      <span class="term-icon">🏗️</span>
+      <span class="term-word">プロビジョニング</span>
+      <div class="term-desc">
+        <strong>「実際に作って配備すること」</strong><br>
+        設計図を元に、EC2やRDSを作成し、使える状態にセットアップする行為。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. AWS Launch Wizard とは？</h2>
+<p>
+  SAP や Microsoft SQL Server など、セットアップが複雑で難しいアプリケーションを、対話形式（ウィザード）で簡単に構築できるサービスです。
+</p>
+<p>
+  「どんなスペックのサーバーにしますか？」「可用性はどうしますか？」といった質問に答えていくだけで、AWSが裏側で勝手に CloudFormation を書いて実行してくれます。
+</p>
+
+<!-- 図解：ウィザードのフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">自動構築の流れ</div>
+  <div class="wizard-flow">
+    
+    <div class="wizard-step step-q">
+      <span class="step-icon">🗣️</span>
+      <div class="step-text">
+        <strong>1. 要件ヒアリング</strong>
+        <span>「SQL Serverを使いたい。本番環境で、高性能なやつ頼む。」</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow">⬇</div>
+
+    <div class="wizard-step step-magic">
+      <span class="step-icon">🧙‍♂️</span>
+      <div class="step-text">
+        <strong>2. Launch Wizard (魔法使い)</strong>
+        <span>「承知しました。ベストプラクティス構成で設計・お見積りします。」</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow">⬇</div>
+
+    <div class="wizard-step step-done">
+      <span class="step-icon">🚀</span>
+      <div class="step-text">
+        <strong>3. 自動プロビジョニング</strong>
+        <span>EC2, RDS, IAM, SecurityGroup... 全部完成！</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. なぜ他の選択肢は不正解なのか？</h2>
+<p>
+  試験では、役割の違うサービスが選択肢に並びます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>選択肢のサービス</th>
+      <th>役割</th>
+      <th>なぜ違う？</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>AWS Launch Wizard</strong></td>
+      <td><strong>初期構築 (Deploy)</strong></td>
+      <td><span class="ok-mark">正解</span><br>ワークロードを迅速にデプロイするサービスだから。</td>
+    </tr>
+    <tr>
+      <td>Amazon CloudWatch</td>
+      <td>監視 (Monitor)</td>
+      <td><span class="ng-mark">不正解</span><br>「作る」のではなく「見張る」サービスだから。</td>
+    </tr>
+    <tr>
+      <td>AWS Auto Scaling</td>
+      <td>拡張 (Scale)</td>
+      <td><span class="ng-mark">不正解</span><br>既存のシステムを「増減させる」サービスだから。</td>
+    </tr>
+    <tr>
+      <td>AWS Billing...</td>
+      <td>請求 (Cost)</td>
+      <td><span class="ng-mark">不正解</span><br>お金の管理をするサービスだから。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Launch Wizard</strong>: 特定の複雑なアプリ（SAP, SQL Serverなど）の構築を自動化するサービス。</li>
+  <li><strong>キーワード</strong>: 「ワークロード（一式）」「プロビジョニング（作る）」「ベストプラクティス」。</li>
+</ul>
+<p>
+  「難しいアプリ環境構築を、魔法使い（Wizard）にお任せする」とイメージしておけばOKです！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
