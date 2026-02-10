@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-kendra-and-generative-ai-role-sharing",
+    "category": "awscp",
+    "timestamp": "2026-02-11T08:06:50+09:00",
+    "title": "Kendraと生成AIの役割分担",
+    "summary": "Kendraは社内文書の検索を担当し、生成AIはその情報を自然に説明します。両者の連携がRAGの仕組みで効果的に機能します。",
+    "tags": [
+      "Kendra",
+      "生成AI",
+      "RAG",
+      "企業内検索",
+      "役割分担"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-11-awscp-kendra-and-generative-ai-role-sharing/"
+  },
+  {
     "id": "awscp-aws-access-keys-basics",
     "category": "awscp",
     "timestamp": "2026-02-10T18:42:51+09:00",
