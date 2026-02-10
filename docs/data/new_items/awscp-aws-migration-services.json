@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-migration-services",
+  "category": "awscp",
+  "timestamp": "2026-02-10T10:24:36+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-migration-services/",
+  "meta": {
+    "title": "AWS移行サービスの活用法",
+    "summary": "AWS移行プロジェクトにおける各サービスの役割を理解し、適切な組み合わせで移行を成功に導く方法を解説します。",
+    "tags": [
+      "AWS",
+      "移行",
+      "ADS",
+      "MGN",
+      "DMS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
