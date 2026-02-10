@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-access-keys-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-10T18:42:51+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-access-keys-basics/",
+  "meta": {
+    "title": "AWS CLI利用に必要なアクセスキーの理解",
+    "summary": "アクセスキーとトークンの違いを理解し、AWS CLIが使用する認証情報について解説します。IAMユーザーがアクセスキーを使用する場面が紹介されています。",
+    "tags": [
+      "AWS",
+      "IAM",
+      "アクセスキー",
+      "認証情報",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
