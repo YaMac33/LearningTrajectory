@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-migration-phase",
+    "category": "awscp",
+    "timestamp": "2026-02-10T10:29:16+09:00",
+    "title": "AWS移行フェーズで注意すべきポイント",
+    "summary": "移行フェーズではサーバーやDB以外の要素も考慮が必要です。特に5つの重要な要素を管理し、事故を防ぐ視点が求められます。",
+    "tags": [
+      "移行フェーズ",
+      "AWS",
+      "データベース",
+      "サーバー",
+      "運用",
+      "管理"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-10-awscp-aws-migration-phase/"
+  },
+  {
     "id": "awscp-aws-migration-services",
     "category": "awscp",
     "timestamp": "2026-02-10T10:24:36+09:00",
