@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cost-optimization-tools",
+    "category": "awscp",
+    "timestamp": "2026-02-10T12:45:58+09:00",
+    "title": "AWSコスト最適化トリオの使い分け",
+    "summary": "AWSのコスト最適化に関する3つのツールの役割と使い分けについて解説します。試験対策としてそれぞれの特徴を理解するのに役立ちます。",
+    "tags": [
+      "AWS",
+      "コスト最適化",
+      "Trusted Advisor",
+      "Cost Explorer",
+      "Compute Optimizer"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "料金モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-10-awscp-aws-cost-optimization-tools/"
+  },
+  {
     "id": "awscp-aws-compute-optimizer",
     "category": "awscp",
     "timestamp": "2026-02-10T12:42:34+09:00",
