@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-launch-wizard-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-10T18:17:45+09:00",
+  "post_path": "awscp/posts/2026-02-10-awscp-aws-launch-wizard-basics/",
+  "meta": {
+    "title": "AWS Launch Wizardの基本的な解説",
+    "summary": "AWS Launch Wizardは複雑なアプリケーションのワークロードを自動的にプロビジョニングするサービスです。特に試験では、「ワークロード」と「プロビジョニング」の定義を理解することが重要です。",
+    "tags": [
+      "AWS",
+      "Launch Wizard",
+      "プロビジョニング",
+      "ワークロード",
+      "自動化"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
