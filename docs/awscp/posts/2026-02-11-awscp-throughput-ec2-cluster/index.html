@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | スループットとEC2の仕組み</title>
+  <meta name="description" content="スループットの意味とEC2のクラスタープレイスメントグループの利点を解説します。HPCやビッグデータ解析で求められる「ネットワーク性能」の基礎知識。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="スループットとEC2の仕組み" />
+  <meta property="og:description" content="スループットの意味とEC2のクラスタープレイスメントグループの利点を解説します。HPCやビッグデータ解析で求められる「ネットワーク性能」の基礎知識。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    /* 土管と水のメタファー */
+    .throughput-viz {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+    .pipe-container {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: 60px;
+      background: #e2e8f0;
+      border-radius: 30px;
+      border: 4px solid #64748b;
+      overflow: hidden;
+    }
+    .water-flow {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      white-space: nowrap;
+      transition: width 0.3s;
+    }
+    .pipe-label {
+      text-align: center;
+      font-size: 0.85em;
+      color: #475569;
+      margin-top: -10px;
+    }
+    
+    /* クラスター配置図 */
+    .cluster-layout {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+    }
+    .rack-box {
+      border: 4px solid #334155;
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 4px;
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+    }
+    .rack-box::before {
+      content: "Rack";
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #334155;
+    }
+    .server-unit {
+      background: #3b82f6;
+      height: 20px;
+      border-radius: 2px;
+      border: 1px solid #1d4ed8;
+      position: relative;
+    }
+    .server-unit::after {
+      content: "";
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      width: 4px;
+      height: 4px;
+      background: #bef264;
+      border-radius: 50%;
+    }
+    .comm-arrow {
+      position: absolute;
+      right: -25px;
+      top: 50%;
+      font-size: 1.5em;
+      color: #f59e0b;
+      font-weight: bold;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+    
+    .compare-text {
+      text-align: center;
+      font-size: 0.9em;
+      margin-top: 10px;
+      color: #1e293b;
+      font-weight: bold;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-10">
+            2026.02.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">スループットとEC2の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#スループット</span>
+            <span class="tag">#EC2</span>
+            <span class="tag">#クラスタープレイスメント</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#ネットワーク</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>スループットの意味とEC2のクラスタープレイスメントグループの利点を解説します。</p>
+<hr>
+<p>
+  <strong>Q. 「TCP/IPトラフィックのフローあたりのスループット上限を向上できる」というEC2のクラスタープレイスメントグループの説明について、わかりやすく教えてください。</strong><br>
+  <strong>A. 専門用語が多くて難しく見えますが、「スループット」という言葉のイメージさえ掴めれば簡単です。</strong>
+</p>
+<p>
+  この機能は、科学技術計算（HPC）やビッグデータ解析など、<strong>「とにかく大量のデータを、一瞬で隣のサーバーに送りたい！」</strong>という時に使う切り札です。
+</p>
+
+<h2>1. 「スループット」とは？</h2>
+<p>
+  一言で言うと、<strong>「単位時間あたりに、実際に処理できた（送れた）データの量」</strong>のことです。<br>
+  <strong>「土管と水」</strong>に例えると一番わかりやすいです。
+</p>
+
+<!-- 図解：土管と水 -->
+<div class="diagram-container">
+  <div class="diagram-title">帯域幅 vs スループット</div>
+  <div class="throughput-viz">
+    
+    <!-- 帯域幅 -->
+    <div style="width:100%; max-width:400px;">
+      <div class="pipe-container">
+        <div class="water-flow" style="width:100%; background:none; color:#64748b;">
+          理論上の最大容量 (100L/秒)
+        </div>
+      </div>
+      <div class="pipe-label">帯域幅 (Bandwidth) = 土管の太さ</div>
+    </div>
+
+    <!-- スループット -->
+    <div style="width:100%; max-width:400px;">
+      <div class="pipe-container">
+        <div class="water-flow" style="width:40%;">
+          実測値 (40L/秒)
+        </div>
+      </div>
+      <div class="pipe-label">スループット (Throughput) = 実際の水量</div>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>帯域幅 (Bandwidth)</strong>: 土管の太さ（スペック上の最大速度）。「この管は最大で毎秒100リットル流せるよ」。</li>
+  <li><strong>スループット (Throughput)</strong>: 実際に流れた水の量。「今は詰まっているから、毎秒40リットルしか流れてないね」という実測値。</li>
+</ul>
+<p>
+  つまり、<strong>「スループットが高い ＝ たくさんのデータを、詰まらずにドバドバ送れている状態」</strong>です。
+</p>
+
+<h2>2. 「フローあたりのスループット上限」とは？</h2>
+<p>
+  ここが少しマニアックですが、試験で問われるポイントです。<br>
+  EC2同士が通信する時、道路に例えると「車線（フロー）」を作ってデータを運びます。
+</p>
+<p>
+  実は、AWSのネットワークには、<strong>「道路全体（インスタンス全体）では100Gbps出せるけど、1つの車線（1つのTCP接続）では最大5Gbpsまでしか出しちゃダメだよ」</strong>という制限（ボトルネック）があります。これを<strong>「フローあたりのスループット上限」</strong>と呼びます。
+</p>
+
+<h2>3. なぜ「クラスター」だと速くなるの？</h2>
+<p>
+  <strong>クラスタープレイスメントグループ</strong>は、複数のEC2インスタンスを、物理的に「隣のラック」や「同じ部屋」に<strong>ギュウギュウに詰め込んで配置する設定</strong>です。
+</p>
+
+<!-- 図解：クラスター配置 -->
+<div class="diagram-container">
+  <div class="diagram-title">物理配置の違い</div>
+  <div class="cluster-layout">
+    
+    <!-- Cluster -->
+    <div class="rack-box">
+      <div class="server-unit"></div>
+      <div class="server-unit"></div>
+      <div class="server-unit"></div>
+      <div class="server-unit"></div>
+      <div class="comm-arrow">⚡</div>
+    </div>
+    
+  </div>
+  <div class="compare-text">
+    物理距離が近い ＝ ケーブルが短い ＝ 信号が劣化しない<br>
+    👉 「1本の車線」で流せる量が劇的に増える！
+  </div>
+</div>
+
+<p>
+  物理的な距離が圧倒的に近くなるため、以下のメリットが生まれます。
+</p>
+<ul>
+  <li><strong>低レイテンシー</strong>: 光が伝わる時間すら短縮されるため、遅延が減ります。</li>
+  <li><strong>高スループット</strong>: 距離が近いため信号の劣化や混雑が減り、前述の「1本のフロー（車線）あたりの上限」を突破して、限界ギリギリまでデータを流せるようになります。</li>
+</ul>
+
+<h2>試験対策：どう覚える？</h2>
+<p>
+  試験で以下のキーワードが出たら、この機能を選んでください。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>キーワード</th>
+      <th>連想する答え</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>科学技術計算、HPC、ビッグデータ解析</td>
+      <td><strong>クラスタープレイスメントグループ</strong></td>
+    </tr>
+    <tr>
+      <td>ノード間通信の遅延を最小化したい</td>
+      <td><strong>クラスタープレイスメントグループ</strong></td>
+    </tr>
+    <tr>
+      <td>単一フローのスループットを向上させたい</td>
+      <td><strong>クラスタープレイスメントグループ</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>スループット</strong> ＝ 実際に流れるデータの量（スピード）。</li>
+  <li><strong>クラスタープレイスメントグループ</strong> ＝ サーバーを物理的に隣同士（密結合）にして、配線を短くし、データをドバドバ流せるようにする機能。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
