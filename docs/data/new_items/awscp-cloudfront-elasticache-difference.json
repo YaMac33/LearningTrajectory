@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cloudfront-elasticache-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-12T06:51:11+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-cloudfront-elasticache-difference/",
+  "meta": {
+    "title": "CloudFrontとElastiCacheの違いを理解しよう",
+    "summary": "CloudFrontはコンテンツ配信、ElastiCacheはDBアクセスの最適化を行う。各サービスの特徴と試験における理解を深めることができる。",
+    "tags": [
+      "CloudFront",
+      "ElastiCache",
+      "キャッシュ",
+      "パフォーマンス",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
