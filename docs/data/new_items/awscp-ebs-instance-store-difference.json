@@ -1,0 +1,21 @@
+{
+  "id": "awscp-ebs-instance-store-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-12T08:20:17+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-ebs-instance-store-difference/",
+  "meta": {
+    "title": "EBSとインスタンスストアの違い",
+    "summary": "EBSは永続的な外付けディスクであり、インスタンスストアは電源オフでデータが消える一時ディスクです。試験で理解すべきポイントを解説します。",
+    "tags": [
+      "EBS",
+      "インスタンスストア",
+      "クラウドストレージ",
+      "AWS",
+      "データ保存"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
