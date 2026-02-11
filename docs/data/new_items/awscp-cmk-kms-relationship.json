@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cmk-kms-relationship",
+  "category": "awscp",
+  "timestamp": "2026-02-12T08:25:59+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-cmk-kms-relationship/",
+  "meta": {
+    "title": "CMKとKMSの仕組みを理解する",
+    "summary": "AWS KMSが管理するCMKはEBSの暗号化において重要な役割を果たします。暗号化の構造やCMKの種類について学びましょう。",
+    "tags": [
+      "CMK",
+      "KMS",
+      "暗号化",
+      "AWS",
+      "EBS"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "暗号化(KMS)"
+    ]
+  }
+}
