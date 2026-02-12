@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SQSによるバッチ処理の最適化</title>
+  <meta name="description" content="SQSを使ってEC2でのバッチ処理を並列化し、効率化する方法を解説。画像変換や夜間バッチの事例、Auto Scalingとの組み合わせによるコスト最適化について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SQSによるバッチ処理の最適化" />
+  <meta property="og:description" content="SQSを使ってEC2でのバッチ処理を並列化し、効率化する方法を解説。画像変換や夜間バッチの事例、Auto Scalingとの組み合わせによるコスト最適化について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* アーキテクチャ比較 */
+    .arch-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .arch-compare { grid-template-columns: 1fr; }
+    }
+    .arch-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .arch-box.bad { border-top: 4px solid #ef4444; }
+    .arch-box.good { border-top: 4px solid #10b981; }
+    
+    .arch-title { font-weight: 800; font-size: 1.1em; margin-bottom: 15px; display: block; }
+    .bad-title { color: #b91c1c; }
+    .good-title { color: #047857; }
+
+    /* キューとワーカーの表現 */
+    .worker-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .task-list {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 5px;
+    }
+    .task-item {
+      width: 20px; height: 20px; background: #64748b; border-radius: 4px;
+    }
+    .worker-node {
+      border: 2px solid #3b82f6;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 6px;
+      width: 80px;
+    }
+    .queue-box {
+      border: 2px dashed #f59e0b;
+      background: #fffbeb;
+      padding: 10px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 180px;
+      color: #b45309;
+      font-weight: bold;
+    }
+    .worker-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+    .arrow-down { font-size: 1.5em; color: #94a3b8; line-height: 0.8; }
+
+    /* Auto Scaling フロー */
+    .scale-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .scale-step {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 15px;
+      text-align: center;
+      background: #fff;
+      font-weight: bold;
+      min-width: 120px;
+      position: relative;
+    }
+    .step-sqs { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .step-asg { border-color: #8b5cf6; color: #5b21b6; background: #f5f3ff; }
+    .step-ec2 { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .step-result { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    
+    .scale-label {
+      font-size: 0.75em;
+      color: #64748b;
+      font-weight: normal;
+      margin-top: 5px;
+      display: block;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-12">
+            2026.02.12
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SQSによるバッチ処理の最適化</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#SQS</span>
+            <span class="tag">#EC2</span>
+            <span class="tag">#バッチ処理</span>
+            <span class="tag">#並列処理</span>
+            <span class="tag">#AWS</span>
+            <span class="tag">#負荷分散</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>SQSを使ってEC2でのバッチ処理を並列化し、効率化する方法を解説します。</p>
+<hr>
+<p>
+  システム開発において、<strong>「重たいバッチ処理（画像変換や集計など）をどうやって効率よく終わらせるか」</strong>は永遠の課題です。<br>
+  AWSでは、<strong>Amazon SQS（メッセージキュー）</strong>を使うことで、この処理を複数のEC2で手軽に「並列化・分散」させることができます。
+</p>
+
+<h2>1. アーキテクチャの比較（なぜSQSが必要？）</h2>
+<p>
+  ユーザーが大量の画像をアップロードし、サーバーで「リサイズ・圧縮処理」を行うケースを考えてみましょう。
+</p>
+
+<!-- 図解：アーキテクチャ比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">バッチ処理の設計比較</div>
+  <div class="arch-compare">
+    
+    <!-- ❌ ダメな設計 -->
+    <div class="arch-box bad">
+      <span class="arch-title bad-title">❌ 1台で頑張る設計</span>
+      <div class="worker-flow">
+        <div class="task-list">
+          <div class="task-item"></div><div class="task-item"></div><div class="task-item"></div><div class="task-item"></div>
+        </div>
+        <div class="arrow-down">⬇</div>
+        <div class="worker-node">EC2 (1台)</div>
+      </div>
+      <p style="font-size:0.85em; color:#475569; margin-top:15px; text-align:left;">
+        ・1000枚の画像を順番に処理。<br>
+        ・とにかく遅い。<br>
+        ・EC2が落ちたら処理待ちデータも消える（ロスト）。
+      </p>
+    </div>
+
+    <!-- ✅ 良い設計 -->
+    <div class="arch-box good">
+      <span class="arch-title good-title">✅ SQSで分散する設計</span>
+      <div class="worker-flow">
+        <div class="queue-box">
+          SQS (キュー)
+          <div class="task-list" style="justify-content:center; margin-top:5px;">
+            <div class="task-item" style="background:#f59e0b;"></div><div class="task-item" style="background:#f59e0b;"></div><div class="task-item" style="background:#f59e0b;"></div>
+          </div>
+        </div>
+        <div class="arrow-down">⬇ 取得 (早い者勝ち)</div>
+        <div class="worker-group">
+          <div class="worker-node">EC2</div>
+          <div class="worker-node">EC2</div>
+          <div class="worker-node">EC2</div>
+        </div>
+      </div>
+      <p style="font-size:0.85em; color:#475569; margin-top:15px; text-align:left;">
+        ・SQSが「タスクの順番待ち箱」になる。<br>
+        ・空いているEC2からタスクを取って並列処理。<br>
+        ・EC2が落ちてもSQSにタスクが残る！
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  SQSのキューには、「画像Aをリサイズしてね」「画像Bをリサイズしてね」という<strong>メッセージ（タスクの指示書）</strong>が入ります。EC2たちはそれを1件ずつ取得し、処理が終わったらメッセージを削除します。
+</p>
+
+<h2>2. 具体的な活用事例</h2>
+
+<h3>事例①：夜間バッチ処理（ECサイト）</h3>
+<ul>
+  <li><strong>内容</strong>: 毎晩行う「売上集計」「在庫再計算」「レコメンド更新」。</li>
+  <li><strong>効果</strong>: 1台でやると2時間かかる1万件の注文データ処理も、SQSに入れてEC2を10台用意すれば、<strong>10倍速（わずか12分）</strong>で終わります。</li>
+</ul>
+
+<h3>事例②：動画エンコード</h3>
+<ul>
+  <li><strong>内容</strong>: ユーザーがアップロードした動画を、1080p, 720p, 480p の各画質に変換する処理。</li>
+  <li><strong>効果</strong>: 「動画A」「動画B」という重いタスクをSQSでキュー化し、複数のEC2で同時並行でエンコードできます。</li>
+</ul>
+
+<h2>3. Auto Scalingと組み合わせると「最強」</h2>
+<p>
+  さらに、SQSとAuto Scalingを連携させると、<strong>コストと速度の究極の最適化</strong>が可能になります。
+</p>
+
+<!-- 図解：スケーリングフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">Auto Scalingとの最強コンボ</div>
+  <div class="scale-flow">
+    <div class="scale-step step-sqs">
+      📦 SQS
+      <span class="scale-label">メッセージが増える</span>
+    </div>
+    <div class="arrow-down" style="transform: rotate(-90deg); margin: 0 5px;">➡</div>
+    <div class="scale-step step-asg">
+      📈 Auto Scaling
+      <span class="scale-label">「忙しい！」と検知</span>
+    </div>
+    <div class="arrow-down" style="transform: rotate(-90deg); margin: 0 5px;">➡</div>
+    <div class="scale-step step-ec2">
+      💻 EC2追加
+      <span class="scale-label">ワーカー台数を増やす</span>
+    </div>
+    <div class="arrow-down" style="transform: rotate(-90deg); margin: 0 5px;">➡</div>
+    <div class="scale-step step-result">
+      ✨ 処理速度UP
+      <span class="scale-label">キューが減ればEC2も減る</span>
+    </div>
+  </div>
+</div>
+<p>
+  仕事が溜まっている時だけ一時的にEC2をドカッと増やし、終わったら減らす（スケールインする）ことで、無駄なサーバー代を払わずに済みます。
+</p>
+
+<h2>4. SQSがないとどうなる？（なぜSQSが必要か）</h2>
+<p>
+  「EC2同士で直接通信して並列処理すればいいのでは？」と思うかもしれませんが、それは地獄の始まりです。
+</p>
+<ul>
+  <li><strong>競合の問題</strong>: 複数台のEC2が「同じ画像」を同時に処理してしまうのを防ぐ制御が極めて複雑になります。（SQSなら、誰かが処理中のメッセージは一時的に他から見えなくなる機能が備わっています）。</li>
+  <li><strong>障害時のロスト</strong>: 処理中にEC2がクラッシュすると、そのタスクは消えてしまいます。（SQSなら、一定時間完了報告がなければ、タスクをキューに戻して別の人にやらせます）。</li>
+</ul>
+
+<h2>5. 試験対策と実務のまとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>出題キーワード</th>
+      <th>正解となるサービス / 構成</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>非同期処理、コンポーネントの分離</td>
+      <td><strong>Amazon SQS</strong> (デカップリング)</td>
+    </tr>
+    <tr>
+      <td>並列バッチ処理、負荷分散</td>
+      <td><strong>SQS + EC2 (ワーカー)</strong></td>
+    </tr>
+    <tr>
+      <td>キューの長さに応じた自動スケール</td>
+      <td><strong>SQS + Auto Scaling</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>【実務での一歩先】</strong><br>
+  現代のAWSでは、ワーカーとしてEC2の代わりに <strong>AWS Lambda（サーバーレス）</strong> や <strong>ECS/Fargate（コンテナ）</strong> を使う構成が主流になっています。さらに大規模な分析処理なら <strong>AWS Batch</strong> という専用サービスもあります。
+</p>
+
+<p>
+  <strong>結論： SQSは「タスクの順番待ち箱」。EC2を増やせば、その箱から同時に取り出して並列処理できる！</strong>
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
