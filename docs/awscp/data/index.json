@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-amazon-cognito-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-12T18:42:27+09:00",
+    "title": "Amazon Cognitoの概要と利用法",
+    "summary": "Amazon Cognitoはアプリ向けの認証基盤で、ユーザー認証とAWSリソースへのアクセスを安全に管理する仕組みを理解することができる。",
+    "tags": [
+      "Cognito",
+      "AWS",
+      "認証",
+      "アプリ",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-amazon-cognito-overview/"
+  },
+  {
     "id": "awscp-iam-user-role-difference",
     "category": "awscp",
     "timestamp": "2026-02-12T18:10:14+09:00",
