@@ -1,0 +1,21 @@
+{
+  "id": "awscp-s3-resource-api-relationship",
+  "category": "awscp",
+  "timestamp": "2026-02-13T07:17:59+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-s3-resource-api-relationship/",
+  "meta": {
+    "title": "S3のリソースとAPIの関係",
+    "summary": "S3におけるバケットとオブジェクトはリソースであり、APIを通じて操作される仕組みを理解できます。開発者視点でのS3の構造と操作について整理します。",
+    "tags": [
+      "S3",
+      "API",
+      "バケット",
+      "オブジェクト",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
