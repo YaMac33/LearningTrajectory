@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-container-services-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-12T19:17:04+09:00",
+    "title": "AWSのコンテナサービスの概要",
+    "summary": "ECR、ECS、EKS、Fargateの役割と特徴を解説し、試験での要点を押さえられる内容です。",
+    "tags": [
+      "AWS",
+      "ECS",
+      "EKS",
+      "ECR",
+      "Fargate",
+      "コンテナ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-aws-container-services-overview/"
+  },
+  {
     "id": "awscp-beanstalk-lambda-difference",
     "category": "awscp",
     "timestamp": "2026-02-12T19:08:39+09:00",
