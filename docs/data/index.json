@@ -1,5 +1,29 @@
 [
   {
+    "id": "awscp-event-driven-architecture-role",
+    "category": "awscp",
+    "timestamp": "2026-02-12T19:41:52+09:00",
+    "title": "AWSのイベント駆動アーキテクチャの役割",
+    "summary": "イベント駆動アーキテクチャにおける主要なAWSサービスの役割を理解することで、システム設計に役立つ知識が得られます。",
+    "tags": [
+      "アーキテクチャ",
+      "イベント駆動",
+      "Lambda",
+      "API Gateway",
+      "Step Functions",
+      "EventBridge",
+      "Amazon SQS",
+      "Amazon SNS"
+    ],
+    "taxonomy": [
+      "アーキテクチャと設計原則",
+      "Well-Architected"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-event-driven-architecture-role/"
+  },
+  {
     "id": "awscp-aws-step-functions-usage",
     "category": "awscp",
     "timestamp": "2026-02-12T19:22:54+09:00",
