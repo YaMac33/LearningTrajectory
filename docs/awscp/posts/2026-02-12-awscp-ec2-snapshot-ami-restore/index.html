@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | EC2復元のためのスナップショットとAMI</title>
+  <meta name="description" content="S3からEBSへのリストアの仕組みと、スナップショットとAMIの決定的な違いについて解説。サーバー復元と量産の用途別の使い分けを整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="EC2復元のためのスナップショットとAMI" />
+  <meta property="og:description" content="S3からEBSへのリストアの仕組みと、スナップショットとAMIの決定的な違いについて解説。サーバー復元と量産の用途別の使い分けを整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 復元フロー */
+    .restore-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .r-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+      position: relative;
+    }
+    .box-s3 { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .box-ebs { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .box-ec2 { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    
+    .r-arrow { font-size: 1.5em; color: #94a3b8; }
+    .r-label { font-size: 0.75em; color: #64748b; margin-top: 5px; font-weight: normal; display: block; }
+
+    /* AMIの包含関係（ベン図風） */
+    .ami-structure {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .ami-outer {
+      border: 3px dashed #8b5cf6;
+      border-radius: 12px;
+      padding: 20px;
+      background: #f5f3ff;
+      text-align: center;
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+    .ami-title {
+      font-weight: 800;
+      color: #5b21b6;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+    }
+    .ami-inner-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    .ami-part {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px 10px;
+      flex: 1;
+      font-weight: bold;
+    }
+    .part-snap { border-color: #3b82f6; color: #1d4ed8; }
+    .part-config { border-color: #64748b; color: #334155; }
+    .plus-sign { font-size: 1.5em; color: #8b5cf6; display: flex; align-items: center; }
+
+    /* メタファー比較 */
+    .meta-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .meta-compare { grid-template-columns: 1fr; }
+    }
+    .meta-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .meta-card.snap { border-top: 4px solid #3b82f6; }
+    .meta-card.ami { border-top: 4px solid #8b5cf6; }
+    
+    .meta-icon { font-size: 3em; display: block; margin-bottom: 5px; }
+    .meta-name { font-weight: 800; color: #1e293b; margin-bottom: 5px; display: block; }
+    .meta-sub { font-size: 0.9em; font-weight: bold; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+    .meta-desc { font-size: 0.85em; color: #475569; text-align: left; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-12">
+            2026.02.12
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">EC2復元のためのスナップショットとAMI</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#EC2</span>
+            <span class="tag">#EBS</span>
+            <span class="tag">#S3</span>
+            <span class="tag">#Snapshot</span>
+            <span class="tag">#AMI</span>
+            <span class="tag">#クラウド</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>S3からEBSへのリストアと、スナップショットとAMIの役割を整理した要約。</p>
+<hr>
+<p>
+  「バックアップからEC2を復元する」という一連の作業において、S3、EBS、スナップショット、AMIがそれぞれどう関わっているのかを整理します。<br>
+  <strong>「スナップショットはデータを守るもの」「AMIはサーバーを再現するもの」</strong>という違いが本質です。
+</p>
+
+<h2>1. 「S3からEBSにリストアしてEC2として復元」の意味</h2>
+<p>
+  まずは用語の整理です。
+</p>
+<ul>
+  <li><strong>EBS</strong> ＝ EC2に接続するハードディスク</li>
+  <li><strong>S3</strong> ＝ データ保管用のオブジェクトストレージ</li>
+  <li><strong>スナップショット</strong> ＝ EBSのバックアップ（内部的にS3へ保存される）</li>
+</ul>
+
+<p>
+  「S3からリストアする」というのは、S3に保存されているディスク丸ごとのバックアップデータ（スナップショット）を使って、新しいサーバーを組み立て直すことを意味します。
+</p>
+
+<!-- 図解：復元フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">手動でのサーバー復元フロー</div>
+  <div class="restore-flow">
+    <div class="r-box box-s3">
+      🪣 S3
+      <span class="r-label">スナップショット<br>(バックアップ保管)</span>
+    </div>
+    <div class="r-arrow">➡</div>
+    <div class="r-box box-ebs">
+      💽 EBS作成
+      <span class="r-label">データを展開し<br>新しいディスクにする</span>
+    </div>
+    <div class="r-arrow">➡</div>
+    <div class="r-box box-ec2">
+      💻 EC2に接続
+      <span class="r-label">マウントして<br>サーバー復活！</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. スナップショットとAMIの違い（超重要）</h2>
+<p>
+  どちらも「バックアップ」のように見えますが、作れるものと目的が違います。
+</p>
+
+<!-- 図解：メタファー比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">役割のメタファー</div>
+  <div class="meta-compare">
+    
+    <div class="meta-card snap">
+      <span class="meta-icon">⚙️</span>
+      <span class="meta-name">スナップショット</span>
+      <span class="meta-sub">ディスクの部品</span>
+      <div class="meta-desc">
+        データを丸ごとコピーしたもの。ここから「EBS（ハードディスク）」を作れる。<br>
+        サーバーとして動かすには、<strong>自分でEC2を用意して組み立てる</strong>必要がある。
+      </div>
+    </div>
+
+    <div class="meta-card ami">
+      <span class="meta-icon">📦</span>
+      <span class="meta-name">AMI</span>
+      <span class="meta-sub">完成品のテンプレート</span>
+      <div class="meta-desc">
+        OSや設定、ディスクの構成まで全て含まれた「設計図」。<br>
+        ここから<strong>「EC2サーバー」をワンクリックで一発起動</strong>できる。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h3>AMIの構造の正体</h3>
+<p>
+  実は、<strong>AMIの中にはスナップショットが含まれています。</strong>
+</p>
+
+<!-- 図解：AMIの包含関係 -->
+<div class="diagram-container">
+  <div class="diagram-title">AMIの内部構造</div>
+  <div class="ami-structure">
+    <div class="ami-outer">
+      <div class="ami-title">AMI (Amazon Machine Image)</div>
+      <div class="ami-inner-group">
+        <div class="ami-part part-snap">
+          💽 EBS<br>スナップショット<br>
+          <span style="font-size:0.7em; font-weight:normal;">(データ本体)</span>
+        </div>
+        <div class="plus-sign">➕</div>
+        <div class="ami-part part-config">
+          📝 起動設定<br>
+          <span style="font-size:0.7em; font-weight:normal;">(OS情報・構成)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. Q&Aで理解度チェック</h2>
+
+<h3>Q. S3から直接EC2は作れるのか？</h3>
+<p>
+  <strong>A. ❌ 普通のS3ファイルからは作れません。</strong><br>
+  EC2を起動するには「OS情報」や「ブート情報」が必要です。S3は単なるオブジェクト倉庫なので、そのままでは起動できません。S3内にある「スナップショット」をEBSに変換してEC2にアタッチするか、AMI経由で起動する必要があります。
+</p>
+
+<h3>Q. スナップショットだけ保存していれば復元できる？</h3>
+<p>
+  <strong>A. ✅ ほぼ正しいですが、再設定の手間がかかります。</strong><br>
+  スナップショットからEBSは作れますが、それを繋ぐための「EC2本体（インスタンスタイプ、セキュリティグループ、ネットワーク設定）」は、自分でイチから作り直す必要があります。DR（災害復旧）としては機能しますが、復旧に少し時間がかかります。
+</p>
+
+<h3>Q. じゃあ、AMIだけあればスナップショットは不要？</h3>
+<p>
+  <strong>A. ❌ 不十分なケースが多いです。役割が違います。</strong><br>
+  AMIは「サーバーを複製・量産する（Auto Scalingなど）」ためのものです。日々のデータのバックアップ（例えばDBの中身）を保護するためには、AMIを毎日作るのではなく、ディスクのスナップショットを定期的に取るのが正解です。
+</p>
+
+<h2>4. まとめと使い分け</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>目的</th>
+      <th>メインで使うもの</th>
+      <th>理由</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>EC2の量産・複製</strong><br>(Auto Scalingなど)</td>
+      <td><strong>AMI</strong></td>
+      <td>ワンクリックで全く同じ構成のサーバーを自動起動できるため。</td>
+    </tr>
+    <tr>
+      <td><strong>日々のデータ保護</strong><br>(DBのバックアップなど)</td>
+      <td><strong>スナップショット</strong></td>
+      <td>データ（ディスク）部分だけを効率的かつ安価に差分保存できるため。</td>
+    </tr>
+    <tr>
+      <td><strong>DR（災害復旧）対策</strong></td>
+      <td><strong>スナップショット</strong> 中心</td>
+      <td>別リージョンへコピーし、いざという時にディスクを復元するため。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>「スナップショットはデータを守るもの」「AMIはサーバーを再現するもの」</strong>。そして、EC2の復元はその組み合わせで成り立っていると理解しましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
