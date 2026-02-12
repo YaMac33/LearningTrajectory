@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-storage-gateway-types",
+  "category": "awscp",
+  "timestamp": "2026-02-12T14:32:48+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-aws-storage-gateway-types/",
+  "meta": {
+    "title": "AWS Storage Gatewayの種類と特徴",
+    "summary": "AWSのストレージゲートウェイにはファイル、ボリューム、テープの3種類があり、それぞれの特性や使用例が理解できます。特にボリュームゲートウェイの保管型とキャッシュ型の違いが重要です。",
+    "tags": [
+      "AWS",
+      "Storage Gateway",
+      "ファイルゲートウェイ",
+      "ボリュームゲートウェイ",
+      "テープゲートウェイ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
