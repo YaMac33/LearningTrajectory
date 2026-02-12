@@ -1,0 +1,21 @@
+{
+  "id": "awscp-batch-processing-efficiency",
+  "category": "awscp",
+  "timestamp": "2026-02-12T18:00:50+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-batch-processing-efficiency/",
+  "meta": {
+    "title": "AWS-CP 対策：バッチ処理の効率化手法",
+    "summary": "本記事では、SQSを利用したEC2でのバッチ処理の並列実行に関するアーキテクチャを解説し、Stateless設計とAuto Scalingの重要性を理解します。",
+    "tags": [
+      "SQS",
+      "EC2",
+      "Auto Scaling",
+      "Stateless",
+      "バッチ処理"
+    ],
+    "taxonomy": [
+      "アーキテクチャと設計原則",
+      "高可用性設計"
+    ]
+  }
+}
