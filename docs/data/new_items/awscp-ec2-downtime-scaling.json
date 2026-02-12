@@ -1,0 +1,21 @@
+{
+  "id": "awscp-ec2-downtime-scaling",
+  "category": "awscp",
+  "timestamp": "2026-02-12T12:57:56+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-ec2-downtime-scaling/",
+  "meta": {
+    "title": "EC2拡大時のダウンタイムとスケーリングの考察",
+    "summary": "EC2のスケールアップに伴うダウンタイムの有無や、DynamoDBが無停止でスケールできる理由を解説します。",
+    "tags": [
+      "DynamoDB",
+      "EC2",
+      "スケーリング",
+      "AWS",
+      "データベース"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
