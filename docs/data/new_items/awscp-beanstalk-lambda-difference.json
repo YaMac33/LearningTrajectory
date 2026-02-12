@@ -1,0 +1,21 @@
+{
+  "id": "awscp-beanstalk-lambda-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-12T19:08:39+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-beanstalk-lambda-difference/",
+  "meta": {
+    "title": "BeanstalkとLambdaの違いを理解しよう",
+    "summary": "AWS BeanstalkとLambdaの違いを比較し、それぞれの特徴や課金モデルについて理解を深めることができる。試験での選択基準も明確に示す。",
+    "tags": [
+      "AWS",
+      "Beanstalk",
+      "Lambda",
+      "サーバーレス",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
