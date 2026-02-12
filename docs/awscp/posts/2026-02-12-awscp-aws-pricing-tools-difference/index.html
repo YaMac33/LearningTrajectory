@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS料金ツールの違い</title>
+  <meta name="description" content="AWSのPricing CalculatorとCost Explorerの特徴と使い方の違いを解説します。システム構築前の「見積もり」と、運用開始後の「実績分析」の使い分けについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS料金ツールの違い" />
+  <meta property="og:description" content="AWSのPricing CalculatorとCost Explorerの特徴と使い方の違いを解説します。システム構築前の「見積もり」と、運用開始後の「実績分析」の使い分けについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* ツール比較カード */
+    .tool-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .tool-compare { grid-template-columns: 1fr; }
+    }
+    .tool-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .card-calc { border-top: 4px solid #f59e0b; } /* Orange */
+    .card-exp { border-top: 4px solid #3b82f6; } /* Blue */
+    
+    .tool-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .tool-name { font-weight: 800; font-size: 1.2em; color: #1e293b; margin-bottom: 5px; display: block; }
+    
+    .tool-phase {
+      display: inline-block;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85em;
+      margin-bottom: 15px;
+      color: #fff;
+    }
+    .card-calc .tool-phase { background: #f59e0b; }
+    .card-exp .tool-phase { background: #3b82f6; }
+    
+    .tool-desc { font-size: 0.9em; color: #475569; text-align: left; line-height: 1.5; }
+    .tool-desc strong { color: #1e293b; }
+
+    /* タイムラインフロー */
+    .timeline-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .time-step {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      min-width: 140px;
+      background: #fff;
+    }
+    .step-before { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .step-build { border-color: #64748b; color: #334155; background: #f1f5f9; border-style: dashed; }
+    .step-after { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    
+    .step-arrow { font-size: 1.5em; color: #94a3b8; font-weight: bold; }
+    .action-label { font-size: 0.8em; color: #64748b; margin-top: 8px; font-weight: normal; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-12">
+            2026.02.12
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS料金ツールの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Pricing Calculator</span>
+            <span class="tag">#Cost Explorer</span>
+            <span class="tag">#費用分析</span>
+            <span class="tag">#見積もり</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSのPricing CalculatorとCost Explorerの特徴と使い方の違いを解説します。</p>
+<hr>
+<p>
+  AWSのコスト管理でよく登場する <strong>AWS Pricing Calculator</strong> と <strong>AWS Cost Explorer</strong>。<br>
+  この2つはどちらも「お金を見るツール」ですが、使う<strong>「タイミング」が真逆</strong>です。ここさえ押さえれば試験でも実務でも迷いません。
+</p>
+
+<h2>1. 1行要約（最大の違い）</h2>
+
+<!-- 図解：ツールの比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">2つのツールの立ち位置</div>
+  <div class="tool-compare">
+    
+    <!-- Pricing Calculator -->
+    <div class="tool-card card-calc">
+      <span class="tool-icon">🧮</span>
+      <span class="tool-name">Pricing Calculator</span>
+      <span class="tool-phase">利用前（Before）</span>
+      <div class="tool-desc">
+        システムを作る前に<br>
+        <strong>「いくらかかるか？」</strong><br>
+        を計算する見積もりツール。
+      </div>
+    </div>
+
+    <!-- Cost Explorer -->
+    <div class="tool-card card-exp">
+      <span class="tool-icon">📊</span>
+      <span class="tool-name">Cost Explorer</span>
+      <span class="tool-phase">利用後（After）</span>
+      <div class="tool-desc">
+        システムを動かした後に<br>
+        <strong>「実際にいくら使ったか？」</strong><br>
+        を分析するツール。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 詳細比較とユースケース</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>Pricing Calculator</th>
+      <th>Cost Explorer</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>使うタイミング</strong></td>
+      <td><strong>利用前 (設計段階)</strong></td>
+      <td><strong>利用後 (運用段階)</strong></td>
+    </tr>
+    <tr>
+      <td><strong>目的</strong></td>
+      <td>予算申請、アーキテクチャのコスト比較</td>
+      <td>実績の分析、コスト急増の原因調査</td>
+    </tr>
+    <tr>
+      <td><strong>データの出所</strong></td>
+      <td>人間が手入力した「想定構成」</td>
+      <td>AWSが記録した「実際の請求データ」</td>
+    </tr>
+    <tr>
+      <td><strong>AWSアカウント</strong></td>
+      <td><strong>不要</strong> (誰でもWebから使える)</td>
+      <td><strong>必要</strong> (自分の環境のデータを見るため)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>① AWS Pricing Calculator（見積もり）</h3>
+<p>
+  まだAWSを使っていなくても、構成図を見ながら「EC2が3台で、RDSが1台で、S3に500GB保存したら…合計で月額いくらになる？」を計算できるシミュレーターです。
+</p>
+<ul>
+  <li><strong>使う場面</strong>: 提案書の作成、会社への予算申請、オンプレミスとクラウドのコスト比較。</li>
+</ul>
+
+<h3>② AWS Cost Explorer（実績分析）</h3>
+<p>
+  実際にAWSを使い始めた後に、過去の請求データをグラフ化して見やすくしてくれるツールです。「先月より2万円高いけど、どのサービスが原因？」「東京リージョンと大阪リージョンでどっちがお金かかってる？」といった分析ができます。
+</p>
+<ul>
+  <li><strong>使う場面</strong>: 毎月のコスト確認、コスト削減のための無駄探し。</li>
+</ul>
+
+<h2>3. タイムラインで見るお金の管理フロー</h2>
+
+<div class="diagram-container">
+  <div class="diagram-title">システム開発とツールの関係</div>
+  <div class="timeline-flow">
+    
+    <div class="time-step step-before">
+      【設計前】
+      <div class="action-label">
+        <strong>Pricing Calculator</strong><br>
+        予算を立てる
+      </div>
+    </div>
+    
+    <div class="step-arrow">➡</div>
+    
+    <div class="time-step step-build">
+      【構築・運用】
+      <div class="action-label">
+        システム稼働<br>
+        (料金発生)
+      </div>
+    </div>
+    
+    <div class="step-arrow">➡</div>
+    
+    <div class="time-step step-after">
+      【利用後】
+      <div class="action-label">
+        <strong>Cost Explorer</strong><br>
+        実績を分析する
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 試験でよくある「ひっかけ・間違い」</h2>
+<p>
+  <strong>❌「Cost Explorerには未来予測機能があるから、構築前の見積もりに使える？」</strong><br>
+  <strong>正解はNOです。</strong>
+</p>
+<p>
+  たしかにCost Explorerには「来月のコスト予測機能」がありますが、これはあくまで<strong>「過去の利用実績（トレンド）に基づいた予測」</strong>です。まだ何も使っていない真っ新な状態で、「こんなシステムを作りたいんだけど」という見積もりを出すことはできません。
+</p>
+<p>
+  問題文に<strong>「事前」「見積もり」「構築前」</strong>というキーワードが出たら、未来予測機能に惑わされず <strong>Pricing Calculator</strong> を選んでください。
+</p>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Pricing Calculator</strong> = 使う前（想定）</li>
+  <li><strong>Cost Explorer</strong> = 使った後（実績）</li>
+</ul>
+<p>
+  「設計段階の見積もり」か「実利用コストの分析」か、ここを切り分けるだけで正解を導き出せます！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
