@@ -1,0 +1,22 @@
+{
+  "id": "awscp-ec2-snapshot-ami-restore",
+  "category": "awscp",
+  "timestamp": "2026-02-12T14:26:51+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-ec2-snapshot-ami-restore/",
+  "meta": {
+    "title": "EC2復元に必要なスナップショットとAMIの理解",
+    "summary": "本記事では、EC2の復元プロセスにおけるスナップショットとAMIの違いを整理し、S3からEBSへのリストアの仕組みを解説します。",
+    "tags": [
+      "EC2",
+      "EBS",
+      "S3",
+      "Snapshot",
+      "AMI",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
