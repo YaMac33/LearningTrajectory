@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-sqs-ec2-batch-optimization",
+    "category": "awscp",
+    "timestamp": "2026-02-12T16:39:20+09:00",
+    "title": "SQSを活用したバッチ処理の効率化",
+    "summary": "SQSを利用してEC2でバッチ処理を並列化する方法を解説し、具体的な活用事例を挙げて理解を深める。試験対策にも有用。",
+    "tags": [
+      "SQS",
+      "EC2",
+      "バッチ処理",
+      "並列処理",
+      "AWS",
+      "負荷分散"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-sqs-ec2-batch-optimization/"
+  },
+  {
     "id": "awscp-aws-storage-gateway-types",
     "category": "awscp",
     "timestamp": "2026-02-12T14:32:48+09:00",
