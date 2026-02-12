@@ -1,0 +1,22 @@
+{
+  "id": "awscp-ec2-purchase-options-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-13T07:23:11+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-ec2-purchase-options-overview/",
+  "meta": {
+    "title": "EC2購入オプションの特徴",
+    "summary": "オンデマンド、リザーブド、スポットのEC2購入オプションの特徴を理解し、最適なプランの選び方を学べます。",
+    "tags": [
+      "EC2",
+      "AWS",
+      "クラウド",
+      "購入オプション",
+      "リザーブド",
+      "スポット"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
