@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Step Functionsの役割と利点</title>
+  <meta name="description" content="AWS Step Functionsは複雑な処理を視覚的に管理し、Lambda間の連携を簡素化するワークフローサービスです。現場監督と作業員のメタファーでわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Step Functionsの役割と利点" />
+  <meta property="og:description" content="AWS Step Functionsは複雑な処理を視覚的に管理し、Lambda間の連携を簡素化するワークフローサービスです。現場監督と作業員のメタファーでわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 現場監督と作業員のメタファー */
+    .role-metaphor {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .role-metaphor { grid-template-columns: 1fr; }
+    }
+    .role-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .role-card.sf { border-top: 4px solid #8b5cf6; } /* Purple for Step Functions */
+    .role-card.lambda { border-top: 4px solid #f59e0b; } /* Orange for Lambda */
+    
+    .role-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .role-name { font-weight: 800; font-size: 1.1em; color: #1e293b; margin-bottom: 5px; display: block; }
+    .role-sub { 
+      font-size: 0.85em; 
+      font-weight: bold; 
+      padding: 4px 12px; 
+      border-radius: 12px; 
+      color: #fff; 
+      margin-bottom: 15px; 
+      display: inline-block;
+    }
+    .role-card.sf .role-sub { background: #8b5cf6; }
+    .role-card.lambda .role-sub { background: #f59e0b; }
+    
+    .role-desc { font-size: 0.9em; color: #475569; text-align: left; line-height: 1.5; }
+
+    /* ワークフローの比較 */
+    .workflow-compare {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .wf-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fff;
+    }
+    .wf-bad { border-color: #ef4444; }
+    .wf-good { border-color: #10b981; }
+    
+    .wf-title { font-weight: bold; margin-bottom: 10px; display: block; }
+    .title-bad { color: #b91c1c; }
+    .title-good { color: #047857; }
+    
+    .lambda-chain {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .l-node {
+      background: #f59e0b;
+      color: #fff;
+      font-weight: bold;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+    .l-arrow { color: #94a3b8; font-weight: bold; }
+    .l-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px dashed #ef4444;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      margin-top: 5px;
+    }
+
+    /* Step Functionsのステート図風 */
+    .state-machine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .sm-node {
+      border: 2px solid #8b5cf6;
+      background: #fff;
+      color: #5b21b6;
+      font-weight: bold;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      min-width: 100px;
+      text-align: center;
+    }
+    .sm-branch {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      width: 100%;
+    }
+    .sm-arrow {
+      color: #94a3b8;
+      font-size: 1.2em;
+      line-height: 0.5;
+    }
+    .sm-label {
+      font-size: 0.7em;
+      color: #64748b;
+      background: #fff;
+      padding: 2px 4px;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-12">
+            2026.02.12
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Step Functionsの役割と利点</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Step Functions</span>
+            <span class="tag">#ワークフロー</span>
+            <span class="tag">#Lambda</span>
+            <span class="tag">#サーバーレス</span>
+            <span class="tag">#状態管理</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Step Functionsは複雑な処理を視覚的に管理し、Lambda間の連携を簡素化するワークフローサービスです。</p>
+<hr>
+<p>
+  <strong>AWS Step Functions</strong> は、「Lambda関数の数が増えてきて、管理がカオスになってきた時」に必要になるサービスです。<br>
+  一言で言うと、<strong>「複数のAWSサービスを順番・分岐・並列でつなぐ“ワークフロー管理サービス”」</strong>です。
+</p>
+
+<h2>1. 役割のメタファー：現場監督と作業員</h2>
+<p>
+  LambdaとStep Functionsの関係は、「作業員」と「現場監督」に例えると非常にわかりやすいです。
+</p>
+
+<!-- 図解：メタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">役割分担のイメージ</div>
+  <div class="role-metaphor">
+    
+    <div class="role-card lambda">
+      <span class="role-icon">👷‍♂️</span>
+      <span class="role-name">AWS Lambda</span>
+      <span class="role-sub">作業員 (実行担当)</span>
+      <div class="role-desc">
+        与えられた1つのタスク（プログラム）を黙々とこなす。<br>
+        <strong>「次は何をすればいいか」という全体像（状態）は把握していない。</strong>
+      </div>
+    </div>
+
+    <div class="role-card sf">
+      <span class="role-icon">📋</span>
+      <span class="role-name">Step Functions</span>
+      <span class="role-sub">現場監督 (流れ管理)</span>
+      <div class="role-desc">
+        「Aが終わったらBをやれ」「失敗したらもう一回やれ」という<strong>「状態（State）」と「設計図」</strong>を管理する。<br>
+        自分自身では作業（計算処理）を行わない。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. なぜ必要なのか？（Lambda単体の限界）</h2>
+<p>
+  例えば、ECサイトの注文処理（在庫確認 → 決済 → 発送メール）をLambdaだけで作ろうとすると、コードの中身が悲惨なことになります。
+</p>
+
+<!-- 図解：ワークフロー比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">複雑な処理の管理方法</div>
+  <div class="workflow-compare">
+    
+    <!-- Step Functionsなし -->
+    <div class="wf-box wf-bad">
+      <span class="wf-title title-bad">❌ Step Functionsなし（Lambdaの数珠つなぎ）</span>
+      <div class="lambda-chain">
+        <div class="l-node">Lambda A (在庫)</div>
+        <div class="l-arrow">➡ 次を呼び出す ➡</div>
+        <div class="l-node">Lambda B (決済)</div>
+      </div>
+      <div class="l-error">⚠️ 決済が失敗したらどうする？ Lambda B の中に「Aを取り消すコード」や「3回リトライするコード」を書かないといけない（コードが地獄になる）。</div>
+    </div>
+
+    <!-- Step Functionsあり -->
+    <div class="wf-box wf-good">
+      <span class="wf-title title-good">✅ Step Functionsあり（ステートマシンによる視覚的管理）</span>
+      <div class="state-machine">
+        <div class="sm-node">Task: 在庫確認</div>
+        <div class="sm-arrow">⬇</div>
+        <div class="sm-node">Task: 決済処理</div>
+        <div class="sm-arrow">⬇</div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="sm-label">成功</div>
+          <div class="sm-node" style="border-color:#10b981; color:#047857;">Task: メール送信</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+          <div class="sm-label">失敗</div>
+          <div class="sm-node" style="border-color:#ef4444; color:#b91c1c;">Task: エラー通知 / 再試行</div>
+        </div>
+      </div>
+      <p style="font-size:0.85em; color:#475569; margin-top:10px;">
+        処理の流れ（設計図）はStep Functionsが持ち、Lambdaは「在庫確認」などの単一の機能だけに集中できる。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. ワークフローを構成する「ステート（状態）」</h2>
+<p>
+  Step Functionsでは、処理の流れを <strong>ステートマシン (State Machine)</strong> と呼び、以下のようないくつかの「ステート（状態）」を組み合わせて作ります。
+</p>
+<ul>
+  <li><strong>Task (タスク)</strong>: Lambda関数などを実際に呼び出して処理を実行する。</li>
+  <li><strong>Choice (選択)</strong>: 「金額が1万円以上なら上司の承認へ、それ以下なら自動承認へ」といった条件分岐。</li>
+  <li><strong>Parallel (並列)</strong>: 「動画の圧縮」と「サムネイル生成」を同時に走らせる並列処理。</li>
+  <li><strong>Wait (待機)</strong>: 「処理Aのあとに10分待ってから処理Bを行う」といった時間制御。</li>
+  <li><strong>Succeed / Fail</strong>: ワークフローの正常終了、または異常終了。</li>
+</ul>
+
+<h2>4. 具体的なユースケース</h2>
+<p>
+  実務では、以下のような場面で大活躍します。
+</p>
+<ul>
+  <li><strong>画像/動画処理パイプライン</strong>: 「S3にアップロード → 圧縮 → AIでタグ付け → DB保存」という一連の処理を連携。</li>
+  <li><strong>複雑なバッチ処理</strong>: 1000件のデータを並列で処理し、途中でエラーが起きたものだけを自動で再実行（リトライ）する。</li>
+  <li><strong>人が介在する承認フロー</strong>: 処理の途中で一旦ストップし、人間が「承認ボタン」を押すまで数日間待機する。</li>
+</ul>
+
+<h2>5. 試験対策まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>AWS Lambda</th>
+      <th>AWS Step Functions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>役割</strong></td>
+      <td>処理の実行（作業員）</td>
+      <td>流れ・状態の管理（現場監督）</td>
+    </tr>
+    <tr>
+      <td><strong>単体での利用</strong></td>
+      <td>可能（単発の処理向け）</td>
+      <td>不可（Lambda等を呼び出して使う）</td>
+    </tr>
+    <tr>
+      <td><strong>状態管理</strong></td>
+      <td><strong>なし（ステートレス）</strong></td>
+      <td><strong>あり（ステートフル）</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  試験問題で以下のキーワードが出たら <strong>Step Functions</strong> が正解になる可能性が極めて高いです。
+</p>
+<ul>
+  <li><strong>「ワークフローの管理」「ステートマシン」</strong></li>
+  <li><strong>「複数のLambda関数の連携（オーケストレーション）」</strong></li>
+  <li><strong>「状態管理」「条件分岐」「並列処理」「長時間（最大1年間）の待機処理」</strong></li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
