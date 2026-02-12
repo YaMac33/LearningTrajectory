@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-policy-roles",
+  "category": "awscp",
+  "timestamp": "2026-02-13T07:42:54+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-policy-roles/",
+  "meta": {
+    "title": "AWSのポリシーと権限の基本",
+    "summary": "AWSにおけるポリシーの構造と権限管理の基本が理解できる。特にIAMポリシーの役割とJSON形式での記述について解説。",
+    "tags": [
+      "AWS",
+      "ポリシー",
+      "権限",
+      "IAM",
+      "ユーザー"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
