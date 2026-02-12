@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-organizations-iam-groups",
+  "category": "awscp",
+  "timestamp": "2026-02-13T08:22:09+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-organizations-iam-groups/",
+  "meta": {
+    "title": "AWS OrganizationsとIAMグループの違い",
+    "summary": "AWS OrganizationsとIAMグループの管理スコープの違いを理解することで、ユーザー管理やアカウント管理を効果的に行うことができます。",
+    "tags": [
+      "AWS",
+      "IAM",
+      "Organizations",
+      "管理",
+      "ユーザー"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
