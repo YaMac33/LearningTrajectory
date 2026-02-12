@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-iam-user-role-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-12T18:10:14+09:00",
+    "title": "IAMユーザーとIAMロールの違い",
+    "summary": "IAMユーザーとIAMロールの区別を明確にし、それぞれの用途や認証情報の違いを理解できます。",
+    "tags": [
+      "IAM",
+      "AWS",
+      "ロール",
+      "ユーザー",
+      "アクセス管理"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-iam-user-role-difference/"
+  },
+  {
     "id": "awscp-batch-processing-efficiency",
     "category": "awscp",
     "timestamp": "2026-02-12T18:00:50+09:00",
