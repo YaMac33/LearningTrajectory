@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-pricing-tools-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-12T13:01:32+09:00",
+  "post_path": "awscp/posts/2026-02-12-awscp-aws-pricing-tools-difference/",
+  "meta": {
+    "title": "AWS料金ツールの違い",
+    "summary": "AWSのPricing CalculatorとCost Explorerの使い方の違いを理解し、試験で必要な知識を習得できる。どちらのツールをどのタイミングで使用するかを明確に区別できる。",
+    "tags": [
+      "AWS",
+      "Pricing Calculator",
+      "Cost Explorer",
+      "費用分析",
+      "見積もり"
+    ],
+    "taxonomy": [
+      "料金とサポート",
+      "料金モデル"
+    ]
+  }
+}
