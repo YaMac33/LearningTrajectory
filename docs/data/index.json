@@ -1,5 +1,28 @@
 [
   {
+    "id": "awscp-aws-elastic-beanstalk-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-12T19:00:00+09:00",
+    "title": "Elastic Beanstalkの概要と活用法",
+    "summary": "AWS Elastic Beanstalkは、コードをアップロードするだけでサーバー構築を自動化するPaaSです。特にECサイトやAPIなどに最適で、開発者がインフラ管理から解放されることが理解できます。",
+    "tags": [
+      "AWS",
+      "Beanstalk",
+      "PaaS",
+      "自動構築",
+      "スケーリング",
+      "EC2",
+      "CloudWatch"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-aws-elastic-beanstalk-overview/"
+  },
+  {
     "id": "awscp-amazon-cognito-overview",
     "category": "awscp",
     "timestamp": "2026-02-12T18:42:27+09:00",
