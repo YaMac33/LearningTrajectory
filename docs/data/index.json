@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-step-functions-usage",
+    "category": "awscp",
+    "timestamp": "2026-02-12T19:22:54+09:00",
+    "title": "AWS Step Functionsの役割と利点",
+    "summary": "AWS Step Functionsは複雑な処理を視覚的に管理でき、Lambda間の連携を簡素化します。試験ではワークフロー管理や状態管理が重要です。",
+    "tags": [
+      "AWS",
+      "Step Functions",
+      "ワークフロー",
+      "Lambda",
+      "サーバーレス",
+      "状態管理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-12-awscp-aws-step-functions-usage/"
+  },
+  {
     "id": "awscp-aws-container-services-overview",
     "category": "awscp",
     "timestamp": "2026-02-12T19:17:04+09:00",
