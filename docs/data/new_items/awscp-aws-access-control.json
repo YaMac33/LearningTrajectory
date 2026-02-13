@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-access-control",
+  "category": "awscp",
+  "timestamp": "2026-02-13T13:23:51+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-access-control/",
+  "meta": {
+    "title": "AWSの部門別アクセス制御について",
+    "summary": "500人規模の組織におけるAWSリソースの権限管理法を解説し、IAMグループやOrganizationsの使い分けが理解できる。",
+    "tags": [
+      "AWS",
+      "アクセス制御",
+      "IAM",
+      "組織管理",
+      "権限管理"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
