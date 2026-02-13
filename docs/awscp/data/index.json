@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-latency-comparison",
+    "category": "awscp",
+    "timestamp": "2026-02-13T20:35:29+09:00",
+    "title": "AWSサービスのレイテンシー比較",
+    "summary": "ElastiCacheとKinesisの特性と用途が理解できる。サブミリ秒レイテンシに向いているサービスの選定方法を学ぶ。",
+    "tags": [
+      "AWS",
+      "ElastiCache",
+      "Kinesis",
+      "リアルタイム",
+      "データ処理"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-aws-latency-comparison/"
+  },
+  {
     "id": "awscp-aws-lambda-usage",
     "category": "awscp",
     "timestamp": "2026-02-13T20:31:25+09:00",
