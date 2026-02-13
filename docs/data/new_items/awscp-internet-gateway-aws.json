@@ -1,0 +1,21 @@
+{
+  "id": "awscp-internet-gateway-aws",
+  "category": "awscp",
+  "timestamp": "2026-02-13T23:17:25+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-internet-gateway-aws/",
+  "meta": {
+    "title": "インターネットゲートウェイ（IGW）の概要",
+    "summary": "インターネットゲートウェイ（IGW）は、VPCとインターネットを接続する重要なコンポーネントです。IGWの役割や設定について理解することで、AWS上での通信が円滑に行えることを学べます。",
+    "tags": [
+      "AWS",
+      "IGW",
+      "VPC",
+      "ネットワーク",
+      "インターネット"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
