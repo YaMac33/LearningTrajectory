@@ -1,0 +1,21 @@
+{
+  "id": "awscp-rds-scaling-explanation",
+  "category": "awscp",
+  "timestamp": "2026-02-13T18:57:23+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-rds-scaling-explanation/",
+  "meta": {
+    "title": "RDSのスケーリング解説",
+    "summary": "RDSにおける垂直スケーリングと水平スケーリングの違いを理解することで、試験対策に役立ちます。特にマルチAZとリードレプリカの役割分担について重点的に学べます。",
+    "tags": [
+      "RDS",
+      "スケーリング",
+      "マルチAZ",
+      "可用性",
+      "性能"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
