@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DAXとElastiCacheとCloudFrontの比較</title>
+  <meta name="description" content="DAX、ElastiCache、CloudFrontの3つのキャッシュサービスの役割と性能の違いを、「何をどこでキャッシュするか」という視点で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DAXとElastiCacheとCloudFrontの比較" />
+  <meta property="og:description" content="DAX、ElastiCache、CloudFrontの3つのキャッシュサービスの役割と性能の違いを、「何をどこでキャッシュするか」という視点で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* キャッシュレイヤー図 */
+    .cache-layers {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .layer-box {
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 6px;
+      position: relative;
+      border: 2px solid;
+    }
+    .box-user { border-color: #64748b; color: #1e293b; background: #fff; }
+    .box-cf { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .box-app { border-color: #64748b; background: #f1f5f9; color: #334155; border-style: dashed; }
+    .box-ec { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .box-dax { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    .box-db { border-color: #64748b; background: #1e293b; color: #fff; }
+    
+    .layer-arrow {
+      color: #94a3b8;
+      font-size: 1.2em;
+      line-height: 0.8;
+    }
+    .layer-note {
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.75em;
+      color: #64748b;
+      width: 100px;
+      text-align: left;
+    }
+    
+    /* 速度比較チャート */
+    .speed-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .speed-label {
+      width: 100px;
+      font-weight: bold;
+      font-size: 0.9em;
+      text-align: right;
+    }
+    .speed-bar-container {
+      flex: 1;
+      background: #f1f5f9;
+      border-radius: 4px;
+      height: 24px;
+      position: relative;
+    }
+    .speed-bar {
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      color: #fff;
+      font-size: 0.75em;
+      font-weight: bold;
+    }
+    /* 棒の長さはイメージ */
+    .bar-cf { width: 80%; background: #3b82f6; }
+    .bar-ec { width: 40%; background: #f59e0b; }
+    .bar-dax { width: 20%; background: #10b981; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .ok-mark { color: #10b981; font-weight: bold; }
+    .ng-mark { color: #ef4444; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-13">
+            2026.02.13
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DAXとElastiCacheとCloudFrontの比較</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#DAX</span>
+            <span class="tag">#ElastiCache</span>
+            <span class="tag">#CloudFront</span>
+            <span class="tag">#キャッシュ</span>
+            <span class="tag">#AWS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>DAX、ElastiCache、CloudFrontのキャッシュ役割と性能を整理して理解しやすく解説します。</p>
+<hr>
+<p>
+  <strong>Q. 「DAX」と「ElastiCache」の違いと、ついでに「CloudFront」も混ぜて比較してください。</strong><br>
+  <strong>A. いいテーマです！ ここは「何をキャッシュするのか？」で整理すると一発で理解できます。</strong>
+</p>
+<p>
+  まず1行ずつでそれぞれの正体を定義します。
+</p>
+<ul>
+  <li><strong>Amazon DynamoDB Accelerator (DAX)</strong> → DynamoDB専用キャッシュ</li>
+  <li><strong>Amazon ElastiCache</strong> → 汎用インメモリキャッシュ（Redis/Memcached）</li>
+  <li><strong>Amazon CloudFront</strong> → グローバルCDN（エッジキャッシュ）</li>
+</ul>
+
+<h2>1. 全体の位置づけ（層で見る）</h2>
+<p>
+  ユーザーからデータまでの距離（レイヤー）で整理すると、それぞれの守備範囲が見えてきます。
+</p>
+
+<!-- 図解：キャッシュレイヤー -->
+<div class="diagram-container">
+  <div class="diagram-title">リクエストの流れとキャッシュの位置</div>
+  <div class="cache-layers">
+    <div class="layer-box box-user">👤 ユーザー</div>
+    <div class="layer-arrow">⬇</div>
+    
+    <div class="layer-box box-cf">
+      🌍 CloudFront
+      <div class="layer-note">世界中 (CDN)<br>静的ファイル</div>
+    </div>
+    
+    <div class="layer-arrow">⬇</div>
+    <div class="layer-box box-app">📱 アプリケーション (EC2/Lambda)</div>
+    <div class="layer-arrow">⬇</div>
+    
+    <div class="layer-box box-ec">
+      ⚡ ElastiCache
+      <div class="layer-note">VPC内<br>汎用データ</div>
+    </div>
+    
+    <div class="layer-arrow">⬇</div>
+    
+    <div class="layer-box box-dax">
+      🚀 DAX
+      <div class="layer-note">DynamoDB専用<br>マイクロ秒</div>
+    </div>
+    
+    <div class="layer-arrow">⬇</div>
+    <div class="layer-box box-db">🗄️ DynamoDB (本体)</div>
+  </div>
+</div>
+
+<h2>2. 何をキャッシュしているか？</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>キャッシュ対象</th>
+      <th>役割</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CloudFront</strong></td>
+      <td>静的ファイル・APIレスポンス</td>
+      <td>ユーザーに近い場所でコンテンツを配信し、レイテンシを削減する。</td>
+    </tr>
+    <tr>
+      <td><strong>ElastiCache</strong></td>
+      <td>任意のデータ（DB結果など）</td>
+      <td>アプリ側で制御して、頻繁に使うデータや計算結果をメモリに置く。</td>
+    </tr>
+    <tr>
+      <td><strong>DAX</strong></td>
+      <td>DynamoDBの読み取り結果</td>
+      <td>DynamoDBへのアクセスを透過的に高速化する。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 性能と役割の違い</h2>
+
+<div class="diagram-container">
+  <div class="diagram-title">応答速度のイメージ</div>
+  <div class="speed-chart">
+    <div class="speed-row">
+      <div class="speed-label">CloudFront</div>
+      <div class="speed-bar-container">
+        <div class="speed-bar bar-cf">数十ミリ秒 (物理距離を短縮)</div>
+      </div>
+    </div>
+    <div class="speed-row">
+      <div class="speed-label">ElastiCache</div>
+      <div class="speed-bar-container">
+        <div class="speed-bar bar-ec">数ミリ秒 (DBより速い)</div>
+      </div>
+    </div>
+    <div class="speed-row">
+      <div class="speed-label">DAX</div>
+      <div class="speed-bar-container">
+        <div class="speed-bar bar-dax">マイクロ秒 (爆速)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>① CloudFront（CDN）</h3>
+<p>
+  <strong>「配送センター」</strong>です。画像、CSS、動画などの「静的コンテンツ」をユーザーの近くに置くことで、ダウンロードを速くします。
+</p>
+
+<h3>② ElastiCache（汎用キャッシュ）</h3>
+<p>
+  <strong>「アプリの作業机」</strong>です。RDSのクエリ結果、セッション情報、ランキングなど、「何でも」置けます。ただし、アプリ側で「まずキャッシュを見て、なければDBへ」というコードを書く必要があります。
+</p>
+
+<h3>③ DAX（DynamoDB専用）</h3>
+<p>
+  <strong>「DynamoDB専用のブースター」</strong>です。アプリのコードをほとんど書き換えずに導入でき、DynamoDBへの読み取り負荷を肩代わりして、応答速度を「マイクロ秒」単位まで縮めます。
+</p>
+
+<h2>4. 具体例：ECサイトでの併用</h2>
+<p>
+  実際のシステムでは、これらを適材適所で組み合わせます。
+</p>
+<ul>
+  <li>🌍 <strong>静的画像（商品写真）</strong> → <strong>CloudFront</strong> で配信。</li>
+  <li>🛒 <strong>セッション管理・カート情報</strong> → <strong>ElastiCache (Redis)</strong> で管理。</li>
+  <li>📦 <strong>商品詳細データ（カタログ）</strong> → DynamoDBの手前に <strong>DAX</strong> を置いて高速化。</li>
+</ul>
+
+<h2>5. 比較表まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>CloudFront</th>
+      <th>ElastiCache</th>
+      <th>DAX</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CDN</strong></td>
+      <td><span class="ok-mark">◎</span></td>
+      <td><span class="ng-mark">❌</span></td>
+      <td><span class="ng-mark">❌</span></td>
+    </tr>
+    <tr>
+      <td><strong>汎用キャッシュ</strong></td>
+      <td><span class="ng-mark">❌</span></td>
+      <td><span class="ok-mark">◎</span> (Redis/Mem)</td>
+      <td><span class="ng-mark">❌</span></td>
+    </tr>
+    <tr>
+      <td><strong>DynamoDB専用</strong></td>
+      <td><span class="ng-mark">❌</span></td>
+      <td><span class="ng-mark">❌</span></td>
+      <td><span class="ok-mark">◎</span></td>
+    </tr>
+    <tr>
+      <td><strong>グローバル配信</strong></td>
+      <td><span class="ok-mark">◎</span></td>
+      <td><span class="ng-mark">❌</span></td>
+      <td><span class="ng-mark">❌</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>試験での即断キーワード</h3>
+<ul>
+  <li><strong>グローバル配信、CDN</strong> → CloudFront</li>
+  <li><strong>Redis、Memcached、DB負荷軽減</strong> → ElastiCache</li>
+  <li><strong>DynamoDB高速化、マイクロ秒レイテンシ</strong> → DAX</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
