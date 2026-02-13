@@ -1,0 +1,22 @@
+{
+  "id": "awscp-ami-container-cloudformation-differences",
+  "category": "awscp",
+  "timestamp": "2026-02-13T21:19:52+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-ami-container-cloudformation-differences/",
+  "meta": {
+    "title": "AMIとコンテナ・CloudFormationの違い",
+    "summary": "AMI、コンテナ、CloudFormationによる復元手法の違いと使い分けを理解することで、試験対策が可能です。",
+    "tags": [
+      "AWS",
+      "復元",
+      "AMI",
+      "コンテナ",
+      "CloudFormation",
+      "インフラ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
