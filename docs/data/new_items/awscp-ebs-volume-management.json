@@ -1,0 +1,21 @@
+{
+  "id": "awscp-ebs-volume-management",
+  "category": "awscp",
+  "timestamp": "2026-02-13T20:47:23+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-ebs-volume-management/",
+  "meta": {
+    "title": "EBSボリューム管理の基本",
+    "summary": "EC2のルートボリュームと追加ボリュームのデフォルトの挙動を理解することで、意図せずデータを消すリスクを避けられます。",
+    "tags": [
+      "EBS",
+      "EC2",
+      "AWS",
+      "ボリューム",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
