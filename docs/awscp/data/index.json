@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-spot-instance-tips",
+    "category": "awscp",
+    "timestamp": "2026-02-13T17:56:08+09:00",
+    "title": "スポットインスタンスに関する重要ポイント",
+    "summary": "スポットインスタンスはコスト削減に有効ですが、中断リスクを理解することが重要です。試験では、安全性を考慮した上で選択するロジックが求められます。",
+    "tags": [
+      "AWS",
+      "スポットインスタンス",
+      "コスト削減",
+      "Auto Scaling",
+      "システム設計"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-aws-spot-instance-tips/"
+  },
+  {
     "id": "awscp-aws-directory-service-overview",
     "category": "awscp",
     "timestamp": "2026-02-13T17:50:38+09:00",
