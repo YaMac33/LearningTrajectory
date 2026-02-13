@@ -1,0 +1,22 @@
+{
+  "id": "awscp-rds-elasticache-disk-io",
+  "category": "awscp",
+  "timestamp": "2026-02-13T12:56:26+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-rds-elasticache-disk-io/",
+  "meta": {
+    "title": "RDSとElastiCacheのディスクI/O解説",
+    "summary": "RDSの遅延の原因となるディスクI/Oについて説明し、ElastiCacheとの速度差を明確にします。",
+    "tags": [
+      "RDS",
+      "ElastiCache",
+      "I/O",
+      "データベース",
+      "速度",
+      "メモリ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
