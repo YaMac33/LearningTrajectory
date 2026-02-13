@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DAXの役割と特性</title>
+  <meta name="description" content="DAXはDynamoDBの読み取りを高速化するインメモリキャッシュで、分析サービスではありません。KinesisやOpenSearchとの役割の違いや、マイクロ秒単位のパフォーマンスについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DAXの役割と特性" />
+  <meta property="og:description" content="DAXはDynamoDBの読み取りを高速化するインメモリキャッシュで、分析サービスではありません。KinesisやOpenSearchとの役割の違いや、マイクロ秒単位のパフォーマンスについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 分析 vs キャッシュ フロー比較 */
+    .flow-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .flow-compare { grid-template-columns: 1fr; }
+    }
+    .flow-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .flow-card.analytics { border-top: 4px solid #f97316; background: #fff7ed; }
+    .flow-card.cache { border-top: 4px solid #10b981; background: #ecfdf5; }
+    
+    .flow-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .flow-title { font-weight: 800; margin-bottom: 8px; display: block; color: #1e293b; }
+    
+    .mini-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9em;
+      color: #475569;
+      font-weight: bold;
+    }
+    .mini-arrow { color: #94a3b8; font-size: 1.2em; line-height: 0.8; }
+    .box-mini {
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      padding: 4px 10px;
+      background: #fff;
+      width: 80%;
+    }
+
+    /* DAXのスタック図 */
+    .dax-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 20px;
+    }
+    .stack-layer {
+      width: 200px;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 2px solid;
+    }
+    .layer-dax {
+      background: #10b981;
+      color: #fff;
+      border-color: #047857;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+    }
+    .layer-dax::after {
+      content: "Cache Hit!";
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #fcd34d;
+      color: #92400e;
+      font-size: 0.7em;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .layer-dynamo {
+      background: #3b82f6;
+      color: #fff;
+      border-color: #1d4ed8;
+      z-index: 1;
+    }
+    .stack-arrow {
+      font-size: 1.5em;
+      color: #94a3b8;
+    }
+    
+    .speed-badge {
+      display: inline-block;
+      font-size: 0.8em;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #475569;
+      margin-top: 5px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-13">
+            2026.02.13
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DAXの役割と特性</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#DAX</span>
+            <span class="tag">#DynamoDB</span>
+            <span class="tag">#キャッシュ</span>
+            <span class="tag">#読み取り</span>
+            <span class="tag">#高速化</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>DAXはDynamoDBの読み取りを高速化するインメモリキャッシュで、分析サービスではない。</p>
+<hr>
+<p>
+  <strong>Amazon DynamoDB Accelerator (DAX)</strong> は、「分析サービス」ではなく、DynamoDBをさらに速くする<strong>「専用のキャッシュ」</strong>です。<br>
+  試験では Kinesis（分析・ストリーム）と混同させるような選択肢が出ることがありますが、役割は明確に違います。
+</p>
+
+<h2>1. 分析サービスとの決定的な違い</h2>
+<p>
+  「データの流れ」と「やること」を比較すると、全く別物であることがわかります。
+</p>
+
+<!-- 図解：分析 vs キャッシュ -->
+<div class="diagram-container">
+  <div class="diagram-title">データの流れの違い</div>
+  <div class="flow-compare">
+    
+    <!-- 分析系 -->
+    <div class="flow-card analytics">
+      <span class="flow-icon">🧠</span>
+      <span class="flow-title">リアルタイム分析系</span>
+      <div class="mini-flow">
+        <div class="box-mini">データ流入</div>
+        <div class="mini-arrow">⬇</div>
+        <div class="box-mini">Kinesis / Flink</div>
+        <div class="mini-arrow">⬇</div>
+        <div class="box-mini">集計・計算</div>
+      </div>
+      <p style="font-size:0.85em; color:#9a3412; margin-top:10px;">
+        データを「処理・加工」する
+      </p>
+    </div>
+
+    <!-- キャッシュ系 (DAX) -->
+    <div class="flow-card cache">
+      <span class="flow-icon">⚡</span>
+      <span class="flow-title">DAX (キャッシュ)</span>
+      <div class="mini-flow">
+        <div class="box-mini">アプリ</div>
+        <div class="mini-arrow">⬇</div>
+        <div class="box-mini" style="background:#10b981; color:#fff; border:none;">DAX</div>
+        <div class="mini-arrow">⬇</div>
+        <div class="box-mini" style="background:#3b82f6; color:#fff; border:none;">DynamoDB</div>
+      </div>
+      <p style="font-size:0.85em; color:#047857; margin-top:10px;">
+        データを「速く返す」だけ
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. サービス別の役割比較</h2>
+<p>
+  似たような文脈で登場するサービスを「〇〇する？」という視点で整理します。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>Kinesis</th>
+      <th>OpenSearch</th>
+      <th>DynamoDB</th>
+      <th>DAX</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>分析・集計する？</strong></td>
+      <td>◎</td>
+      <td>◎</td>
+      <td>△</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td><strong>ストリーム処理？</strong></td>
+      <td>◎</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td><strong>データベース？</strong></td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>◎</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td><strong>キャッシュ？</strong></td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>◎</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. DAXの本質： 「上に乗っかる加速装置」</h2>
+<p>
+  DAXは単独で使うものではなく、必ず <strong>DynamoDB の手前（上）</strong> に配置されます。<br>
+  アプリからは DynamoDB を使っているように見えますが、実は DAX が代理で応答しています。
+</p>
+
+<!-- 図解：DAXスタック -->
+<div class="diagram-container">
+  <div class="diagram-title">DAXの構成イメージ</div>
+  <div class="dax-stack">
+    <div class="box-mini" style="border:none; font-weight:bold; color:#1e293b;">アプリケーション</div>
+    <div class="stack-arrow">⬇</div>
+    
+    <div class="stack-layer layer-dax">
+      DAX (キャッシュ)
+      <br><span style="font-size:0.8em; font-weight:normal;">マイクロ秒で応答</span>
+    </div>
+    
+    <div class="stack-arrow">⬇</div>
+    
+    <div class="stack-layer layer-dynamo">
+      DynamoDB (本体)
+      <br><span style="font-size:0.8em; font-weight:normal;">ミリ秒で応答</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    キャッシュにデータがあれば、下のDynamoDBにはアクセスしない。<br>
+    これが高速化と負荷軽減の仕組み。
+  </p>
+</div>
+
+<ul>
+  <li><strong>パフォーマンス</strong>: DynamoDBの「ミリ秒」単位の応答を、<strong>「マイクロ秒（0.000001秒）」</strong>単位まで高速化します。</li>
+  <li><strong>透過的</strong>: アプリのコードをほとんど書き換えずに導入できます（API互換）。</li>
+  <li><strong>読み取り専用</strong>: 書き込み（更新）の高速化には寄与しません（ライトスルー方式のため）。</li>
+</ul>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  試験で以下のキーワードが出たら、即座に反応してください。
+</p>
+<ul>
+  <li><strong>「マイクロ秒のレイテンシ」</strong> → DAX</li>
+  <li><strong>「インメモリキャッシュ」</strong> → DAX (or ElastiCache)</li>
+  <li><strong>「読み取り負荷（Read throughput）の軽減」</strong> → DAX</li>
+  <li><strong>「ストリーミングデータの分析」</strong> → Kinesis</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>DAX</strong>: DynamoDB専用の<strong>読み取り高速化キャッシュ</strong>。</li>
+  <li><strong>違い</strong>: 分析や集計はしない。「同じデータを何度も読む」処理を劇的に速くする。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
