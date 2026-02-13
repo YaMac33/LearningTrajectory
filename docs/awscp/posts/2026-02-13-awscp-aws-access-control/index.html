@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWSの部門別アクセス制御</title>
+  <meta name="description" content="500人規模の組織におけるAWSリソースの権限管理法を解説。IAMグループ、IAMロール、Organizationsの使い分けと、組織構造に適したアクセス制御について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWSの部門別アクセス制御" />
+  <meta property="og:description" content="500人規模の組織におけるAWSリソースの権限管理法を解説。IAMグループ、IAMロール、Organizationsの使い分けと、組織構造に適したアクセス制御について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 組織図ツリー */
+    .org-tree {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-family: monospace;
+      font-size: 0.9em;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .tree-node {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .node-icon { font-size: 1.2em; }
+    .indent-1 { margin-left: 20px; border-left: 2px solid #e2e8f0; padding-left: 10px; }
+    .indent-2 { margin-left: 40px; border-left: 2px solid #e2e8f0; padding-left: 10px; }
+    
+    .badge {
+      font-size: 0.75em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .bg-blue { background: #3b82f6; }
+    .bg-green { background: #10b981; }
+    .bg-orange { background: #f97316; }
+    .bg-red { background: #ef4444; }
+    
+    /* 4つの選択肢グリッド */
+    .option-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .option-grid { grid-template-columns: 1fr; }
+    }
+    .option-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fff;
+      position: relative;
+    }
+    .card-ok { border-top: 4px solid #10b981; background: #ecfdf5; }
+    .card-ng { border-top: 4px solid #ef4444; background: #fef2f2; }
+    .card-maybe { border-top: 4px solid #f97316; background: #fff7ed; }
+    
+    .opt-label { font-weight: 800; font-size: 1.1em; margin-bottom: 5px; display: block; }
+    .opt-desc { font-size: 0.85em; color: #475569; }
+    .judge-mark {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .mark-o { color: #10b981; }
+    .mark-x { color: #ef4444; }
+    .mark-t { color: #f97316; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-13">
+            2026.02.13
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWSの部門別アクセス制御</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#アクセス制御</span>
+            <span class="tag">#IAM</span>
+            <span class="tag">#組織管理</span>
+            <span class="tag">#権限管理</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>500人規模の組織におけるAWSリソースの権限管理法を解説します。</p>
+<hr>
+<p>
+  <strong>Q. 「500人規模の組織で、各部門ごとにアクセス制御を設定する最適な方法は？」</strong><br>
+  <strong>A. 1つのアカウント内なら「IAMグループ」、完全に分離するなら「Organizations」です。</strong>
+</p>
+<p>
+  この問題は、「IAMグループ」「IAMロール」「Organizations」「個別管理」の使い分けを問う良問です。<br>
+  それぞれの構成を図解して、なぜそれが正解（または不正解）なのかを整理しましょう。
+</p>
+
+<h2>1. 選択肢ごとの構成イメージ</h2>
+
+<!-- 図解：4つのパターンの比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">管理手法の構造比較</div>
+  <div class="option-grid">
+    
+    <!-- A. IAMグループ -->
+    <div class="option-card card-ok">
+      <span class="judge-mark mark-o">◎</span>
+      <span class="opt-label">A. IAMグループ</span>
+      <div class="org-tree">
+        <div class="tree-node">🏢 AWSアカウント</div>
+        <div class="tree-node indent-1">👥 営業部グループ <span class="badge bg-blue">権限A</span></div>
+        <div class="tree-node indent-2">👤 User 1</div>
+        <div class="tree-node indent-2">👤 User 2</div>
+        <div class="tree-node indent-1">👥 開発部グループ <span class="badge bg-green">権限B</span></div>
+        <div class="tree-node indent-2">👤 User 3</div>
+      </div>
+      <p class="opt-desc">ユーザーをグループに入れて、グループに権限を貼る。管理が楽。</p>
+    </div>
+
+    <!-- B. IAMロール -->
+    <div class="option-card card-ng">
+      <span class="judge-mark mark-x">✕</span>
+      <span class="opt-label">B. IAMロール</span>
+      <div class="org-tree">
+        <div class="tree-node">🏢 AWSアカウント</div>
+        <div class="tree-node indent-1">👤 User 1</div>
+        <div class="tree-node indent-1">🎭 開発部ロール</div>
+        <div class="tree-node indent-2" style="color:#ef4444;">⬆ 毎回AssumeRoleが必要</div>
+      </div>
+      <p class="opt-desc">ロールは「一時的に被る帽子」。所属を表すものではない。</p>
+    </div>
+
+    <!-- C. Organizations -->
+    <div class="option-card card-maybe">
+      <span class="judge-mark mark-t">○</span>
+      <span class="opt-label">C. Organizations</span>
+      <div class="org-tree">
+        <div class="tree-node">🌏 Organizations</div>
+        <div class="tree-node indent-1">🏢 営業部アカウント</div>
+        <div class="tree-node indent-2">👤 User 1...</div>
+        <div class="tree-node indent-1">🏢 開発部アカウント</div>
+        <div class="tree-node indent-2">👤 User 3...</div>
+      </div>
+      <p class="opt-desc">部門ごとに「アカウントごと」分ける。大規模ならアリだが構成が大掛かり。</p>
+    </div>
+
+    <!-- D. 個別管理 -->
+    <div class="option-card card-ng">
+      <span class="judge-mark mark-x">✕</span>
+      <span class="opt-label">D. 個別設定</span>
+      <div class="org-tree">
+        <div class="tree-node">🏢 AWSアカウント</div>
+        <div class="tree-node indent-1">👤 User 1 <span class="badge bg-red">権限A</span></div>
+        <div class="tree-node indent-1">👤 User 2 <span class="badge bg-red">権限A</span></div>
+        <div class="tree-node indent-1">👤 User 3 <span class="badge bg-red">権限B</span></div>
+      </div>
+      <p class="opt-desc">一人一人にポリシーを貼る。500人いたら管理不能になる。</p>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. なぜ「IAMグループ」が正解なのか？</h2>
+<p>
+  IAMのベストプラクティスは<strong>「権限は個人ではなくグループに付与する」</strong>です。
+</p>
+<ul>
+  <li><strong>効率性</strong>: 「営業部の権限を変更したい」と思った時、グループのポリシーを1回書き換えるだけで全員に反映されます。</li>
+  <li><strong>運用</strong>: 新人が入ったら「営業部グループ」に追加するだけ。異動したらグループを付け替えるだけです。</li>
+</ul>
+
+<h2>3. なぜ他はダメなのか？</h2>
+<ul>
+  <li><strong>B. IAMロール</strong>: ロールはEC2などの「サービス」や、「一時的な権限昇格」のために使うものです。「私は営業部です」という所属を表すために常時使うものではありません。</li>
+  <li><strong>C. Organizations</strong>: これも正解になり得ますが、「アクセス制御を設定する方法」という文脈では、まずはIAMグループによる管理が基本です。アカウントを分けるのは「請求分離」や「強い隔離」が必要な場合です。</li>
+  <li><strong>D. 個別設定</strong>: 500人のユーザー一人一人にポリシーをアタッチしていたら、誰が何の権限を持っているか把握できなくなり、セキュリティ事故の元です。</li>
+</ul>
+
+<h2>4. 規模別・使い分けの目安</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>規模・要件</th>
+      <th>推奨される方法</th>
+      <th>イメージ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>小〜中規模</strong><br>(1つのアカウント内)</td>
+      <td><strong>IAMグループ</strong></td>
+      <td>「営業部」「開発部」というフォルダを作って整理する。</td>
+    </tr>
+    <tr>
+      <td><strong>大規模・厳格</strong><br>(請求も分けたい)</td>
+      <td><strong>AWS Organizations</strong></td>
+      <td>「営業部株式会社」「開発部株式会社」のように会社（アカウント）ごと分ける。</td>
+    </tr>
+    <tr>
+      <td><strong>一時利用</strong></td>
+      <td><strong>IAMロール</strong></td>
+      <td>「今日だけ管理者権限を貸してあげる」ための入館証。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<p>
+  <strong>「部門単位」の権限管理と言われたら、まずは「IAMグループ」を探してください。</strong><br>
+  （もし選択肢にIAMグループがなく、マルチアカウントの話をしていたら Organizations が正解になります）
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
