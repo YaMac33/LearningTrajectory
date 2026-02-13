@@ -1,0 +1,22 @@
+{
+  "id": "awscp-aws-lambda-usage",
+  "category": "awscp",
+  "timestamp": "2026-02-13T20:31:25+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-lambda-usage/",
+  "meta": {
+    "title": "AWS Lambdaの利用方法を学ぶ",
+    "summary": "AWS Lambdaの利用におけるコードの提出方法と実行の流れを理解し、ZIPファイル方式とコンテナイメージ方式の違いを把握できます。",
+    "tags": [
+      "AWS",
+      "Lambda",
+      "ZIP",
+      "Container",
+      "実行環境",
+      "プログラミング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
