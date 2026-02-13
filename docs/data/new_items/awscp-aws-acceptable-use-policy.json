@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-acceptable-use-policy",
+  "category": "awscp",
+  "timestamp": "2026-02-13T17:45:01+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-acceptable-use-policy/",
+  "meta": {
+    "title": "AWS適正利用規約の理解と対策",
+    "summary": "AWSの適正利用規約について、具体的な禁止事項の理解が深まります。試験対策のための重要なポイントも紹介します。",
+    "tags": [
+      "AWS",
+      "利用規約",
+      "セキュリティ",
+      "対策",
+      "禁止事項"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
