@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-device-farm-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-13T15:53:18+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-device-farm-overview/",
+  "meta": {
+    "title": "AWS Device Farmの概要と活用方法",
+    "summary": "AWS Device Farmは、実機でアプリを自動テストするためのクラウドサービスです。機種依存のバグを解消し、CI/CDパイプラインとの連携も可能です。",
+    "tags": [
+      "AWS",
+      "Device Farm",
+      "テスト",
+      "自動化",
+      "実機"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "テスト・自動化"
+    ]
+  }
+}
