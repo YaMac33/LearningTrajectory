@@ -1,0 +1,21 @@
+{
+  "id": "awscp-dax-elasticache-cloudfront-comparison",
+  "category": "awscp",
+  "timestamp": "2026-02-13T12:52:24+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-dax-elasticache-cloudfront-comparison/",
+  "meta": {
+    "title": "DAX、ElastiCache、CloudFrontの比較",
+    "summary": "DAX、ElastiCache、CloudFrontのキャッシュサービスの特徴と性能の違いを理解できます。特に、何をどこでキャッシュするかに着目した説明がされています。",
+    "tags": [
+      "DAX",
+      "ElastiCache",
+      "CloudFront",
+      "キャッシュ",
+      "AWS"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ストレージ(S3/EBS)"
+    ]
+  }
+}
