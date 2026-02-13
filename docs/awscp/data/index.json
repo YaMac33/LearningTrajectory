@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-resource-groups",
+    "category": "awscp",
+    "timestamp": "2026-02-13T19:06:28+09:00",
+    "title": "AWSリソースグループの基本",
+    "summary": "AWSリソースグループは、タグを用いて複数のリソースを論理的にまとめて管理する機能です。この技術を通じて、試験対策として重要なリソース管理の理解が深まります。",
+    "tags": [
+      "AWS",
+      "Resource Groups",
+      "タグ管理",
+      "クラウド",
+      "EC2",
+      "RDS"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-aws-resource-groups/"
+  },
+  {
     "id": "awscp-rds-scaling-explanation",
     "category": "awscp",
     "timestamp": "2026-02-13T18:57:23+09:00",
