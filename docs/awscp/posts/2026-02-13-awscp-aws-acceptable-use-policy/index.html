@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS適正利用規約について</title>
+  <meta name="description" content="AWS Acceptable Use Policy（AWS適正利用規約）の概要と、試験で問われる具体的な禁止事項（不正アクセス、スパム、マルウェア等）について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS適正利用規約について" />
+  <meta property="og:description" content="AWS Acceptable Use Policy（AWS適正利用規約）の概要と、試験で問われる具体的な禁止事項（不正アクセス、スパム、マルウェア等）について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* Go / No-Go 比較 */
+    .policy-signal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .policy-signal { grid-template-columns: 1fr; }
+    }
+    .signal-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .signal-go { border-top: 4px solid #10b981; background: #ecfdf5; }
+    .signal-nogo { border-top: 4px solid #ef4444; background: #fef2f2; }
+    
+    .signal-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .signal-title { font-weight: 800; font-size: 1.1em; display: block; margin-bottom: 5px; }
+    .signal-desc { font-size: 0.9em; color: #475569; }
+
+    /* 禁止事項グリッド */
+    .ban-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+    }
+    .ban-item {
+      background: #fff;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      color: #991b1b;
+    }
+    .ban-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+    .ban-name { font-weight: bold; font-size: 0.9em; display: block; }
+    
+    /* 試験判定ボックス */
+    .exam-check {
+      background: #1e293b;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .exam-q { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; display: block; }
+    .exam-a { 
+      background: #ef4444; 
+      color: #fff; 
+      padding: 8px 20px; 
+      border-radius: 30px; 
+      font-weight: bold;
+      display: inline-block;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-13">
+            2026.02.13
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS適正利用規約について</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#利用規約</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#対策</span>
+            <span class="tag">#禁止事項</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWSの不正利用を防ぐための規約。禁止事項を理解することが重要です。</p>
+<hr>
+<p>
+  <strong>AWS Acceptable Use Policy（AUP：AWS適正利用規約）</strong> とは、一言で言うと<strong>「AWSサービスを『どう使ってはいけないか』を定めたルールブック」</strong>です。<br>
+  「やっていいこと」ではなく、<strong>「やってはいけないこと（禁止事項）」</strong>がリストアップされています。
+</p>
+<p>
+  AWSは世界中で共有されるインフラです。誰かが悪用すると他の利用者に迷惑がかかるため、厳しいルールが設けられています。
+</p>
+
+<h2>1. 規約の全体像（青信号と赤信号）</h2>
+<p>
+  AWSを利用する上で、守るべきラインを明確にしています。
+</p>
+
+<!-- 図解：Go / No-Go -->
+<div class="diagram-container">
+  <div class="diagram-title">AUPの役割</div>
+  <div class="policy-signal">
+    
+    <div class="signal-card signal-go">
+      <span class="signal-icon">✅</span>
+      <span class="signal-title">適正利用</span>
+      <p class="signal-desc">
+        ・アプリのホスティング<br>
+        ・データ分析<br>
+        ・機械学習<br>
+        （通常のビジネス利用）
+      </p>
+    </div>
+
+    <div class="signal-card signal-nogo">
+      <span class="signal-icon">🚫</span>
+      <span class="signal-title">禁止事項 (AUP)</span>
+      <p class="signal-desc">
+        ・攻撃の踏み台にする<br>
+        ・違法データの配布<br>
+        ・迷惑メール送信<br>
+        <strong style="color:#ef4444;">（ここが問われる！）</strong>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 代表的な禁止事項（CLFで出る5つ）</h2>
+<p>
+  試験では、以下の行為が「許可されているか？」という形式で問われます。答えは全て<strong>NO</strong>です。
+</p>
+
+<!-- 図解：禁止事項グリッド -->
+<div class="diagram-container">
+  <div class="diagram-title">AUPで禁止されている行為</div>
+  <div class="ban-grid">
+    <div class="ban-item">
+      <span class="ban-icon">🔓</span>
+      <span class="ban-name">不正アクセス<br>ハッキング</span>
+    </div>
+    <div class="ban-item">
+      <span class="ban-icon">🦠</span>
+      <span class="ban-name">マルウェア<br>ウイルス配布</span>
+    </div>
+    <div class="ban-item">
+      <span class="ban-icon">📧</span>
+      <span class="ban-name">スパムメール<br>大量送信</span>
+    </div>
+    <div class="ban-item">
+      <span class="ban-icon">🔞</span>
+      <span class="ban-name">違法コンテンツ<br>侵害データ</span>
+    </div>
+    <div class="ban-item">
+      <span class="ban-icon">💥</span>
+      <span class="ban-name">DDoS攻撃の<br>実行</span>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>① 不正アクセス</strong>: 他人のシステムへの侵入、脆弱性の悪用、ポートスキャンなど。</li>
+  <li><strong>② マルウェア配布</strong>: ウイルス、ランサムウェア、トロイの木馬などをAWS上に置いたり配布したりすること。</li>
+  <li><strong>③ スパム送信</strong>: 受信者の同意を得ていない迷惑メールを大量に送りつけること。</li>
+  <li><strong>④ 違法コンテンツ</strong>: 著作権侵害データ、児童ポルノ、違法薬物の取引など、法律に違反するデータのホスティング。</li>
+  <li><strong>⑤ DDoS攻撃</strong>: AWSリソースを使って、他社サイトにサイバー攻撃を仕掛けること（ボットネット運用）。</li>
+</ul>
+
+<h2>3. 試験での問われ方（典型パターン）</h2>
+<p>
+  試験では、非常にシンプルな「○×問題」のような形式で出題されます。
+</p>
+
+<!-- 図解：試験判定 -->
+<div class="diagram-container">
+  <div class="diagram-title">試験脳での判定</div>
+  <div class="exam-check">
+    <span class="exam-q">Q. 「AWS上でボットネットを構築・運用することは許可されているか？」</span>
+    <div class="exam-a">❌ 許可されていない</div>
+    <p style="margin-top:10px; font-size:0.9em; color:#cbd5e1;">理由：AWS Acceptable Use Policy (AUP) 違反だから。</p>
+  </div>
+</div>
+
+<h2>4. 関連用語との違い</h2>
+<p>
+  似たような規約やモデルと混同しないようにしましょう。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>用語</th>
+      <th>内容</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Acceptable Use Policy (AUP)</strong></td>
+      <td><strong>「やってはいけないこと（禁止事項）」</strong>のリスト。モラルと法律の話。</td>
+    </tr>
+    <tr>
+      <td><strong>Shared Responsibility Model</strong></td>
+      <td><strong>「セキュリティの責任分担」</strong>の話。AWSとユーザーがどこを守るか。</td>
+    </tr>
+    <tr>
+      <td><strong>Customer Agreement</strong></td>
+      <td><strong>「契約全体」</strong>の話。料金支払いや解約条件などを含む包括的な契約書。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Acceptable Use Policy</strong>: AWSを違法行為、攻撃、迷惑行為に使ってはいけないというルール。</li>
+  <li><strong>ポイント</strong>: 内容を丸暗記するより、「他人に迷惑をかける行為は全部NG」という常識で判断すれば正解できます。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
