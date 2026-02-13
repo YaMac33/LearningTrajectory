@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-service-catalog-importance",
+  "category": "awscp",
+  "timestamp": "2026-02-13T18:01:56+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-service-catalog-importance/",
+  "meta": {
+    "title": "AWS Service Catalogの重要性",
+    "summary": "AWS Service Catalogは、IAMユーザーが承認済みのレソースだけを利用できる環境を提供します。この試験対策記事では、その仕組みや利点を解説します。",
+    "tags": [
+      "AWS",
+      "Service Catalog",
+      "IAM",
+      "CloudFormation",
+      "ガバナンス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
