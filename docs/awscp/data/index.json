@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-dax-role-characteristics",
+    "category": "awscp",
+    "timestamp": "2026-02-13T12:46:15+09:00",
+    "title": "DAXの役割と特性を理解する",
+    "summary": "DAXはDynamoDBの読み取りを高速化するインメモリキャッシュで、分析サービスではないことを理解できる。試験で混同しやすいKinesisとの違いを明確に認識できる。",
+    "tags": [
+      "DAX",
+      "DynamoDB",
+      "キャッシュ",
+      "読み取り",
+      "高速化"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-dax-role-characteristics/"
+  },
+  {
     "id": "awscp-aws-organizations-iam-groups",
     "category": "awscp",
     "timestamp": "2026-02-13T08:22:09+09:00",
