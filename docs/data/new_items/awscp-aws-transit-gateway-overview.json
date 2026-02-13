@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-transit-gateway-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-13T19:20:27+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-transit-gateway-overview/",
+  "meta": {
+    "title": "AWS Transit Gatewayの概要と活用法",
+    "summary": "AWS Transit Gatewayは、複数のVPCやオンプレミスネットワークを接続する中央ハブサービスです。これにより、ネットワークの構成が簡素化され、大規模環境における利便性が向上します。",
+    "tags": [
+      "AWS",
+      "Transit Gateway",
+      "VPC",
+      "ネットワーク",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ]
+  }
+}
