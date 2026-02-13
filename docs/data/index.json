@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-provisioned-concurrency-effect",
+    "category": "awscp",
+    "timestamp": "2026-02-13T20:25:08+09:00",
+    "title": "LambdaのProvisioned Concurrencyの効果",
+    "summary": "Provisioned Concurrencyにより、Lambdaのコールドスタートを解消し、低レイテンシでのリクエスト応答が可能になります。",
+    "tags": [
+      "AWS",
+      "Lambda",
+      "Provisioned Concurrency",
+      "コールドスタート",
+      "レイテンシ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-provisioned-concurrency-effect/"
+  },
+  {
     "id": "awscp-aws-transit-gateway-overview",
     "category": "awscp",
     "timestamp": "2026-02-13T19:20:27+09:00",
