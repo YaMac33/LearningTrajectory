@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-tag-editor-resource-groups",
+  "category": "awscp",
+  "timestamp": "2026-02-13T19:16:18+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-aws-tag-editor-resource-groups/",
+  "meta": {
+    "title": "AWS Tag EditorとResource Groupsの違い",
+    "summary": "AWS Tag EditorとResource Groupsの役割の違いと連携フローを解説します。試験対策として、両機能の特性を理解することが重要です。",
+    "tags": [
+      "AWS",
+      "Tag Editor",
+      "Resource Groups",
+      "タグ管理",
+      "クラウド技術"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
