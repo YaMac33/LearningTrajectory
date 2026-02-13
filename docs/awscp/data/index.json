@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-auto-scaling-keypair",
+    "category": "awscp",
+    "timestamp": "2026-02-13T15:45:12+09:00",
+    "title": "AWS Auto Scalingでのキーペア設定",
+    "summary": "AWS Auto Scalingでは、インスタンス起動時にキーペアを設定する必要があり、設計図にその情報を含めておくことが重要です。",
+    "tags": [
+      "AWS",
+      "Auto Scaling",
+      "キーペア",
+      "EC2",
+      "設定"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-aws-auto-scaling-keypair/"
+  },
+  {
     "id": "awscp-aws-access-control",
     "category": "awscp",
     "timestamp": "2026-02-13T13:23:51+09:00",
