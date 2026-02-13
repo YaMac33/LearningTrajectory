@@ -1,0 +1,21 @@
+{
+  "id": "awscp-hsm-kms-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-13T18:22:12+09:00",
+  "post_path": "awscp/posts/2026-02-13-awscp-hsm-kms-difference/",
+  "meta": {
+    "title": "HSMとKMSの明確な違い",
+    "summary": "AWSの暗号化サービスKMSとCloudHSMの違いを理解し、それぞれの特性を把握することで、試験における選択肢を正確に見極める力を養うことができる。",
+    "tags": [
+      "CloudHSM",
+      "KMS",
+      "暗号化",
+      "AWS",
+      "ハードウェア"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
