@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS Directory Serviceの概要</title>
+  <meta name="description" content="AWS Directory Serviceは、AWS上でActive Directoryを運用・連携するためのマネージドサービスです。Managed Microsoft AD、AD Connector、Simple ADの3つのタイプと使い分けについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS Directory Serviceの概要" />
+  <meta property="og:description" content="AWS Directory Serviceは、AWS上でActive Directoryを運用・連携するためのマネージドサービスです。Managed Microsoft AD、AD Connector、Simple ADの3つのタイプと使い分けについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* ADの概念図 */
+    .ad-concept {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    .ad-book {
+      background: #1e293b;
+      color: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      width: 140px;
+      text-align: center;
+      position: relative;
+      box-shadow: 4px 4px 0 #cbd5e1;
+    }
+    .ad-book::before {
+      content: "DIRECTORY";
+      display: block;
+      font-size: 0.7em;
+      opacity: 0.7;
+      margin-bottom: 5px;
+    }
+    .ad-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .u-item {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .u-check { color: #10b981; font-weight: bold; }
+    
+    .connect-arrow {
+      color: #3b82f6;
+      font-size: 2em;
+      font-weight: bold;
+    }
+
+    /* 3つのタイプ比較 */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .type-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fff;
+      text-align: center;
+    }
+    .card-ms { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    .card-conn { border-top: 4px solid #f97316; background: #fff7ed; }
+    .card-simple { border-top: 4px solid #64748b; background: #f8fafc; }
+    
+    .type-icon { font-size: 2em; display: block; margin-bottom: 8px; }
+    .type-name { font-weight: 800; color: #1e293b; margin-bottom: 5px; display: block; font-size: 1.05em; }
+    .type-badge { 
+      font-size: 0.75em; font-weight: bold; padding: 2px 8px; 
+      border-radius: 12px; color: #fff; margin-bottom: 10px; display: inline-block;
+    }
+    .card-ms .type-badge { background: #3b82f6; }
+    .card-conn .type-badge { background: #f97316; }
+    .card-simple .type-badge { background: #64748b; }
+    
+    .type-desc { font-size: 0.85em; color: #475569; text-align: left; line-height: 1.4; }
+
+    /* ハイブリッド連携 */
+    .hybrid-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+    }
+    .zone-box {
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #64748b;
+      font-size: 0.9em;
+      min-width: 100px;
+    }
+    .zone-aws { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .link-line {
+      flex: 1;
+      height: 4px;
+      background: #cbd5e1;
+      position: relative;
+      max-width: 100px;
+    }
+    .link-line::after {
+      content: "信頼関係 / 転送";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7em;
+      white-space: nowrap;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-13">
+            2026.02.13
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS Directory Serviceの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Directory Service</span>
+            <span class="tag">#Active Directory</span>
+            <span class="tag">#ユーザー管理</span>
+            <span class="tag">#クラウドサービス</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS Directory Serviceは、AWS上でユーザーやグループ情報を管理するサービスです。</p>
+<hr>
+<p>
+  <strong>AWS Directory Service</strong> は、企業の社内ネットワークで広く使われている<strong>「Microsoft Active Directory (AD)」</strong>を、AWS上で簡単に使えるようにするマネージドサービスです。<br>
+  一言で言うと、<strong>「AWS上にある『社員名簿・権限管理センター』」</strong>です。
+</p>
+<p>
+  これを使うことで、社員が普段使っているWindowsのIDとパスワードで、AWSのサービス（EC2やマネジメントコンソール）にログインできるようになります。
+</p>
+
+<h2>1. そもそも「ディレクトリサービス」とは？</h2>
+<p>
+  会社の中で、「社員のID」「所属部署」「どのパソコンにログインできるか」を一元管理する仕組みのことです。
+</p>
+
+<!-- 図解：ADの役割 -->
+<div class="diagram-container">
+  <div class="diagram-title">ディレクトリサービスの役割</div>
+  <div class="ad-concept">
+    <div class="ad-book">
+      <span class="ad-icon">📒</span>
+      <div style="font-weight:bold;">Active<br>Directory</div>
+    </div>
+    
+    <div class="connect-arrow">➡</div>
+    
+    <div class="user-list">
+      <div class="u-item"><span class="u-check">✓</span> ログイン認証</div>
+      <div class="u-item"><span class="u-check">✓</span> 権限チェック</div>
+      <div class="u-item"><span class="u-check">✓</span> グループ管理</div>
+    </div>
+  </div>
+</div>
+
+<h2>2. AWSでの3つの選択肢（試験のポイント）</h2>
+<p>
+  「AWSでADを使いたい」と言っても、用途に合わせて3つのタイプがあります。試験ではこの使い分けが問われます。
+</p>
+
+<!-- 図解：3タイプの比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">提供される3つのタイプ</div>
+  <div class="type-grid">
+    
+    <!-- Managed Microsoft AD -->
+    <div class="type-card card-ms">
+      <span class="type-icon">🏢</span>
+      <span class="type-name">Managed Microsoft AD</span>
+      <span class="type-badge">本物・推奨</span>
+      <div class="type-desc">
+        本物のWindows Server ADが裏で動く。<br>
+        オンプレミスADと<strong>「信頼関係」</strong>を結んで連携できる。<br>
+        最も高機能。
+      </div>
+    </div>
+
+    <!-- AD Connector -->
+    <div class="type-card card-conn">
+      <span class="type-icon">🔌</span>
+      <span class="type-name">AD Connector</span>
+      <span class="type-badge">中継・プロキシ</span>
+      <div class="type-desc">
+        AWS上にデータを持たない。<br>
+        認証リクエストを<strong>「オンプレミスADへ転送」</strong>するだけ。<br>
+        安価でシンプル。
+      </div>
+    </div>
+
+    <!-- Simple AD -->
+    <div class="type-card card-simple">
+      <span class="type-icon">📦</span>
+      <span class="type-name">Simple AD</span>
+      <span class="type-badge">簡易版・互換</span>
+      <div class="type-desc">
+        Samba 4 ベースの互換機能。<br>
+        オンプレミスADとの<strong>連携機能はない</strong>。<br>
+        AWS内だけで完結する小規模用。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. オンプレミスとの連携（ハイブリッド構成）</h2>
+<p>
+  大企業では、「本社にあるメインのAD」と「AWS上のAD」を連携させて、統合管理したいという要望がよくあります。
+</p>
+
+<!-- 図解：連携イメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">ハイブリッドAD構成</div>
+  <div class="hybrid-flow">
+    <div class="zone-box">
+      🏢 オンプレミス<br>
+      (既存のAD)
+    </div>
+    <div class="link-line"></div>
+    <div class="zone-box zone-aws">
+      ☁️ AWS<br>
+      (Managed AD)
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:5px;">
+    「AWS Managed Microsoft AD」を使うことで、オンプレミスのIDでAWSを利用可能になる。
+  </p>
+</div>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  以下のキーワードが出たら、対応するサービスを選んでください。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>要件・キーワード</th>
+      <th>正解のサービス</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>「オンプレミスADと<strong>信頼関係 (Trust Relationship)</strong> を結びたい」<br>「互換性が高い本物のAD機能が必要」</td>
+      <td><strong>AWS Managed Microsoft AD</strong></td>
+    </tr>
+    <tr>
+      <td>「クラウド上にディレクトリ情報を持ちたくない」<br>「オンプレミスへ<strong>リダイレクト（転送）</strong>したい」</td>
+      <td><strong>AD Connector</strong></td>
+    </tr>
+    <tr>
+      <td>「低コストで、AWS内だけで完結するディレクトリが欲しい」<br>「Linux (Samba) ベースで十分」</td>
+      <td><strong>Simple AD</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>AWS Directory Service</strong>: AWSでADを使うためのサービス。</li>
+  <li><strong>Managed Microsoft AD</strong>: 本命。オンプレ連携もできる高機能版。</li>
+  <li><strong>AD Connector</strong>: 転送専用。中継役。</li>
+  <li><strong>Simple AD</strong>: 簡易版。独立して使う。</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
