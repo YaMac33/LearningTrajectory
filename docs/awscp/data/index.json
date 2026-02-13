@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-directory-service-overview",
+    "category": "awscp",
+    "timestamp": "2026-02-13T17:50:38+09:00",
+    "title": "AWS Directory Serviceの概念と活用法",
+    "summary": "AWS Directory Serviceを通じて、Active DirectoryをAWS上で簡便に運用できる方法を理解することができます。試験のポイントとして、3つのサービスタイプの使い分けが重要です。",
+    "tags": [
+      "AWS",
+      "Directory Service",
+      "Active Directory",
+      "ユーザー管理",
+      "クラウドサービス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-13-awscp-aws-directory-service-overview/"
+  },
+  {
     "id": "awscp-aws-acceptable-use-policy",
     "category": "awscp",
     "timestamp": "2026-02-13T17:45:01+09:00",
