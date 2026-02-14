@@ -1,0 +1,21 @@
+{
+  "id": "awscp-lightsail-beanstalk-amplify-differences",
+  "category": "awscp",
+  "timestamp": "2026-02-14T20:31:50+09:00",
+  "post_path": "awscp/posts/2026-02-14-awscp-lightsail-beanstalk-amplify-differences/",
+  "meta": {
+    "title": "Lightsail・Beanstalk・Amplifyの違い",
+    "summary": "AWSのWebホスティングサービスの違いを理解することで、それぞれの適したユースケースを把握します。",
+    "tags": [
+      "AWS",
+      "Lightsail",
+      "Beanstalk",
+      "Amplify",
+      "サービス比較"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
