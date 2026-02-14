@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-customer-gateway-basic",
+    "category": "awscp",
+    "timestamp": "2026-02-15T06:32:21+09:00",
+    "title": "カスタマーゲートウェイの基本",
+    "summary": "AWS VPCとオンプレミス接続のカスタマーゲートウェイの役割を解説し、その位置関係を理解できます。",
+    "tags": [
+      "AWS",
+      "VPN",
+      "Customer Gateway",
+      "ネットワーク",
+      "VPC"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-15-awscp-customer-gateway-basic/"
+  },
+  {
     "id": "awscp-lightsail-beanstalk-amplify-differences",
     "category": "awscp",
     "timestamp": "2026-02-14T20:31:50+09:00",
