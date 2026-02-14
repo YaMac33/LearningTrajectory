@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | カスタマーゲートウェイの基本</title>
+  <meta name="description" content="AWS Site-to-Site VPNにおけるカスタマーゲートウェイの役割を解説。オンプレミス側のVPN装置としての定義や、仮想プライベートゲートウェイとの位置関係について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="カスタマーゲートウェイの基本" />
+  <meta property="og:description" content="AWS Site-to-Site VPNにおけるカスタマーゲートウェイの役割を解説。オンプレミス側のVPN装置としての定義や、仮想プライベートゲートウェイとの位置関係について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* VPN構成図 */
+    .vpn-architecture {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 20px 0;
+    }
+    .site-area {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+      min-width: 140px;
+    }
+    .area-onprem { border-color: #64748b; color: #1e293b; background: #f1f5f9; }
+    .area-aws { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    
+    .gateway-box {
+      background: #1e293b;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85em;
+      margin-top: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .gw-customer { background: #3b82f6; }
+    .gw-virtual { background: #f97316; }
+    
+    .vpn-tunnel {
+      flex: 1;
+      height: 40px;
+      background: repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 10px, #fff 10px, #fff 20px);
+      border-top: 2px dashed #94a3b8;
+      border-bottom: 2px dashed #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-width: 100px;
+    }
+    .tunnel-label {
+      background: #fff;
+      padding: 2px 8px;
+      font-size: 0.75em;
+      font-weight: bold;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+    }
+
+    /* 比較図 (IGW vs VPN) */
+    .route-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .route-compare { grid-template-columns: 1fr; }
+    }
+    .route-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .route-card.igw { border-top: 4px solid #10b981; }
+    .route-card.vpn { border-top: 4px solid #3b82f6; }
+    
+    .route-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .route-name { font-weight: 800; font-size: 1em; color: #1e293b; margin-bottom: 10px; display: block; }
+    
+    .simple-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85em;
+      color: #475569;
+      font-weight: bold;
+    }
+    .flow-line { height: 20px; width: 2px; background: #cbd5e1; }
+    
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">カスタマーゲートウェイの基本</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#VPN</span>
+            <span class="tag">#Customer Gateway</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#VPC</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>オンプレミスとVPCを接続する際の「自社側の装置」について解説します。</p>
+<hr>
+<p>
+  <strong>カスタマーゲートウェイ (Customer Gateway)</strong> は、AWS Site-to-Site VPN（拠点間VPN）を利用する際に、<strong>「オンプレミス（自社）側に設置するVPN装置」</strong>のことです。<br>
+  AWS側の受け口である「仮想プライベートゲートウェイ」と対になる概念です。
+</p>
+
+<h2>1. 全体構成： どっちがどっち？</h2>
+<p>
+  VPN接続は「2つの装置」の間でトンネルを掘ることで成立します。
+</p>
+
+<!-- 図解：VPN構成 -->
+<div class="diagram-container">
+  <div class="diagram-title">Site-to-Site VPN の接続図</div>
+  <div class="vpn-architecture">
+    
+    <!-- オンプレ側 -->
+    <div class="site-area area-onprem">
+      <div style="font-size:2em;">🏢</div>
+      <strong>オンプレミス</strong>
+      <div style="font-size:0.75em; margin-bottom:5px;">(社内NW)</div>
+      
+      <div class="gateway-box gw-customer">
+        Customer Gateway<br>
+        (CGW)
+      </div>
+    </div>
+
+    <!-- トンネル -->
+    <div class="vpn-tunnel">
+      <span class="tunnel-label">VPN Connection</span>
+    </div>
+
+    <!-- AWS側 -->
+    <div class="site-area area-aws">
+      <div style="font-size:2em;">☁️</div>
+      <strong>AWS VPC</strong>
+      <div style="font-size:0.75em; margin-bottom:5px;">(クラウド)</div>
+      
+      <div class="gateway-box gw-virtual">
+        Virtual Private<br>Gateway (VGW)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 役割の違いを整理</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>コンポーネント名</th>
+      <th>場所</th>
+      <th>実体</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Customer Gateway (CGW)</strong></td>
+      <td><strong>オンプレミス側</strong></td>
+      <td>物理ルーター、またはソフトウェアVPN装置。<br>(ユーザーが管理)</td>
+    </tr>
+    <tr>
+      <td><strong>Virtual Private Gateway (VGW)</strong></td>
+      <td><strong>AWS側</strong> (VPCの入口)</td>
+      <td>AWSのマネージドVPNルーター。<br>(AWSが管理)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>カスタマーゲートウェイの実体</h3>
+<p>
+  「ゲートウェイ」という名前ですが、AWSが提供する機器ではありません。<br>
+  実際には、あなたの会社にある<strong>「Ciscoのルーター」</strong>や<strong>「FortiGate」</strong>、あるいは<strong>「Linuxサーバーに入れたVPNソフト（OpenSwanなど）」</strong>のことを指します。<br>
+  AWSのコンソールには、その装置の「グローバルIPアドレス」などの情報を登録します。
+</p>
+
+<h2>3. IGW（インターネットゲートウェイ）との違い</h2>
+<p>
+  試験でよくあるひっかけポイントです。「ゲートウェイ」とついていますが、役割は全く別です。
+</p>
+
+<!-- 図解：接続先の違い -->
+<div class="diagram-container">
+  <div class="diagram-title">接続目的の違い</div>
+  <div class="route-compare">
+    
+    <!-- IGW -->
+    <div class="route-card igw">
+      <span class="route-icon">🌍</span>
+      <span class="route-name">Internet Gateway (IGW)</span>
+      <div class="simple-flow">
+        <div style="border:1px solid #ccc; padding:2px 8px; border-radius:4px;">VPC</div>
+        <div class="flow-line"></div>
+        <div style="background:#dcfce7; padding:4px 8px; border-radius:4px; color:#166534;">IGW</div>
+        <div class="flow-line"></div>
+        <div>インターネット</div>
+      </div>
+      <p style="font-size:0.8em; margin-top:10px; color:#64748b;">
+        「外の世界」へ出るための玄関。
+      </p>
+    </div>
+
+    <!-- VPN (CGW) -->
+    <div class="route-card vpn">
+      <span class="route-icon">🏢</span>
+      <span class="route-name">VPN (CGW + VGW)</span>
+      <div class="simple-flow">
+        <div style="border:1px solid #ccc; padding:2px 8px; border-radius:4px;">VPC</div>
+        <div class="flow-line"></div>
+        <div style="background:#dbeafe; padding:4px 8px; border-radius:4px; color:#1e40af;">VGW ↔ CGW</div>
+        <div class="flow-line"></div>
+        <div>社内ネットワーク</div>
+      </div>
+      <p style="font-size:0.8em; margin-top:10px; color:#64748b;">
+        「特定の拠点」と繋ぐ専用トンネル。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>IGW</strong>: インターネット（不特定多数）と通信するためのもの。</li>
+  <li><strong>CGW (VPN)</strong>: 特定の拠点（自社）とだけ通信するためのもの。<strong>インターネットアクセス用ではありません。</strong></li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Customer Gateway</strong> ＝ <strong>「社内にあるVPNルーター」</strong>のこと。</li>
+  <li><strong>Virtual Private Gateway</strong> ＝ <strong>「AWS側にあるVPNの受け口」</strong>のこと。</li>
+</ul>
+<p>
+  「カスタマー（顧客）側のゲートウェイ」という名前の通り、<strong>「あなたの会社に置いてある装置」</strong>だとイメージしてください。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
