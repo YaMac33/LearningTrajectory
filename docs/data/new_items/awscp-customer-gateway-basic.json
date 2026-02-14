@@ -1,0 +1,21 @@
+{
+  "id": "awscp-customer-gateway-basic",
+  "category": "awscp",
+  "timestamp": "2026-02-15T06:32:21+09:00",
+  "post_path": "awscp/posts/2026-02-15-awscp-customer-gateway-basic/",
+  "meta": {
+    "title": "カスタマーゲートウェイの基本",
+    "summary": "AWS VPCとオンプレミス接続のカスタマーゲートウェイの役割を解説し、その位置関係を理解できます。",
+    "tags": [
+      "AWS",
+      "VPN",
+      "Customer Gateway",
+      "ネットワーク",
+      "VPC"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
