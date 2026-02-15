@@ -1,0 +1,21 @@
+{
+  "id": "awscp-rds-storage-types",
+  "category": "awscp",
+  "timestamp": "2026-02-15T21:08:44+09:00",
+  "post_path": "awscp/posts/2026-02-15-awscp-rds-storage-types/",
+  "meta": {
+    "title": "RDSでのストレージタイプの特徴解説",
+    "summary": "RDSでのストレージタイプの違いや性能に関する理解を深めることができる記事です。特に、SSDとHDDの使い分けについて詳述されています。",
+    "tags": [
+      "AWS",
+      "RDS",
+      "EBS",
+      "ストレージ",
+      "データベース"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
