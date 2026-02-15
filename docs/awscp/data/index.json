@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-elb-pre-warming",
+    "category": "awscp",
+    "timestamp": "2026-02-15T20:53:43+09:00",
+    "title": "AWS-CP対策: ELBのPre-Warming",
+    "summary": "ELBのPre-Warmingは、大量アクセスに備えるための事前処理であり、NLBでは不要であることを理解する。試験では適切なロードバランサーの選択が求められる。",
+    "tags": [
+      "AWS",
+      "ELB",
+      "Pre-Warming",
+      "スケーリング",
+      "トラブルシューティング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-15-awscp-elb-pre-warming/"
+  },
+  {
     "id": "awscp-alb-nlb-difference",
     "category": "awscp",
     "timestamp": "2026-02-15T08:07:35+09:00",
