@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ELBのPre-Warming</title>
+  <meta name="description" content="ELBの事前暖機（Pre-Warming）が必要な理由と、NLBでは不要な理由を解説。トラフィック急増時の挙動の違いと、試験での判断ポイントについて。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ELBのPre-Warming" />
+  <meta property="og:description" content="ELBの事前暖機（Pre-Warming）が必要な理由と、NLBでは不要な理由を解説。トラフィック急増時の挙動の違いと、試験での判断ポイントについて。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* トラフィック急増のグラフイメージ */
+    .traffic-chart {
+      position: relative;
+      height: 150px;
+      border-bottom: 2px solid #64748b;
+      border-left: 2px solid #64748b;
+      margin: 20px 40px;
+      background: linear-gradient(to top, #fff, #f1f5f9);
+    }
+    .line-traffic {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 100%;
+      background: transparent;
+      border-top: 3px solid #ef4444; /* Red Traffic */
+      border-radius: 0 100% 0 0; /* 簡易曲線 */
+      clip-path: polygon(0 100%, 30% 100%, 40% 10%, 100% 10%, 100% 100%);
+    }
+    .line-elb {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 100%;
+      background: transparent;
+      border-top: 3px dashed #3b82f6; /* Blue ELB Capa */
+      clip-path: polygon(0 100%, 30% 100%, 60% 30%, 100% 20%, 100% 100%);
+    }
+    .chart-label {
+      position: absolute;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .lbl-traffic { top: 10px; left: 45%; color: #ef4444; }
+    .lbl-elb { top: 50px; left: 65%; color: #3b82f6; }
+    .lbl-gap { top: 30px; left: 40%; color: #b91c1c; font-size: 0.7em; background: #fee2e2; padding: 2px; }
+
+    /* ELBタイプ比較 */
+    .elb-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .elb-compare { grid-template-columns: 1fr; }
+    }
+    .elb-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .elb-card.warm { border-top: 4px solid #64748b; }
+    .elb-card.no-warm { border-top: 4px solid #f97316; background: #fff7ed; }
+    
+    .elb-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .elb-name { font-weight: 800; color: #1e293b; margin-bottom: 5px; display: block; }
+    .warm-status {
+      display: inline-block;
+      font-size: 0.85em;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+    .st-req { background: #fee2e2; color: #991b1b; }
+    .st-ok { background: #dcfce7; color: #166534; }
+    
+    .elb-desc { font-size: 0.9em; color: #475569; text-align: left; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ELBのPre-Warming</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#ELB</span>
+            <span class="tag">#Pre-Warming</span>
+            <span class="tag">#スケーリング</span>
+            <span class="tag">#トラブルシューティング</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Pre-Warmingとは大量アクセス前にELBの処理能力を事前拡張する申請で、CLBや一部ALBでは必要でしたが、NLBでは不要です。</p>
+<hr>
+<p>
+  <strong>Pre-Warming（プレウォーミング：事前暖機）</strong> とは、一言で言うと<strong>「テレビ砲などの急激なアクセス増に備えて、AWSに頼んでロードバランサー（ELB）をあらかじめ大きくしてもらう申請」</strong>のことです。<br>
+  「昔のELB（CLB）」と「今のELB（ALB/NLB）」で考え方が異なります。
+</p>
+
+<h2>1. なぜ必要だったの？（課題）</h2>
+<p>
+  ELBはトラフィックが増えると自動でスケール（拡張）しますが、それには<strong>数分程度の時間</strong>がかかります。<br>
+  「1秒でアクセスが100倍になる」ような極端なスパイク（急増）が起きると、ELBの成長が追いつかず、溢れたアクセスがエラー（503 Service Unavailable）になってしまうのです。
+</p>
+
+<!-- 図解：トラフィック急増とELBの限界 -->
+<div class="diagram-container">
+  <div class="diagram-title">急増時のELBの挙動イメージ</div>
+  <div class="traffic-chart">
+    <div class="line-traffic"></div>
+    <div class="line-elb"></div>
+    <span class="chart-label lbl-traffic">アクセス急増！</span>
+    <span class="chart-label lbl-elb">ELB拡張(遅れる)</span>
+    <span class="chart-label lbl-gap">あふれる(503エラー)</span>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b;">
+    この「追いついていない期間」をなくすために、事前に拡張（暖機）しておくのがPre-Warming。
+  </p>
+</div>
+
+<h2>2. Pre-Warming とは？</h2>
+<p>
+  AWSサポートに「〇月〇日の△時から、秒間XX万リクエストが来ます」と申請することで、AWS側が手動（または半自動）でELBのキャパシティを事前に増やしてくれます。<br>
+  これにより、アクセスが来た瞬間にフルパワーで処理できるようになります。
+</p>
+
+<h2>3. 種類による違い（試験のポイント）</h2>
+<p>
+  試験では<strong>「どのロードバランサーなら申請が不要か？」</strong>が問われます。
+</p>
+
+<!-- 図解：ELBタイプ比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">タイプ別の対応要否</div>
+  <div class="elb-compare">
+    
+    <!-- CLB / ALB -->
+    <div class="elb-card warm">
+      <span class="elb-icon">🐢</span>
+      <span class="elb-name">CLB / ALB</span>
+      <span class="warm-status st-req">場合により必要</span>
+      <div class="elb-desc">
+        <ul>
+          <li>基本は自動スケール</li>
+          <li><strong>「予測可能な超・急増」</strong>なら申請推奨</li>
+          <li>スケールに少し時間がかかる構造</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- NLB -->
+    <div class="elb-card no-warm">
+      <span class="elb-icon">🚀</span>
+      <span class="elb-name">NLB</span>
+      <span class="warm-status st-ok">申請不要</span>
+      <div class="elb-desc">
+        <ul>
+          <li>最初から超高性能</li>
+          <li><strong>突発的な数百万リクエスト</strong>も即座に処理可能</li>
+          <li>Pre-Warmingという概念がない</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. NLBはなぜ不要？</h2>
+<p>
+  <strong>Network Load Balancer (NLB)</strong> は、他のELBとはアーキテクチャが根本的に異なります。<br>
+  L4（TCPレベル）で動作し、静的IPを持つ特殊な構造のため、<strong>「暖機運転なしで、いきなりトップスピードを出せる」</strong>ように設計されています。
+</p>
+
+<h2>5. 試験対策キーワード</h2>
+<p>
+  以下の条件が出たら、答えは決まっています。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>要件・キーワード</th>
+      <th>正解</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>「急激なトラフィック増加が予測される」<br>「ALB/CLBを使用している」</td>
+      <td><strong>Pre-Warming (事前暖機) を申請する</strong></td>
+    </tr>
+    <tr>
+      <td>「数百万リクエストのスパイクを処理したい」<br>「暖機申請（Pre-Warming）をしたくない」</td>
+      <td><strong>Network Load Balancer (NLB) を使う</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<p>
+  <strong>「ALB/CLBは急な坂道に弱いが、NLBは最初からロケットエンジンを積んでいる」</strong><br>
+  だから、ALBには準備（Pre-Warming）が必要で、NLBには不要なのです。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
