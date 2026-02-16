@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-ddos-protection-shield-waf",
+    "category": "awscp",
+    "timestamp": "2026-02-16T12:29:34+09:00",
+    "title": "DDoS攻撃対策：ShieldとWAFの違い",
+    "summary": "AWS ShieldとAWS WAFの違いを理解し、それぞれの役割について学ぶことができます。DDoS攻撃防御の観点からの比較がテーマです。",
+    "tags": [
+      "AWS",
+      "Shield",
+      "WAF",
+      "セキュリティ",
+      "DDoS"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-16-awscp-ddos-protection-shield-waf/"
+  },
+  {
     "id": "awscp-rds-storage-types",
     "category": "awscp",
     "timestamp": "2026-02-15T21:08:44+09:00",
