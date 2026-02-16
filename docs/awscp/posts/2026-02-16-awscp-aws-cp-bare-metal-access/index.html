@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | プロセッサーとメモリーとベアメタル</title>
+  <meta name="description" content="CPU（プロセッサー）とメモリの違いを「脳と机」の例えで解説。さらに、それらに直接アクセスできる「ベアメタルインスタンス」の特徴について図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="プロセッサーとメモリーとベアメタル" />
+  <meta property="og:description" content="CPU（プロセッサー）とメモリの違いを「脳と机」の例えで解説。さらに、それらに直接アクセスできる「ベアメタルインスタンス」の特徴について図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* コンピュータ構成図 */
+    .computer-arch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      background: #1e293b;
+      border-radius: 12px;
+      color: #fff;
+      max-width: 400px;
+      margin: 0 auto;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    .comp-screen {
+      width: 100%;
+      height: 20px;
+      background: #334155;
+      border-radius: 4px;
+      margin-bottom: 5px;
+    }
+    .parts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+    .part-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .part-cpu { border-color: #f59e0b; color: #fbbf24; }
+    .part-ram { border-color: #10b981; color: #4ade80; }
+    .part-disk { 
+      grid-column: span 2; 
+      border-color: #3b82f6; 
+      color: #60a5fa; 
+      margin-top: 5px;
+    }
+    .part-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+
+    /* メタファー比較 */
+    .metaphor-box {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 10px;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      text-align: center;
+      width: 120px;
+    }
+    .meta-img { font-size: 3em; margin-bottom: 5px; display: block; }
+    .meta-label { font-weight: bold; color: #1e293b; display: block; }
+    .meta-sub { font-size: 0.8em; color: #64748b; }
+
+    /* 仮想化 vs ベアメタル */
+    .layer-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .layer-compare { grid-template-columns: 1fr; }
+    }
+    .stack-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+    }
+    .col-virtual { border-top: 4px solid #3b82f6; }
+    .col-bare { border-top: 4px solid #ef4444; }
+    
+    .stack-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #1e293b;
+    }
+    .layer-bar {
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.85em;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .l-app { background: #60a5fa; }
+    .l-os { background: #3b82f6; }
+    .l-hyp { background: #94a3b8; color: #1e293b; border: 2px dashed #475569; } /* 邪魔な層 */
+    .l-hw { background: #1e293b; }
+    
+    .direct-arrow {
+      color: #ef4444;
+      font-weight: bold;
+      font-size: 1.5em;
+      line-height: 1;
+      margin: 5px 0;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">プロセッサーとメモリーとベアメタル</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#EC2</span>
+            <span class="tag">#ベアメタル</span>
+            <span class="tag">#CPU</span>
+            <span class="tag">#メモリ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>CPUは脳、メモリは机。これらに直接アクセスするための「ベアメタル」について解説します。</p>
+<hr>
+<p>
+  <strong>Q. 「クラウドサーバーのプロセッサーとメモリーに直接アクセスする必要がある場合に選ぶべきインスタンスは？」</strong><br>
+  <strong>A. 答えは「ベアメタルインスタンス」です。</strong>
+</p>
+<p>
+  この問題を解くには、まず「プロセッサー」と「メモリー」がコンピュータの中で何をしているか（脳と机）を理解し、なぜ「直接アクセス」が特別なのかを知る必要があります。
+</p>
+
+<h2>1. コンピュータの中身（基本の3要素）</h2>
+<p>
+  コンピュータは主に3つのパーツで動いています。
+</p>
+
+<!-- 図解：PC内部 -->
+<div class="diagram-container">
+  <div class="diagram-title">コンピュータの主要パーツ</div>
+  <div class="computer-arch">
+    <div class="comp-screen"></div>
+    <div class="parts-grid">
+      <div class="part-box part-cpu">
+        <span class="part-icon">🧠</span>
+        プロセッサー<br>(CPU)
+      </div>
+      <div class="part-box part-ram">
+        <span class="part-icon">🪑</span>
+        メモリー<br>(RAM)
+      </div>
+      <div class="part-box part-disk">
+        <span class="part-icon">📚</span>
+        ディスク (Storage)
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>① プロセッサー (CPU) = 「脳」</h3>
+<p>
+  <strong>計算をする場所</strong>です。プログラムを実行したり、データを加工したりします。<br>
+  これが速いと、処理があっという間に終わります。
+</p>
+
+<h3>② メモリー (RAM) = 「作業机」</h3>
+<p>
+  <strong>作業中のデータを一時的に広げておく場所</strong>です。<br>
+  これが広い（容量が多い）と、たくさんのアプリを同時に開いても重くなりません。
+</p>
+
+<h3>③ ディスク (Storage) = 「本棚」</h3>
+<p>
+  データを長期保管する場所です。机（メモリ）が狭くなったら、使わない資料を一旦本棚（ディスク）に戻します。
+</p>
+
+<!-- 図解：メタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">仕事に例えると</div>
+  <div class="metaphor-box">
+    <div class="meta-item">
+      <span class="meta-img">👨‍💼</span>
+      <span class="meta-label">CPU</span>
+      <span class="meta-sub">計算する人</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-img">🪑</span>
+      <span class="meta-label">メモリ</span>
+      <span class="meta-sub">作業机の広さ</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-img">🗄️</span>
+      <span class="meta-label">ディスク</span>
+      <span class="meta-sub">保管庫</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. 「直接アクセス」とは？（ベアメタルの正体）</h2>
+<p>
+  通常のEC2インスタンスは<strong>「仮想化」</strong>されています。<br>
+  つまり、物理的なサーバーの上に「ハイパーバイザー（管理人）」というソフトがいて、その上に「仮想的なCPUとメモリ」を作ってあなたに貸しています。
+</p>
+<p>
+  しかし、一部の特殊なアプリやライセンスの都合で、この「管理人」を通さずに、<strong>「物理サーバーの脳と机を直接使いたい」</strong>というケースがあります。これに応えるのが<strong>「ベアメタルインスタンス」</strong>です。
+</p>
+
+<!-- 図解：仮想化 vs ベアメタル -->
+<div class="diagram-container">
+  <div class="diagram-title">アクセスの深さの違い</div>
+  <div class="layer-compare">
+    
+    <!-- 通常 -->
+    <div class="stack-col col-virtual">
+      <div class="stack-title">🔵 通常のEC2</div>
+      <div class="layer-bar l-app">アプリ</div>
+      <div class="layer-bar l-os">ゲストOS</div>
+      <div class="layer-bar l-hyp">仮想化 (壁)</div>
+      <div class="layer-bar l-hw">物理ハードウェア</div>
+      <p style="font-size:0.8em; text-align:center; color:#64748b; margin-top:5px;">
+        間にハイパーバイザーが入る
+      </p>
+    </div>
+
+    <!-- ベアメタル -->
+    <div class="stack-col col-bare">
+      <div class="stack-title">🔴 ベアメタル</div>
+      <div class="layer-bar l-app">アプリ</div>
+      <div class="layer-bar l-os">OS</div>
+      <div class="direct-arrow">⬇ 直結</div>
+      <div class="layer-bar l-hw">物理ハードウェア</div>
+      <p style="font-size:0.8em; text-align:center; color:#ef4444; margin-top:5px;">
+        物理CPU/メモリを占有！
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. なぜベアメタルが必要なの？</h2>
+<p>
+  普通は仮想化されたEC2で十分ですが、以下のような場合に必要になります。
+</p>
+<ul>
+  <li><strong>仮想化非対応のアプリ</strong>: そもそも仮想環境では動かない古いソフトや特殊なソフト。</li>
+  <li><strong>パフォーマンスの極限追求</strong>: 仮想化によるわずかなオーバーヘッド（遅延）すら許されない場合。</li>
+  <li><strong>ライセンスの制約</strong>: 「物理コア」に紐づくライセンスを持ち込みたい場合（※専有ホストとも関連）。</li>
+  <li><strong>仮想化を自分でやりたい</strong>: 自分でハイパーバイザーをインストールしたい場合（Intel VT-x などのハードウェア機能を使いたい）。</li>
+</ul>
+
+<h2>まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>用語</th>
+      <th>意味</th>
+      <th>役割</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>プロセッサー</strong></td>
+      <td>CPU</td>
+      <td>計算する脳</td>
+    </tr>
+    <tr>
+      <td><strong>メモリー</strong></td>
+      <td>RAM</td>
+      <td>作業する机</td>
+    </tr>
+    <tr>
+      <td><strong>ベアメタル</strong></td>
+      <td>Bare Metal</td>
+      <td>仮想化を通さず、<strong>ハードウェアに直接アクセス</strong>できるインスタンス</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>「プロセッサーとメモリーに直接アクセス」＝「ベアメタル」</strong>。<br>
+  このキーワードの結びつきを覚えておけば即答できます！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
