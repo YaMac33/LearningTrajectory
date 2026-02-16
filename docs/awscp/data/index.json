@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-appconfig-vs-config-differences",
+    "category": "awscp",
+    "timestamp": "2026-02-17T07:55:12+09:00",
+    "title": "AppConfigとConfigの違いを理解する",
+    "summary": "AWS AppConfigとAWS Configの役割の違いを学び、それぞれの使用ケースについて理解できます。試験においてキーワードで瞬時に判断する力が身につきます。",
+    "tags": [
+      "AWS",
+      "AppConfig",
+      "Config",
+      "設定管理",
+      "ガバナンス",
+      "サービス比較"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-17-awscp-appconfig-vs-config-differences/"
+  },
+  {
     "id": "awscp-rest-api-basics",
     "category": "awscp",
     "timestamp": "2026-02-17T06:59:15+09:00",
