@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DDoS攻撃対策：ShieldとWAFの違い</title>
+  <meta name="description" content="DDoS攻撃を防ぐAWS ShieldとAWS WAFの違いを解説。ネットワーク層（L3/4）の大規模攻撃防御と、アプリケーション層（L7）の悪意あるリクエスト防御の役割分担について。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DDoS攻撃対策：ShieldとWAFの違い" />
+  <meta property="og:description" content="DDoS攻撃を防ぐAWS ShieldとAWS WAFの違いを解説。ネットワーク層（L3/4）の大規模攻撃防御と、アプリケーション層（L7）の悪意あるリクエスト防御の役割分担について。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 防御レイヤー図 */
+    .defense-layers {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 20px;
+      position: relative;
+    }
+    .attacker {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .attack-arrow {
+      width: 0; 
+      height: 0; 
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid #ef4444;
+      margin-bottom: 5px;
+    }
+    
+    .layer-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      border-radius: 8px;
+      position: relative;
+      color: #fff;
+    }
+    .layer-shield {
+      background: #2563eb; /* Blue */
+      border: 4px solid #1e40af;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+    }
+    .layer-waf {
+      background: #f59e0b; /* Orange */
+      border: 4px solid #b45309;
+      margin-bottom: 10px;
+      width: 80%; /* 絞り込まれた感 */
+      box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+    }
+    .layer-app {
+      background: #10b981; /* Green */
+      border: 4px solid #047857;
+      width: 60%;
+      color: #fff;
+    }
+    
+    .filter-text {
+      font-size: 0.8em;
+      color: #cbd5e1;
+      font-weight: normal;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* 役割比較カード */
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .role-grid { grid-template-columns: 1fr; }
+    }
+    .role-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      position: relative;
+    }
+    .role-card.shield { border-top: 4px solid #2563eb; }
+    .role-card.waf { border-top: 4px solid #f59e0b; }
+    
+    .role-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .role-name { font-weight: 800; font-size: 1.2em; color: #1e293b; margin-bottom: 5px; display: block; }
+    .role-type { 
+      display: inline-block; padding: 4px 10px; border-radius: 12px; 
+      font-size: 0.8em; font-weight: bold; color: #fff; margin-bottom: 15px; 
+    }
+    .role-card.shield .role-type { background: #2563eb; }
+    .role-card.waf .role-type { background: #f59e0b; }
+    
+    .role-desc { font-size: 0.9em; color: #475569; text-align: left; line-height: 1.5; }
+
+    /* 攻撃種類の分類 */
+    .attack-type-box {
+      background: #fff;
+      border: 2px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .type-label { font-weight: bold; color: #1e293b; display: block; margin-bottom: 5px; }
+    .type-ex { font-size: 0.85em; color: #64748b; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DDoS攻撃対策：ShieldとWAFの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Shield</span>
+            <span class="tag">#WAF</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#DDoS</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ShieldはネットワークレベルのDDoS防御、WAFはWebアプリレベルの攻撃防御。両方で守るのがベストです。</p>
+<hr>
+<p>
+  <strong>Q. 「DDoS攻撃を防ぐのはShieldだと思ってたんだけど、WAFでも防げるの？」</strong><br>
+  <strong>A. はい、防げます。ただし「守備範囲」が違います。</strong>
+</p>
+<p>
+  「AWS Shield」と「AWS WAF」は、どちらもDDoS攻撃（大量のアクセスでサーバーをダウンさせる攻撃）への対策になりますが、守るレイヤー（階層）が異なります。<br>
+  一言で言うと、<strong>「Shieldは『力任せの暴力』を防ぎ、WAFは『悪知恵の働く侵入者』を防ぐ」</strong>イメージです。
+</p>
+
+<h2>1. 全体像：多層防御の仕組み</h2>
+<p>
+  攻撃者はインターネットからやってきます。アプリに到達する前に、2つの壁で守ります。
+</p>
+
+<!-- 図解：多層防御 -->
+<div class="diagram-container">
+  <div class="diagram-title">攻撃パケットのフィルタリング</div>
+  <div class="defense-layers">
+    
+    <div class="attacker">😈 攻撃者</div>
+    <div class="attack-arrow"></div>
+
+    <!-- Shield -->
+    <div class="layer-box layer-shield">
+      🛡️ AWS Shield
+      <span class="filter-text">L3/L4 ネットワーク層 (インフラ防御)</span>
+    </div>
+
+    <!-- WAF -->
+    <div class="layer-box layer-waf">
+      🧱 AWS WAF
+      <span class="filter-text">L7 アプリケーション層 (Web防御)</span>
+    </div>
+
+    <!-- App -->
+    <div class="layer-box layer-app">
+      🏠 Webアプリ
+      <span class="filter-text">(ALB / CloudFront / EC2)</span>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    まずShieldで「量」をさばき、次にWAFで「質」をチェックする。
+  </p>
+</div>
+
+<h2>2. 役割の違いをメタファーで理解</h2>
+
+<!-- 図解：役割比較カード -->
+<div class="diagram-container">
+  <div class="diagram-title">防波堤と検問所</div>
+  <div class="role-grid">
+    
+    <!-- Shield -->
+    <div class="role-card shield">
+      <span class="role-icon">🌊</span>
+      <span class="role-name">AWS Shield</span>
+      <span class="role-type">ネットワークレベル防御</span>
+      <div class="role-desc">
+        <strong>「巨大な防波堤」</strong><br>
+        とにかく大量の水（パケット）が押し寄せてくるのを、物理的な強さで受け止める。<br>
+        中身は見ない。「量」で圧倒してくる攻撃を防ぐ。
+      </div>
+      <div class="attack-type-box">
+        <span class="type-label">防ぐ攻撃</span>
+        <span class="type-ex">SYN Flood, UDP Flood (回線パンク狙い)</span>
+      </div>
+    </div>
+
+    <!-- WAF -->
+    <div class="role-card waf">
+      <span class="role-icon">👮</span>
+      <span class="role-name">AWS WAF</span>
+      <span class="role-type">アプリレベル防御</span>
+      <div class="role-desc">
+        <strong>「入り口の検問官」</strong><br>
+        一人ひとりの顔（リクエストの中身）を見て、「お前は怪しいから通さない」と判断する。<br>
+        「質」の悪い攻撃を防ぐ。
+      </div>
+      <div class="attack-type-box">
+        <span class="type-label">防ぐ攻撃</span>
+        <span class="type-ex">SQLインジェクション, HTTP Flood (負荷狙い)</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. WAFが防ぐ「DDoS」とは？</h2>
+<p>
+  DDoS攻撃には種類があります。
+</p>
+<ul>
+  <li><strong>ボリューム型（Shieldの担当）</strong>: 意味のないデータを大量に送りつけて回線を埋め尽くす攻撃。</li>
+  <li><strong>アプリケーション層攻撃（WAFの担当）</strong>: 「ログイン画面でわざと重い処理を連打する」ような、回線は埋めないけどサーバーのCPUを疲れさせる攻撃（HTTPフラッド）。</li>
+</ul>
+<p>
+  問題文にある「AWS WAFはDDoS攻撃を防ぐ」というのは、この<strong>「アプリケーション層へのDDoS（HTTPフラッド）」</strong>のことを指しています。<br>
+  WAFの<strong>「レートベースのルール（5分間に100回以上アクセスしたらブロック）」</strong>機能を使うことで、これを防げます。
+</p>
+
+<h2>4. 試験対策まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>AWS Shield</th>
+      <th>AWS WAF</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>レイヤー</strong></td>
+      <td>L3 / L4 (ネットワーク)</td>
+      <td>L7 (アプリケーション)</td>
+    </tr>
+    <tr>
+      <td><strong>守る対象</strong></td>
+      <td>インフラ全体</td>
+      <td>Webアプリの入り口</td>
+    </tr>
+    <tr>
+      <td><strong>攻撃の種類</strong></td>
+      <td>大規模トラフィック<br>(SYN/UDP Flood)</td>
+      <td>悪意あるリクエスト<br>(SQLi, XSS, HTTP Flood)</td>
+    </tr>
+    <tr>
+      <td><strong>導入</strong></td>
+      <td>Standardは<strong>自動付与 (無料)</strong></td>
+      <td>自分でルールを設定 (有料)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Shield</strong>: ネットワークレベルの「暴力（大量トラフィック）」を防ぐ盾。</li>
+  <li><strong>WAF</strong>: アプリレベルの「悪意（SQLインジェクションや連打）」を防ぐ壁。</li>
+</ul>
+<p>
+  「WAFでも（HTTPレベルの）DDoSは防げる」というのが正解です。両方を使って守るのがベストプラクティスです。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
