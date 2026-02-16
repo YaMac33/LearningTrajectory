@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | RESTエンドポイントの基礎</title>
+  <meta name="description" content="AppSyncがデータソースとして利用する「RESTエンドポイント」について解説。REST APIの基本構造と、GraphQLからREST APIを呼び出す仕組みを図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="RESTエンドポイントの基礎" />
+  <meta property="og:description" content="AppSyncがデータソースとして利用する「RESTエンドポイント」について解説。REST APIの基本構造と、GraphQLからREST APIを呼び出す仕組みを図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* URL構造分解 */
+    .url-structure {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: monospace;
+      padding: 10px;
+    }
+    .url-box {
+      background: #1e293b;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      display: flex;
+      gap: 5px;
+      font-size: 1.1em;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .part-method { color: #f59e0b; font-weight: bold; }
+    .part-domain { color: #cbd5e1; }
+    .part-path { color: #3b82f6; font-weight: bold; }
+    .part-param { color: #10b981; }
+    
+    .url-labels {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 500px;
+      justify-content: space-around;
+      font-size: 0.8em;
+      color: #64748b;
+      font-weight: bold;
+    }
+
+    /* AppSync連携フロー */
+    .sync-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      position: relative;
+    }
+    .row-gql { border-color: #f97316; color: #c2410c; background: #fff7ed; }
+    .row-appsync { border-color: #e11d48; color: #9f1239; background: #fff1f2; }
+    .row-rest { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    
+    .flow-icon { font-size: 1.5em; width: 40px; text-align: center; }
+    .flow-content strong { display: block; font-size: 1em; }
+    .flow-content span { font-size: 0.85em; font-family: monospace; }
+    
+    .arrow-down {
+      color: #94a3b8;
+      font-size: 1.5em;
+      line-height: 0.8;
+    }
+    .transform-badge {
+      font-size: 0.75em;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 2px 8px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      margin-left: 10px;
+    }
+
+    /* メタファー比較 */
+    .shop-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .shop-compare { grid-template-columns: 1fr; }
+    }
+    .shop-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+    }
+    .shop-rest { border-top: 4px solid #3b82f6; }
+    .shop-gql { border-top: 4px solid #f97316; }
+    
+    .shop-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .shop-title { font-weight: 800; color: #1e293b; margin-bottom: 5px; }
+    .shop-desc { font-size: 0.9em; color: #475569; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">RESTエンドポイントの基礎</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#AppSync</span>
+            <span class="tag">#REST</span>
+            <span class="tag">#API</span>
+            <span class="tag">#エンドポイント</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>RESTエンドポイントとは、HTTPでアクセスできるAPIのURLであり、AppSyncはそのようなREST APIをデータソースとして呼び出すことができます。</p>
+<hr>
+<p>
+  <strong>Q. 「AppSyncはRESTエンドポイントと同期できる」ってどういうこと？</strong><br>
+  <strong>A. 「AppSyncが、裏側で普通のWeb API（URL）を叩いてデータを取ってきてくれる」ということです。</strong>
+</p>
+<p>
+  「エンドポイント」という言葉が難しく聞こえますが、要するに<strong>「APIのURL（アクセス先）」</strong>のことです。<br>
+  AppSyncは、DynamoDBのようなAWSサービスだけでなく、インターネット上の普通のAPI（天気予報APIなど）もデータソースとして使える、ということを意味しています。
+</p>
+
+<h2>1. RESTエンドポイントとは？</h2>
+<p>
+  HTTPを使ってアクセスできる「データの窓口（URL）」のことです。
+</p>
+
+<!-- 図解：URL構造 -->
+<div class="diagram-container">
+  <div class="diagram-title">REST APIの構造</div>
+  <div class="url-structure">
+    <div class="url-box">
+      <span class="part-method">GET</span>
+      <span class="part-domain">https://api.example.com</span>
+      <span class="part-path">/users</span>
+      <span class="part-param">/1</span>
+    </div>
+    <div class="url-labels">
+      <span>メソッド</span>
+      <span>サーバー</span>
+      <span>パス</span>
+      <span>ID</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:10px;">
+    この「URL全体」がエンドポイント（Endpoint）です。
+  </p>
+</div>
+
+<ul>
+  <li><strong>メソッド</strong>: 何をしたいか（GET=取得, POST=作成, PUT=更新, DELETE=削除）。</li>
+  <li><strong>エンドポイント</strong>: どこにアクセスするか（URL）。</li>
+</ul>
+
+<h2>2. AppSyncとの連携（裏側の動き）</h2>
+<p>
+  AppSyncは「GraphQL」のサービスですが、その裏側で「REST API」を呼び出すことができます。<br>
+  つまり、クライアントはGraphQLだけを知っていればよく、AppSyncが通訳としてREST APIを叩いてくれます。
+</p>
+
+<!-- 図解：AppSync連携フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">データ取得の流れ</div>
+  <div class="sync-flow">
+    
+    <div class="flow-row row-gql">
+      <span class="flow-icon">📱</span>
+      <div class="flow-content">
+        <strong>Client (GraphQL)</strong>
+        <span>query { weather(city: "Tokyo") }</span>
+      </div>
+    </div>
+    
+    <div class="arrow-down">⬇</div>
+    
+    <div class="flow-row row-appsync">
+      <span class="flow-icon">🚀</span>
+      <div class="flow-content">
+        <strong>AWS AppSync</strong>
+        <span>リクエスト変換 (Mapping)</span>
+      </div>
+      <div class="transform-badge">通訳</div>
+    </div>
+
+    <div class="arrow-down">⬇</div>
+
+    <div class="flow-row row-rest">
+      <span class="flow-icon">☁️</span>
+      <div class="flow-content">
+        <strong>REST Endpoint</strong>
+        <span>GET https://api.weather.com/tokyo</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. RESTとGraphQLの違い（イメージ）</h2>
+<p>
+  なぜAppSync（GraphQL）を使うのでしょうか？ それは「窓口を一つにするため」です。
+</p>
+
+<!-- 図解：メタファー比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">窓口の違い</div>
+  <div class="shop-compare">
+    
+    <!-- REST -->
+    <div class="shop-card shop-rest">
+      <span class="shop-icon">🏪</span>
+      <span class="shop-title">RESTエンドポイント</span>
+      <div class="shop-desc">
+        <strong>「特定商品の売り場」</strong><br>
+        野菜は八百屋、肉は肉屋へ。<br>
+        URLごとに機能がバラバラ。
+      </div>
+    </div>
+
+    <!-- GraphQL -->
+    <div class="shop-card shop-gql">
+      <span class="shop-icon">🛎️</span>
+      <span class="shop-title">GraphQL (AppSync)</span>
+      <div class="shop-desc">
+        <strong>「総合コンシェルジュ」</strong><br>
+        「肉と野菜をください」と言えば、<br>
+        裏で買い集めて渡してくれる。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>REST API</th>
+      <th>GraphQL (AppSync)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>アクセス先</strong></td>
+      <td>機能ごとに<strong>複数のURL</strong>がある</td>
+      <td>たった<strong>1つのURL</strong> (エンドポイント)</td>
+    </tr>
+    <tr>
+      <td><strong>取得データ</strong></td>
+      <td>サーバーが決めた固定セット</td>
+      <td>クライアントが欲しい項目を指定</td>
+    </tr>
+    <tr>
+      <td><strong>連携</strong></td>
+      <td>直接叩く</td>
+      <td>AppSyncが裏でRESTを叩く</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>RESTエンドポイント</strong>: HTTPでアクセスできるAPIのURL（入口）。</li>
+  <li><strong>AppSyncの役割</strong>: GraphQLのリクエストを受け取り、裏側でRESTエンドポイントやDynamoDBなどにアクセスしてデータを集めてくる。</li>
+</ul>
+<p>
+  「AppSyncは、既存のWeb API（REST）もデータソースとして取り込める便利なハブ」だと覚えておけばOKです！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
