@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-s3-resilience",
+    "category": "awscp",
+    "timestamp": "2026-02-16T22:11:43+09:00",
+    "title": "S3のレジリエンスの理解",
+    "summary": "S3のレジリエンスとは、障害後の回復力を指します。One Zone-IAとStandardの比較を通じて、S3のレジリエンスの重要性を理解します。",
+    "tags": [
+      "AWS",
+      "S3",
+      "レジリエンス",
+      "One Zone-IA",
+      "可用性"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-16-awscp-s3-resilience/"
+  },
+  {
     "id": "awscp-aws-cp-bare-metal-access",
     "category": "awscp",
     "timestamp": "2026-02-16T20:38:15+09:00",
