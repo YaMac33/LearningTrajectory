@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 「疎結合」と「冗長性」の関係</title>
+  <meta name="description" content="「疎結合」と「冗長性」は混同しやすい概念です。それぞれの目的（依存を減らす vs 予備を持つ）と、組み合わせた時の効果を図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="「疎結合」と「冗長性」の関係" />
+  <meta property="og:description" content="「疎結合」と「冗長性」は混同しやすい概念です。それぞれの目的（依存を減らす vs 予備を持つ）と、組み合わせた時の効果を図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 概念メタファー */
+    .concept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .concept-grid { grid-template-columns: 1fr; }
+    }
+    .concept-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .card-loose { border-top: 4px solid #3b82f6; } /* Blue */
+    .card-redun { border-top: 4px solid #f97316; } /* Orange */
+    
+    .c-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .c-title { font-weight: 800; font-size: 1.1em; color: #1e293b; margin-bottom: 5px; display: block; }
+    .c-target { font-size: 0.9em; font-weight: bold; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; color: #475569; display: inline-block; margin-bottom: 10px; }
+    .c-desc { font-size: 0.9em; color: #475569; text-align: left; line-height: 1.5; }
+
+    /* 4象限マトリックス */
+    .matrix-box {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .matrix-header {
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #334155;
+    }
+    .matrix-cell {
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .cell-bad { border-color: #ef4444; background: #fef2f2; }
+    .cell-mid { border-color: #f59e0b; background: #fffbeb; }
+    .cell-good { border-color: #10b981; background: #ecfdf5; }
+    
+    /* 連結図 */
+    .link-viz {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .node-a { background: #3b82f6; color: #fff; padding: 4px 8px; border-radius: 4px; }
+    .node-b { background: #10b981; color: #fff; padding: 4px 8px; border-radius: 4px; }
+    .link-line { width: 20px; height: 2px; background: #94a3b8; }
+    .link-queue { border: 1px dashed #f59e0b; padding: 2px 4px; border-radius: 4px; color: #b45309; font-size: 0.7em; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">「疎結合」と「冗長性」の関係</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#アーキテクチャ</span>
+            <span class="tag">#疎結合</span>
+            <span class="tag">#冗長性</span>
+            <span class="tag">#設計</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>疎結合と冗長性は異なる概念です。両者を組み合わせることで強力なシステムになります。</p>
+<hr>
+<p>
+  <strong>Q. 「冗長性の向上はシステム設計の一部だが、疎結合が直接的に目指すものではない」という説明がピンときません。図解してください。</strong><br>
+  <strong>A. これは「何を防ぎたいか（目的）」の違いを整理するとスッキリします。</strong>
+</p>
+<p>
+  一言で言うと、<strong>「疎結合＝縁を切る（巻き添え防止）」</strong>、<strong>「冗長性＝予備を持つ（全滅防止）」</strong>です。<br>
+  この2つは独立した概念ですが、組み合わせることで最強のシステムになります。
+</p>
+
+<h2>1. 用語の定義とイメージ</h2>
+
+<!-- 図解：概念比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">目的の違い</div>
+  <div class="concept-grid">
+    
+    <!-- 疎結合 -->
+    <div class="concept-card card-loose">
+      <span class="c-icon">🔗</span>
+      <span class="c-title">疎結合 (Loose Coupling)</span>
+      <span class="c-target">関係性の話</span>
+      <div class="c-desc">
+        システム間の<strong>「依存」</strong>を減らす設計。<br>
+        Aが倒れても、Bは巻き添えを食らわない。<br>
+        (間にクッションを挟むイメージ)
+      </div>
+    </div>
+
+    <!-- 冗長性 -->
+    <div class="concept-card card-redun">
+      <span class="c-icon">👯</span>
+      <span class="c-title">冗長性 (Redundancy)</span>
+      <span class="c-target">数の話</span>
+      <div class="c-desc">
+        同じ機能を<strong>「複数」</strong>用意する設計。<br>
+        1つが壊れても、もう1つが代わりを務める。<br>
+        (スペアタイヤを持つイメージ)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 組み合わせマトリックス（これが本質）</h2>
+<p>
+  「疎結合だけど冗長じゃない」状態や、「冗長だけど密結合」な状態があり得ることを理解しましょう。
+</p>
+
+<!-- 図解：4象限マトリックス -->
+<div class="diagram-container">
+  <div class="diagram-title">結合度 × 多重度 の組み合わせ</div>
+  <div class="matrix-box">
+    <div></div>
+    <div class="matrix-header">単一構成<br>(冗長性なし)</div>
+    <div class="matrix-header">複数構成<br>(冗長性あり)</div>
+    
+    <div class="matrix-header" style="writing-mode: vertical-rl;">密結合<br>(直結)</div>
+    <div class="matrix-cell cell-bad">
+      <div class="link-viz">
+        <div class="node-a">A</div>
+        <div class="link-line"></div>
+        <div class="node-b">B</div>
+      </div>
+      <span style="font-size:0.8em; color:#b91c1c; font-weight:bold;">最弱</span>
+      <span style="font-size:0.7em;">Bが死ぬとAも死ぬ。<br>予備もない。</span>
+    </div>
+    <div class="matrix-cell cell-mid">
+      <div class="link-viz">
+        <div class="node-a">A</div>
+        <div class="link-line"></div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div class="node-b">B1</div>
+          <div class="node-b">B2</div>
+        </div>
+      </div>
+      <span style="font-size:0.8em; color:#b45309; font-weight:bold;">惜しい</span>
+      <span style="font-size:0.7em;">予備はあるが、<br>AがBの場所を知りすぎている。</span>
+    </div>
+    
+    <div class="matrix-header" style="writing-mode: vertical-rl;">疎結合<br>(SQS等)</div>
+    <div class="matrix-cell cell-mid">
+      <div class="link-viz">
+        <div class="node-a">A</div>
+        <div class="link-queue">SQS</div>
+        <div class="node-b">B</div>
+      </div>
+      <span style="font-size:0.8em; color:#b45309; font-weight:bold;">惜しい</span>
+      <span style="font-size:0.7em;">依存は弱いが、<br>Bが死ぬと処理が止まる。</span>
+    </div>
+    <div class="matrix-cell cell-good">
+      <div class="link-viz">
+        <div class="node-a">A</div>
+        <div class="link-queue">SQS</div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div class="node-b">B1</div>
+          <div class="node-b">B2</div>
+        </div>
+      </div>
+      <span style="font-size:0.8em; color:#166534; font-weight:bold;">最強</span>
+      <span style="font-size:0.7em;">AはBを知らない。<br>Bが片方死んでも続く。</span>
+    </div>
+  </div>
+</div>
+
+<h2>3. なぜ「疎結合の目的は冗長性ではない」のか？</h2>
+<p>
+  上の図の左下（疎結合×単一）を見てください。<br>
+  間にSQS（キュー）を挟んで「疎結合」にしましたが、処理するサーバーBは1台しかありません。もしBが故障したら、処理は止まってしまいます（可用性は低いまま）。
+</p>
+<p>
+  つまり、<strong>「疎結合にしたからといって、自動的に予備が増えるわけではない」</strong>のです。<br>
+  疎結合にする目的は、「AとBを切り離して、お互いの変更や障害の影響を直接受けないようにすること」です。
+</p>
+
+<h2>4. 試験対策：比較表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>疎結合 (Loose Coupling)</th>
+      <th>冗長性 (Redundancy)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>目的</strong></td>
+      <td>依存を減らす、拡張しやすくする</td>
+      <td>壊れても止まらないようにする（可用性）</td>
+    </tr>
+    <tr>
+      <td><strong>主な手段</strong></td>
+      <td>SQS, SNS, ELB (ロードバランサー)</td>
+      <td>Multi-AZ, Auto Scaling (複数台構成)</td>
+    </tr>
+    <tr>
+      <td><strong>対象</strong></td>
+      <td>コンポーネント間の<strong>「つながり方」</strong></td>
+      <td>リソースの<strong>「数と配置」</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>疎結合</strong> ＝ つながりを弱くする（クッションを挟む）。</li>
+  <li><strong>冗長性</strong> ＝ 数を増やす（予備を用意する）。</li>
+</ul>
+<p>
+  この2つを組み合わせることで、<strong>「柔軟で（疎結合）、かつ壊れにくい（冗長化された）システム」</strong>が完成します。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
