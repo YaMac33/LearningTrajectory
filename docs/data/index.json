@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cp-bare-metal-access",
+    "category": "awscp",
+    "timestamp": "2026-02-16T20:38:15+09:00",
+    "title": "プロセッサーとメモリーとベアメタル",
+    "summary": "プロセッサーとメモリーの基本を理解し、ベアメタルインスタンスの特徴を学びます。直接アクセスの必要性についても解説します。",
+    "tags": [
+      "AWS",
+      "EC2",
+      "ベアメタル",
+      "CPU",
+      "メモリ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-16-awscp-aws-cp-bare-metal-access/"
+  },
+  {
     "id": "awscp-customer-gateway-basics",
     "category": "awscp",
     "timestamp": "2026-02-16T19:32:44+09:00",
