@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-loose-coupling-redundancy",
+    "category": "awscp",
+    "timestamp": "2026-02-17T08:31:23+09:00",
+    "title": "「疎結合」と「冗長性」の基礎理解",
+    "summary": "本記事では、疎結合と冗長性の異なる目的を理解し、両者の組み合わせがシステム設計に与える効果を学びます。",
+    "tags": [
+      "AWS",
+      "アーキテクチャ",
+      "疎結合",
+      "冗長性",
+      "設計"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-17-awscp-loose-coupling-redundancy/"
+  },
+  {
     "id": "awscp-appconfig-vs-config-differences",
     "category": "awscp",
     "timestamp": "2026-02-17T07:55:12+09:00",
