@@ -1,0 +1,21 @@
+{
+  "id": "awscp-graphql-pubsub-api-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-17T06:50:05+09:00",
+  "post_path": "awscp/posts/2026-02-17-awscp-graphql-pubsub-api-basics/",
+  "meta": {
+    "title": "GraphQLとPub/Sub APIの基礎",
+    "summary": "AWS AppSyncにおけるGraphQLとPub/Sub APIの理解を深め、効率的なデータ取得やリアルタイム通知の仕組みを学ぶことができます。",
+    "tags": [
+      "AWS",
+      "AppSync",
+      "GraphQL",
+      "API",
+      "PubSub"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ]
+  }
+}
