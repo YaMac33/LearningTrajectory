@@ -1,0 +1,21 @@
+{
+  "id": "awscp-customer-gateway-basics",
+  "category": "awscp",
+  "timestamp": "2026-02-16T19:32:44+09:00",
+  "post_path": "awscp/posts/2026-02-16-awscp-customer-gateway-basics/",
+  "meta": {
+    "title": "AWS Site-to-Site VPNのカスタマーゲートウェイ概説",
+    "summary": "AWSのSite-to-Site VPNにおけるカスタマーゲートウェイの役割や特徴を理解できる記事です。自社側の装置としての役割や、AWS側の仮想プライベートゲートウェイとの関係について解説します。",
+    "tags": [
+      "AWS",
+      "VPN",
+      "Customer Gateway",
+      "ネットワーク",
+      "VPC"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
