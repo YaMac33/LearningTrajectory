@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-rest-api-basics",
+    "category": "awscp",
+    "timestamp": "2026-02-17T06:59:15+09:00",
+    "title": "AWS-CPに向けたRESTエンドポイントの基礎",
+    "summary": "RESTエンドポイントの概念と、AppSyncを介してそれを利用する方法を理解できます。HTTPを通じてのデータアクセスとAPIの役割を学習します。",
+    "tags": [
+      "AWS",
+      "AppSync",
+      "REST",
+      "API",
+      "エンドポイント"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-17-awscp-rest-api-basics/"
+  },
+  {
     "id": "awscp-graphql-pubsub-api-basics",
     "category": "awscp",
     "timestamp": "2026-02-17T06:50:05+09:00",
