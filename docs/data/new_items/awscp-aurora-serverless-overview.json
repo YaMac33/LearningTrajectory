@@ -1,0 +1,22 @@
+{
+  "id": "awscp-aurora-serverless-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-18T06:55:40+09:00",
+  "post_path": "awscp/posts/2026-02-18-awscp-aurora-serverless-overview/",
+  "meta": {
+    "title": "Aurora Serverlessの概要と特徴",
+    "summary": "Aurora Serverlessは、サーバー管理不要で自動スケールするリレーショナルデータベースです。試験では、そのキャパシティ管理の簡略化や自動スケーリングが重要なポイントとなります。",
+    "tags": [
+      "AWS",
+      "Aurora",
+      "Serverless",
+      "RDS",
+      "データベース",
+      "スケーリング"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
