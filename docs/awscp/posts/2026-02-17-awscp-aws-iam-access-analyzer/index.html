@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS IAM Access Analyzerの概要</title>
+  <meta name="description" content="AWS IAM Access Analyzerは、S3やIAMロールなどのリソースに対する意図しない外部アクセスを検出し、組織のポリシー違反を可視化するサービスです。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS IAM Access Analyzerの概要" />
+  <meta property="og:description" content="AWS IAM Access Analyzerは、S3やIAMロールなどのリソースに対する意図しない外部アクセスを検出し、組織のポリシー違反を可視化するサービスです。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 外部公開の危険性図 */
+    .danger-zone {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 20px;
+      position: relative;
+    }
+    .my-account {
+      border: 2px dashed #64748b;
+      padding: 20px;
+      border-radius: 12px;
+      background: #fff;
+      position: relative;
+      text-align: center;
+    }
+    .my-account::before {
+      content: "自社AWSアカウント";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #fff;
+      padding: 0 8px;
+      color: #64748b;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .resource-item {
+      border: 2px solid;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin: 10px 0;
+      font-weight: bold;
+      background: #fff;
+    }
+    .res-s3 { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .res-iam { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    
+    .leak-arrow {
+      color: #ef4444;
+      font-size: 2em;
+      animation: flash 1.5s infinite;
+    }
+    @keyframes flash { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+    
+    .internet-zone {
+      font-size: 3em;
+      color: #94a3b8;
+      text-align: center;
+    }
+    
+    /* 検出フロー */
+    .analyze-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .flow-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 20px;
+      background: #fff;
+      text-align: center;
+      width: 200px;
+      font-weight: bold;
+    }
+    .card-analyzer { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    .card-alert { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+    .flow-down { font-size: 1.5em; color: #cbd5e1; line-height: 0.8; }
+
+    /* 役割比較 */
+    .role-matrix {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .matrix-item {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+      background: #fff;
+    }
+    .matrix-title { font-weight: bold; font-size: 0.9em; display: block; margin-bottom: 5px; }
+    .matrix-desc { font-size: 0.8em; color: #475569; }
+    .matrix-icon { font-size: 1.5em; display: block; margin-bottom: 5px; }
+
+    /* メタファー */
+    .key-check {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+    }
+    .check-box {
+      text-align: center;
+    }
+    .check-icon { font-size: 3em; display: block; margin-bottom: 5px; }
+    .check-text { font-weight: bold; color: #1e293b; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-17">
+            2026.02.17
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS IAM Access Analyzerの概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#IAM</span>
+            <span class="tag">#Access Analyzer</span>
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#ガバナンス</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>IAM Access Analyzerは、S3やIAMロールなどのリソースに対する意図しない外部アクセスを検出し、組織のポリシー違反を可視化するサービスです。</p>
+<hr>
+<p>
+  <strong>AWS IAM Access Analyzer</strong> は、一言で言うと<strong>「あなたのAWS環境が、意図せず外部に公開されていないかを自動でチェックしてくれる警備員」</strong>です。<br>
+  「S3バケットをうっかり全世界公開にしてしまった」「開発用のIAMロールを外部のアカウントからも使えるようにしてしまった」といった設定ミスを数理的に分析して教えてくれます。
+</p>
+
+<h2>1. 何を見張っているのか？</h2>
+<p>
+  Access Analyzerが見ているのは、リソースに設定された「ポリシー（許可証）」です。
+</p>
+
+<!-- 図解：危険な状態 -->
+<div class="diagram-container">
+  <div class="diagram-title">検出対象となる「穴」</div>
+  <div class="danger-zone">
+    <div class="my-account">
+      <div class="resource-item res-s3">🪣 S3 (Public)</div>
+      <div class="resource-item res-iam">🎭 IAMロール</div>
+    </div>
+    
+    <div class="leak-arrow">➡ 🔓</div>
+    
+    <div class="internet-zone">
+      ☁️<br><span style="font-size:0.3em; color:#64748b; font-weight:bold;">インターネット / 他人</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#ef4444; margin-top:10px; font-weight:bold;">
+    「誰でもアクセスOK（Principal: *）」になっていないか？
+  </p>
+</div>
+
+<ul>
+  <li><strong>主な監視対象</strong>: S3バケット、IAMロール、KMSキー、Lambda関数、SQSキューなど。</li>
+  <li><strong>チェック内容</strong>: ポリシーの中に <code>Principal: "*"</code>（誰でもOK）や、<code>Principal: "arn:aws:iam::123456789012:root"</code>（知らない他人のアカウント）が含まれていないか。</li>
+</ul>
+
+<h2>2. 検出の流れ</h2>
+<p>
+  Access Analyzerを有効にすると、バックグラウンドで自動的に分析が始まります。
+</p>
+
+<!-- 図解：検出フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">分析と通知のプロセス</div>
+  <div class="analyze-flow">
+    <div class="flow-card">
+      📁 各種リソース<br>
+      <span style="font-size:0.8em; font-weight:normal;">(ポリシー変更を検知)</span>
+    </div>
+    <div class="flow-down">⬇</div>
+    <div class="flow-card card-analyzer">
+      🔍 Access Analyzer<br>
+      <span style="font-size:0.8em; font-weight:normal;">(論理的に解析)</span>
+    </div>
+    <div class="flow-down">⬇</div>
+    <div class="flow-card card-alert">
+      🚨 アラート<br>
+      <span style="font-size:0.8em; font-weight:normal;">「外部公開されています」</span>
+    </div>
+  </div>
+</div>
+
+<h2>3. 他のセキュリティサービスとの違い</h2>
+<p>
+  「IAM」「Config」「CloudTrail」と何が違うの？と混乱しがちですが、役割が明確に分かれています。
+</p>
+
+<!-- 図解：役割マトリックス -->
+<div class="diagram-container">
+  <div class="diagram-title">セキュリティサービスの役割分担</div>
+  <div class="role-matrix">
+    <div class="matrix-item" style="border-top: 3px solid #3b82f6;">
+      <span class="matrix-icon">🔐</span>
+      <span class="matrix-title">IAM</span>
+      <span class="matrix-desc">権限を<strong>「設定」</strong>する</span>
+    </div>
+    <div class="matrix-item" style="border-top: 3px solid #10b981;">
+      <span class="matrix-icon">📐</span>
+      <span class="matrix-title">Config</span>
+      <span class="matrix-desc">設定履歴を<strong>「記録」</strong>する</span>
+    </div>
+    <div class="matrix-item" style="border-top: 3px solid #64748b;">
+      <span class="matrix-icon">👣</span>
+      <span class="matrix-title">CloudTrail</span>
+      <span class="matrix-desc">操作ログを<strong>「記録」</strong>する</span>
+    </div>
+    <div class="matrix-item" style="border-top: 3px solid #ef4444; background:#fff7ed;">
+      <span class="matrix-icon">🧐</span>
+      <span class="matrix-title">Access Analyzer</span>
+      <span class="matrix-desc">外部公開を<strong>「検出」</strong>する</span>
+    </div>
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>役割のイメージ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>IAM</strong></td>
+      <td>鍵を取り付ける人。</td>
+    </tr>
+    <tr>
+      <td><strong>Access Analyzer</strong></td>
+      <td><strong>「鍵が開いていないか（外部から入れるか）」をチェックする人。</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Config</strong></td>
+      <td>「いつ誰が鍵を変えたか」を記録するカメラ。</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. 試験対策キーワード</h2>
+<p>
+  問題文に以下の言葉が出てきたら、IAM Access Analyzer が正解です。
+</p>
+<ul>
+  <li>「<strong>意図しない（Unintended）</strong>外部アクセスを検出したい」</li>
+  <li>「S3バケットやIAMロールが<strong>パブリックに公開</strong>されていないか確認したい」</li>
+  <li>「<strong>クロスアカウント</strong>アクセス権限の分析を行いたい」</li>
+</ul>
+
+<h2>まとめ</h2>
+
+<div class="diagram-container">
+  <div class="diagram-title">シンプルなイメージ</div>
+  <div class="key-check">
+    <div class="check-box">
+      <span class="check-icon">🔒</span>
+      <span class="check-text">IAM = 施錠</span>
+    </div>
+    <div style="font-size:2em; color:#94a3b8;">➕</div>
+    <div class="check-box">
+      <span class="check-icon">🔦</span>
+      <span class="check-text">Analyzer = 点検</span>
+    </div>
+  </div>
+</div>
+
+<p>
+  <strong>IAM Access Analyzerは、「設定ミスによる情報漏洩（うっかり公開）」を防ぐための最後の砦</strong>です。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
