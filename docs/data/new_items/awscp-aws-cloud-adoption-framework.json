@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-cloud-adoption-framework",
+  "category": "awscp",
+  "timestamp": "2026-02-17T18:39:07+09:00",
+  "post_path": "awscp/posts/2026-02-17-awscp-aws-cloud-adoption-framework/",
+  "meta": {
+    "title": "AWSクラウド導入フレームワーク（CAF）の概要",
+    "summary": "AWS CAFは技術だけでなく組織や人材を含むクラウド導入の変革ガイドです。全体像と6つのパースペクティブを通じてビジネス成功に繋げる方法を学びます。",
+    "tags": [
+      "AWS",
+      "CAF",
+      "クラウド導入",
+      "フレームワーク",
+      "DX"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
