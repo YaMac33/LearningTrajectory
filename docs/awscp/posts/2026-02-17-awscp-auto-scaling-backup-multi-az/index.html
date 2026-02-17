@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 自動スケーリングと自動バックアップとデフォルトマルチAZ</title>
+  <meta name="description" content="S3、RDS、DynamoDBの「自動スケーリング」「自動バックアップ」「デフォルトマルチAZ」の対応状況を整理。特にRDSのマルチAZがデフォルトではない点について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="自動スケーリングと自動バックアップとデフォルトマルチAZ" />
+  <meta property="og:description" content="S3、RDS、DynamoDBの「自動スケーリング」「自動バックアップ」「デフォルトマルチAZ」の対応状況を整理。特にRDSのマルチAZがデフォルトではない点について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 3サービス機能比較マトリックス */
+    .feature-matrix {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    .matrix-head {
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      font-size: 0.9em;
+      color: #475569;
+    }
+    .svc-header {
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+    }
+    .icon-s3 { font-size: 1.5em; }
+    .icon-rds { font-size: 1.5em; }
+    .icon-ddb { font-size: 1.5em; }
+    
+    .cell-box {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 15px 5px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 0.9em;
+      background: #fff;
+    }
+    .cell-ok {
+      background: #ecfdf5;
+      color: #047857;
+      border-color: #10b981;
+    }
+    .cell-ng {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #ef4444;
+    }
+    .cell-opt {
+      background: #fffbeb;
+      color: #b45309;
+      border-color: #f59e0b;
+    }
+    .sub-text {
+      display: block;
+      font-size: 0.75em;
+      font-weight: normal;
+      margin-top: 4px;
+    }
+
+    /* RDSの注意点図解 */
+    .rds-focus {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 20px;
+    }
+    .rds-mode {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      width: 160px;
+      position: relative;
+    }
+    .mode-single { border-color: #64748b; background: #fff; color: #475569; }
+    .mode-multi { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    
+    .mode-label { font-weight: bold; margin-bottom: 10px; display: block; }
+    .az-icon { font-size: 2em; display: block; }
+    .default-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #64748b;
+      color: #fff;
+      font-size: 0.7em;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .opt-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3b82f6;
+      color: #fff;
+      font-size: 0.7em;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">自動スケーリングと自動バックアップとデフォルトマルチAZ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#S3</span>
+            <span class="tag">#RDS</span>
+            <span class="tag">#DynamoDB</span>
+            <span class="tag">#スケーリング</span>
+            <span class="tag">#バックアップ</span>
+            <span class="tag">#マルチAZ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>3大サービスの「デフォルト機能」の違いを整理。RDSのマルチAZはデフォルトではない点に注意。</p>
+<hr>
+<p>
+  <strong>Q. 「自動スケーリング→S3」「自動バックアップ→RDS」「デフォルトでマルチAZ→DynamoDB, S3」という認識で合っていますか？</strong><br>
+  <strong>A. ほぼ正解です！ただし、RDSのマルチAZについては「オプション（デフォルトではない）」という点だけ補正すれば完璧です。</strong>
+</p>
+<p>
+  各サービスが「何もしなくてもやってくれること（デフォルト）」と「設定すればできること（オプション）」を図で整理します。
+</p>
+
+<h2>1. 3大サービスの機能対応表（一目瞭然）</h2>
+<p>
+  サービスの性格によって「デフォルトの充実度」が違います。
+</p>
+
+<!-- 図解：機能マトリックス -->
+<div class="diagram-container">
+  <div class="diagram-title">デフォルト機能の比較</div>
+  <div class="feature-matrix">
+    <div></div>
+    <div class="matrix-head">自動スケール</div>
+    <div class="matrix-head">自動バックアップ</div>
+    <div class="matrix-head">デフォルトMulti-AZ</div>
+
+    <div class="svc-header"><span class="icon-s3">🪣</span> S3</div>
+    <div class="cell-box cell-ok">◎ 完全自動<span class="sub-text">容量無制限</span></div>
+    <div class="cell-box cell-ok">◎ (高耐久)<span class="sub-text">イレブンナイン</span></div>
+    <div class="cell-box cell-ok">◎ はい<span class="sub-text">3AZにコピー</span></div>
+
+    <div class="svc-header"><span class="icon-ddb">⚡</span> DynamoDB</div>
+    <div class="cell-box cell-opt">△ 設定次第<span class="sub-text">オンデマンドなら〇</span></div>
+    <div class="cell-box cell-opt">△ オプション<span class="sub-text">PITRは設定必要</span></div>
+    <div class="cell-box cell-ok">◎ はい<span class="sub-text">3AZにコピー</span></div>
+
+    <div class="svc-header"><span class="icon-rds">🗄️</span> RDS</div>
+    <div class="cell-box cell-opt">△ ストレージのみ<span class="sub-text">計算資源は手動</span></div>
+    <div class="cell-box cell-ok">◎ はい<span class="sub-text">デフォルト有効</span></div>
+    <div class="cell-box cell-ng">❌ いいえ<span class="sub-text">シングルが標準</span></div>
+  </div>
+</div>
+
+<h2>2. それぞれの補足解説</h2>
+
+<h3>① 自動スケーリング → S3 (正解)</h3>
+<p>
+  <strong>S3は最強です。</strong><br>
+  「容量を増やす」という操作が存在しません。データを入れれば勝手に裏でディスクが増え、アクセスが増えれば勝手に処理能力が上がります。<br>
+  ※DynamoDBも「オンデマンドモード」にすれば自動スケールしますが、S3ほど「完全無意識」ではありません。
+</p>
+
+<h3>② 自動バックアップ → RDS (正解)</h3>
+<p>
+  <strong>RDSは「バックアップの優等生」です。</strong><br>
+  DB作成時にデフォルトで「自動バックアップ」が有効になっています。これにより、特定の時刻（5分前など）への復元（ポイントインタイムリカバリ）が可能です。<br>
+  ※DynamoDBもバックアップ機能はありますが、デフォルトでPITRが有効になっているわけではありません。
+</p>
+
+<h3>③ デフォルトマルチAZ → S3, DynamoDB (正解)、RDS (注意！)</h3>
+<p>
+  ここが今回の最重要ポイントです。
+</p>
+<ul>
+  <li><strong>S3 / DynamoDB</strong>: サービスを作った瞬間から、AWSが勝手に3つのAZにデータをコピーしてくれます。「AZ障害でデータが消えた」ということは（Standardクラスなら）まずありえません。</li>
+  <li><strong>RDS</strong>: 昔ながらのサーバーベースのDBなので、<strong>デフォルトでは「シングルAZ（1台構成）」</strong>です。「マルチAZ」にするには、作成時にチェックを入れる（課金が増える）必要があります。</li>
+</ul>
+
+<!-- 図解：RDSの構成 -->
+<div class="diagram-container">
+  <div class="diagram-title">RDSの構成パターン</div>
+  <div class="rds-focus">
+    <div class="rds-mode mode-single">
+      <span class="default-badge">Default</span>
+      <span class="mode-label">シングルAZ</span>
+      <span class="az-icon">🏢</span>
+      <p style="font-size:0.8em; margin-top:5px;">AZ障害で止まる。<br>開発用など。</p>
+    </div>
+    <div class="rds-mode mode-multi">
+      <span class="opt-badge">Option</span>
+      <span class="mode-label">マルチAZ</span>
+      <span class="az-icon">🏢 ⇄ 🏢</span>
+      <p style="font-size:0.8em; margin-top:5px;">予備機がある。<br>本番用。</p>
+    </div>
+  </div>
+</div>
+
+<h2>まとめ：試験用超圧縮暗記</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>サービス</th>
+      <th>特徴 (試験的ステレオタイプ)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>S3</strong></td>
+      <td>何もしなくても<strong>「勝手に拡張」「勝手に冗長化」</strong>される最強ストレージ。</td>
+    </tr>
+    <tr>
+      <td><strong>DynamoDB</strong></td>
+      <td><strong>「デフォルトでマルチAZ」</strong>。スケールは設定次第。</td>
+    </tr>
+    <tr>
+      <td><strong>RDS</strong></td>
+      <td><strong>「バックアップは自動」</strong>だが、<strong>「マルチAZは選択制」</strong>。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  あなたの認識はほぼ完璧ですが、<strong>「RDSは明示的に頼まないとマルチAZにならない（ケチることができる）」</strong>と覚えておけば、ひっかけ問題も回避できます！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
