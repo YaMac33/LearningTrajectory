@@ -1,0 +1,21 @@
+{
+  "id": "awscp-s3-client-side-encryption",
+  "category": "awscp",
+  "timestamp": "2026-02-18T07:33:20+09:00",
+  "post_path": "awscp/posts/2026-02-18-awscp-s3-client-side-encryption/",
+  "meta": {
+    "title": "S3のクライアントサイド暗号化の理解",
+    "summary": "CSEはクライアント側でデータを暗号化する方式であり、S3のサーバーサイド暗号化との違いを正しく理解することが試験で重要です。",
+    "tags": [
+      "AWS",
+      "S3",
+      "暗号化",
+      "CSE",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
