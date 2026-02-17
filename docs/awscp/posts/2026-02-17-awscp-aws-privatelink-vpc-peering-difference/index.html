@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AWS PrivateLinkの基本とVPCピアリングとの違い</title>
+  <meta name="description" content="AWS PrivateLinkの仕組みとメリットを解説。VPCピアリングとの決定的な違いや、インターネットを経由しないセキュアな接続アーキテクチャについて図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AWS PrivateLinkの基本とVPCピアリングとの違い" />
+  <meta property="og:description" content="AWS PrivateLinkの仕組みとメリットを解説。VPCピアリングとの決定的な違いや、インターネットを経由しないセキュアな接続アーキテクチャについて図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 接続方式の比較 */
+    .connect-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .connect-compare { grid-template-columns: 1fr; }
+    }
+    .connect-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-peering { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    .card-pl { border-top: 4px solid #10b981; background: #ecfdf5; }
+    
+    .connect-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+      width: 100%;
+    }
+    .vpc-node {
+      border: 2px solid #64748b;
+      padding: 8px;
+      border-radius: 6px;
+      background: #fff;
+      font-weight: bold;
+      color: #1e293b;
+      font-size: 0.9em;
+      min-width: 60px;
+    }
+    .arrow-peer {
+      flex: 1;
+      height: 6px;
+      background: #3b82f6;
+      position: relative;
+    }
+    .arrow-peer::after, .arrow-peer::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+    .arrow-peer::after { right: -5px; border-left: 10px solid #3b82f6; }
+    .arrow-peer::before { left: -5px; border-right: 10px solid #3b82f6; }
+    
+    .arrow-pl {
+      flex: 1;
+      height: 2px;
+      background: #10b981;
+      position: relative;
+    }
+    .arrow-pl::after {
+      content: "▶";
+      position: absolute;
+      right: -2px;
+      top: -10px;
+      color: #10b981;
+      font-size: 1.2em;
+    }
+    .svc-point {
+      width: 12px; height: 12px; background: #f59e0b; border-radius: 50%;
+      position: absolute; right: 0; top: -5px;
+      box-shadow: 0 0 5px #f59e0b;
+    }
+
+    /* ネットワーク経路比較 */
+    .route-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .route-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+    }
+    .route-row.internet { border-left: 5px solid #ef4444; }
+    .route-row.private { border-left: 5px solid #10b981; }
+    
+    .route-label { font-weight: bold; width: 80px; font-size: 0.9em; text-align: right; }
+    .route-diagram { flex: 1; display: flex; align-items: center; justify-content: space-between; font-size: 0.8em; color: #64748b; }
+    .route-icon { font-size: 1.5em; }
+    .route-path {
+      flex: 1;
+      border-bottom: 2px dashed #94a3b8;
+      position: relative;
+      margin: 0 10px;
+      text-align: center;
+    }
+    .path-bad { border-color: #ef4444; color: #ef4444; }
+    .path-good { border-color: #10b981; border-style: solid; color: #10b981; }
+    .path-text { background: #fff; padding: 0 4px; position: relative; top: 10px; font-size: 0.75em; font-weight: bold; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-17">
+            2026.02.17
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AWS PrivateLinkの基本とVPCピアリングとの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#PrivateLink</span>
+            <span class="tag">#VPC</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#セキュリティ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AWS PrivateLinkは、インターネットを経由せずAWS内部ネットワークのみで安全に接続できる仕組みです。</p>
+<hr>
+<p>
+  <strong>AWS PrivateLink</strong> を使うと、<strong>「他のAWSアカウントから自社のアプリケーションへ、インターネットを経由せず、AWSの内部ネットワークのみで安全に接続」</strong>できます。<br>
+  VPC同士を繋ぐ技術ですが、「VPCピアリング」とは目的も挙動も全く異なります。
+</p>
+
+<h2>1. VPCピアリングとの違い（面か、点か）</h2>
+<p>
+  2つのVPCを繋ぐとき、ネットワーク全体を繋ぐのか、特定のサービスだけを繋ぐのかの違いがあります。
+</p>
+
+<!-- 図解：ピアリング vs PrivateLink -->
+<div class="diagram-container">
+  <div class="diagram-title">接続形態の違い</div>
+  <div class="connect-compare">
+    
+    <!-- VPCピアリング -->
+    <div class="connect-card card-peering">
+      <strong>VPCピアリング</strong>
+      <div class="connect-visual">
+        <div class="vpc-node">VPC A</div>
+        <div class="arrow-peer"></div>
+        <div class="vpc-node">VPC B</div>
+      </div>
+      <p style="font-size:0.9em; text-align:left; color:#1e3a8a;">
+        <strong>「ネットワーク同士の結合」</strong><br>
+        お互いの全リソースが見える。<br>
+        IPアドレス重複はNG。<br>
+        双方向通信が可能。
+      </p>
+    </div>
+
+    <!-- PrivateLink -->
+    <div class="connect-card card-pl">
+      <strong>PrivateLink</strong>
+      <div class="connect-visual">
+        <div class="vpc-node">VPC A</div>
+        <div class="arrow-pl"><div class="svc-point"></div></div>
+        <div class="vpc-node">VPC B</div>
+      </div>
+      <p style="font-size:0.9em; text-align:left; color:#065f46;">
+        <strong>「特定サービスへの接続」</strong><br>
+        指定したアプリだけ公開。<br>
+        IPアドレス重複OK。<br>
+        一方向（利用→提供）のみ。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h3>VPCピアリング（面で繋ぐ）</h3>
+<ul>
+  <li><strong>特徴</strong>: 2つのネットワークを合体させるイメージ。相手のネットワークが丸見えになります。</li>
+  <li><strong>用途</strong>: 社内の部署間接続、データベースへの直接アクセスなど、信頼できる相手との相互通信。</li>
+</ul>
+
+<h3>PrivateLink（点で繋ぐ）</h3>
+<ul>
+  <li><strong>特徴</strong>: 相手のVPCの中身は見えません。「公開された1つのサービス（NLB）」だけにアクセスできます。</li>
+  <li><strong>用途</strong>: SaaS提供、他社へのAPI公開、セキュリティを重視した一方向連携。</li>
+</ul>
+
+<h2>2. インターネット経由との比較（安全性）</h2>
+<p>
+  なぜわざわざ PrivateLink を使うのか？ それは「インターネットを通すリスク」を排除するためです。
+</p>
+
+<!-- 図解：経路の比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">データ経路の比較</div>
+  <div class="route-grid">
+    
+    <!-- インターネット -->
+    <div class="route-row internet">
+      <div class="route-label">通常</div>
+      <div class="route-diagram">
+        <div class="route-icon">🏢</div>
+        <div class="route-path path-bad">
+          <span class="path-text">Internet 🌍</span>
+        </div>
+        <div class="route-icon">☁️</div>
+      </div>
+      <div style="font-size:0.8em; color:#ef4444; font-weight:bold; width:80px;">
+        攻撃リスク有<br>IP公開必須
+      </div>
+    </div>
+
+    <!-- PrivateLink -->
+    <div class="route-row private">
+      <div class="route-label">PrivateLink</div>
+      <div class="route-diagram">
+        <div class="route-icon">🏢</div>
+        <div class="route-path path-good">
+          <span class="path-text">AWS Backbone 🔒</span>
+        </div>
+        <div class="route-icon">☁️</div>
+      </div>
+      <div style="font-size:0.8em; color:#10b981; font-weight:bold; width:80px;">
+        閉域網<br>IP公開不要
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<ul>
+  <li><strong>通常</strong>: インターネットを経由するため、パブリックIPが必要ですし、DDoS攻撃や盗聴のリスクがあります。</li>
+  <li><strong>PrivateLink</strong>: AWSの巨大な専用ネットワーク（バックボーン）の中だけで通信が完結します。インターネットに出ないため、パブリックIPも不要で、外部からの攻撃を受けません。</li>
+</ul>
+
+<h2>3. 構成要素（エンドポイントとNLB）</h2>
+<p>
+  PrivateLinkを実現するには、以下の2つのパーツが必要です。
+</p>
+<ul>
+  <li><strong>利用者側 (Consumer)</strong>: <strong>「インターフェースエンドポイント (Interface Endpoint)」</strong>を作成します。これがVPC内に作られる「入り口」になります。</li>
+  <li><strong>提供者側 (Provider)</strong>: アプリケーションの前に <strong>「Network Load Balancer (NLB)」</strong> を置きます。これが「出口」になります。</li>
+</ul>
+
+<h2>まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>VPCピアリング</th>
+      <th>AWS PrivateLink</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>接続単位</strong></td>
+      <td>VPC全体 (ネットワーク)</td>
+      <td>特定のサービス (アプリケーション)</td>
+    </tr>
+    <tr>
+      <td><strong>方向</strong></td>
+      <td>双方向</td>
+      <td>一方向 (Consumer → Provider)</td>
+    </tr>
+    <tr>
+      <td><strong>IP重複</strong></td>
+      <td>不可 (設計調整が必要)</td>
+      <td><strong>可能</strong> (気にしなくて良い)</td>
+    </tr>
+    <tr>
+      <td><strong>主な用途</strong></td>
+      <td>社内ネットワーク統合</td>
+      <td>SaaS利用、API公開、セキュア接続</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>「VPCピアリングはネットワーク同士をつなぐ。PrivateLinkはサービスだけを安全に公開する。」</strong><br>
+  この違いを覚えておけば、設計や試験で迷うことはありません！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
