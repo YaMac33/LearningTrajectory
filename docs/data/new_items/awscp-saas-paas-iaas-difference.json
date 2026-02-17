@@ -1,0 +1,21 @@
+{
+  "id": "awscp-saas-paas-iaas-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-17T20:53:19+09:00",
+  "post_path": "awscp/posts/2026-02-17-awscp-saas-paas-iaas-difference/",
+  "meta": {
+    "title": "SaaS/PaaS/IaaS の違いを解説",
+    "summary": "IaaS、PaaS、SaaSの違いを理解し、試験に向けての判断基準を学ぶことができます。",
+    "tags": [
+      "AWS",
+      "IaaS",
+      "PaaS",
+      "SaaS",
+      "クラウド"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
