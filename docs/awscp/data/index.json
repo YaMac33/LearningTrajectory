@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-iam-access-analyzer",
+    "category": "awscp",
+    "timestamp": "2026-02-17T19:10:15+09:00",
+    "title": "AWS IAM Access Analyzerの基本解説",
+    "summary": "AWS IAM Access Analyzerは、リソースへの意図しない外部アクセスを検出し、ポリシー違反を可視化するサービスです。試験ではこのサービスの役割と特徴を理解しておくことが重要です。",
+    "tags": [
+      "AWS",
+      "IAM",
+      "Access Analyzer",
+      "セキュリティ",
+      "ガバナンス"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-17-awscp-aws-iam-access-analyzer/"
+  },
+  {
     "id": "awscp-aws-privatelink-vpc-peering-difference",
     "category": "awscp",
     "timestamp": "2026-02-17T18:52:57+09:00",
