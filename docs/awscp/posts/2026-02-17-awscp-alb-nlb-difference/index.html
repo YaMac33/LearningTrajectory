@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ALBとNLBの違いまとめ</title>
+  <meta name="description" content="EC2インスタンスとアプリケーションの関係性を整理し、ALB（Webアプリ向け）とNLB（ネットワーク通信向け）の試験的な判断基準を明確に解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ALBとNLBの違いまとめ" />
+  <meta property="og:description" content="EC2インスタンスとアプリケーションの関係性を整理し、ALB（Webアプリ向け）とNLB（ネットワーク通信向け）の試験的な判断基準を明確に解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* EC2構造図（箱と中身） */
+    .server-structure {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .ec2-box {
+      border: 3px solid #f97316; /* Compute Orange */
+      background: #fff7ed;
+      border-radius: 12px;
+      padding: 20px;
+      width: 200px;
+      position: relative;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .ec2-label {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f97316;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .layer-item {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #475569;
+    }
+    .layer-app {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1e40af;
+      padding: 10px;
+    }
+
+    /* LB比較カード */
+    .lb-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .lb-compare { grid-template-columns: 1fr; }
+    }
+    .lb-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fff;
+      text-align: center;
+    }
+    .lb-card.alb { border-top: 4px solid #3b82f6; }
+    .lb-card.nlb { border-top: 4px solid #f97316; }
+    
+    .lb-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .lb-name { font-weight: 800; font-size: 1.1em; margin-bottom: 5px; display: block; color: #1e293b; }
+    .lb-layer {
+      display: inline-block;
+      font-size: 0.8em;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .lb-desc { font-size: 0.9em; color: #475569; text-align: left; }
+
+    /* 判定フローチャート */
+    .decision-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .decision-box {
+      border: 2px solid #64748b;
+      border-radius: 8px;
+      padding: 10px 20px;
+      background: #fff;
+      text-align: center;
+      font-weight: bold;
+      max-width: 300px;
+    }
+    .decision-arrow { font-size: 1.5em; color: #94a3b8; line-height: 0.8; }
+    .result-row {
+      display: flex;
+      gap: 30px;
+    }
+    .res-box {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #fff;
+      min-width: 100px;
+      text-align: center;
+    }
+    .res-alb { background: #3b82f6; }
+    .res-nlb { background: #f97316; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-15">
+            2026.02.15
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ALBとNLBの違いまとめ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#ALB</span>
+            <span class="tag">#NLB</span>
+            <span class="tag">#ELB</span>
+            <span class="tag">#試験対策</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>EC2インスタンスとアプリの関係、そしてALBとNLBの決定的な違いを整理します。</p>
+<hr>
+<p>
+  <strong>Application Load Balancer (ALB)</strong> と <strong>Network Load Balancer (NLB)</strong> の違いは、試験で最も頻出するトピックの一つです。<br>
+  「EC2インスタンス」という言葉の解釈から、適切なロードバランサーを選ぶための思考プロセスをまとめます。
+</p>
+
+<h2>1. EC2インスタンス ＝ アプリなのか？</h2>
+<p>
+  まず大前提として、<strong>「EC2インスタンス ＝ アプリケーション」ではありません。</strong><br>
+  EC2はあくまで「サーバー（箱）」であり、その中でアプリケーション（中身）が動いています。
+</p>
+
+<!-- 図解：EC2の構造 -->
+<div class="diagram-container">
+  <div class="diagram-title">EC2インスタンスの構造</div>
+  <div class="server-structure">
+    <div class="ec2-box">
+      <div class="ec2-label">EC2インスタンス</div>
+      <div class="layer-stack">
+        <div class="layer-item layer-app">アプリケーション</div>
+        <div class="layer-item">ミドルウェア (Web/DB)</div>
+        <div class="layer-item">OS (Linux/Windows)</div>
+        <div class="layer-item" style="background:#f1f5f9;">ハードウェア</div>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#64748b; margin-top:-10px;">
+    試験で「EC2」と出たら、基本的には中の「Webアプリ」を含意していることが多い。
+  </p>
+</div>
+
+<h3>試験での読み解き方</h3>
+<p>
+  問題文に「EC2インスタンスでトラフィックを分散」とあった場合、それは多くの場合<strong>「（EC2で動いている）Webアプリケーションへのアクセスを分散」</strong>という意味です。<br>
+  そのため、Webアプリに特化した <strong>ALB</strong> が正解になるケースが圧倒的に多くなります。
+</p>
+
+<h2>2. なぜNLBが不正解になるのか？</h2>
+<p>
+  技術的には NLB でも Webサーバーへの負荷分散は可能です（TCP 80/443ポートで転送すればいいので）。<br>
+  しかし、<strong>「得意分野（OSI参照モデルのレイヤー）」</strong>が違います。
+</p>
+
+<!-- 図解：LBの比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">レイヤーと役割の違い</div>
+  <div class="lb-compare">
+    
+    <!-- ALB -->
+    <div class="lb-card alb">
+      <span class="lb-icon">🧠</span>
+      <span class="lb-name">ALB</span>
+      <span class="lb-layer">L7 (アプリ層)</span>
+      <div class="lb-desc">
+        <strong>HTTPを理解する。</strong><br>
+        「このURLはあっちのサーバーへ」といった賢い振り分けができる。<br>
+        Webアプリには最適。
+      </div>
+    </div>
+
+    <!-- NLB -->
+    <div class="lb-card nlb">
+      <span class="lb-icon">🏎️</span>
+      <span class="lb-name">NLB</span>
+      <span class="lb-layer">L4 (トランスポート層)</span>
+      <div class="lb-desc">
+        <strong>通信を理解しない。</strong><br>
+        「IPとポート」だけを見て、パケットを高速に流す土管。<br>
+        Web特有の機能はない。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  Webアプリは「URLのパス（/api, /img）」や「HTTPヘッダー」を使った制御を求めることが多いため、それらを理解できないNLBは（間違いではないものの）<strong>「最適解」ではない</strong>と判断されます。
+</p>
+
+<h2>3. NLBが正解になるケース（4つの条件）</h2>
+<p>
+  逆に、NLBを選ばなければならない明確な条件があります。
+</p>
+<ul>
+  <li><strong>TCP/UDP 通信</strong>: ゲームサーバー、IoT、データベース接続など、HTTP以外のプロトコルを使う場合。</li>
+  <li><strong>固定IPが必要</strong>: ALBのIPは変動しますが、NLBはElastic IPを割り当てて固定できます。</li>
+  <li><strong>超低レイテンシ・高スループット</strong>: 金融取引システムなど、ミリ秒単位の遅延も許されない場合。</li>
+  <li><strong>TLSオフロードをしない</strong>: 暗号化を解かずにそのままサーバーへ通したい場合（※ALBもパススルーは可能だが、NLBの方が適している場合がある）。</li>
+</ul>
+
+<h2>4. まとめ：試験での判断チャート</h2>
+
+<!-- 図解：判断フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">ロードバランサー選定フロー</div>
+  <div class="decision-tree">
+    <div class="decision-box">Webアプリ / HTTP(S) ですか？</div>
+    <div class="decision-arrow">⬇</div>
+    <div style="display:flex; gap:50px; width:100%; justify-content:center;">
+      <div style="text-align:center;">
+        <span style="font-weight:bold; color:#3b82f6;">YES</span>
+        <div class="decision-arrow">⬇</div>
+        <div class="res-box res-alb">ALB</div>
+      </div>
+      <div style="text-align:center;">
+        <span style="font-weight:bold; color:#f97316;">NO</span>
+        <div class="decision-arrow">⬇</div>
+        <div class="res-box res-nlb">NLB</div>
+      </div>
+    </div>
+    <div style="margin-top:10px; font-size:0.85em; color:#64748b;">
+      ※ただし「固定IP必須」ならWebでもNLB
+    </div>
+  </div>
+</div>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>条件キーワード</th>
+      <th>選択すべきLB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Webアプリ、HTTP/HTTPS、パスベース</td>
+      <td><strong>ALB</strong></td>
+    </tr>
+    <tr>
+      <td>TCP/UDP、ゲーム、データベース、IoT</td>
+      <td><strong>NLB</strong></td>
+    </tr>
+    <tr>
+      <td>静的IP (固定IP)、Elastic IP</td>
+      <td><strong>NLB</strong></td>
+    </tr>
+    <tr>
+      <td>数百万リクエスト/秒、超低遅延</td>
+      <td><strong>NLB</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>「Webを分けるならALB、通信を分けるならNLB」</strong>。<br>
+  基本はこれでOKです！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
