@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-emr-spark-hive-presto",
+    "category": "awscp",
+    "timestamp": "2026-02-17T18:00:25+09:00",
+    "title": "Apache Spark・Hive・Prestoの概要",
+    "summary": "AWSのEMRで使われるSpark、Hive、Prestoの特徴を比較し、各エンジンの処理能力を理解することができます。",
+    "tags": [
+      "AWS",
+      "EMR",
+      "Spark",
+      "Hive",
+      "Presto",
+      "ビッグデータ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "コンピューティング(EC2/Lambda)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-17-awscp-aws-emr-spark-hive-presto/"
+  },
+  {
     "id": "awscp-loose-coupling-redundancy",
     "category": "awscp",
     "timestamp": "2026-02-17T08:31:23+09:00",
