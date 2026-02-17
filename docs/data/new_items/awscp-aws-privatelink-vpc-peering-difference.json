@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-privatelink-vpc-peering-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-17T18:52:57+09:00",
+  "post_path": "awscp/posts/2026-02-17-awscp-aws-privatelink-vpc-peering-difference/",
+  "meta": {
+    "title": "AWS PrivateLinkとVPCピアリングの違い",
+    "summary": "AWS PrivateLinkの重要な機能とVPCピアリングとの違いについて解説しています。特に、セキュリティ面での利点が理解できます。",
+    "tags": [
+      "AWS",
+      "PrivateLink",
+      "VPC",
+      "ネットワーク",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
