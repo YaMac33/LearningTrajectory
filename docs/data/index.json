@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-alb-nlb-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-17T19:29:53+09:00",
+    "title": "ALBとNLBの違いを理解しよう",
+    "summary": "ALBとNLBの違いを整理し、EC2インスタンスとの関連性を把握することで、試験対策に役立つ知識が得られます。",
+    "tags": [
+      "AWS",
+      "ALB",
+      "NLB",
+      "ELB",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-17-awscp-alb-nlb-difference/"
+  },
+  {
     "id": "awscp-aws-iam-access-analyzer",
     "category": "awscp",
     "timestamp": "2026-02-17T19:10:15+09:00",
@@ -294,28 +315,6 @@
     "dr": null,
     "status": "public",
     "post_path": "awscp/posts/2026-02-15-awscp-elb-pre-warming/"
-  },
-  {
-    "id": "awscp-alb-nlb-difference",
-    "category": "awscp",
-    "timestamp": "2026-02-15T08:07:35+09:00",
-    "title": "ALBとNLBの違いを理解する",
-    "summary": "ALBとNLBの機能の違いをレイヤーや用途の観点から解説し、試験での判断ポイントを整理します。",
-    "tags": [
-      "AWS",
-      "ALB",
-      "NLB",
-      "ロードバランサー",
-      "ELB",
-      "ネットワーク"
-    ],
-    "taxonomy": [
-      "AWSのコアサービス",
-      "ネットワーク(VPC/Route53)"
-    ],
-    "dr": null,
-    "status": "public",
-    "post_path": "awscp/posts/2026-02-15-awscp-alb-nlb-difference/"
   },
   {
     "id": "awscp-customer-gateway-basic",
