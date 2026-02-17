@@ -1,0 +1,21 @@
+{
+  "id": "awscp-nlb-container-relations",
+  "category": "awscp",
+  "timestamp": "2026-02-18T06:59:50+09:00",
+  "post_path": "awscp/posts/2026-02-18-awscp-nlb-container-relations/",
+  "meta": {
+    "title": "NLBとコンテナアプリの関連性",
+    "summary": "NLBがコンテナ環境（ECS/EKS）に適している理由を理解し、高速・低遅延なトラフィック分散の特性を学べます。",
+    "tags": [
+      "AWS",
+      "NLB",
+      "ECS",
+      "EKS",
+      "コンテナ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
