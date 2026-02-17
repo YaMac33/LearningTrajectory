@@ -1,0 +1,23 @@
+{
+  "id": "awscp-auto-scaling-backup-multi-az",
+  "category": "awscp",
+  "timestamp": "2026-02-17T20:13:18+09:00",
+  "post_path": "awscp/posts/2026-02-17-awscp-auto-scaling-backup-multi-az/",
+  "meta": {
+    "title": "自動スケーリングとバックアップ機能の違い",
+    "summary": "S3、RDS、DynamoDBの自動スケーリングやバックアップ機能の違いについて説明し、特にRDSのマルチAZの重要性を理解します。",
+    "tags": [
+      "AWS",
+      "S3",
+      "RDS",
+      "DynamoDB",
+      "スケーリング",
+      "バックアップ",
+      "マルチAZ"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "可用性と耐障害性"
+    ]
+  }
+}
