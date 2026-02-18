@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | CIDR（Classless Inter-Domain Routing）の概要</title>
+  <meta name="description" content="CIDRはIPアドレスを柔軟に区切る仕組みです。クラスフル方式との違いや、サブネット分割の計算方法を図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CIDR（Classless Inter-Domain Routing）の概要" />
+  <meta property="og:description" content="CIDRはIPアドレスを柔軟に区切る仕組みです。クラスフル方式との違いや、サブネット分割の計算方法を図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* クラスフル vs CIDR 箱の比較 */
+    .box-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .box-compare { grid-template-columns: 1fr; }
+    }
+    .box-model {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .box-model.old { border-top: 4px solid #64748b; background: #f8fafc; }
+    .box-model.new { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    
+    .box-title { font-weight: 800; color: #1e293b; font-size: 1.1em; }
+    
+    /* 固定サイズの箱 */
+    .fixed-boxes {
+      display: flex;
+      gap: 5px;
+      align-items: flex-end;
+    }
+    .fb-s { width: 30px; height: 30px; background: #cbd5e1; border: 1px solid #64748b; display: flex; align-items: center; justify-content: center; font-size: 0.7em; }
+    .fb-m { width: 50px; height: 50px; background: #94a3b8; border: 1px solid #64748b; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8em; }
+    .fb-l { width: 80px; height: 80px; background: #64748b; border: 1px solid #334155; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; }
+    
+    /* 可変サイズの箱 */
+    .cidr-slider {
+      width: 100%;
+      height: 40px;
+      background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+      position: relative;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .cidr-cut {
+      position: absolute;
+      top: -5px;
+      bottom: -5px;
+      width: 2px;
+      background: #ef4444;
+      left: 70%; /* カット位置 */
+    }
+    .cidr-cut::before {
+      content: "✂️";
+      position: absolute;
+      top: -20px;
+      left: -10px;
+      font-size: 1.2em;
+    }
+    .cidr-label {
+      position: absolute;
+      bottom: -25px;
+      width: 100%;
+      text-align: center;
+      font-size: 0.8em;
+      color: #3b82f6;
+      font-weight: bold;
+    }
+
+    /* ビット分割図 */
+    .bit-diagram {
+      font-family: monospace;
+      background: #1e293b;
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      text-align: center;
+    }
+    .bit-row {
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+      margin-bottom: 5px;
+    }
+    .bit-block {
+      display: inline-block;
+      padding: 4px;
+      border: 1px solid #475569;
+      color: #94a3b8;
+    }
+    .bit-net { background: #3b82f6; color: #fff; border-color: #1d4ed8; }
+    .bit-host { background: #f59e0b; color: #fff; border-color: #b45309; }
+    .bit-desc {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.8em;
+      color: #cbd5e1;
+    }
+
+    /* VPC分割イメージ */
+    .vpc-split {
+      border: 2px solid #3b82f6;
+      background: #eff6ff;
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+      text-align: center;
+    }
+    .vpc-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #3b82f6;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .subnet-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .subnet-box {
+      border: 2px dashed #f59e0b;
+      background: #fffbeb;
+      padding: 10px;
+      border-radius: 6px;
+      color: #b45309;
+      font-weight: bold;
+      font-size: 0.85em;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-18">
+            2026.02.18
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CIDR（Classless Inter-Domain Routing）の概要</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#CIDR</span>
+            <span class="tag">#IPアドレス</span>
+            <span class="tag">#VPC</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>CIDRはIPアドレスをビット単位で柔軟に分割する仕組みです。VPC設計の基礎となる考え方を解説します。</p>
+<hr>
+<p>
+  <strong>CIDR（サイダー：Classless Inter-Domain Routing）</strong> は、一言で言うと<strong>「IPアドレスという『土地』の区画整理を、自由な広さでできるようにした仕組み」</strong>です。<br>
+  これがないと、AWSのVPC（仮想ネットワーク）を自由に設計することができません。
+</p>
+
+<h2>1. 昔の「クラスフル方式」の問題点</h2>
+<p>
+  昔は、IPアドレスのネットワークサイズは「大・中・小」の3サイズ（クラスA, B, C）しか選べませんでした。
+</p>
+
+<!-- 図解：クラスフル vs CIDR -->
+<div class="diagram-container">
+  <div class="diagram-title">区切り方の進化</div>
+  <div class="box-compare">
+    
+    <!-- 昔 -->
+    <div class="box-model old">
+      <span class="box-title">昔 (クラスフル)</span>
+      <p style="font-size:0.85em; color:#475569;">サイズが決まっている</p>
+      <div class="fixed-boxes">
+        <div class="fb-s">C</div>
+        <div class="fb-m">B</div>
+        <div class="fb-l">A</div>
+      </div>
+      <p style="font-size:0.8em; color:#ef4444; margin-top:10px;">
+        「300台ほしい」<br>→ C(254)じゃ足りない<br>→ B(65,000)だと余りすぎ！
+      </p>
+    </div>
+
+    <!-- 今 -->
+    <div class="box-model new">
+      <span class="box-title">今 (CIDR)</span>
+      <p style="font-size:0.85em; color:#475569;">好きな場所で切れる</p>
+      <div class="cidr-slider">
+        <div class="cidr-cut"></div>
+      </div>
+      <span class="cidr-label">/16 ... /24 ... /28 ... 自由自在</span>
+      <p style="font-size:0.8em; color:#1d4ed8; margin-top:10px;">
+        「300台なら /23 (510個) でちょうどいい」
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<p>
+  クラスフル方式では「帯に短し襷に長し」状態で、貴重なIPアドレスが無駄になっていました。<br>
+  CIDRは「ビット単位」で区切ることで、この無駄を解消しました。
+</p>
+
+<h2>2. CIDR表記の読み方</h2>
+<p>
+  <code>192.168.1.0/26</code> のように、後ろに <code>/数字</code> をつけて表現します。<br>
+  この数字は<strong>「ネットワーク部（固定された住所）のビット数」</strong>を表しています。
+</p>
+
+<!-- 図解：ビット分割 -->
+<div class="diagram-container">
+  <div class="diagram-title">/26 の内訳 (32ビット中)</div>
+  <div class="bit-diagram">
+    <div class="bit-row">
+      <span class="bit-net">11111111</span>.<span class="bit-net">11111111</span>.<span class="bit-net">11111111</span>.<span class="bit-net">11</span><span class="bit-host">000000</span>
+    </div>
+    <div class="bit-desc">
+      <span>⬅ ネットワーク部 (26bit) ➡</span>
+      <span>ホスト (6bit) ➡</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.9em; margin-top:10px; color:#fff;">
+    残りのホスト部が 6bit なので、<br>
+    2の6乗 ＝ <strong>64個</strong> のIPが使える。
+  </p>
+</div>
+
+<ul>
+  <li><code>/24</code> → ホスト部 8bit (2^8 = 256個)</li>
+  <li><code>/26</code> → ホスト部 6bit (2^6 = 64個)</li>
+  <li><code>/28</code> → ホスト部 4bit (2^4 = 16個)</li>
+</ul>
+<p>
+  <strong>数字が大きくなるほど、ネットワークは小さくなります（使えるIPが減る）。</strong>
+</p>
+
+<h2>3. AWS VPCでの活用例</h2>
+<p>
+  AWSでは、最初に大きなCIDRでVPC（土地）を確保し、それを小さなCIDR（サブネット）に切り分けて使います。
+</p>
+
+<!-- 図解：VPC分割 -->
+<div class="diagram-container">
+  <div class="diagram-title">VPCとサブネットの設計</div>
+  <div class="vpc-split">
+    <div class="vpc-label">VPC (10.0.0.0/16)</div>
+    <p style="margin-top:15px; font-size:0.9em; color:#1e40af;">約65,000個のIPを確保</p>
+    
+    <div style="font-size:1.5em; color:#94a3b8; margin:5px 0;">⬇ 切り分け ⬇</div>
+
+    <div class="subnet-group">
+      <div class="subnet-box">
+        Public Subnet<br>
+        10.0.1.0/24<br>
+        (256個)
+      </div>
+      <div class="subnet-box">
+        Private Subnet<br>
+        10.0.2.0/24<br>
+        (256個)
+      </div>
+      <div class="subnet-box" style="border-style:dashed; opacity:0.6;">
+        予備エリア<br>
+        (残り大量)
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>CIDR</strong>: IPアドレスを「/数字」で柔軟に区切る方式。</li>
+  <li><strong>メリット</strong>: 必要な数だけIPアドレスを確保でき、無駄がない。</li>
+  <li><strong>ルール</strong>: <code>/</code>の後ろの数字が大きいほど、範囲は狭くなる。</li>
+</ul>
+<p>
+  「VPCを作るときは、まずCIDRで土地の広さを決める」と覚えておきましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
