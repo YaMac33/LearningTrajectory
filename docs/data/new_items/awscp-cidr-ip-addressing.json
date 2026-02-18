@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cidr-ip-addressing",
+  "category": "awscp",
+  "timestamp": "2026-02-18T12:28:23+09:00",
+  "post_path": "awscp/posts/2026-02-18-awscp-cidr-ip-addressing/",
+  "meta": {
+    "title": "CIDR（Classless Inter-Domain Routing）の概要",
+    "summary": "CIDRはIPアドレスを柔軟に区切る仕組みで、AWSのVPC設計に不可欠な考え方です。クラスフル方式の問題点を解消し、効率よくIPアドレスを管理できます。",
+    "tags": [
+      "AWS",
+      "ネットワーク",
+      "CIDR",
+      "IPアドレス",
+      "VPC"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "ネットワーク(VPC/Route53)"
+    ]
+  }
+}
