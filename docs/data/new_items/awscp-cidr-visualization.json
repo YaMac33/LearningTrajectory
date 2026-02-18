@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cidr-visualization",
+  "category": "awscp",
+  "timestamp": "2026-02-19T07:07:32+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-cidr-visualization/",
+  "meta": {
+    "title": "CIDRの視覚的理解を深める",
+    "summary": "CIDRの階層構造をマトリョーシカやマンションの視点で理解することができます。VPC、サブネット、ホストIPの関係を明確に例示します。",
+    "tags": [
+      "AWS",
+      "ネットワーク",
+      "CIDR",
+      "VPC",
+      "IPアドレス"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ]
+  }
+}
