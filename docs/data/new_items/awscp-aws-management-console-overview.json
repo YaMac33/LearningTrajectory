@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-management-console-overview",
+  "category": "awscp",
+  "timestamp": "2026-02-19T17:57:06+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-aws-management-console-overview/",
+  "meta": {
+    "title": "AWS Management Consoleの概要と操作",
+    "summary": "AWS Management Consoleは、AWSリソースを視覚的に操作するためのGUIであり、基本的な操作フローやメリットを理解できます。",
+    "tags": [
+      "AWS",
+      "マネジメントコンソール",
+      "GUI",
+      "操作方法",
+      "初心者"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "クラウドの特徴"
+    ]
+  }
+}
