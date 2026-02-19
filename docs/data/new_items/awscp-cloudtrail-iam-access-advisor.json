@@ -1,0 +1,21 @@
+{
+  "id": "awscp-cloudtrail-iam-access-advisor",
+  "category": "awscp",
+  "timestamp": "2026-02-19T20:46:58+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-cloudtrail-iam-access-advisor/",
+  "meta": {
+    "title": "CloudTrailとIAM Access Advisorの違いを理解する",
+    "summary": "CloudTrailとIAM Access Advisorの役割とデータ処理の違いを解説し、最終アクセス日時の確認における重要な知識を提供します。",
+    "tags": [
+      "AWS",
+      "IAM",
+      "CloudTrail",
+      "Access Advisor",
+      "監査"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "責任共有モデル"
+    ]
+  }
+}
