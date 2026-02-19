@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | Amazon TimestreamとSQSの違いと連携</title>
+  <meta name="description" content="時系列データベースのTimestreamとメッセージキューのSQS。それぞれの役割の違いと、IoT分野での鉄板連携アーキテクチャについて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Amazon TimestreamとSQSの違いと連携" />
+  <meta property="og:description" content="時系列データベースのTimestreamとメッセージキューのSQS。それぞれの役割の違いと、IoT分野での鉄板連携アーキテクチャについて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 役割比較カード */
+    .role-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .role-compare { grid-template-columns: 1fr; }
+    }
+    .role-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card-sqs { border-top: 4px solid #f59e0b; background: #fff7ed; } /* Orange */
+    .card-ts { border-top: 4px solid #8b5cf6; background: #f5f3ff; } /* Purple */
+    
+    .role-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .role-name { font-weight: 800; font-size: 1.1em; color: #1e293b; margin-bottom: 5px; }
+    .role-meta {
+      font-size: 0.85em; font-weight: bold; padding: 4px 12px; border-radius: 12px; color: #fff; margin-bottom: 15px;
+    }
+    .card-sqs .role-meta { background: #f59e0b; }
+    .card-ts .role-meta { background: #8b5cf6; }
+    .role-desc { font-size: 0.9em; color: #475569; line-height: 1.5; }
+
+    /* IoTアーキテクチャフロー */
+    .iot-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      position: relative;
+    }
+    .row-edge { border-color: #64748b; color: #334155; }
+    .row-core { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+    .row-sqs { border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .row-proc { border-color: #f97316; background: #fff7ed; color: #c2410c; }
+    .row-ts { border-color: #8b5cf6; background: #f5f3ff; color: #5b21b6; }
+    .row-viz { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    
+    .flow-icon { font-size: 1.5em; width: 40px; text-align: center; }
+    .flow-text strong { display: block; font-size: 1.05em; }
+    .flow-text span { font-size: 0.85em; font-weight: normal; }
+    
+    .flow-arrow-down {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 1.5em;
+      line-height: 0.8;
+      font-weight: bold;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-19">
+            2026.02.19
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">Amazon TimestreamとSQSの違いと連携</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#Timestream</span>
+            <span class="tag">#SQS</span>
+            <span class="tag">#IoT</span>
+            <span class="tag">#アーキテクチャ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>時系列DBのTimestreamとメッセージキューのSQS。それぞれの役割と、IoT分野での強力な連携について解説します。</p>
+<hr>
+<p>
+  <strong>Amazon Timestream</strong> と <strong>Amazon SQS</strong> は、どちらも大量のデータを扱うAWSのマネージドサービスですが、その役割は「倉庫」と「通路」くらい違います。<br>
+  これらを混同せず、適切に組み合わせることで、堅牢なIoTデータ処理基盤を作ることができます。
+</p>
+
+<h2>1. 決定的な違い：役割のメタファー</h2>
+<p>
+  それぞれのサービスを「場所」と「機能」でイメージしてみましょう。
+</p>
+
+<!-- 図解：役割比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">データ処理における役割</div>
+  <div class="role-compare">
+    
+    <!-- SQS -->
+    <div class="role-card card-sqs">
+      <span class="role-icon">📨</span>
+      <span class="role-name">Amazon SQS</span>
+      <span class="role-meta">通路・バッファ</span>
+      <div class="role-desc">
+        データを一時的に溜めて、次のシステムへ渡すための<strong>「行列（キュー）」</strong>。<br>
+        データは処理されたら消える。<br>
+        分析機能はない。
+      </div>
+    </div>
+
+    <!-- Timestream -->
+    <div class="role-card card-ts">
+      <span class="role-icon">📈</span>
+      <span class="role-name">Amazon Timestream</span>
+      <span class="role-meta">保存・分析場所</span>
+      <div class="role-desc">
+        データを時系列順に整理して保管する<strong>「データベース」</strong>。<br>
+        データはずっと残る。<br>
+        SQLクエリで分析できる。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 機能比較表</h2>
+<p>
+  「何ができるか」を比較すると、使い分けが明確になります。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>Amazon SQS</th>
+      <th>Amazon Timestream</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>主な用途</strong></td>
+      <td>非同期メッセージング、バッファ</td>
+      <td>IoTセンサーログ、メトリクス保存</td>
+    </tr>
+    <tr>
+      <td><strong>データ保持</strong></td>
+      <td>一時的 (最大14日)</td>
+      <td>長期的 (メモリ層 + 磁気層)</td>
+    </tr>
+    <tr>
+      <td><strong>データの扱い</strong></td>
+      <td>到着順に処理して削除</td>
+      <td>時間順に並べて分析・集計</td>
+    </tr>
+    <tr>
+      <td><strong>分析機能</strong></td>
+      <td>なし</td>
+      <td>あり (SQLライクなクエリ)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 鉄板の連携アーキテクチャ（IoTの場合）</h2>
+<p>
+  これらは「どっちを使う？」ではなく、<strong>「組み合わせて使う」</strong>のがIoTシステムの定石です。<br>
+  SQSが大量のデータを一時的に受け止め（バッファ）、Lambdaがそれを整形して、Timestreamに保存します。
+</p>
+
+<!-- 図解：IoTアーキテクチャ -->
+<div class="diagram-container">
+  <div class="diagram-title">IoTデータ処理の黄金ルート</div>
+  <div class="iot-flow">
+    
+    <div class="flow-row row-edge">
+      <span class="flow-icon">🌡️</span>
+      <div class="flow-text">
+        <strong>IoTデバイス / Greengrass</strong>
+        <span>データ発生・エッジ処理</span>
+      </div>
+    </div>
+    
+    <div class="flow-arrow-down">⬇</div>
+    
+    <div class="flow-row row-core">
+      <span class="flow-icon">☁️</span>
+      <div class="flow-text">
+        <strong>AWS IoT Core</strong>
+        <span>クラウドへの入り口 (MQTT)</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow-down">⬇</div>
+
+    <div class="flow-row row-sqs">
+      <span class="flow-icon">📦</span>
+      <div class="flow-text">
+        <strong>Amazon SQS</strong>
+        <span>★ バッファ (急な増減を吸収)</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow-down">⬇</div>
+
+    <div class="flow-row row-proc">
+      <span class="flow-icon">λ</span>
+      <div class="flow-text">
+        <strong>AWS Lambda</strong>
+        <span>データ整形・書き込み処理</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow-down">⬇</div>
+
+    <div class="flow-row row-ts">
+      <span class="flow-icon">📉</span>
+      <div class="flow-text">
+        <strong>Amazon Timestream</strong>
+        <span>★ 時系列データの保存・分析</span>
+      </div>
+    </div>
+
+    <div class="flow-arrow-down">⬇</div>
+
+    <div class="flow-row row-viz">
+      <span class="flow-icon">📊</span>
+      <div class="flow-text">
+        <strong>QuickSight / Grafana</strong>
+        <span>可視化・ダッシュボード</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h3>この構成のメリット</h3>
+<ul>
+  <li><strong>耐障害性</strong>: 突発的にデータが増えても、SQSがクッションになってくれるため、後続のLambdaやTimestreamがパンクしません。</li>
+  <li><strong>効率的な分析</strong>: Timestreamは時系列データに特化しているため、数億件のデータから「昨日の温度変化」などを一瞬でグラフ化できます。</li>
+</ul>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>SQS</strong>: データを安全に運ぶための<strong>「通路・バッファ」</strong>。</li>
+  <li><strong>Timestream</strong>: データを時系列で管理する<strong>「保存・分析場所」</strong>。</li>
+</ul>
+<p>
+  IoTシステムでは、「SQSで受け止めて、Timestreamに溜める」という流れをセットで覚えておきましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
