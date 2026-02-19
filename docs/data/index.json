@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-ebs-vs-instance-store",
+    "category": "awscp",
+    "timestamp": "2026-02-19T19:12:47+09:00",
+    "title": "EBSとインスタンスストアの違い",
+    "summary": "EBSとインスタンスストアの特徴と試験での重要ポイントを解説します。データの保存方法に関する理解を深めることができます。",
+    "tags": [
+      "EBS",
+      "インスタンスストア",
+      "クラウドストレージ",
+      "AWS",
+      "データ保存"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "IaaS/PaaS/SaaS"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-ebs-vs-instance-store/"
+  },
+  {
     "id": "awscp-ssl-tls-cloudhsm-offload",
     "category": "awscp",
     "timestamp": "2026-02-19T18:55:08+09:00",
@@ -1965,28 +1986,6 @@
     "dr": "2026-02-08_db-backups-rds-redshift-redis",
     "status": "public",
     "post_path": "awscp/posts/2026-02-08-awscp-db-backups-rds-redshift-redis/"
-  },
-  {
-    "id": "awscp-ebs-vs-instance-store",
-    "category": "awscp",
-    "timestamp": "2026-02-07T23:42:40+09:00",
-    "title": "EBSとインスタンスストアの違いと選び方",
-    "summary": "EC2のブロックストレージ比較。EBSは永続・スナップショット可、インスタンスストアは高速だが停止/終了で消失が頻出ポイント。",
-    "tags": [
-      "Amazon EBS",
-      "Amazon EC2",
-      "Instance Store",
-      "スナップショット",
-      "永続ストレージ",
-      "一時ストレージ"
-    ],
-    "taxonomy": [
-      "core_services",
-      "storage"
-    ],
-    "dr": "2026-02-07_ebs-vs-instance-store",
-    "status": "public",
-    "post_path": "awscp/posts/2026-02-07-awscp-ebs-vs-instance-store/"
   },
   {
     "id": "awscp-amazon-neptune-overview",
