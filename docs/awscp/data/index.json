@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-cost-optimization-spot-instances",
+    "category": "awscp",
+    "timestamp": "2026-02-19T15:38:42+09:00",
+    "title": "Auto Scalingとスポットインスタンスによるコスト削減",
+    "summary": "AWSのAuto Scalingとスポットインスタンスの組み合わせにより、可用性を維持しながらコストを効果的に削減する方法を解説します。",
+    "tags": [
+      "AWS",
+      "EC2",
+      "AutoScaling",
+      "スポットインスタンス",
+      "コスト削減"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "料金モデル"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-aws-cost-optimization-spot-instances/"
+  },
+  {
     "id": "awscp-aws-waf-applicable-services",
     "category": "awscp",
     "timestamp": "2026-02-19T12:35:06+09:00",
