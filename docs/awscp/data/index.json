@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-route53-waf-dns-firewall-difference",
+    "category": "awscp",
+    "timestamp": "2026-02-19T20:03:53+09:00",
+    "title": "Route53とWAFの違いを解説",
+    "summary": "WAFとRoute 53のプロトコルレベルでの違いを理解し、DNSを守る方法を学べます。",
+    "tags": [
+      "AWS",
+      "Route53",
+      "WAF",
+      "DNS Firewall",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-route53-waf-dns-firewall-difference/"
+  },
+  {
     "id": "awscp-aws-network-firewall-ips",
     "category": "awscp",
     "timestamp": "2026-02-19T19:59:21+09:00",
