@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-timestream-sqs-comparison",
+    "category": "awscp",
+    "timestamp": "2026-02-19T17:45:15+09:00",
+    "title": "Amazon TimestreamとSQSの違いと連携",
+    "summary": "Amazon TimestreamとSQSは異なる役割を持つAWSサービスであり、IoTシステムにおける有効な連携方法を理解することが重要です。",
+    "tags": [
+      "AWS",
+      "Timestream",
+      "SQS",
+      "IoT",
+      "アーキテクチャ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-aws-timestream-sqs-comparison/"
+  },
+  {
     "id": "awscp-aws-privatelink-ssl-tls",
     "category": "awscp",
     "timestamp": "2026-02-19T17:40:50+09:00",
