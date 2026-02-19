@@ -1,0 +1,21 @@
+{
+  "id": "awscp-memcached-redis-difference",
+  "category": "awscp",
+  "timestamp": "2026-02-19T17:49:27+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-memcached-redis-difference/",
+  "meta": {
+    "title": "MemcachedとRedisの違いを理解する",
+    "summary": "Amazon ElastiCacheでのMemcachedとRedisの選択ポイントとそれぞれの特徴を学ぶことで、効果的なキャッシュ戦略を理解できる。",
+    "tags": [
+      "AWS",
+      "ElastiCache",
+      "Redis",
+      "Memcached",
+      "キャッシュ"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "データベース(RDS/DynamoDB)"
+    ]
+  }
+}
