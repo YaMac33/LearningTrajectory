@@ -1,0 +1,24 @@
+{
+  "id": "awscp-ip-address-control-services",
+  "category": "awscp",
+  "timestamp": "2026-02-19T19:28:09+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-ip-address-control-services/",
+  "meta": {
+    "title": "IPアドレス制御に関するAWSサービスまとめ",
+    "summary": "AWSにおけるIPアドレスの制御が可能なサービスについて解説します。各サービスの特徴や防御層を理解することで、適切な選択ができるようになります。",
+    "tags": [
+      "AWS",
+      "セキュリティ",
+      "IP制限",
+      "WAF",
+      "CloudFront",
+      "ALB",
+      "Network Firewall",
+      "AWS Shield"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ]
+  }
+}
