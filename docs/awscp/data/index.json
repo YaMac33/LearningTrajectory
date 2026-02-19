@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-waf-applicable-services",
+    "category": "awscp",
+    "timestamp": "2026-02-19T12:35:06+09:00",
+    "title": "AWS WAFを適用できるサービス",
+    "summary": "AWS WAFの適用可能なサービスを理解し、EC2やNLBといったレイヤー4以下のサービスが対象外であることを学べます。",
+    "tags": [
+      "AWS",
+      "WAF",
+      "セキュリティ",
+      "ALB",
+      "API Gateway",
+      "CloudFront"
+    ],
+    "taxonomy": [
+      "クラウドの概念",
+      "レイヤーの理解"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-aws-waf-applicable-services/"
+  },
+  {
     "id": "awscp-aws-cloud-adoption-framework",
     "category": "awscp",
     "timestamp": "2026-02-19T07:12:31+09:00",
