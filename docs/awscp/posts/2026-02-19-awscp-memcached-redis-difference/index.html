@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | MemcachedとRedisの違い</title>
+  <meta name="description" content="Amazon ElastiCacheで選択できる2つのエンジン、MemcachedとRedisの違いを解説。スレッドモデル、データ構造、永続化の有無から最適な選び方を整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="MemcachedとRedisの違い" />
+  <meta property="og:description" content="Amazon ElastiCacheで選択できる2つのエンジン、MemcachedとRedisの違いを解説。スレッドモデル、データ構造、永続化の有無から最適な選び方を整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* エンジン比較カード */
+    .engine-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .engine-compare { grid-template-columns: 1fr; }
+    }
+    .engine-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+    }
+    .card-mem { border-top: 4px solid #3b82f6; background: #eff6ff; }
+    .card-redis { border-top: 4px solid #ef4444; background: #fef2f2; }
+    
+    .engine-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .engine-name { font-weight: 800; font-size: 1.2em; margin-bottom: 5px; display: block; color: #1e293b; }
+    .engine-badge {
+      display: inline-block;
+      font-size: 0.8em;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+    .card-mem .engine-badge { background: #3b82f6; }
+    .card-redis .engine-badge { background: #ef4444; }
+    
+    /* スレッドモデルの図 */
+    .thread-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .thread-lane {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      width: 100%;
+      justify-content: center;
+    }
+    .core-box {
+      width: 30px; height: 30px; background: #94a3b8; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; font-size: 0.8em;
+    }
+    .task-arrow { color: #64748b; font-weight: bold; }
+    
+    /* データ構造の図 */
+    .data-struct-box {
+      margin-top: 10px;
+      text-align: left;
+      font-size: 0.85em;
+      color: #475569;
+    }
+    .struct-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .struct-icon { font-size: 1.2em; }
+
+    /* 用途マトリックス */
+    .usecase-matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    .matrix-head {
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      color: #475569;
+    }
+    .matrix-cell {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.9em;
+      border-radius: 6px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cell-ok { color: #047857; background: #ecfdf5; border-color: #10b981; font-weight: bold; }
+    .cell-ng { color: #991b1b; background: #fef2f2; border-color: #ef4444; opacity: 0.7; }
+    .cell-sub { font-size: 0.75em; font-weight: normal; margin-top: 2px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-19">
+            2026.02.19
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">MemcachedとRedisの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AWS</span>
+            <span class="tag">#ElastiCache</span>
+            <span class="tag">#Redis</span>
+            <span class="tag">#Memcached</span>
+            <span class="tag">#キャッシュ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ElastiCacheの2つのエンジン、MemcachedとRedisの特徴と用途の違いを解説します。</p>
+<hr>
+<p>
+  <strong>Amazon ElastiCache</strong> を使うとき、最初に決断しなければならないのが<strong>「Memcachedにするか、Redisにするか」</strong>です。<br>
+  どちらも「メモリ上で動く超高速なデータベース」ですが、得意なこと（キャラクター）がはっきり違います。
+</p>
+
+<h2>1. キャラクターの違い：シンプル vs 多機能</h2>
+
+<!-- 図解：エンジン比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">ElastiCacheの2つの顔</div>
+  <div class="engine-compare">
+    
+    <!-- Memcached -->
+    <div class="engine-card card-mem">
+      <span class="engine-icon">Ⓜ️</span>
+      <span class="engine-name">Memcached</span>
+      <span class="engine-badge">マルチスレッド・シンプル</span>
+      
+      <div class="thread-visual">
+        <div style="font-size:0.8em; font-weight:bold; margin-bottom:5px;">並列処理 (Multi-Thread)</div>
+        <div class="thread-lane"><span class="task-arrow">➡</span><div class="core-box">C1</div></div>
+        <div class="thread-lane"><span class="task-arrow">➡</span><div class="core-box">C2</div></div>
+        <div class="thread-lane"><span class="task-arrow">➡</span><div class="core-box">C3</div></div>
+      </div>
+
+      <div class="data-struct-box">
+        <strong>扱えるデータ型:</strong><br>
+        <div class="struct-item"><span class="struct-icon">📦</span> 文字列 (String) のみ</div>
+      </div>
+    </div>
+
+    <!-- Redis -->
+    <div class="engine-card card-redis">
+      <span class="engine-icon">🔴</span>
+      <span class="engine-name">Redis</span>
+      <span class="engine-badge">シングルスレッド・多機能</span>
+      
+      <div class="thread-visual">
+        <div style="font-size:0.8em; font-weight:bold; margin-bottom:5px;">直列処理 (Single-Thread)</div>
+        <div class="thread-lane"><span class="task-arrow">➡➡➡</span><div class="core-box" style="background:#ef4444; width:40px;">C1</div></div>
+        <div style="font-size:0.7em; color:#94a3b8;">(※1コアで爆速処理)</div>
+      </div>
+
+      <div class="data-struct-box">
+        <strong>扱えるデータ型:</strong><br>
+        <div class="struct-item"><span class="struct-icon">📝</span> String (文字列)</div>
+        <div class="struct-item"><span class="struct-icon">📋</span> List (リスト)</div>
+        <div class="struct-item"><span class="struct-icon">🥇</span> Sorted Set (ランキング)</div>
+        <div class="struct-item"><span class="struct-icon">🗺️</span> Hash, Set, Geo...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h3>① Memcached（メムキャッシュド）</h3>
+<p>
+  <strong>「シンプルな高速キャッシュ箱」</strong>です。<br>
+  Key-Value形式の単純なデータしか扱えませんが、<strong>マルチスレッド</strong>で動作するため、CPUのコア数に応じて性能をスケールアップ（垂直分散）しやすいのが特徴です。<br>
+  「Webセッション情報」や「DBクエリ結果」を一時的に置くだけなら、これで十分かつ強力です。
+</p>
+
+<h3>② Redis（レディス）</h3>
+<p>
+  <strong>「データ構造を操作できる高機能キャッシュ＆DB」</strong>です。<br>
+  リスト、セット、ソート済みセット（ランキング）など、複雑なデータをそのまま扱えます。また、<strong>「データの永続化（バックアップ）」</strong>や「レプリケーション（複製）」機能も持っており、キャッシュ以上の役割を果たせます。<br>
+  基本はシングルスレッドですが、処理自体が極めて高速なため、通常はボトルネックになりません。
+</p>
+
+<h2>2. 機能比較まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>特徴</th>
+      <th>Memcached</th>
+      <th>Redis</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>処理モデル</strong></td>
+      <td><strong>マルチスレッド</strong><br>(並列処理が得意)</td>
+      <td><strong>シングルスレッド</strong><br>(1処理が爆速)</td>
+    </tr>
+    <tr>
+      <td><strong>データ型</strong></td>
+      <td>Stringのみ (シンプル)</td>
+      <td>List, Set, Hash, Sorted Set等 (複雑)</td>
+    </tr>
+    <tr>
+      <td><strong>永続化 (保存)</strong></td>
+      <td>なし (電源OFFで消える)</td>
+      <td><strong>あり</strong> (RDB/AOFで保存可能)</td>
+    </tr>
+    <tr>
+      <td><strong>スケーリング</strong></td>
+      <td>水平スケール (シャーディング)</td>
+      <td>クラスタリング、リードレプリカ</td>
+    </tr>
+    <tr>
+      <td><strong>Pub/Sub機能</strong></td>
+      <td>なし</td>
+      <td>あり (チャット等に利用可)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 用途別：どっちを選ぶ？</h2>
+<p>
+  実務での選び方をマトリックスで整理します。
+</p>
+
+<div class="diagram-container">
+  <div class="diagram-title">ElastiCacheの使い分け</div>
+  <div class="usecase-matrix">
+    <div class="matrix-head">用途</div>
+    <div class="matrix-head">Memcached</div>
+    <div class="matrix-head">Redis</div>
+    
+    <div class="matrix-cell"><strong>Webセッション</strong></div>
+    <div class="matrix-cell cell-ok">◎ 最適<span class="cell-sub">シンプル・高速</span></div>
+    <div class="matrix-cell cell-ok">○ 可能<span class="cell-sub">やや高機能すぎる</span></div>
+    
+    <div class="matrix-cell"><strong>ランキング</strong></div>
+    <div class="matrix-cell cell-ng">× 苦手<span class="cell-sub">アプリで計算必要</span></div>
+    <div class="matrix-cell cell-ok">◎ 最強<span class="cell-sub">Sorted Set機能</span></div>
+    
+    <div class="matrix-cell"><strong>永続化が必要</strong></div>
+    <div class="matrix-cell cell-ng">× 不可<span class="cell-sub">消える前提</span></div>
+    <div class="matrix-cell cell-ok">◎ 可能<span class="cell-sub">バックアップ可</span></div>
+    
+    <div class="matrix-cell"><strong>キャッシュ専用</strong></div>
+    <div class="matrix-cell cell-ok">◎ 向いている<span class="cell-sub">水平スケール容易</span></div>
+    <div class="matrix-cell cell-ok">○ 可能<span class="cell-sub">万能</span></div>
+  </div>
+</div>
+
+<h2>まとめ</h2>
+<ul>
+  <li><strong>Memcached</strong>: 「単純なキャッシュ」として、マルチスレッドで並列にさばきたい時。</li>
+  <li><strong>Redis</strong>: 「ランキング」「永続化」「複雑なデータ操作」など、高度な機能が必要な時。迷ったらRedisを選べば大体OK。</li>
+</ul>
+<p>
+  <strong>「Memcached = シンプルな箱」「Redis = 万能ナイフ付きの箱」</strong>と覚えておきましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
