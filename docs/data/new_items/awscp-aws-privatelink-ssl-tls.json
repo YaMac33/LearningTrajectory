@@ -1,0 +1,21 @@
+{
+  "id": "awscp-aws-privatelink-ssl-tls",
+  "category": "awscp",
+  "timestamp": "2026-02-19T17:40:50+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-aws-privatelink-ssl-tls/",
+  "meta": {
+    "title": "AWS PrivateLinkとSSL/TLSの重要性",
+    "summary": "AWS PrivateLinkの利用時にSSL/TLSが必要な理由を理解し、セキュリティの多層防御について学びます。",
+    "tags": [
+      "AWS",
+      "PrivateLink",
+      "SSL",
+      "TLS",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "暗号化(KMS)"
+    ]
+  }
+}
