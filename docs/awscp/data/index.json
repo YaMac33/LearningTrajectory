@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-aws-network-firewall-ips",
+    "category": "awscp",
+    "timestamp": "2026-02-19T19:59:21+09:00",
+    "title": "AWS Network FirewallのIPSとパケットフィルタリング",
+    "summary": "AWS Network FirewallはVPC境界でのパケットフィルタリングとIPS機能の提供により、通信を詳細に検査・遮断します。この内容を理解することで、セキュリティ強化の基礎が学べます。",
+    "tags": [
+      "AWS",
+      "Network Firewall",
+      "IPS",
+      "パケットフィルタリング",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-aws-network-firewall-ips/"
+  },
+  {
     "id": "awscp-ip-address-control-services",
     "category": "awscp",
     "timestamp": "2026-02-19T19:28:09+09:00",
