@@ -1,0 +1,21 @@
+{
+  "id": "awscp-control-tower-vs-cloudformation",
+  "category": "awscp",
+  "timestamp": "2026-02-19T20:31:03+09:00",
+  "post_path": "awscp/posts/2026-02-19-awscp-control-tower-vs-cloudformation/",
+  "meta": {
+    "title": "Control TowerとCloudFormationの違いを理解する",
+    "summary": "AWS Control TowerとCloudFormationは、異なるレイヤーでの環境構築を行うサービスであり、それぞれの特徴が理解できる。特に、組織の統制とインフラの構築における違いが明確になる。",
+    "tags": [
+      "AWS",
+      "Control Tower",
+      "CloudFormation",
+      "IaC",
+      "ガバナンス"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ]
+  }
+}
