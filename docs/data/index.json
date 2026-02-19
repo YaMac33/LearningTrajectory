@@ -1,5 +1,27 @@
 [
   {
+    "id": "awscp-aws-control-tower-landing-zone",
+    "category": "awscp",
+    "timestamp": "2026-02-19T20:16:51+09:00",
+    "title": "AWS Control Towerのランディングゾーンとガードレール",
+    "summary": "AWS Control Towerを利用することで、安全なマルチアカウント環境を自動的に構築できることが理解できます。特に、ランディングゾーンとガードレールの概念が重要です。",
+    "tags": [
+      "AWS",
+      "Control Tower",
+      "Organizations",
+      "ガバナンス",
+      "ランディングゾーン",
+      "ガードレール"
+    ],
+    "taxonomy": [
+      "AWSのコアサービス",
+      "管理と監視(CloudWatch/CloudTrail)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-aws-control-tower-landing-zone/"
+  },
+  {
     "id": "awscp-route53-waf-dns-firewall-difference",
     "category": "awscp",
     "timestamp": "2026-02-19T20:03:53+09:00",
