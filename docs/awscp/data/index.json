@@ -1,5 +1,26 @@
 [
   {
+    "id": "awscp-ssl-offloading-alb-cloudhsm",
+    "category": "awscp",
+    "timestamp": "2026-02-19T19:22:58+09:00",
+    "title": "ALBとCloudHSMのSSLオフロード方法比較",
+    "summary": "SSLオフロードの手法としてALBとCloudHSMの違いを理解し、セキュリティ要件に応じた適切な選択ができるようになります。",
+    "tags": [
+      "AWS",
+      "ALB",
+      "CloudHSM",
+      "SSLオフロード",
+      "セキュリティ"
+    ],
+    "taxonomy": [
+      "セキュリティとコンプライアンス",
+      "IAMと認証認可"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "awscp/posts/2026-02-19-awscp-ssl-offloading-alb-cloudhsm/"
+  },
+  {
     "id": "awscp-ebs-vs-instance-store",
     "category": "awscp",
     "timestamp": "2026-02-19T19:12:47+09:00",
