@@ -1,0 +1,21 @@
+{
+  "id": "ap-mips-calculation-issues",
+  "category": "ap",
+  "timestamp": "2026-02-20T20:44:55+09:00",
+  "post_path": "ap/posts/2026-02-20-ap-mips-calculation-issues/",
+  "meta": {
+    "title": "MIPS計算問題の解法を理解する",
+    "summary": "MIPSに関する計算問題を解説し、1秒あたりの処理件数を算出する方法を示します。CPU性能と命令数の関係が理解できます。",
+    "tags": [
+      "MIPS",
+      "CPU",
+      "計算問題",
+      "応用情報",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ]
+  }
+}
