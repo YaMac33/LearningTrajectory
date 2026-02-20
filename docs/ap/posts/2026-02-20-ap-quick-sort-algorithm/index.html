@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | クイックソート</title>
+  <meta name="description" content="基準値を決めて大小のグループに分ける操作を繰り返す「クイックソート」のアルゴリズムの仕組みと、応用情報技術者試験におけるトレース問題の解き方、実務での利用イメージを解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="クイックソート" />
+  <meta property="og:description" content="基準値を決めて大小のグループに分ける操作を繰り返す「クイックソート」のアルゴリズムの仕組みと、応用情報技術者試験におけるトレース問題の解き方、実務での利用イメージを解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">クイックソート</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">応用情報技術者試験</span>
+            <span class="tag">アルゴリズム</span>
+            <span class="tag">ソート</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <h2>1. クイックソートとは？（定義と仕組み）</h2>
+        <p>クイックソートは、「代表（<strong>基準値</strong>：ピボット）を1人決めて、その人より小さい人と大きい人に分ける」という操作を、グループが1人になるまで繰り返す並べ替え（ソート）アルゴリズムです。このように、大きな問題を小さな問題に分割しながら解決していく手法を<strong>分割統治法</strong>と呼びます。</p>
+        <p>試験では「配列の左端を基準値とする」「グループ内の元の順番は変えない（安定かどうかは実装によるが、設問の条件に必ず従う）」といった指定ルールが出題の鍵となります。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">アルゴリズムのトレース（左端基準の例）</h3>
+          <p class="diagram__note" style="text-align:center; margin-bottom:16px;">配列：<code>[2, 3, 5, 4, 1]</code> を昇順に並べ替える</p>
+          
+          <div style="display:flex; flex-direction:column; gap:20px; font-family:monospace; font-size:14px; color:#1f2937;">
+            
+            <!-- 1回目の分割 -->
+            <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:16px;">
+              <div style="font-weight:bold; color:#2563eb; margin-bottom:8px;">🔷 1回目の分割</div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <span>初期状態:</span>
+                <span style="padding:4px 8px; background:#f3f4f6; border-radius:4px;">[ <strong style="color:#dc2626;">2</strong>, 3, 5, 4, 1 ]</span>
+                <span style="color:#dc2626; font-size:12px;">← 基準値(2)は左端</span>
+              </div>
+              <div style="margin-left:16px; border-left:2px solid #cbd5e1; padding-left:12px; margin-bottom:8px; color:#4b5563;">
+                <div>2より小さい → [1]</div>
+                <div>2より大きい → [3, 5, 4] （※元の順番を維持）</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>結果:</span>
+                <span style="padding:4px 8px; background:#dbeafe; border-radius:4px;">[ 1 ]</span>
+                <span style="padding:4px 8px; background:#fecaca; border-radius:4px; font-weight:bold;">[ 2 ]</span>
+                <span style="padding:4px 8px; background:#fef3c7; border-radius:4px;">[ 3, 5, 4 ]</span>
+              </div>
+              <div style="margin-top:8px; font-size:12px; color:#6b7280;">※この時点では「1, 2, 3, 5, 4」となり、まだ全体は整列されていません。</div>
+            </div>
+
+            <!-- 2回目の分割 -->
+            <div style="background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:16px;">
+              <div style="font-weight:bold; color:#2563eb; margin-bottom:8px;">🔷 2回目の分割</div>
+              <div style="margin-bottom:8px; color:#4b5563;">
+                要素が1つの [1], [2] は分割終了。<br>残りの <code>[ 3, 5, 4 ]</code> を分割します。
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <span>対象:</span>
+                <span style="padding:4px 8px; background:#f3f4f6; border-radius:4px;">[ <strong style="color:#dc2626;">3</strong>, 5, 4 ]</span>
+                <span style="color:#dc2626; font-size:12px;">← 基準値(3)は左端</span>
+              </div>
+              <div style="margin-left:16px; border-left:2px solid #cbd5e1; padding-left:12px; margin-bottom:8px; color:#4b5563;">
+                <div>3より小さい → なし</div>
+                <div>3より大きい → [5, 4]</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>全体結果:</span>
+                <span style="padding:4px 8px; background:#dbeafe; border-radius:4px;">[ 1 ]</span>
+                <span style="padding:4px 8px; background:#fecaca; border-radius:4px;">[ 2 ]</span>
+                <span style="padding:4px 8px; background:#fecaca; border-radius:4px; font-weight:bold;">[ 3 ]</span>
+                <span style="padding:4px 8px; background:#fef3c7; border-radius:4px;">[ 5, 4 ]</span>
+              </div>
+            </div>
+            
+          </div>
+          <p class="diagram__note" style="margin-top:16px;">このように、基準値が確定するたびに配列が小さな集団に分かれていき、最終的にすべての要素が1つになった時点で整列が完了します。</p>
+        </div>
+
+        <h2>2. 応用情報技術者試験（午前）での問われ方</h2>
+        <p>午前試験のソート問題では、アルゴリズムの定義や「途中の状態」を問うトレース問題が頻出です。以下の手順（解くときの型）を意識しましょう。</p>
+
+        <ol>
+          <li><strong>基準値を確認する：</strong> 左端か？ 右端か？ 中央か？</li>
+          <li><strong>グループ内の順番ルールを確認する：</strong> 基本は「元の配列と同じ順番を維持する」条件を見落とさないこと。</li>
+          <li><strong>途中状態か最終状態かを確認する：</strong> 「N回目の分割が終わった直後の配列はどれか」という引っ掛けに注意。</li>
+        </ol>
+
+        <h3>混同しやすいソートアルゴリズム</h3>
+        <p>午前試験では、他のソートアルゴリズムと特徴をすり替えた選択肢が出題されます。明確に区別できるようにしておきましょう。</p>
+
+        <div style="overflow-x:auto; margin-top:16px; margin-bottom:16px;">
+          <table class="article-table">
+            <thead>
+              <tr>
+                <th>アルゴリズム</th>
+                <th>特徴（試験でのキーワード）</th>
+                <th>平均計算量</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>クイックソート</strong></td>
+                <td><strong>基準値</strong>を選び、それより小さい/大きいグループに分割する。（分割統治法）</td>
+                <td>$O(N \log N)$</td>
+              </tr>
+              <tr>
+                <td>バブルソート</td>
+                <td><strong>隣り合う</strong>要素を比較し、逆順であれば交換する。（水面へ浮かぶ泡のよう）</td>
+                <td>$O(N^2)$</td>
+              </tr>
+              <tr>
+                <td>選択ソート</td>
+                <td>未整列の部分から<strong>最小値（または最大値）を探して</strong>先頭へ移動させる。</td>
+                <td>$O(N^2)$</td>
+              </tr>
+              <tr>
+                <td>マージソート</td>
+                <td>配列を半分に分割し、それぞれ整列させた後、<strong>併合（マージ）</strong>する。</td>
+                <td>$O(N \log N)$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. 午後問題対策（記述問題の視点）</h2>
+        <p>午後問題（特にアルゴリズムやプログラミング分野）では、クイックソートの<strong>「弱点（最悪ケース）」</strong>について深く問われることがあります。計算量や再帰処理の仕組みを理解しているかが試されます。</p>
+
+        <div class="diagram" style="background: #ffffff; border-color: #cbd5e1;">
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【想定設問】</div>
+          <p style="font-size: 14px; margin-bottom: 16px; padding: 14px; background: #f8fafc; border:1px solid #e2e8f0; border-radius: 8px;">
+            常に「配列の左端」を基準値として選択するクイックソートにおいて、<strong>既に昇順に整列されている配列</strong>を処理対象とした場合、平均的な処理時間とならず、最悪の計算量 $O(N^2)$ となってしまう。その理由を、分割のされ方に着目して40字以内で述べよ。
+          </p>
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【解答例】</div>
+          <p style="font-size: 15px; font-weight: bold; color: #b91c1c; margin-bottom: 16px;">
+            基準値が常に最小値となり、データが偏って分割されず再帰の深さが最大になるから。（39字）
+          </p>
+          <hr style="border:none; border-top:1px dashed #cbd5e1; margin:16px 0;" />
+          <div style="font-size: 13px; color: #475569; line-height: 1.6;">
+            <strong>【ポイント抽出の思考プロセス】</strong><br>
+            1. <strong>前提の確認</strong>： 昇順の配列 `[1, 2, 3, 4, 5]` で左端を基準値にすると、基準値は常にそのグループの「最小値」になります。<br>
+            2. <strong>生じる現象</strong>： 「基準値より小さいグループ（0個）」と「大きいグループ（残り全部）」に分かれてしまい、要素が半分になりません。<br>
+            3. <strong>結果（なぜ遅いか）</strong>： $N$個のデータを分割する回数（再帰処理の深さ）が $\log N$ 回ではなく、$N$ 回になってしまい、処理効率がバブルソート等と同じ $O(N^2)$ に落ちてしまいます。<br>
+            ※実務ではこの問題を回避するため、左端・右端・中央の値の「中間値」を基準値に選ぶ工夫（Median-of-Three）が取られます。
+          </div>
+        </div>
+
+        <h2>4. 実務イメージとシステム構成</h2>
+        <p>ITエンジニアの実務において、クイックソートの概念はどこで活かされているのでしょうか。</p>
+        
+        <p>クイックソートは、その名の通り平均的に最も速い（$O(N \log N)$）ソートアルゴリズムの一つであり、メモリ使用量も少ない（インプレースな並べ替えが可能）という強力な特徴を持っています。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">実務での利用シーン</h3>
+          <div class="diagram__grid">
+            <div class="diagram__card">
+              <div class="diagram__head">1. プログラミング言語の標準関数</div>
+              <p class="diagram__note">多くの言語の <code>sort()</code> 関数（C言語の <code>qsort</code> など）の内部実装のベースとして使われています。（※現在はクイックソートの弱点を補った「イントロソート」が多く採用されています）</p>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head">2. データベースの内部ソート</div>
+              <p class="diagram__note">RDBMSで <code>ORDER BY</code> 句を実行した際、インデックスが使えない場面（巨大なメモリ上での整列作業）において、高速に処理を完了させるために利用されます。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <style>
+    /* 追加CSS（図表・テーブル用） */
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .article-table th, .article-table td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .article-table th {
+      background: #f8fafc;
+      font-weight: 800;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+    .article-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+  </style>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
