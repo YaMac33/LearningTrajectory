@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 応用情報技術者試験（AP）の概要と合格への戦略</title>
+  <meta name="description" content="応用情報技術者試験（AP）の全体像から、午前・午後問題の違いと対策、実務への活かし方までを解説。午後問題の記述対策の思考プロセスも網羅しています。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="応用情報技術者試験（AP）の概要と合格への戦略" />
+  <meta property="og:description" content="応用情報技術者試験（AP）の全体像から、午前・午後問題の違いと対策、実務への活かし方までを解説。午後問題の記述対策の思考プロセスも網羅しています。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+  
+  <style>
+    /* 図や表のための必要最小限の追加CSS */
+    .article-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+      font-size: 0.95em;
+    }
+    .article-content th, .article-content td {
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+    }
+    .article-content th {
+      background: #f8fafc;
+      font-weight: bold;
+    }
+    .diagram {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.5em;
+      margin: 1.5em 0;
+    }
+    .diagram__title {
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 1em;
+      text-align: center;
+      color: #1f2937;
+    }
+    .diagram__grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .diagram__card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .diagram__head {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #3b82f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .diagram__badge {
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 0.8em;
+    }
+    .diagram__note {
+      font-size: 0.9em;
+      margin: 0;
+      color: #4b5563;
+    }
+    .diagram__note ul {
+      margin-top: 8px;
+      margin-bottom: 0;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">応用情報技術者試験（AP）の概要と合格への戦略</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">資格対策</span>
+            <span class="tag">AP</span>
+            <span class="tag">試験概要</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p><strong>応用情報技術者試験（AP：Applied Information Technology Engineer Examination）</strong>は、情報処理推進機構（IPA）が実施する国家試験であり、ITエンジニアとして「基礎の上に応用力があるか」を問われる中堅レベルの資格です。基本情報技術者試験（FE）の次のステップとして位置づけられています。</p>
+
+        <h2>応用情報技術者試験（AP）とは？</h2>
+        <h3>試験の位置づけと対象者</h3>
+        <p>APは単なる技術知識の暗記ではなく、「技術と経営の橋渡し」ができる人材を目指すための試験です。特に以下のような社会人エンジニアにとって、学習のメリットが大きい資格です。</p>
+        <ul>
+          <li>SEやインフラエンジニアを志望する人</li>
+          <li>将来、ネットワークスペシャリストや情報処理安全確保支援士などの高度区分を目指す人</li>
+          <li>ITの全体像を体系的に理解し、管理側（マネジメント）のポジションを見据えている人</li>
+        </ul>
+
+        <h3>実務（AWS等の学習）への活き方</h3>
+        <p>APの学習範囲、特に<strong>OS、ネットワーク、セキュリティ</strong>の深い理解は、パブリッククラウド（AWSやAzureなど）のアーキテクチャを設計・構築する際の強力な基礎となります。「知識の横断整理フェーズ」として非常に相性が良く、実務に直結する知識を得ることができます。</p>
+
+        <h2>試験の基本構造と範囲</h2>
+        <h3>試験の仕組み</h3>
+        <p>試験は1日がかりで行われ、午前と午後の両方で基準点を満たす必要があります。片方のみ高得点でも合格にはなりません。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>試験区分</td>
+              <td>レベル3（応用レベル）</td>
+            </tr>
+            <tr>
+              <td>実施回数</td>
+              <td>年2回（春・秋）</td>
+            </tr>
+            <tr>
+              <td>試験時間</td>
+              <td>午前150分 ＋ 午後150分</td>
+            </tr>
+            <tr>
+              <td>出題形式</td>
+              <td>午前：四択マーク式<br>午後：記述式（長文読解 ＋ 計算 ＋ 論述）</td>
+            </tr>
+            <tr>
+              <td>合格基準</td>
+              <td>午前60%以上、かつ 午後60%以上</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>出題範囲（広く・深く）</h3>
+        <p>応用情報の出題範囲は、大きく3つの分野に分かれます。</p>
+        
+        <div class="diagram">
+          <p class="diagram__title">AP 試験範囲の構造</p>
+          <div class="diagram__grid">
+            <div class="diagram__card">
+              <div class="diagram__head">テクノロジ系 <span class="diagram__badge">約50%</span></div>
+              <p class="diagram__note">OS、ネットワーク、データベース、セキュリティ、アルゴリズムなど、IT技術の根幹を問う。AWSなどインフラ学習に直結。</p>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head">マネジメント系 <span class="diagram__badge">管理力</span></div>
+              <p class="diagram__note">プロジェクト管理、サービスマネジメント、システム監査。チームやシステム運用をどう適切に回すか。</p>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head">ストラテジ系 <span class="diagram__badge">ビジネス</span></div>
+              <p class="diagram__note">経営戦略、会計、法務、IT戦略。技術と経営の橋渡し役として必須の知識。</p>
+            </div>
+          </div>
+        </div>
+
+        <h2>午前問題と午後問題の違いと対策</h2>
+        <h3>午前：知識の網羅と過去問演習</h3>
+        <p>基本情報（FE）の延長ですが、より深く広範な知識が問われます。知識問題が中心であり、<strong>過去問対策が非常に有効</strong>です。過去問道場などのWebサービスを活用し、反復学習を行うことが王道の対策となります。</p>
+
+        <h3>午後：長文読解と記述（本番はここから）</h3>
+        <p>「午後が本番」と言われる理由は、単なる知識の暗記だけでは解けないためです。現場の業務やシステム構成を模した長文を読み解き、計算を行い、記述式で回答する必要があります。</p>
+        <ul>
+          <li><strong>情報セキュリティは必須解答</strong></li>
+          <li>残りの問題は、データベース、ネットワーク、組込みシステム、プロジェクトマネジメントなどから選択します。</li>
+        </ul>
+
+        <h2>【午後問題対策】記述式で問われる「思考プロセス」</h2>
+        <p>午後問題の記述式では、「なぜその事象が起きるのか」「どう対応すべきか」を論理的に説明する力が問われます。単に用語を暗記するだけでなく、「定義 → 仕組み → 実務での事象」を繋げて考える訓練が必要です。</p>
+
+        <div class="diagram">
+          <p class="diagram__title">設問例と解答プロセス（情報セキュリティ分野の例）</p>
+          <div class="diagram__card" style="margin-bottom: 12px;">
+            <div class="diagram__head">【設問例】</div>
+            <p class="diagram__note">ファイアウォール（FW）のフィルタリングルールを追加・変更する際、一時的に正しい通信が遮断されるリスクがある。その理由を40字以内で述べよ。</p>
+          </div>
+          <div class="diagram__card" style="margin-bottom: 12px;">
+            <div class="diagram__head">【ポイント抽出の思考プロセス】</div>
+            <div class="diagram__note">
+              <ul>
+                <li><strong>定義:</strong> FWはパケットの情報を基に、設定されたルールに従って通信を制御する。</li>
+                <li><strong>仕組み:</strong> ルールは上から順に評価される。また、明示的に許可されていない通信を全て弾く「暗黙のDeny（拒否）」が末尾にある。</li>
+                <li><strong>実務イメージ:</strong> 新ルールの適用中や順序を入れ替える瞬間、本来許可されるべきパケットがルールにマッチせず、末尾の「暗黙のDeny」に該当してしまう可能性がある。</li>
+              </ul>
+            </div>
+          </div>
+          <div class="diagram__card">
+            <div class="diagram__head">【解答の書き方例】</div>
+            <p class="diagram__note">ルールの適用順序が変わり、許可すべき通信が一時的に暗黙の拒否に該当するため。（38字）</p>
+          </div>
+        </div>
+        
+        <p>このように、与えられた字数制限の中で、技術的な「仕組み」と「発生する事象」を過不足なくまとめる記述力が合否を分けます。</p>
+
+        <h2>学習時間の目安とまとめ</h2>
+        <p>応用情報技術者試験の合格率はおよそ20〜25%前後です。学習時間の目安は以下の通りです。</p>
+        <ul>
+          <li><strong>基本情報技術者（FE）合格者：</strong> 150〜250時間</li>
+          <li><strong>未経験者：</strong> 300時間以上</li>
+        </ul>
+        <p>午前対策でITの全体像と知識の基盤を固めつつ、早い段階で午後問題の長文読解と記述フォーマットに慣れていくことが、合格への確実なロードマップとなります。</p>
+
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
