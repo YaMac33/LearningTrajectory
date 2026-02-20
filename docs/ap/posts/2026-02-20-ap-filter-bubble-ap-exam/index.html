@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | フィルターバブル</title>
+  <meta name="description" content="検索履歴やSNSの行動履歴によってAIが情報を自動選別した結果、自分好みの情報という「見えない泡」に閉じ込められてしまう現象「フィルターバブル」の仕組みや、応用情報技術者試験の対策、実務での課題について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="フィルターバブル" />
+  <meta property="og:description" content="検索履歴やSNSの行動履歴によってAIが情報を自動選別した結果、自分好みの情報という「見えない泡」に閉じ込められてしまう現象「フィルターバブル」の仕組みや、応用情報技術者試験の対策、実務での課題について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">フィルターバブル</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">応用情報技術者試験</span>
+            <span class="tag">AI</span>
+            <span class="tag">アルゴリズム</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <h2>1. フィルターバブルとは？（定義と仕組み）</h2>
+        <p>インターネットを利用している際に、「自分が興味のある広告ばかり表示される」「SNSのタイムラインが自分の好きな話題で埋まっている」と感じることはありませんか？</p>
+        <p>これは、検索エンジンやSNSの<strong>アルゴリズム（AIの仕組み）</strong>が、ユーザーの行動履歴から「この人はこういう情報が好きだろう」と推測し、情報をカスタマイズ（<strong>パーソナライズ</strong>）して提供しているためです。</p>
+        <p>しかし、このパーソナライズが行き過ぎると、<strong>自分と異なる意見や、関心はないが重要なニュースなどが表示されなくなってしまいます。</strong>まるで自分の好きな情報だけで作られた「泡（バブル）」の中に閉じ込められたような状態になる現象を、提唱者のイーライ・パリサーは<strong>「フィルターバブル」</strong>と名付けました。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">フィルターバブルの構造</h3>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+              <span style="padding:8px; background:#fecaca; border-radius:8px; color:#7f1d1d; font-size:12px; font-weight:bold;">反対意見 ✖</span>
+              <span style="padding:8px; background:#fecaca; border-radius:8px; color:#7f1d1d; font-size:12px; font-weight:bold;">関心のないニュース ✖</span>
+              <span style="padding:8px; background:#fecaca; border-radius:8px; color:#7f1d1d; font-size:12px; font-weight:bold;">異なる価値観 ✖</span>
+            </div>
+            <div style="padding:4px 16px; background:#e5e7eb; border-radius:999px; font-weight:bold; font-size:14px; color:#374151;">
+              ↓ フィルター（AI・アルゴリズムによる選別） ↓
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+              <span style="padding:6px 10px; border:1px solid #d1d5db; background:#fff; border-radius:8px; font-size:12px;">クリック履歴</span>
+              <span style="padding:6px 10px; border:1px solid #d1d5db; background:#fff; border-radius:8px; font-size:12px;">検索履歴</span>
+              <span style="padding:6px 10px; border:1px solid #d1d5db; background:#fff; border-radius:8px; font-size:12px;">SNSの「いいね」</span>
+            </div>
+            <div style="width:100%; max-width:400px; padding:20px; border:2px dashed #6366f1; border-radius:50%; background:#e0e7ff; text-align:center; margin-top:8px;">
+              <strong style="color:#312e81;">ユーザーのフィルターバブル（泡の中）</strong>
+              <ul style="text-align:left; font-size:13px; margin-top:12px; color:#374151;">
+                <li>ユーザーの好きな情報ばかり</li>
+                <li>ユーザーの意見に賛成する記事ばかり</li>
+                <li>ユーザーが買いそうな商品の広告ばかり</li>
+              </ul>
+              <div style="margin-top:16px; font-weight:bold; color:#1e40af; font-size:14px;">
+                🧑 ユーザー<br>「世の中、自分と同じ意見の人ばかりだ！」
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2>2. 応用情報技術者試験（午前）での問われ方</h2>
+        <p>午前試験では、以下のキーワードが選択肢の正誤判定の決め手になります。</p>
+        <ul>
+          <li><strong>提唱者：</strong>「イーライ・パリサー」という名前が出たらフィルターバブル。</li>
+          <li><strong>原因：</strong>「パーソナライズ（最適化）された検索結果や情報提供」「アルゴリズムによる自動選別」が原因。</li>
+          <li><strong>結果：</strong>「実社会とは隔てられた情報空間に包まれる」「自分と異なる価値観の受け入れが難しくなる（視野狭窄）」。</li>
+        </ul>
+
+        <h3>過去問の正答選択肢の例</h3>
+        <blockquote>
+          「利用者の属性・行動などに応じ、好ましいと考えられる情報がより多く表示され、利用者は実社会とは隔てられたパーソナライズされた情報空間へと包まれる。」
+        </blockquote>
+        <p>まさに上記3つのポイント（パーソナライズ、好ましい情報のみ、隔てられた空間）がすべて詰め込まれた選択肢です。</p>
+
+        <h3>混同しやすい用語との違い</h3>
+        <p>試験では、類似の用語を混ぜて引っ掛けを狙ってきます。明確に違いを理解しましょう。</p>
+
+        <div style="overflow-x:auto; margin-top:16px; margin-bottom:16px;">
+          <table class="article-table">
+            <thead>
+              <tr>
+                <th>用語</th>
+                <th>原因・主体</th>
+                <th>解説</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>フィルターバブル</strong></td>
+                <td>AI（アルゴリズム）</td>
+                <td><strong>システム</strong>が勝手に情報を偏らせてしまうこと。（泡に包まれる）</td>
+              </tr>
+              <tr>
+                <td>エコーチェンバー</td>
+                <td>人間（自分自身）</td>
+                <td>似た者同士で集まり、自分の意見を言い合うことで、特定の意見が増幅される現象。<br>※AIのせいではなく、人間の心理やSNS上のコミュニティ形成が主原因。</td>
+              </tr>
+              <tr>
+                <td>確証バイアス</td>
+                <td>人間の心理</td>
+                <td>自分の思い込みを裏付ける情報ばかりを集め、反証を無視してしまう心理的傾向のこと。</td>
+              </tr>
+              <tr>
+                <td>サイバーカスケード</td>
+                <td>集団心理</td>
+                <td>インターネット上で同じ意見を持つ人々が結びつき、極端な方向に意見が雪だるま式に過激化していく現象。（カスケード＝連鎖的な滝）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>【ひっかけ対策のコツ】</strong> 問題文に「パーソナライズされた検索結果（アルゴリズム）」とあれば<strong>フィルターバブル</strong>、「SNSで同じ意見を持つ者が集まり（コミュニティ）」とあれば<strong>エコーチェンバー</strong>を選ぶのが鉄則です。</p>
+
+        <h2>3. 午後問題対策（記述問題の視点）</h2>
+        <p>午後問題では、情報システムが社会に与える影響として、セキュリティやモラルと絡めて出題される可能性があります。単なる用語暗記ではなく、「なぜ問題なのか」「どう対処すべきか」を論理的に説明できるようにしておきましょう。</p>
+
+        <div class="diagram" style="background: #ffffff; border-color: #cbd5e1;">
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【想定設問】</div>
+          <p style="font-size: 14px; margin-bottom: 16px; padding: 14px; background: #f8fafc; border:1px solid #e2e8f0; border-radius: 8px;">
+            ニュース配信アプリにおいて、利用者の興味関心に合致する記事のみを推薦するアルゴリズムを採用した場合に生じる、社会的な情報の偏りに関する課題を40字以内で述べよ。
+          </p>
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【解答例】</div>
+          <p style="font-size: 15px; font-weight: bold; color: #b91c1c; margin-bottom: 16px;">
+            利用者が自分と異なる意見や価値観に触れる機会が失われ、視野狭窄に陥る課題。（37字）
+          </p>
+          <hr style="border:none; border-top:1px dashed #cbd5e1; margin:16px 0;" />
+          <div style="font-size: 13px; color: #475569; line-height: 1.6;">
+            <strong>【ポイント抽出の思考プロセス】</strong><br>
+            1. <strong>事象</strong>：システムによる過度なパーソナライズ（フィルターバブルの発生）<br>
+            2. <strong>影響</strong>：利用者の好む情報しか表示されず、異なる意見が排除される。<br>
+            3. <strong>結果</strong>：利用者の視野が狭くなり、社会的な分断や偏見の助長に繋がる。<br>
+            文字数制限の中で、「異なる意見に触れる機会の喪失」「視野狭窄」というキーワードを盛り込むのがポイントです。
+          </div>
+        </div>
+
+        <h2>4. 実務イメージとシステム構成</h2>
+        <p>ITエンジニアとして、この仕組みをシステムにどう組み込んでいるか、またどう対処すべきかをイメージしてみましょう。</p>
+        
+        <h3>利用シーン（レコメンドエンジン）</h3>
+        <p>ECサイト（Amazonなど）や動画配信（Netflix、YouTube）では、顧客の滞在時間や購買率を上げるためにフィルターバブルの元となる技術（協調フィルタリングなど）を積極的に活用しています。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">システム構成例と課題</h3>
+          <div class="diagram__grid">
+            <div class="diagram__card">
+              <div class="diagram__head">1. ログ収集基盤</div>
+              <p class="diagram__note">ユーザーのクリック、視聴時間、検索キーワードなどの行動ログをリアルタイムで収集（Apache Kafkaなど）。</p>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head">2. データ分析・AI基盤</div>
+              <p class="diagram__note">収集したログをもとに、ユーザーの嗜好ベクトルを機械学習で計算。</p>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head">3. コンテンツ配信サーバー</div>
+              <p class="diagram__note">AIの計算結果に基づき、数百万のコンテンツから「その人がクリックしそうな上位10件」だけを抽出（フィルタリング）して表示。</p>
+            </div>
+            <div class="diagram__card" style="border-color: #f59e0b; background: #fffbeb;">
+              <div class="diagram__head" style="color: #b45309;">💡 課題と対策</div>
+              <p class="diagram__note">フィルターバブルによる「社会の分断」を防ぐため、あえて<strong>「異なる意見」や「ランダムなトピックス」を数%混ぜて表示する（セレンディピティの創出）</strong>といったシステム的な工夫が求められます。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <style>
+    /* 追加CSS（図表・テーブル用） */
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .article-table th, .article-table td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .article-table th {
+      background: #f8fafc;
+      font-weight: 800;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+    .article-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+  </style>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
