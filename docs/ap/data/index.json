@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-disk-cache-and-cache-memory",
+    "category": "ap",
+    "timestamp": "2026-02-20T18:13:01+09:00",
+    "title": "ディスクキャッシュとキャッシュメモリの違い",
+    "summary": "キャッシュメモリとディスクキャッシュの違いや仕組みを解説し、応用情報技術者試験での出題ポイントを理解できます。",
+    "tags": [
+      "キャッシュメモリ",
+      "ディスクキャッシュ",
+      "応用情報技術者試験",
+      "ハードウェア",
+      "アーキテクチャ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "コンピュータ構成要素"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-20-ap-disk-cache-and-cache-memory/"
+  },
+  {
     "id": "ap-quick-sort-algorithm",
     "category": "ap",
     "timestamp": "2026-02-20T17:41:16+09:00",
