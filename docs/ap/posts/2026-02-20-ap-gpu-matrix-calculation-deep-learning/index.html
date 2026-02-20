@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | GPUの行列演算とディープラーニングにおける役割</title>
+  <meta name="description" content="GPUは大量の行列計算を同時並列で処理できる演算特化型プロセッサです。応用情報技術者試験（AP）の午前・午後問題対策として、CPUとの違いやAIシステムでの役割を解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="GPUの行列演算とディープラーニングにおける役割" />
+  <meta property="og:description" content="GPUは大量の行列計算を同時並列で処理できる演算特化型プロセッサです。応用情報技術者試験（AP）の午前・午後問題対策として、CPUとの違いやAIシステムでの役割を解説します。" />
+  <meta property="og:url" content="" />
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 記事専用の追加CSS（図解・強調表示用） -->
+  <style>
+    .article-diagram {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .article-diagram__title {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: var(--text);
+      text-align: center;
+    }
+    .article-diagram__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 600px) {
+      .article-diagram__grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .article-diagram__card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .article-diagram__card-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2563eb;
+    }
+    .article-diagram pre {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      overflow-x: auto;
+      margin: 0;
+    }
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.95em;
+    }
+    .article-table th, .article-table td {
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+    }
+    .article-table th {
+      background: #f3f4f6;
+    }
+    .exam-point {
+      border-left: 4px solid #f59e0b;
+      background: #fffbeb;
+      padding: 16px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .exam-point h3 {
+      margin-top: 0;
+      color: #b45309;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+    }
+    .exam-point p:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">GPUの行列演算とディープラーニングにおける役割</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">応用情報技術者試験</span>
+            <span class="tag">AIシステム</span>
+            <span class="tag">ハードウェア</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <blockquote>
+          <p><strong>🧠 1行要約</strong><br>
+          GPUは「大量の行列計算を同時並列で高速処理できる、行列演算特化型のプロセッサ」である。</p>
+        </blockquote>
+
+        <h2>1. 基礎理解：行列と行列演算とは？</h2>
+        <p>AIやディープラーニングの話題で必ず登場する「行列演算」ですが、まずは前提となる知識を整理します。</p>
+        
+        <h3>行列と行列演算の基本</h3>
+        <p>行列とは、数字を四角く並べたデータ構造のことです。行列演算とは、この行列同士の掛け算、行列とベクトルの掛け算、転置、加算などの計算を指します。特にAI分野で極めて重要なのが<strong>行列同士の掛け算</strong>です。</p>
+
+        <h3>なぜディープラーニングで行列が出てくるのか？</h3>
+        <p>ニューラルネットワーク（ディープラーニングの基礎となるモデル）の計算処理の本質は、以下の数式で表されます。</p>
+        <div class="article-diagram" style="padding: 12px; text-align: center; font-weight: bold;">
+          入力データ × 重み行列 ＝ 出力
+        </div>
+        <p>ディープラーニングでは、「数百万画素の画像データ」に対して「数千万のパラメータ（重み）」を掛け合わせる処理を、何万回も繰り返して学習を進めます。つまり、ニューラルネットワークとは<strong>「巨大な行列計算マシン」</strong>と言えます。</p>
+
+        <h2>2. CPUとGPUのアーキテクチャ比較</h2>
+        <p>なぜこの膨大な行列演算にCPUではなくGPUが使われるのでしょうか。両者の設計思想（アーキテクチャ）の違いから理由を紐解きます。</p>
+
+        <div class="article-diagram">
+          <h3 class="article-diagram__title">CPUとGPUの処理方式の違い</h3>
+          <div class="article-diagram__grid">
+            <div class="article-diagram__card">
+              <div class="article-diagram__card-title">CPU（中央処理装置）</div>
+              <p style="font-size: 0.9em; margin-bottom: 12px;">少数精鋭のコアを持ち、複雑な処理や条件分岐を「順番に（直列に）」実行するのが得意です。</p>
+              <pre><code>[タスクA]
+   ↓
+[タスクB]
+   ↓
+[タスクC]</code></pre>
+            </div>
+            <div class="article-diagram__card">
+              <div class="article-diagram__card-title">GPU（画像処理装置）</div>
+              <p style="font-size: 0.9em; margin-bottom: 12px;">数千の小さなコアを持ち、単純な計算を「大量に同時並列で」実行するのが得意です。</p>
+              <pre><code>[計算A][計算B][計算C]...
+[計算D][計算E][計算F]...
+[計算G][計算H][計算I]...
+（一気に同時処理）</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <h3>行列演算ユニットの正体</h3>
+        <p>最新のGPU（例：NVIDIA製GPU）には、行列演算を一気に処理するための専用回路（Tensor Coreなど）が搭載されています。これにより、CPUでは時間がかかりすぎる「数百万×数千万の掛け算」を、並列処理によって爆速で実行できるのです。</p>
+
+        <h2>3. 計算トレース：行列の掛け算の仕組み</h2>
+        <p>実際に行列の掛け算がどのように行われるか、2×2の行列を例に計算プロセスをトレースしてみましょう。この単純な計算の「超巨大版」をGPUは処理しています。</p>
+
+        <div class="article-diagram">
+          <h3 class="article-diagram__title">行列の掛け算のトレース（2×2）</h3>
+          <div class="article-diagram__card" style="text-align: center;">
+            <p><strong>A</strong> = [1, 2] <br> &nbsp;&nbsp;&nbsp;&nbsp;[3, 4] <br><br> × <br><br> <strong>B</strong> = [5, 6] <br> &nbsp;&nbsp;&nbsp;&nbsp;[7, 8]</p>
+            <hr style="margin: 16px 0; border: none; border-top: 1px dashed var(--border);">
+            <p style="text-align: left;"><strong>ステップ：左の「行」と右の「列」を掛けて足し合わせる</strong></p>
+            <ul style="text-align: left;">
+              <li><strong>1行1列目:</strong> (1×5) + (2×7) = 5 + 14 = <strong>19</strong></li>
+              <li><strong>1行2列目:</strong> (1×6) + (2×8) = 6 + 16 = <strong>22</strong></li>
+              <li><strong>2行1列目:</strong> (3×5) + (4×7) = 15 + 28 = <strong>43</strong></li>
+              <li><strong>2行2列目:</strong> (3×6) + (4×8) = 18 + 32 = <strong>50</strong></li>
+            </ul>
+            <p><strong>結果</strong> = [19, 22] <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[43, 50]</p>
+          </div>
+        </div>
+
+        <h2>4. 【午前試験対策】問われやすいポイントと頻出用語</h2>
+        <p>応用情報技術者試験の午前問題では、AIやビッグデータの文脈でGPUの特徴がよく問われます。以下の本質と用語の違いを押さえましょう。</p>
+
+        <ul>
+          <li><strong>✅ GPUの本質：</strong> 画像処理専用だからAIに向いているわけではない。「行列演算を並列で高速処理できるから」AIに向いている。</li>
+          <li><strong>✅ メモリとの関係：</strong> メモリ容量が大きいから速いのではなく、演算コア数と並列処理能力が要因。</li>
+        </ul>
+
+        <table class="article-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">用語</th>
+              <th>意味・特徴</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>並列処理</strong></td>
+              <td>一つのシステム内で、複数のタスクを「同時に」処理すること。（GPUの得意領域）</td>
+            </tr>
+            <tr>
+              <td><strong>分散処理</strong></td>
+              <td>ネットワーク上の「複数の機械（サーバなど）」に負荷を分けて処理すること。</td>
+            </tr>
+            <tr>
+              <td><strong>GPU</strong></td>
+              <td>Graphics Processing Unit。並列計算に特化したプロセッサ。</td>
+            </tr>
+            <tr>
+              <td><strong>TPU</strong></td>
+              <td>Tensor Processing Unit。Googleが開発したAI（機械学習）専用の演算装置。</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>5. 【午後試験対策】AIシステム構成とGPU導入の記述問題</h2>
+        <p>午後問題の「システムアーキテクチャ」や「クラウドサービス導入」の分野では、GPUの活用設計や導入メリットを記述させる問題が出題される可能性があります。</p>
+
+        <div class="article-diagram">
+          <h3 class="article-diagram__title">実務におけるAIシステムの構成例</h3>
+          <div class="article-diagram__card">
+            <pre><code>[ エッジデバイス / センサー ] (データ収集)
+        ↓
+[ 前処理サーバ (CPU) ] (データクレンジング・ノイズ除去・画像リサイズ)
+        ↓
+[ ★学習サーバ (GPU搭載) ] (数百万枚の画像を用いた重みの更新・大規模行列演算)
+        ↓
+[ 推論APIサーバ (CPU/GPU) ] (学習済みモデルを用いたリアルタイムの予測・推論)</code></pre>
+            <p style="font-size: 0.9em; margin-top: 12px; color: var(--muted);">※実務では、計算負荷が最も高い「学習」プロセスにおいてGPUリソースが集中的に割り当てられます。</p>
+          </div>
+        </div>
+
+        <h3>記述問題の対策：ポイント抽出の思考プロセス</h3>
+        <p>午後試験で「なぜその構成にしたのか？」を問われた場合の思考プロセスと記述例です。</p>
+
+        <div class="exam-point">
+          <h3>✍️ 【想定設問】と解答の導き方</h3>
+          <p><strong>問：</strong> クラウド環境において、AIモデルの学習処理を行う仮想サーバに「GPU搭載インスタンス」を選択した理由を40字以内で述べよ。</p>
+          
+          <p style="margin-top: 16px;"><strong>【思考プロセス】</strong></p>
+          <ol>
+            <li>ディープラーニングの学習処理はどのような計算か？<br>
+              → <strong>「大規模な行列演算の繰り返し」</strong></li>
+            <li>GPUの強みは何か？<br>
+              → <strong>「並列処理能力が極めて高い」</strong></li>
+            <li>それによってシステム（業務）にどんなメリットがあるか？<br>
+              → <strong>「学習時間を大幅に短縮できる」</strong></li>
+          </ol>
+
+          <p style="margin-top: 16px;"><strong>【解答の書き方例】</strong></p>
+          <p style="font-weight: bold; font-size: 1.1em; color: #111827;">大規模な行列演算を並列処理によって高速化し、AIの学習時間を短縮できるため。（38字）</p>
+        </div>
+
+        <p>このように、単に「AIだからGPU」と暗記するのではなく、「行列演算 → 並列処理 → 高速化（時間短縮）」という論理の繋がりを意識して記述することが、午後試験突破の鍵となります。</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
