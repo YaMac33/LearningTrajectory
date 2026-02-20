@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-capacitor-dram-exam",
+    "category": "ap",
+    "timestamp": "2026-02-20T19:26:58+09:00",
+    "title": "応用情報技術者試験対策：コンデンサとDRAM",
+    "summary": "コンデンサの構造と特性、DRAMにおける役割を解説し、試験に必要な知識をまとめます。",
+    "tags": [
+      "応用情報技術者試験",
+      "ハードウェア",
+      "メモリ",
+      "DRAM",
+      "コンデンサ",
+      "電気回路",
+      "リフレッシュ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "システムアーキテクチャ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-20-ap-capacitor-dram-exam/"
+  },
+  {
     "id": "ap-disk-cache-and-cache-memory",
     "category": "ap",
     "timestamp": "2026-02-20T18:13:01+09:00",
