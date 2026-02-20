@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | コンデンサとDRAM</title>
+  <meta name="description" content="コンデンサの基本構造と直流・交流に対する性質、およびその特性を活かしたDRAM（1T1C構造）の仕組みやリフレッシュ動作について、応用情報技術者試験の対策を交えて解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="コンデンサとDRAM" />
+  <meta property="og:description" content="コンデンサの基本構造と直流・交流に対する性質、およびその特性を活かしたDRAM（1T1C構造）の仕組みやリフレッシュ動作について、応用情報技術者試験の対策を交えて解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">コンデンサとDRAM</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">応用情報技術者試験</span>
+            <span class="tag">ハードウェア</span>
+            <span class="tag">メモリ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <h2>1. コンデンサとは？（定義と仕組み）</h2>
+        <p>コンデンサは、内部に電気を蓄えたり、蓄えた電気を放出したりする電子部品です。真ん中の絶縁体（誘電体）を2つの金属板（電極）で挟むという基本構造になっており、金属板に電圧を加えても絶縁体が電気を流さないため、金属板に電気が貯まる仕組みになっています。</p>
+        <p>コンデンサの重要な特性として、<strong>直流（DC）と交流（AC）に対する振る舞いの違い</strong>があります。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">コンデンサと直流・交流の違い</h3>
+          <div class="diagram__grid">
+            <div class="diagram__card">
+              <div class="diagram__head" style="color: #b91c1c;">■ 直流（DC）の場合</div>
+              <p style="font-family: monospace; text-align:center; margin: 10px 0; font-weight:bold; color:#1f2937;">＋ ────||──── －</p>
+              <ol style="font-size: 13px; color: #374151; padding-left: 20px;">
+                <li>電源ONで充電が始まる。</li>
+                <li>いっぱいになる（静電容量の限界）。</li>
+                <li>それ以上流れない（電流ストップ）。</li>
+              </ol>
+              <div style="margin-top: 8px; font-weight: bold; color: #b91c1c; font-size: 13px;">結果：直流は通さない ❌</div>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head" style="color: #1d4ed8;">■ 交流（AC）の場合</div>
+              <p style="font-family: monospace; text-align:center; margin: 10px 0; font-weight:bold; color:#1f2937;">＋→←－→←＋</p>
+              <ul style="font-size: 13px; color: #374151; padding-left: 20px;">
+                <li>電流の向きが交互に変わる。</li>
+                <li>向きが変わるたびに「充電」と「放電」を繰り返す。</li>
+                <li>電子が左右に動き続ける。</li>
+              </ul>
+              <div style="margin-top: 8px; font-weight: bold; color: #1d4ed8; font-size: 13px;">結果：実質的に電流を通す ⭕</div>
+            </div>
+          </div>
+          <p class="diagram__note" style="margin-top:16px; text-align:center;">
+            💡 <strong>イメージ</strong>：<br>
+            直流 ＝ 「水をためて満タンで止まる風船」<br>
+            交流 ＝ 「押したり引いたりして空気が行ったり来たりする風船」
+          </p>
+        </div>
+
+        <h2>2. 応用情報技術者試験（午前）での問われ方</h2>
+        <p>午前試験では、電気回路を構成する各部品の役割や特徴を問う問題が出題されます。コンデンサの性質は他の部品とセットで問われるため、明確に区別しましょう。</p>
+
+        <div style="overflow-x:auto; margin-top:16px; margin-bottom:16px;">
+          <table class="article-table">
+            <thead>
+              <tr>
+                <th>部品・装置</th>
+                <th>試験で問われる機能・特徴</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>コンデンサ</strong></td>
+                <td><strong>交流電流は通すが直流電流は通さない。</strong>（電気を蓄える）</td>
+              </tr>
+              <tr>
+                <td>コイル（インダクタ）</td>
+                <td>直流電流は通すが交流電流は通さない。</td>
+              </tr>
+              <tr>
+                <td>AC/DCコンバータ</td>
+                <td>交流電流を直流電流に変換する。</td>
+              </tr>
+              <tr>
+                <td>インバータ</td>
+                <td>直流電流を交流電流に変換する。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>試験において「交流電流は通すが直流電流は通さない」という選択肢があれば、それはコンデンサの説明として<strong>正しい</strong>と判断できます。</p>
+
+        <h2>3. DRAMとコンデンサの関係（アーキテクチャ）</h2>
+        <p>コンピュータの主記憶（メインメモリ）として広く使われている<strong>DRAM（Dynamic Random Access Memory）</strong>のメモリセルには、このコンデンサが活用されています。「直流を通さない」という性質を利用して、電荷の有無そのものを情報として保存しています。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">DRAMメモリセルの構造（1T1C）</h3>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+            <div style="font-family: monospace; font-size: 14px; background: #fff; border: 1px solid #d1d5db; padding: 16px; border-radius: 8px; color: #1f2937; text-align:center;">
+              ワード線<br>
+              │<br>
+              [トランジスタ]<br>
+              │<br>
+              ┌──||──┐<br>
+              │コンデンサ│<br>
+              └──────┘<br>
+              │<br>
+              ビット線
+            </div>
+            <div style="font-size: 14px; color: #374151; width:100%; max-width:400px;">
+              <strong>1T1C構造</strong>（1つのトランジスタ ＋ 1つのコンデンサ）
+              <ul style="margin-top:4px;">
+                <li><strong>コンデンサ</strong> ＝ 電気をためる（情報保持）</li>
+                <li><strong>トランジスタ</strong> ＝ 読み書きを制御するスイッチ</li>
+              </ul>
+              <div style="margin-top:12px; padding:12px; background:#f3f4f6; border-radius:8px;">
+                <strong>ビット情報の表現：</strong><br>
+                コンデンサの電荷がたくさん溜まっている → <strong>「1」</strong><br>
+                コンデンサの電荷がほとんど無い → <strong>「0」</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2>4. 午後問題対策（記述問題の視点）</h2>
+        <p>ハードウェアやアーキテクチャの分野において、DRAMの最大の特徴である<strong>「リフレッシュ」</strong>の必要性について、物理的な仕組みの観点から説明を求められることがあります。</p>
+
+        <div class="diagram" style="background: #ffffff; border-color: #cbd5e1;">
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【想定設問】</div>
+          <p style="font-size: 14px; margin-bottom: 16px; padding: 14px; background: #f8fafc; border:1px solid #e2e8f0; border-radius: 8px;">
+            主記憶装置に用いられるDRAMは、SRAMと異なり、データを保持するために定期的なリフレッシュ動作が必要となる。その理由を、DRAMを構成する素子の特性に着目して40字以内で述べよ。
+          </p>
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【解答例】</div>
+          <p style="font-size: 15px; font-weight: bold; color: #b91c1c; margin-bottom: 16px;">
+            コンデンサに蓄えられた電荷は時間が経つと自然に放電して失われてしまうため。（37字）
+          </p>
+          <hr style="border:none; border-top:1px dashed #cbd5e1; margin:16px 0;" />
+          <div style="font-size: 13px; color: #475569; line-height: 1.6;">
+            <strong>【ポイント抽出の思考プロセス】</strong><br>
+            1. <strong>構成素子</strong>： DRAMは「コンデンサ」で電荷を保持している。<br>
+            2. <strong>物理的特性</strong>： コンデンサは絶縁体を使っていても、微小な漏れ電流により時間とともに徐々に自然放電してしまう。<br>
+            3. <strong>結果</strong>： 放置すると「1」のデータが「0」に変わってしまうため、電荷が完全に消える前に読み直して、もう一度充電（リフレッシュ）する必要がある。<br><br>
+            ※SRAMはフリップフロップ回路（トランジスタの組み合わせ）で構成されているため、通電している限りデータは消えず、リフレッシュは不要です。この対比もセットで覚えておきましょう。
+          </div>
+        </div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <style>
+    /* 追加CSS（図表・テーブル用） */
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .article-table th, .article-table td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .article-table th {
+      background: #f8fafc;
+      font-weight: 800;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+    .article-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+  </style>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
