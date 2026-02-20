@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | MIPSの計算問題（1秒あたりの処理件数）</title>
+  <meta name="description" content="基本情報・応用情報試験で頻出のMIPS計算問題を解説。CPUの性能（MIPS）と1件あたりの命令数から、1秒間に処理できる件数を算出する手順を工場のメタファーで分かりやすく図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="MIPSの計算問題（1秒あたりの処理件数）" />
+  <meta property="og:description" content="基本情報・応用情報試験で頻出のMIPS計算問題を解説。CPUの性能（MIPS）と1件あたりの命令数から、1秒間に処理できる件数を算出する手順を工場のメタファーで分かりやすく図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 用語解説カード */
+    .term-card {
+      border: 2px dashed #3b82f6;
+      background: #eff6ff;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      color: #1d4ed8;
+      font-weight: bold;
+    }
+    .term-card span.highlight {
+      font-size: 1.5em;
+      color: #ef4444;
+      display: block;
+      margin: 10px 0;
+    }
+
+    /* 計算式ビジュアル */
+    .calc-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+    .calc-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .val-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 10px 15px;
+      text-align: center;
+      background: #fff;
+      min-width: 150px;
+    }
+    .val-server { border-color: #10b981; color: #047857; background: #ecfdf5; }
+    .val-task { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    .val-result { border-color: #ef4444; color: #991b1b; background: #fef2f2; font-size: 1.2em; font-weight: bold; }
+    
+    .operator { font-size: 1.5em; font-weight: bold; color: #64748b; }
+
+    /* 工場メタファー */
+    .factory-metaphor {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .metaphor-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .m-icon { font-size: 2.5em; width: 50px; text-align: center; }
+    .m-text { flex: 1; }
+    .m-title { font-weight: bold; font-size: 1.1em; color: #1e293b; display: block; }
+    .m-desc { font-size: 0.9em; color: #475569; }
+
+    /* 鉄則ボックス */
+    .golden-rule {
+      background: #1e293b;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1em;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .golden-rule span { color: #facc15; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">MIPSの計算問題（1秒あたりの処理件数）</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#応用情報</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#MIPS</span>
+            <span class="tag">#計算問題</span>
+            <span class="tag">#CPU</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>情報処理試験で頻出の「MIPS」を用いた処理件数の計算問題を、意味と図解で徹底解説します。</p>
+<hr>
+
+<div class="question-box">
+  【問題】<br>
+  あるクライアントサーバシステムにおいて、クライアントから要求された1件の検索を処理するために、サーバで平均 <strong>100万命令</strong> が実行される。このサーバの性能は <strong>100MIPS</strong> である。このシステムにおいて、<strong>1秒間に処理できる検索要求は何件か。</strong>
+</div>
+
+<h2>1. まず「MIPS」の意味を完全に理解する</h2>
+<p>
+  計算を始める前に、単位の意味を翻訳しましょう。
+</p>
+
+<!-- 図解：MIPSの意味 -->
+<div class="diagram-container">
+  <div class="term-card">
+    <strong>MIPS</strong> (Million Instructions Per Second)<br>
+    ＝ 1秒間に実行できる「百万単位の」命令数
+    <span class="highlight">1 MIPS ＝ 1秒間に 100万命令</span>
+  </div>
+</div>
+
+<h2>2. 条件を整理して単位をそろえる</h2>
+<p>
+  今回の条件を「命令数」という同じ土俵に揃えます。ここが超重要です。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>要素</th>
+      <th>問題文の数値</th>
+      <th>実際の命令数に直す</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>サーバの処理能力</strong></td>
+      <td>100 MIPS</td>
+      <td>1秒間に 100 × 100万 = <strong>1億命令 / 秒</strong></td>
+    </tr>
+    <tr>
+      <td><strong>1件の検索に必要な量</strong></td>
+      <td>100万命令</td>
+      <td>検索1回につき <strong>100万命令</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. 実際に計算する（割るだけ！）</h2>
+<p>
+  やることは<strong>「1秒間にできる総仕事量」÷「1件あたりに必要な仕事量」</strong>だけです。
+</p>
+
+<!-- 図解：計算フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">計算式のイメージ</div>
+  <div class="calc-flow">
+    <div class="calc-row">
+      <div class="val-box val-server">
+        <strong>サーバの能力</strong><br>
+        1億命令 / 秒<br>
+        <span style="font-size:0.8em;">(10<sup>8</sup>)</span>
+      </div>
+      <div class="operator">÷</div>
+      <div class="val-box val-task">
+        <strong>1件に必要な命令</strong><br>
+        100万命令 / 件<br>
+        <span style="font-size:0.8em;">(10<sup>6</sup>)</span>
+      </div>
+    </div>
+    <div class="operator">⬇</div>
+    <div class="val-box val-result">
+      100 件 / 秒
+    </div>
+  </div>
+</div>
+
+<p>
+  指数で計算すると：<br>
+  <code>10^8 ÷ 10^6 = 10^2 = 100</code><br>
+  よって、答えは <strong>100件</strong> となります。
+</p>
+
+<h2>4. 工場のメタファー（イメージで理解する）</h2>
+<p>
+  「1件あたり100万命令が必要な作業に対して、1秒で1億処理できる性能のサーバを当てているから、1秒で100件の処理ができる」という本質を、工場に例えてみましょう。
+</p>
+
+<!-- 図解：工場メタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">CPU ＝ 工場</div>
+  <div class="factory-metaphor">
+    <div class="metaphor-item">
+      <div class="m-icon">🧠</div>
+      <div class="m-text">
+        <span class="m-title">サーバ (工場) の能力</span>
+        <span class="m-desc">この工場は、1秒間に <strong>1億回</strong> の作業（命令）をこなせます。</span>
+      </div>
+    </div>
+    <div class="metaphor-item">
+      <div class="m-icon">🔎</div>
+      <div class="m-text">
+        <span class="m-title">検索1件 (製品) の手間</span>
+        <span class="m-desc">製品を1個完成させるには、<strong>100万回</strong> の作業（命令）が必要です。</span>
+      </div>
+    </div>
+    <div class="metaphor-item">
+      <div class="m-icon">📦</div>
+      <div class="m-text">
+        <span class="m-title">結論 (生産量)</span>
+        <span class="m-desc">1億回作業できるパワーで、1個あたり100万回の手間をかけるので、<strong>1秒間に100個</strong> の製品（検索）が完了します。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>試験での鉄則まとめ</h2>
+
+<div class="diagram-container">
+  <div class="golden-rule">
+    MIPS問題の万能公式<br><br>
+    <span>（ MIPS × 100万 ） ÷ 1件あたりの命令数</span><br>
+    ＝ 1秒あたりの処理件数
+  </div>
+</div>
+
+<p>
+  <strong>「MIPSは100万掛けろ！あとは割るだけ！」</strong><br>
+  これだけ覚えておけば、MIPSの処理件数問題は確実に得点源になります。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
