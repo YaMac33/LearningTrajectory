@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-gpu-matrix-calculation-deep-learning",
+    "category": "ap",
+    "timestamp": "2026-02-20T16:18:04+09:00",
+    "title": "GPUの行列演算とディープラーニングの役割",
+    "summary": "GPUは、行列演算に特化したプロセッサとしてAIシステムに不可欠な役割を果たします。CPUとの違いを理解することで、試験対策になります。",
+    "tags": [
+      "GPU",
+      "行列演算",
+      "ディープラーニング",
+      "AIシステム",
+      "並列処理",
+      "ハードウェア",
+      "計算プロセス"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "システムアーキテクチャ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-20-ap-gpu-matrix-calculation-deep-learning/"
+  },
+  {
     "id": "ap-ap-exam-overview-strategy",
     "category": "ap",
     "timestamp": "2026-02-20T12:23:25+09:00",
