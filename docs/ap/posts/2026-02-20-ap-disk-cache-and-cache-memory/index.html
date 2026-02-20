@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ディスクキャッシュとキャッシュメモリ</title>
+  <meta name="description" content="コンピュータの処理速度を向上させる「キャッシュメモリ」と「ディスクキャッシュ」の違い、それぞれの仕組みや応用情報技術者試験での問われ方、実務でのキャッシュの考え方について解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ディスクキャッシュとキャッシュメモリ" />
+  <meta property="og:description" content="コンピュータの処理速度を向上させる「キャッシュメモリ」と「ディスクキャッシュ」の違い、それぞれの仕組みや応用情報技術者試験での問われ方、実務でのキャッシュの考え方について解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-20">
+            2026.02.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ディスクキャッシュとキャッシュメモリ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">応用情報技術者試験</span>
+            <span class="tag">ハードウェア</span>
+            <span class="tag">アーキテクチャ</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <h2>1. 定義と仕組み（2つのキャッシュの違い）</h2>
+        <p>コンピュータを高速に動作させるためには、CPUがデータを待ち時間なく受け取れることが理想です。しかし、各装置の処理速度には大きな差があります。そこで、よく使うデータを「一時保存用の高速な場所」に置いておく技術が<strong>キャッシュ（Cache）</strong>です。</p>
+        <p>キャッシュには、配置される場所と目的によって<strong>「キャッシュメモリ」</strong>と<strong>「ディスクキャッシュ」</strong>の2種類が存在します。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">コンピュータ全体の階層とキャッシュの位置付け</h3>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <div style="display:flex; justify-content:space-between; width:100%; max-width:500px; font-weight:bold; color:#4b5563; font-size:12px; border-bottom:1px dashed #cbd5e1; padding-bottom:4px; margin-bottom:8px;">
+              <span>← 速い / 容量小 / 高価</span>
+              <span>遅い / 容量大 / 安価 →</span>
+            </div>
+
+            <!-- CPU -->
+            <div style="padding:12px 24px; background:#f87171; border-radius:8px; font-weight:bold; color:#fff; text-align:center; width:140px;">
+              CPU (超高速)
+            </div>
+            <div style="color:#64748b; font-size:16px;">⇅</div>
+            
+            <!-- キャッシュメモリ -->
+            <div style="padding:12px 24px; background:#fca5a5; border-radius:8px; font-weight:bold; color:#7f1d1d; text-align:center; width:220px; border:2px solid #b91c1c;">
+              キャッシュメモリ (高速)<br>
+              <span style="font-size:11px; font-weight:normal;">主記憶(RAM)の一部をコピー<br>「机の上のよく読む本」</span>
+            </div>
+            <div style="color:#64748b; font-size:16px;">⇅</div>
+
+            <!-- 主記憶(RAM) -->
+            <div style="padding:12px 24px; background:#60a5fa; border-radius:8px; font-weight:bold; color:#fff; text-align:center; width:140px;">
+              主記憶 / RAM (中速)
+            </div>
+            <div style="color:#64748b; font-size:16px;">⇅</div>
+
+            <!-- ディスクキャッシュ -->
+            <div style="padding:12px 24px; background:#93c5fd; border-radius:8px; font-weight:bold; color:#1e3a8a; text-align:center; width:220px; border:2px solid #1d4ed8;">
+              ディスクキャッシュ (低〜中速)<br>
+              <span style="font-size:11px; font-weight:normal;">HDDデータの一時バッファ<br>「倉庫前の手元の棚」</span>
+            </div>
+            <div style="color:#64748b; font-size:16px;">⇅</div>
+
+            <!-- 磁気ディスク -->
+            <div style="padding:12px 24px; background:#475569; border-radius:8px; font-weight:bold; color:#fff; text-align:center; width:160px;">
+              磁気ディスク / HDD (低速)
+            </div>
+          </div>
+        </div>
+
+        <h3>① キャッシュメモリ（CPUと主記憶の間）</h3>
+        <p>CPUは非常に高速ですが、主記憶（RAM）はそれに比べて遅いため、CPUがデータ待ちになってしまいます。これを解消するため、CPUのすぐ近くに配置され、主記憶のうち<strong>よく使うデータの一部をコピーしておく</strong>のがキャッシュメモリです。</p>
+
+        <h3>② ディスクキャッシュ（主記憶とディスクの間）</h3>
+        <p>主記憶（RAM）と磁気ディスク（HDD等）の間には、さらに絶望的な速度差があります。HDDは物理的に円盤を回転させてデータを読み書きするため非常に遅いのです。そこで、ディスクへのアクセス回数を減らすため、HDD側に<strong>一時保存用の半導体メモリ（データバッファ）</strong>を設けたものがディスクキャッシュです。</p>
+
+        <h2>2. 応用情報技術者試験（午前）での問われ方</h2>
+        <p>午前試験では、この2つを明確に区別できているかを問う問題が頻出します。「どの装置とどの装置の速度差を埋めるのか」を確実におさえましょう。</p>
+
+        <div style="overflow-x:auto; margin-top:16px; margin-bottom:16px;">
+          <table class="article-table">
+            <thead>
+              <tr>
+                <th>比較項目</th>
+                <th>キャッシュメモリ</th>
+                <th>ディスクキャッシュ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>どこを高速化？</strong></td>
+                <td><strong>CPU</strong> ⇄ <strong>主記憶</strong></td>
+                <td><strong>主記憶</strong> ⇄ <strong>ディスク</strong></td>
+              </tr>
+              <tr>
+                <td><strong>何をコピーする？</strong></td>
+                <td>主記憶データの一部</td>
+                <td>ディスクデータの一部</td>
+              </tr>
+              <tr>
+                <td><strong>主な実装場所</strong></td>
+                <td>CPU内部、またはCPU周辺</td>
+                <td>ディスク装置側（コントローラ内など）</td>
+              </tr>
+              <tr>
+                <td><strong>試験でのキーワード</strong></td>
+                <td>「実効アクセス時間」「ヒット率」</td>
+                <td>「バッファ」「回転待ち時間の隠蔽」</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p><strong>【ひっかけ対策のコツ】</strong><br>
+        問題文に「CPUと主記憶のアクセス速度の差」とあれば<strong>キャッシュメモリ</strong>、「主記憶と磁気ディスクのアクセス速度の差」とあれば<strong>ディスクキャッシュ</strong>を選びます。「上の層を速くするのがキャッシュメモリ、下の層を速くするのがディスクキャッシュ」と覚えましょう。</p>
+
+        <h2>3. 午後問題対策（記述問題の視点）</h2>
+        <p>午後問題（コンピュータシステム分野）では、「実効アクセス時間」の計算や、「なぜキャッシュが有効に働くのか（局所性）」といったより深い理解が問われます。</p>
+
+        <div class="diagram" style="background: #ffffff; border-color: #cbd5e1;">
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【想定設問】</div>
+          <p style="font-size: 14px; margin-bottom: 16px; padding: 14px; background: #f8fafc; border:1px solid #e2e8f0; border-radius: 8px;">
+            キャッシュメモリを導入することでシステム全体の処理速度が向上する理由として、プログラムの実行がもつ「局所性（Locality）」という性質が関係している。この「局所性」とはどのような性質か、時間的・空間的という観点を含めて40字以内で述べよ。
+          </p>
+          <div style="margin-bottom: 8px; font-weight: bold; color: #1e293b; font-size:15px;">【解答例】</div>
+          <p style="font-size: 15px; font-weight: bold; color: #b91c1c; margin-bottom: 16px;">
+            一度アクセスしたデータやその周辺のデータに、近い将来再びアクセスしやすい性質。（39字）
+          </p>
+          <hr style="border:none; border-top:1px dashed #cbd5e1; margin:16px 0;" />
+          <div style="font-size: 13px; color: #475569; line-height: 1.6;">
+            <strong>【ポイント抽出の思考プロセス】</strong><br>
+            1. <strong>局所性とは</strong>： 特定のデータばかり偏って使われる性質のこと。<br>
+            2. <strong>時間的局所性</strong>： 「今使ったデータは、すぐ後にもう一度使われる可能性が高い」（例：ループ処理の変数）。<br>
+            3. <strong>空間的局所性</strong>： 「今使ったデータのアドレスの、すぐ近くのアドレスが使われる可能性が高い」（例：配列の連続アクセス）。<br>
+            これらがあるからこそ、少容量のキャッシュでも「ヒット率」が高くなり、全体として高速化できるという論理を理解しておきましょう。
+          </div>
+        </div>
+
+        <h2>4. 実務イメージとシステム構成</h2>
+        <p>ITエンジニアの実務において、「キャッシュ」という概念はハードウェアにとどまらず、ソフトウェアアーキテクチャ全体に適用される非常に重要な考え方です。</p>
+
+        <p>「遅いストレージの前に、速い一時保存場所を置く」という基本原理は、Webシステムなどでもそのまま応用されています。</p>
+
+        <div class="diagram">
+          <h3 class="diagram__title">Webシステムにおけるキャッシュの応用例</h3>
+          <div class="diagram__grid">
+            <div class="diagram__card">
+              <div class="diagram__head">1. メモリキャッシュ (Redis / Memcached)</div>
+              <p class="diagram__note">RDBMS（データベース）はHDDやSSDにアクセスするため遅延が発生します。そこで、よく検索されるユーザー情報などを「インメモリDB」にキャッシュし、高速にレスポンスを返します。（ディスクキャッシュの概念の応用）</p>
+            </div>
+            <div class="diagram__card">
+              <div class="diagram__head">2. CDN (コンテンツ配信ネットワーク)</div>
+              <p class="diagram__note">遠くにあるオリジンサーバー（主記憶のようなもの）から毎回画像をダウンロードするのは遅いため、ユーザーの物理的に近いエッジサーバー（キャッシュメモリのようなもの）に画像を一時保存しておきます。</p>
+            </div>
+          </div>
+        </div>
+        <p>キャッシュは速度を劇的に改善しますが、同時に<strong>「元のデータが更新されたとき、いつキャッシュを破棄・更新するか（キャッシュの無効化・整合性維持）」</strong>という運用上の難しい課題も引き起こします。試験だけでなく、実務でもこのトレードオフを意識して設計を行うことが求められます。</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <style>
+    /* 追加CSS（図表・テーブル用） */
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .article-table th, .article-table td {
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .article-table th {
+      background: #f8fafc;
+      font-weight: 800;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+    .article-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+  </style>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
