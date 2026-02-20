@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-filter-bubble-ap-exam",
+    "category": "ap",
+    "timestamp": "2026-02-20T17:10:08+09:00",
+    "title": "フィルターバブルとその影響",
+    "summary": "フィルターバブルは、AIによる情報の偏りがもたらす現象であり、試験ではその原因や結果を理解することが求められます。",
+    "tags": [
+      "応用情報技術者試験",
+      "AI",
+      "アルゴリズム",
+      "パーソナライズ",
+      "視野狭窄",
+      "情報セキュリティ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-20-ap-filter-bubble-ap-exam/"
+  },
+  {
     "id": "ap-gpu-matrix-calculation-deep-learning",
     "category": "ap",
     "timestamp": "2026-02-20T16:18:04+09:00",
