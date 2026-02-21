@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-compiler-optimization-techniques",
+    "category": "ap",
+    "timestamp": "2026-02-21T21:21:40+09:00",
+    "title": "コンパイラの最適化手法まとめ",
+    "summary": "コンパイラがプログラムの実行時間を短縮するための最適化技術を体系的にまとめています。具体的な手法を理解することで、AP試験における重要な知識を得られます。",
+    "tags": [
+      "基本情報",
+      "応用情報",
+      "コンパイラ",
+      "最適化",
+      "プログラミング"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ソフトウェア工学"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-21-ap-compiler-optimization-techniques/"
+  },
+  {
     "id": "ap-mips-calculation-issues",
     "category": "ap",
     "timestamp": "2026-02-20T20:44:55+09:00",
