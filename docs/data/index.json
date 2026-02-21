@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-sandbox-security-terms",
+    "category": "ap",
+    "timestamp": "2026-02-21T21:29:50+09:00",
+    "title": "サンドボックスとセキュリティ用語の解説",
+    "summary": "本記事では、サンドボックスやSIEMなど情報セキュリティの重要な概念を図解で解説します。これらの仕組みを理解することで、セキュリティ対策の効果的な実施が可能になります。",
+    "tags": [
+      "セキュリティ",
+      "基本情報",
+      "応用情報",
+      "サンドボックス",
+      "SIEM",
+      "サニタイジング",
+      "リバースプロキシ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-21-ap-sandbox-security-terms/"
+  },
+  {
     "id": "ap-compiler-optimization-techniques",
     "category": "ap",
     "timestamp": "2026-02-21T21:21:40+09:00",
