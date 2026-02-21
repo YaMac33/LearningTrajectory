@@ -1,0 +1,23 @@
+{
+  "id": "ap-arp-rarp-icmp-nat-difference",
+  "category": "ap",
+  "timestamp": "2026-02-21T22:22:14+09:00",
+  "post_path": "ap/posts/2026-02-21-ap-arp-rarp-icmp-nat-difference/",
+  "meta": {
+    "title": "ARP・RARP・ICMP・NATの役割と違い",
+    "summary": "TCP/IPネットワークにおけるARP、RARP、ICMP、NATの基本的な役割と相違点を理解できる内容です。特に、アドレス変換や通信確認の仕組みが解説されています。",
+    "tags": [
+      "ネットワーク",
+      "基本情報",
+      "プロトコル",
+      "ARP",
+      "RARP",
+      "ICMP",
+      "NAT"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
