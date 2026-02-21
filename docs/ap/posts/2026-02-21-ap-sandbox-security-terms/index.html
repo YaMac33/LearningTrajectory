@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | サンドボックスと各種セキュリティ用語の解説</title>
+  <meta name="description" content="情報セキュリティにおける「サンドボックス」「SIEM」「サニタイジング」「リバースプロキシ」の仕組みと目的を図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="サンドボックスと各種セキュリティ用語の解説" />
+  <meta property="og:description" content="情報セキュリティにおける「サンドボックス」「SIEM」「サニタイジング」「リバースプロキシ」の仕組みと目的を図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    
+    /* サンドボックス図解 */
+    .sandbox-visual {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .system-area {
+      border: 3px solid #64748b;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 30px;
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+    }
+    .system-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #64748b;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .safe-files {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      color: #10b981;
+      font-weight: bold;
+    }
+    .sandbox-area {
+      border: 3px dashed #ef4444;
+      background: #fee2e2;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .sandbox-label {
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      background: #ef4444;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .suspect-pg { font-size: 2em; margin-bottom: 5px; }
+    .no-access {
+      position: absolute;
+      top: -25px;
+      right: 20px;
+      color: #ef4444;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    /* SIEM図解 */
+    .siem-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .log-sources {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .log-item {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 5px 15px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #475569;
+    }
+    .flow-arrows {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #94a3b8;
+      font-weight: bold;
+    }
+    .siem-core {
+      background: #1e293b;
+      color: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      border: 2px solid #3b82f6;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+    .siem-title { font-size: 1.2em; font-weight: bold; display: block; margin-bottom: 10px; color: #60a5fa; }
+    .siem-alert {
+      background: #ef4444;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 0.8; } }
+
+    /* サニタイジング図解 */
+    .sanitize-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .code-box {
+      font-family: monospace;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1.1em;
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+    }
+    .code-danger { background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; }
+    .code-safe { background: #dcfce7; border: 1px solid #10b981; color: #047857; }
+    .action-arrow { color: #f59e0b; font-weight: bold; font-size: 1.2em; }
+
+    /* リバースプロキシ図解 */
+    .proxy-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .proxy-node {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #fff;
+      font-weight: bold;
+    }
+    .node-client { border-color: #64748b; color: #334155; }
+    .node-proxy { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; position: relative; }
+    .node-server { border-color: #10b981; background: #ecfdf5; color: #047857; }
+    .proxy-shield {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      font-size: 1.5em;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-21">
+            2026.02.21
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">サンドボックスと各種セキュリティ用語の解説</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+            <span class="tag">#サンドボックス</span>
+            <span class="tag">#SIEM</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>情報セキュリティ試験で頻出のキーワード「サンドボックス」「SIEM」「サニタイジング」「リバースプロキシ」について、それぞれの目的と仕組みを図解します。</p>
+<hr>
+
+<div class="question-box">
+  【問題】<br>
+  情報セキュリティにおける <strong>サンドボックス</strong> の説明はどれか。<br><br>
+  （選択肢の構成要素）<br>
+  ・ SIEM<br>
+  ・ サニタイジング / エスケープ処理<br>
+  ・ リバースプロキシ<br>
+  ・ サンドボックス
+</div>
+
+<h2>1. サンドボックス（Sandbox）の仕組み</h2>
+<p>
+  サンドボックスは、<strong>「隔離して動かすことで、被害を広げない仕組み」</strong>です。<br>
+  子供を公園の「砂場」の中だけで遊ばせれば、外の道路に飛び出したり汚したりしない、というイメージから名付けられました。
+</p>
+
+<!-- 図解：サンドボックス -->
+<div class="diagram-container">
+  <div class="diagram-title">サンドボックスの概念図</div>
+  <div class="sandbox-visual">
+    <div class="system-area">
+      <span class="system-label">システム全体</span>
+      
+      <div class="safe-files">
+        <span>📄OS重要ファイル</span>
+        <span>📁他のアプリ</span>
+      </div>
+
+      <div class="sandbox-area">
+        <span class="sandbox-label">Sandbox (隔離領域)</span>
+        <div class="no-access">✖ アクセス不可</div>
+        <div class="suspect-pg">👾</div>
+        <div style="font-weight:bold; color:#b91c1c;">不審なプログラム</div>
+        <div style="font-size:0.8em; color:#ef4444;">※ここでだけ実行させる</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<table class="comparison-table">
+  <tbody>
+    <tr><th>目的</th><td>システム全体の保護</td></tr>
+    <tr><th>方法</th><td>不正の可能性があるプログラムを、隔離された専用領域で実行し振る舞いを見る。</td></tr>
+    <tr><th>効果</th><td>もしウイルスであっても、OSや他のファイルに影響を与えられない。</td></tr>
+  </tbody>
+</table>
+
+<h2>2. SIEM の仕組み</h2>
+<p>
+  SIEM（Security Information and Event Management）は、<strong>「バラバラのログを集めて、まとめて分析する仕組み」</strong>です。
+</p>
+
+<!-- 図解：SIEM -->
+<div class="diagram-container">
+  <div class="diagram-title">SIEMのログ集約と分析</div>
+  <div class="siem-flow">
+    
+    <div class="log-sources">
+      <div class="log-item">OSのログ</div>
+      <div class="log-item">DBMSのログ</div>
+      <div class="log-item">アプリのログ</div>
+      <div class="log-item">FW/ルータのログ</div>
+    </div>
+
+    <div class="flow-arrows">
+      ➡<br>➡<br>➡
+    </div>
+
+    <div class="siem-core">
+      <span class="siem-title">SIEM</span>
+      <div style="font-size:0.85em; margin-bottom:10px;">相関分析 (まとめて照合)</div>
+      <div style="font-size:0.85em; margin-bottom:10px;">異常検知</div>
+    </div>
+
+    <div class="flow-arrows">➡</div>
+
+    <div class="siem-alert">
+      🚨 アラート通知<br>
+      <span style="font-size:0.75em; font-weight:normal;">攻撃を発見！</span>
+    </div>
+
+  </div>
+</div>
+
+<table class="comparison-table">
+  <tbody>
+    <tr><th>目的</th><td>不正・攻撃の早期検知</td></tr>
+    <tr><th>方法</th><td>様々な機器やソフトウェアのログを1か所に集約し、横断的に分析（相関分析）する。</td></tr>
+    <tr><th>効果</th><td>単体の機器のログだけでは気づけない、巧妙な攻撃シナリオを発見できる。</td></tr>
+  </tbody>
+</table>
+
+<h2>3. サニタイジング ／ エスケープ処理の仕組み</h2>
+<p>
+  サニタイジングは、<strong>「入力は信用しない。実行させず、ただの文字にする（無害化する）」</strong>処理です。<br>
+  XSS（クロスサイトスクリプティング）やSQLインジェクションの対策として必須の技術です。
+</p>
+
+<!-- 図解：サニタイジング -->
+<div class="diagram-container">
+  <div class="diagram-title">エスケープ処理による無害化</div>
+  <div class="sanitize-flow">
+    
+    <div class="code-box code-danger">
+      &lt;script&gt;alert(1)&lt;/script&gt;
+      <div style="font-size:0.6em; color:#ef4444; margin-top:5px;">※このまま画面に出すとプログラムとして実行される！</div>
+    </div>
+
+    <div class="action-arrow">⬇ 特殊文字を別の文字列に変換</div>
+
+    <div class="code-box code-safe">
+      &amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;
+      <div style="font-size:0.6em; color:#10b981; margin-top:5px;">※ただの文字として画面に表示されるだけになり安全！</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. リバースプロキシの仕組み</h2>
+<p>
+  リバースプロキシは、<strong>「Webサーバの盾（前面に立つ代理人）」</strong>のような存在です。<br>
+  クライアントは裏にいる本当のWebサーバを直接触ることはできません。
+</p>
+
+<!-- 図解：リバースプロキシ -->
+<div class="diagram-container">
+  <div class="diagram-title">リバースプロキシの配置</div>
+  <div class="proxy-diagram">
+    <div class="proxy-node node-client">
+      利用者<br>(多数のPC)
+    </div>
+    <div style="color:#94a3b8; font-weight:bold;">➡</div>
+    <div class="proxy-node node-proxy">
+      <div class="proxy-shield">🛡️</div>
+      リバースプロキシ<br>
+      <span style="font-size:0.7em;">(代理でリクエスト受付)</span>
+    </div>
+    <div style="color:#94a3b8; font-weight:bold;">➡</div>
+    <div class="proxy-node node-server">
+      Webサーバ<br>
+      <span style="font-size:0.7em;">(直接アクセスさせない)</span>
+    </div>
+  </div>
+</div>
+
+<table class="comparison-table">
+  <tbody>
+    <tr><th>位置</th><td>Webサーバの前面（インターネットとの境界）</td></tr>
+    <tr><th>役割</th><td>クライアントからの要求を代理で受け取り、背後のWebサーバへ転送する。</td></tr>
+    <tr><th>効果</th><td>Webサーバを直接の攻撃から隠す（保護）。また、複数台への負荷分散も可能。</td></tr>
+  </tbody>
+</table>
+
+<h2>まとめ</h2>
+<p>
+  各用語のキーワードをもう一度整理しましょう。
+</p>
+<ul>
+  <li><strong>サンドボックス</strong> ＝ 隔離して動かす砂場</li>
+  <li><strong>SIEM</strong> ＝ ログを集めて相関分析</li>
+  <li><strong>サニタイジング</strong> ＝ 危険な入力をただの文字に変換（無害化）</li>
+  <li><strong>リバースプロキシ</strong> ＝ Webサーバの前に立つ身代わり（盾）</li>
+</ul>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
