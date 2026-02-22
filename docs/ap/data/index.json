@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-version-control-tools-differences",
+    "category": "ap",
+    "timestamp": "2026-02-22T20:22:01+09:00",
+    "title": "バージョン管理ツールの違い（Git, SVN, CVS）",
+    "summary": "バージョン管理システムの基本概念である集中型と分散型の違いを説明し、Git、SVN、CVSの特徴を比較します。",
+    "tags": [
+      "Git",
+      "SVN",
+      "バージョン管理",
+      "開発ツール",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ソフトウェア工学"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-22-ap-version-control-tools-differences/"
+  },
+  {
     "id": "ap-arp-rarp-icmp-nat-difference",
     "category": "ap",
     "timestamp": "2026-02-21T22:22:14+09:00",
