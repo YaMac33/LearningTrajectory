@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | NAPTの仕組みとIPv6時代のネットワーク設計思想</title>
+  <meta name="description" content="NAPT（IPマスカレード）の仕組みから、メリット・デメリット、そしてIPv6の普及による「隠す」から「制御する」へのネットワーク設計思想の根本的な変化について図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="NAPTの仕組みとIPv6時代のネットワーク設計思想" />
+  <meta property="og:description" content="NAPT（IPマスカレード）の仕組みから、メリット・デメリット、そしてIPv6の普及による「隠す」から「制御する」へのネットワーク設計思想の根本的な変化について図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* NAPT変換図解 */
+    .napt-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .network-zone {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      flex: 1;
+      min-width: 180px;
+    }
+    .zone-private { border-color: #10b981; background: #ecfdf5; }
+    .zone-public { border-color: #3b82f6; background: #eff6ff; }
+    .zone-title { font-weight: bold; margin-bottom: 10px; display: block; }
+    
+    .device-box {
+      background: #fff;
+      border: 1px solid currentColor;
+      padding: 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85em;
+      margin: 5px 0;
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+    }
+    .zone-private .device-box { color: #047857; }
+    .zone-public .device-box { color: #1d4ed8; }
+    .port-text { font-size: 0.8em; color: #64748b; margin-top: 2px; }
+
+    .router-core {
+      background: #1e293b;
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: bold;
+      z-index: 2;
+    }
+    .router-icon { font-size: 2em; margin-bottom: 5px; }
+    .napt-table {
+      background: #334155;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.7em;
+      margin-top: 10px;
+      border-spacing: 0;
+    }
+    .napt-table th, .napt-table td { padding: 2px 5px; text-align: left; }
+    .napt-table th { color: #94a3b8; border-bottom: 1px solid #475569; }
+
+    /* メリット・デメリットカード */
+    .pros-cons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .pros-cons-grid { grid-template-columns: 1fr; }
+    }
+    .feature-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fff;
+    }
+    .card-pros { border-top: 4px solid #10b981; }
+    .card-cons { border-top: 4px solid #ef4444; }
+    .feature-title { font-weight: 800; font-size: 1.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+    .card-pros .feature-title { color: #047857; }
+    .card-cons .feature-title { color: #b91c1c; }
+    .feature-list { padding-left: 20px; margin: 0; font-size: 0.9em; color: #475569; }
+    .feature-list li { margin-bottom: 5px; }
+
+    /* 思想の転換図解 */
+    .paradigm-shift {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .shift-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .era-badge {
+      position: absolute;
+      top: -12px;
+      left: 15px;
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .era-v4 { background: #64748b; }
+    .era-v6 { background: #3b82f6; }
+    
+    .shift-concept {
+      flex: 1;
+      text-align: center;
+    }
+    .concept-title { font-weight: 900; font-size: 1.2em; color: #1e293b; display: block; margin-bottom: 5px; }
+    .concept-desc { font-size: 0.85em; color: #475569; }
+    .visual-box {
+      font-size: 2em;
+      width: 60px;
+      text-align: center;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-22">
+            2026.02.22
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">NAPTの仕組みとIPv6時代のネットワーク設計思想</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#IPv4</span>
+            <span class="tag">#IPv6</span>
+            <span class="tag">#NAPT</span>
+            <span class="tag">#ゼロトラスト</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>枯渇するIPv4アドレスを救った救世主「NAPT」。その仕組みと、IPv6への移行に伴うネットワーク設計のパラダイムシフトについて解説します。</p>
+<hr>
+
+<h2>1. NAPT（Network Address Port Translation）とは？</h2>
+<p>
+  NAPTは、限られた<strong>「グローバルIPアドレス」1つ</strong>を、社内や家庭の<strong>複数の端末（プライベートIP）で共有する</strong>ための技術です。<br>
+  「IPマスカレード」とも呼ばれます。
+</p>
+
+<!-- 図解：NAPTの変換イメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">NAPTによるアドレスとポートの変換</div>
+  <div class="napt-diagram">
+    
+    <div class="network-zone zone-private">
+      <span class="zone-title">社内/家庭 (プライベート)</span>
+      <div class="device-box">
+        PC-A: 192.168.1.10
+        <span class="port-text">Port: 50000</span>
+      </div>
+      <div class="device-box">
+        PC-B: 192.168.1.11
+        <span class="port-text">Port: 50001</span>
+      </div>
+    </div>
+
+    <div class="router-core">
+      <span class="router-icon">🖧</span>
+      <span>NAPTルータ</span>
+      <table class="napt-table">
+        <tr><th>内部IP:ポート</th><th>外部ポート</th></tr>
+        <tr><td>.1.10 : 50000</td><td>: 1001</td></tr>
+        <tr><td>.1.11 : 50001</td><td>: 1002</td></tr>
+      </table>
+    </div>
+
+    <div class="network-zone zone-public">
+      <span class="zone-title">インターネット (グローバル)</span>
+      <div class="device-box" style="margin-top:20px;">
+        1つのグローバルIP<br>
+        203.0.113.5
+        <span class="port-text">Port: 1001 (PC-Aの通信)</span>
+        <span class="port-text">Port: 1002 (PC-Bの通信)</span>
+      </div>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:10px;">
+    ルータが「IPアドレス」だけでなく<strong>「ポート番号」</strong>も書き換えることで、通信の行き帰りを区別します。
+  </p>
+</div>
+
+<h2>2. NAPTの功罪（メリットとデメリット）</h2>
+<p>
+  NAPTはIPv4の枯渇問題を延命させた偉大な技術ですが、インターネット本来の設計思想を壊す「副作用」も持っています。
+</p>
+
+<!-- 図解：メリットとデメリット -->
+<div class="diagram-container">
+  <div class="diagram-title">NAPTのメリットと副作用</div>
+  <div class="pros-cons-grid">
+    
+    <div class="feature-card card-pros">
+      <div class="feature-title"><span>✅</span> メリット (救世主)</div>
+      <ul class="feature-list">
+        <li><strong>IPアドレスの節約</strong>：これが最大の目的。約43億個しかないIPv4を今日まで持たせた。</li>
+        <li><strong>コスト削減</strong>：1回線1IPの契約で、何台でもネットに繋がる。</li>
+        <li><strong>簡易的なセキュリティ</strong>：外部から内部のPCへ直接アクセスできない（隠れている）。</li>
+      </ul>
+    </div>
+
+    <div class="feature-card card-cons">
+      <div class="feature-title"><span>🔥</span> デメリット (副作用)</div>
+      <ul class="feature-list">
+        <li><strong>エンドツーエンド原則の破壊</strong>：端末同士が直接通信するというネットの基本が崩れ、P2P（WebRTCやゲーム）が複雑化。</li>
+        <li><strong>サーバ公開が面倒</strong>：外部から繋ぐにはポートフォワーディング等の設定が必須。</li>
+        <li><strong>ログ解析の困難化</strong>：外部からは全員が「同じ1つのIP」に見えてしまう。</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. IPv6時代、NAPTはどうなる？</h2>
+<p>
+  <strong>結論：IPv6では、枯渇対策としてのNAPTは「不要」になります。</strong><br>
+  IPv6のアドレス空間は128bit（約340澗個）あり、事実上無限です。世界中のすべての端末にグローバルIPを割り当てても余ります。<br>
+  これにより、失われていた「エンドツーエンドの直接通信」が復活します。
+</p>
+
+<h2>4. 本質的な設計思想の転換</h2>
+<p>
+  IPv6の普及により、ネットワークのセキュリティ設計そのものが大きく変わります。
+</p>
+
+<!-- 図解：設計思想の転換 -->
+<div class="diagram-container">
+  <div class="diagram-title">ネットワークセキュリティのパラダイムシフト</div>
+  <div class="paradigm-shift">
+    
+    <div class="shift-row">
+      <span class="era-badge era-v4">旧: IPv4 + NAPT</span>
+      <div class="visual-box">🙈</div>
+      <div class="shift-concept">
+        <span class="concept-title">「隠す」防御 (境界防御)</span>
+        <span class="concept-desc">NAPTルータの後ろに隠れていれば、外からは見えないから安全（という前提）。内部の通信は信用する。</span>
+      </div>
+    </div>
+
+    <div style="text-align:center; color:#94a3b8; font-weight:bold; font-size:1.5em; line-height:0.5;">⬇</div>
+
+    <div class="shift-row">
+      <span class="era-badge era-v6">新: IPv6 + ゼロトラスト</span>
+      <div class="visual-box">🚦</div>
+      <div class="shift-concept">
+        <span class="concept-title">「制御する」防御</span>
+        <span class="concept-desc">全端末がグローバルIPを持つ。隠れない代わりに、FW（ファイアウォール）のポリシーで「誰が何にアクセスできるか」を明示的に制御する。</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ：試験で問われるポイント</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>観点</th>
+      <th>IPv4時代 (NAPTあり)</th>
+      <th>IPv6時代 (NAPT不要)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>アドレスの前提</strong></td>
+      <td>枯渇している（節約が必須）</td>
+      <td>無限にある（全端末に付与）</td>
+    </tr>
+    <tr>
+      <td><strong>セキュリティの考え方</strong></td>
+      <td>変換して<strong>隠す</strong>（境界防御）</td>
+      <td>FWで<strong>制御する</strong>（ゼロトラスト志向）</td>
+    </tr>
+    <tr>
+      <td><strong>VPNの主な目的</strong></td>
+      <td>到達できない内部へ「到達するため」</td>
+      <td>通信の「認証と暗号化」のため</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  NAPTは単なる「アドレス変換技術」ではありません。<br>
+  <strong>「IPv4の限界をNAPTで無理やり補ってきた歴史があり、IPv6はそれを本来の美しい形に戻すものだ」</strong>という本質を理解しておくと、ネットワーク設計への理解が一段と深まります。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
