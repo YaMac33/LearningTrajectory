@@ -1,0 +1,21 @@
+{
+  "id": "ap-napt-and-ipv6-network-design",
+  "category": "ap",
+  "timestamp": "2026-02-22T21:07:39+09:00",
+  "post_path": "ap/posts/2026-02-22-ap-napt-and-ipv6-network-design/",
+  "meta": {
+    "title": "NAPTの仕組みとIPv6時代のネットワーク設計思想",
+    "summary": "NAPTの基本概念とIPv6におけるネットワーク設計の変化を解説し、試験での理解ポイントを紹介します。",
+    "tags": [
+      "ネットワーク",
+      "IPv4",
+      "IPv6",
+      "NAPT",
+      "ゼロトラスト"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
