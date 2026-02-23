@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-osi-7-layers-protocol",
+    "category": "ap",
+    "timestamp": "2026-02-24T07:47:27+09:00",
+    "title": "OSI 7階層とプロトコルの重要性",
+    "summary": "OSI 7階層モデルに基づくプロトコルの整理と、試験や実務での重要度について解説します。",
+    "tags": [
+      "ネットワーク",
+      "OSI参照モデル",
+      "プロトコル",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-24-ap-osi-7-layers-protocol/"
+  },
+  {
     "id": "ap-network-connection-services",
     "category": "ap",
     "timestamp": "2026-02-23T19:58:37+09:00",
