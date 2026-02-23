@@ -1,0 +1,21 @@
+{
+  "id": "ap-network-connection-services",
+  "category": "ap",
+  "timestamp": "2026-02-23T19:58:37+09:00",
+  "post_path": "ap/posts/2026-02-23-ap-network-connection-services/",
+  "meta": {
+    "title": "拠点間接続サービスの種類と特徴",
+    "summary": "拠点間接続サービスの違いを解説し、各方式の特長や進化の歴史を理解するための情報を提供します。",
+    "tags": [
+      "ネットワーク",
+      "WAN",
+      "フレームリレー",
+      "ATM",
+      "広域イーサネット"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
