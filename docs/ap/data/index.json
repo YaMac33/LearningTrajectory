@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-difference-fms-plm-mrp-scm",
+    "category": "ap",
+    "timestamp": "2026-02-23T15:01:08+09:00",
+    "title": "製造業システムの違い（FMS・PLM・MRP・SCM）",
+    "summary": "製造業の主要システム（FMS、PLM、MRP、SCM）の違いと、それぞれが管理する対象について解説します。",
+    "tags": [
+      "基本情報",
+      "応用情報",
+      "ITストラテジ",
+      "製造業",
+      "SCM"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "システムアーキテクチャ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-23-ap-difference-fms-plm-mrp-scm/"
+  },
+  {
     "id": "ap-napt-and-ipv6-network-design",
     "category": "ap",
     "timestamp": "2026-02-22T21:07:39+09:00",
