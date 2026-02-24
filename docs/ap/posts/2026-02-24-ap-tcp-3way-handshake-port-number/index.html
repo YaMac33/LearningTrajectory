@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | TCPの3ウェイハンドシェイクとポート番号の役割</title>
+  <meta name="description" content="TCP通信の開始時に行われる「3ウェイハンドシェイク」の仕組みと、IPアドレス・ポート番号の関係を図解でわかりやすく解説します。多重接続ができる理由もスッキリ理解できます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="TCPの3ウェイハンドシェイクとポート番号の役割" />
+  <meta property="og:description" content="TCP通信の開始時に行われる「3ウェイハンドシェイク」の仕組みと、IPアドレス・ポート番号の関係を図解でわかりやすく解説します。多重接続ができる理由もスッキリ理解できます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 3ウェイハンドシェイク図解 */
+    .handshake-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .node-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      margin-bottom: 10px;
+      padding: 0 20px;
+    }
+    .node-box {
+      text-align: center;
+    }
+    .node-box span { display: block; font-size: 0.8em; color: #64748b; font-weight: normal; }
+    
+    .msg-row {
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding: 10px 0;
+    }
+    .msg-arrow {
+      flex: 1;
+      height: 2px;
+      background: #94a3b8;
+      position: relative;
+      margin: 0 40px;
+    }
+    .msg-label {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85em;
+      border: 1px solid currentColor;
+      white-space: nowrap;
+    }
+    .msg-desc {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75em;
+      color: #475569;
+      white-space: nowrap;
+    }
+    
+    .arrow-right::after { content: "▶"; position: absolute; right: -5px; top: -10px; font-size: 1.5em; color: #94a3b8; }
+    .arrow-left::before { content: "◀"; position: absolute; left: -5px; top: -10px; font-size: 1.5em; color: #94a3b8; }
+
+    .step1 .msg-arrow { background: #3b82f6; }
+    .step1 .arrow-right::after { color: #3b82f6; }
+    .step1 .msg-label { color: #1d4ed8; border-color: #3b82f6; background: #eff6ff; }
+
+    .step2 .msg-arrow { background: #f59e0b; }
+    .step2 .arrow-left::before { color: #f59e0b; }
+    .step2 .msg-label { color: #b45309; border-color: #f59e0b; background: #fffbeb; }
+
+    .step3 .msg-arrow { background: #10b981; }
+    .step3 .arrow-right::after { color: #10b981; }
+    .step3 .msg-label { color: #047857; border-color: #10b981; background: #ecfdf5; }
+
+    /* メタファー図解（マンション） */
+    .metaphor-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+    }
+    .metaphor-box {
+      text-align: center;
+    }
+    .m-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .m-title { font-weight: bold; color: #1e293b; display: block; }
+    .m-sub { font-size: 0.85em; color: #3b82f6; font-weight: bold; background: #eff6ff; padding: 2px 8px; border-radius: 12px; margin-top: 5px; display: inline-block; }
+
+    /* 多重接続イメージ */
+    .multiplex-diagram {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 15px;
+    }
+    .client-side {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .app-box {
+      border: 2px solid #3b82f6;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fff;
+      font-size: 0.85em;
+    }
+    .app-name { font-weight: bold; display: block; color: #1e293b; }
+    .app-port { color: #1d4ed8; }
+    
+    .connection-lines {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      position: relative;
+      width: 60px;
+    }
+    .conn-line {
+      height: 2px; background: #94a3b8; width: 100%; position: relative;
+    }
+    .conn-line::after { content: "▶"; position: absolute; right: -5px; top: -10px; color: #94a3b8; }
+    
+    .server-side {
+      border: 2px solid #10b981;
+      border-radius: 8px;
+      padding: 20px;
+      background: #ecfdf5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+    .server-ip { font-weight: bold; color: #047857; margin-bottom: 10px; display: block; }
+    .server-port {
+      background: #fff;
+      border: 2px solid #10b981;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-24">
+            2026.02.24
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">TCPの3ウェイハンドシェイクとポート番号の役割</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#TCP</span>
+            <span class="tag">#ポート番号</span>
+            <span class="tag">#ハンドシェイク</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>TCP通信が始まる前の「3回の握手（確認）」と、データを正しいアプリに届けるための「ポート番号」の関係を解説します。</p>
+<hr>
+
+<h2>1. 3ウェイハンドシェイクとは？（通信前の挨拶）</h2>
+<p>
+  TCPは<strong>「信頼性重視」</strong>の通信方式です。そのため、いきなりデータを送りつけるのではなく、事前に<strong>「今から送るけど準備できてる？」</strong>という確認を3ステップで行います。
+</p>
+
+<!-- 図解：3ウェイハンドシェイク -->
+<div class="diagram-container">
+  <div class="diagram-title">3ウェイハンドシェイクの流れ</div>
+  <div class="handshake-flow">
+    
+    <div class="node-header">
+      <div class="node-box">💻 クライアント<span>(Port: 50000)</span></div>
+      <div class="node-box">🖥️ サーバ<span>(Port: 80)</span></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="msg-row step1">
+      <div class="msg-arrow arrow-right">
+        <span class="msg-label">① SYN (接続要求)</span>
+        <span class="msg-desc">「そっちの80番に接続していい？」</span>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="msg-row step2" style="margin-top: 20px;">
+      <div class="msg-arrow arrow-left">
+        <span class="msg-label">② SYN + ACK (許可＋確認)</span>
+        <span class="msg-desc">「いいよ！そっちも準備OK？」</span>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="msg-row step3" style="margin-top: 20px;">
+      <div class="msg-arrow arrow-right">
+        <span class="msg-label">③ ACK (確認応答)</span>
+        <span class="msg-desc">「了解！じゃあ通信始めるね」</span>
+      </div>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:15px; font-weight:bold;">
+    ✅ この3回のやり取りが終わって初めて、実際のデータ送信がスタートします。
+  </p>
+</div>
+
+<h2>2. IPアドレスとポート番号の役割</h2>
+<p>
+  通信を正しく届けるためには、「どの端末か？」だけでなく<strong>「どのアプリか？」</strong>まで指定する必要があります。
+</p>
+
+<!-- 図解：メタファー -->
+<div class="diagram-container">
+  <div class="diagram-title">マンションと部屋番号の例え</div>
+  <div class="metaphor-container">
+    <div class="metaphor-box">
+      <span class="m-icon">🏢</span>
+      <span class="m-title">IPアドレス</span>
+      <span style="font-size:0.8em; color:#475569;">（マンションの住所）</span><br>
+      <span class="m-sub">端末を特定する</span>
+    </div>
+    <div style="font-size:2em; color:#cbd5e1; font-weight:bold;">＋</div>
+    <div class="metaphor-box">
+      <span class="m-icon">🚪</span>
+      <span class="m-title">ポート番号</span>
+      <span style="font-size:0.8em; color:#475569;">（部屋番号）</span><br>
+      <span class="m-sub">アプリを特定する</span>
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li><strong>クライアント側（例：50000番など）</strong>：OSが空いている番号を適当に（動的に）割り当てます。これは「送信元の部屋番号」になります。</li>
+  <li><strong>サーバ側（例：80番など）</strong>：Webなら80番、メールなら25番など、あらかじめ決まっている番号（ウェルノウンポート）を使います。</li>
+</ul>
+
+<h2>3. なぜポート番号が必要なのか？（多重接続）</h2>
+<p>
+  私たちが「ブラウザでWebサイトを見ながら、裏で別のアプリも通信する」といったことができるのは、このポート番号のおかげです。
+</p>
+
+<!-- 図解：多重接続 -->
+<div class="diagram-container">
+  <div class="diagram-title">同じサーバへの複数アプリからの接続</div>
+  <div class="multiplex-diagram">
+    
+    <div class="client-side">
+      <div style="font-weight:bold; font-size:0.9em; margin-bottom:5px;">💻 クライアントPC</div>
+      <div class="app-box">
+        <span class="app-name">🌐 ブラウザA</span>
+        <span class="app-port">送信元 Port: 50001</span>
+      </div>
+      <div class="app-box">
+        <span class="app-name">🌐 ブラウザB</span>
+        <span class="app-port">送信元 Port: 50002</span>
+      </div>
+    </div>
+
+    <div class="connection-lines">
+      <div class="conn-line"></div>
+      <div class="conn-line"></div>
+    </div>
+
+    <div class="server-side">
+      <span class="server-ip">IP: 203.0.113.1<br>(Webサーバ)</span>
+      <div class="server-port">
+        宛先 Port: 80<br>
+        <span style="font-size:0.7em; font-weight:normal; color:#475569;">(HTTPサービス)</span>
+      </div>
+      <p style="font-size:0.7em; margin-top:10px; color:#047857;">
+        サーバは「送信元のポート番号<br>(50001と50002)」を見て、<br>返事を返す相手を区別できる！
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>用語</th>
+      <th>役割・特徴</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>3ウェイハンドシェイク</strong></td>
+      <td>TCPでデータ送信前に「SYN → SYN+ACK → ACK」の3回で接続を確立する手順。信頼性を担保する。</td>
+    </tr>
+    <tr>
+      <td><strong>ポート番号</strong></td>
+      <td>端末内の「どのアプリケーション（サービス）宛か」を特定するための番号（部屋番号）。</td>
+    </tr>
+    <tr>
+      <td><strong>クライアントのポート</strong></td>
+      <td>OSが通信のたびに<strong>動的</strong>に割り当てる番号（例: 49152〜65535）。</td>
+    </tr>
+    <tr>
+      <td><strong>サーバのポート</strong></td>
+      <td>サービスごとに<strong>固定</strong>された番号（ウェルノウンポート。例: HTTPは80、HTTPSは443）。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>「IPアドレスで家を探し、ポート番号で部屋をピンポンする。そしてTCPは、いきなり荷物を投げ込まずに、まず3回挨拶をしてから荷物を渡す」</strong>とイメージしておきましょう！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
