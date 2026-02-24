@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-forward-and-reverse-proxy",
+    "category": "ap",
+    "timestamp": "2026-02-24T17:14:31+09:00",
+    "title": "フォワードプロキシとリバースプロキシの違い",
+    "summary": "フォワードプロキシとリバースプロキシの基本的な違いや設置パターンを把握できる。各プロキシのメリット・デメリットを理解することで、ネットワークの設計に役立てることが可能。",
+    "tags": [
+      "ネットワーク",
+      "セキュリティ",
+      "プロキシ",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-24-ap-forward-and-reverse-proxy/"
+  },
+  {
     "id": "ap-linear-differential-cryptanalysis",
     "category": "ap",
     "timestamp": "2026-02-24T15:41:40+09:00",
