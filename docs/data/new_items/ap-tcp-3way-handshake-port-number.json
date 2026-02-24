@@ -1,0 +1,21 @@
+{
+  "id": "ap-tcp-3way-handshake-port-number",
+  "category": "ap",
+  "timestamp": "2026-02-24T12:21:36+09:00",
+  "post_path": "ap/posts/2026-02-24-ap-tcp-3way-handshake-port-number/",
+  "meta": {
+    "title": "TCPの3ウェイハンドシェイクとポート番号の役割",
+    "summary": "TCP通信における3ウェイハンドシェイクの仕組みと、ポート番号が果たす役割を理解します。",
+    "tags": [
+      "ネットワーク",
+      "TCP",
+      "ポート番号",
+      "ハンドシェイク",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
