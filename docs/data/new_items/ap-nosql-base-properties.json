@@ -1,0 +1,21 @@
+{
+  "id": "ap-nosql-base-properties",
+  "category": "ap",
+  "timestamp": "2026-02-24T21:48:18+09:00",
+  "post_path": "ap/posts/2026-02-24-ap-nosql-base-properties/",
+  "meta": {
+    "title": "NoSQLとBASE特性の解説",
+    "summary": "NoSQLの特徴とその基盤となるBASE特性について解説し、従来のRDBとの違いを理解することができます。",
+    "tags": [
+      "データベース",
+      "NoSQL",
+      "BASE特性",
+      "CAP定理",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
