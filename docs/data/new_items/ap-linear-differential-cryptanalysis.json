@@ -1,0 +1,20 @@
+{
+  "id": "ap-linear-differential-cryptanalysis",
+  "category": "ap",
+  "timestamp": "2026-02-24T15:41:40+09:00",
+  "post_path": "ap/posts/2026-02-24-ap-linear-differential-cryptanalysis/",
+  "meta": {
+    "title": "線形解読法と差分解読法の解説",
+    "summary": "暗号解読手法「線形解読法」と「差分解読法」の違いと共通点を解説し、各手法の特徴が理解できます。",
+    "tags": [
+      "セキュリティ",
+      "暗号解読",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
