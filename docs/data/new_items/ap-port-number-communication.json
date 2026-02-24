@@ -1,0 +1,21 @@
+{
+  "id": "ap-port-number-communication",
+  "category": "ap",
+  "timestamp": "2026-02-24T12:29:00+09:00",
+  "post_path": "ap/posts/2026-02-24-ap-port-number-communication/",
+  "meta": {
+    "title": "ポート番号の分類と通信の仕組み",
+    "summary": "ポート番号の3つの分類（ウェルノウン、登録済み、ダイナミック）について解説し、TCP/IPを利用した通信の基本的な流れを理解します。",
+    "tags": [
+      "ポート番号",
+      "TCP/IP",
+      "ネットワーク",
+      "基本情報",
+      "通信"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
