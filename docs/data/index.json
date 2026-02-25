@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-system-audit-criteria",
+    "category": "ap",
+    "timestamp": "2026-02-25T14:37:03+09:00",
+    "title": "システム監査基準の全体像解説",
+    "summary": "システム監査基準のガバナンス、マネジメント、コントロールの3層構造を理解し、全般統制と業務処理統制の違いを学ぶことができます。",
+    "tags": [
+      "システム監査",
+      "内部統制",
+      "ITガバナンス",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-25-ap-system-audit-criteria/"
+  },
+  {
     "id": "ap-tuckman-model-team-development",
     "category": "ap",
     "timestamp": "2026-02-25T14:11:58+09:00",
