@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 仮想記憶方式とスラッシング</title>
+  <meta name="description" content="仮想記憶におけるページング方式の仕組み（ページイン・ページアウト）と、実メモリ不足によって発生する「スラッシング」のメカニズム、関連用語の違いを図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="仮想記憶方式とスラッシング" />
+  <meta property="og:description" content="仮想記憶におけるページング方式の仕組み（ページイン・ページアウト）と、実メモリ不足によって発生する「スラッシング」のメカニズム、関連用語の違いを図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 仮想記憶の構造図 */
+    .memory-structure {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .hw-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      width: 100%;
+      max-width: 300px;
+    }
+    .box-cpu { border-color: #64748b; background: #f1f5f9; color: #334155; }
+    .box-ram { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; position: relative; }
+    .box-disk { border-color: #94a3b8; background: #fff; color: #475569; border-style: dashed; }
+    
+    .hw-sub { font-size: 0.7em; font-weight: normal; display: block; margin-top: 5px; }
+    
+    .exchange-arrows {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+    }
+    .arrow-col { display: flex; flex-direction: column; align-items: center; font-size: 0.8em; font-weight: bold; }
+    .arrow-in { color: #10b981; }
+    .arrow-out { color: #ef4444; }
+
+    /* スラッシングのCPU図 */
+    .thrashing-visual {
+      background: #fff;
+      border: 2px solid #ef4444;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.1);
+    }
+    .cpu-status {
+      width: 100%;
+      max-width: 400px;
+    }
+    .status-label { font-weight: bold; color: #1e293b; margin-bottom: 5px; display: block; }
+    .progress-bar {
+      display: flex;
+      height: 30px;
+      border-radius: 15px;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+    }
+    .p-calc { background: #3b82f6; width: 10%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.8em; font-weight: bold; }
+    .p-wait { background: #fca5a5; width: 90%; display: flex; align-items: center; justify-content: center; color: #7f1d1d; font-size: 0.8em; font-weight: bold; }
+    .thrashing-desc { font-size: 0.9em; color: #b91c1c; font-weight: bold; text-align: center; }
+
+    /* 用語比較カード */
+    .term-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .term-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .term-title { font-weight: 900; font-size: 1.1em; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 10px; display: block; }
+    
+    /* 視覚的メタファー */
+    .mem-visual { display: flex; gap: 2px; margin-bottom: 10px; height: 20px; }
+    .m-block { flex: 1; border-radius: 2px; }
+    .m-used { background: #3b82f6; }
+    .m-free { background: #e2e8f0; }
+    .m-leak { background: #ef4444; }
+    
+    .term-desc { font-size: 0.85em; color: #475569; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-25">
+            2026.02.25
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">仮想記憶方式とスラッシング</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#OS</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+            <span class="tag">#メモリ管理</span>
+            <span class="tag">#スラッシング</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>実メモリ（RAM）が足りないときに起きるシステムの悲鳴「スラッシング」と、間違いやすいメモリ関連用語を図解で整理します。</p>
+<hr>
+
+<div class="question-box">
+  【問題】<br>
+  仮想記憶方式では、割り当てられる実記憶の容量が小さいとページアウト、ページインが頻発し、スループットが急速に低下することがある。このような現象を何というか。<br><br>
+  ア. スラッシング<br>
+  イ. スワッピング<br>
+  ウ. フラグメンテーション<br>
+  エ. メモリリーク
+</div>
+
+<h2>1. 仮想記憶（ページング方式）の基本</h2>
+<p>
+  プログラムを実行するには、データを実メモリ（RAM）に載せる必要があります。<br>
+  しかしRAMの容量は限られているため、<strong>「今使う部分（ページ）だけをRAMに置き、使わない部分はディスクに避難させる」</strong>のが仮想記憶の仕組みです。
+</p>
+
+<!-- 図解：仮想記憶とページインアウト -->
+<div class="diagram-container">
+  <div class="diagram-title">実メモリとディスク間のページのやり取り</div>
+  <div class="memory-structure">
+    <div class="hw-box box-cpu">
+      🧠 CPU
+      <span class="hw-sub">処理を実行</span>
+    </div>
+    
+    <div style="color:#94a3b8; font-size:1.5em; line-height:0.5;">⬇</div>
+    
+    <div class="hw-box box-ram">
+      ⚡ 実メモリ (RAM)
+      <span class="hw-sub">容量小さい・超高速 (ナノ秒)</span>
+    </div>
+
+    <div class="exchange-arrows">
+      <div class="arrow-col arrow-in">
+        <span>⬆ 読み込む</span>
+        <span>ページイン</span>
+      </div>
+      <div class="arrow-col arrow-out">
+        <span>ページアウト</span>
+        <span>退避する ⬇</span>
+      </div>
+    </div>
+
+    <div class="hw-box box-disk">
+      💾 補助記憶 (ディスク)
+      <span class="hw-sub">容量大きい・低速 (ミリ秒)</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. スラッシングとは？（問題の答え）</h2>
+<p>
+  実メモリの容量が少なすぎたり、同時に起動するプログラムが多すぎたりすると、メモリがすぐに満杯になります。<br>
+  すると、<strong>「ページを追い出しては（ページアウト）、またすぐに読み込む（ページイン）」</strong>という入れ替え作業ばかりが発生します。
+</p>
+<p>
+  ディスクはRAMに比べて圧倒的に遅いため、この入れ替え作業中はCPUが何もできず「待ち状態」になってしまいます。<br>
+  この<strong>「入れ替え多発でCPUが働けず、システム全体が重くなる現象」</strong>を<strong>スラッシング</strong>と呼びます。
+</p>
+
+<!-- 図解：スラッシング -->
+<div class="diagram-container">
+  <div class="thrashing-visual">
+    <span style="font-size:3em; line-height:1;">🤯</span>
+    <div class="thrashing-desc">
+      「ちょっと待って！今ディスクからデータ持ってくるから！」<br>が連続して起きている状態
+    </div>
+    
+    <div class="cpu-status">
+      <span class="status-label">スラッシング中のCPUの様子</span>
+      <div class="progress-bar">
+        <div class="p-calc">計算 10%</div>
+        <div class="p-wait">ディスク待ち時間 90%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. 選択肢の用語解説（ここがよく狙われる！）</h2>
+<p>
+  試験では、他の選択肢の意味を正確に区別できるかが問われます。
+</p>
+
+<!-- 図解：用語比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">間違いやすいメモリ関連用語</div>
+  <div class="term-grid">
+    
+    <div class="term-card">
+      <span class="term-title">スワッピング</span>
+      <div class="mem-visual">
+        <div class="m-block m-used"></div><div class="m-block m-used"></div><div class="m-block m-used"></div><div class="m-block m-free"></div>
+      </div>
+      <div class="term-desc">
+        プログラム<strong>全体</strong>を丸ごとディスクに退避させ、別のプログラムを読み込むこと。主記憶を効率利用するための<strong>「正常な動作」</strong>です。
+      </div>
+    </div>
+
+    <div class="term-card">
+      <span class="term-title">フラグメンテーション</span>
+      <div class="mem-visual">
+        <div class="m-block m-used"></div><div class="m-block m-free"></div><div class="m-block m-used"></div><div class="m-block m-free"></div><div class="m-block m-used"></div>
+      </div>
+      <div class="term-desc">
+        メモリの確保と解放を繰り返すうちに、空き領域が<strong>バラバラ（断片化）</strong>になり、合計容量は足りているのに連続した大きな領域が確保できなくなる現象（穴あき状態）。
+      </div>
+    </div>
+
+    <div class="term-card">
+      <span class="term-title">メモリリーク</span>
+      <div class="mem-visual">
+        <div class="m-block m-used"></div><div class="m-block m-leak"></div><div class="m-block m-used"></div><div class="m-block m-leak"></div>
+      </div>
+      <div class="term-desc">
+        プログラムが使い終わったメモリ領域を<strong>「解放し忘れる」</strong>バグのこと。これが続くと徐々に空きメモリが減り、最終的にシステムが停止します。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>用語</th>
+      <th>一言でいうと</th>
+      <th>原因 / 目的</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#ef4444; font-weight:bold;">スラッシング</td>
+      <td><strong>入れ替え多発で激重</strong></td>
+      <td>実メモリ不足（多重度が高すぎる）</td>
+    </tr>
+    <tr>
+      <td>スワッピング</td>
+      <td><strong>丸ごと退避して場所を空ける</strong></td>
+      <td>効率利用のためのOSの正常機能</td>
+    </tr>
+    <tr>
+      <td>フラグメンテーション</td>
+      <td><strong>メモリの穴あき状態</strong></td>
+      <td>確保・解放の繰り返し（断片化）</td>
+    </tr>
+    <tr>
+      <td>メモリリーク</td>
+      <td><strong>メモリの解放忘れ</strong></td>
+      <td>プログラムのバグ</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  スラッシングを防ぐ対策としては、<strong>「実メモリ（RAM）の増設」</strong>や「同時に実行するプログラム数を減らす」ことが有効です。
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
