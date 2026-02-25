@@ -1,5 +1,25 @@
 [
   {
+    "id": "ap-liquid-cooling-methods",
+    "category": "ap",
+    "timestamp": "2026-02-25T12:51:38+09:00",
+    "title": "データセンターの液体冷却方式",
+    "summary": "液体冷却の仕組みとその種類について、試験観点を中心に解説します。単相冷却と二相冷却の違いも理解できます。",
+    "tags": [
+      "ハードウェア",
+      "データセンター",
+      "冷却方式",
+      "最新技術"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-25-ap-liquid-cooling-methods/"
+  },
+  {
     "id": "ap-project-management-structure",
     "category": "ap",
     "timestamp": "2026-02-25T12:40:25+09:00",
