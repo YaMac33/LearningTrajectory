@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-binary-weight-decimal-conversion",
+    "category": "ap",
+    "timestamp": "2026-02-26T07:24:01+09:00",
+    "title": "2進数の重みと10進数変換の基礎",
+    "summary": "2進数の各桁の重みを理解し、10進数への変換方法を習得できます。計算問題の解法も学ぶことができます。",
+    "tags": [
+      "基礎理論",
+      "数学",
+      "2進数",
+      "基数変換",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-26-ap-binary-weight-decimal-conversion/"
+  },
+  {
     "id": "ap-cryptrec-3-classifications",
     "category": "ap",
     "timestamp": "2026-02-25T20:47:36+09:00",
