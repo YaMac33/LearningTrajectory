@@ -1,5 +1,29 @@
 [
   {
+    "id": "ap-evm-indicators-and-reserves",
+    "category": "ap",
+    "timestamp": "2026-02-25T20:17:41+09:00",
+    "title": "EVM指標と予備費についての理解",
+    "summary": "プロジェクトマネジメントにおけるEVM指標の計算やリスクに対する予備費の重要性を学ぶことができる。",
+    "tags": [
+      "プロジェクトマネジメント",
+      "EVM",
+      "コスト管理",
+      "CPI",
+      "SPI",
+      "TCPI",
+      "基本情報",
+      "予備費"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "プロジェクトマネジメント"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-25-ap-evm-indicators-and-reserves/"
+  },
+  {
     "id": "ap-virtual-memory-thrashing",
     "category": "ap",
     "timestamp": "2026-02-25T19:22:01+09:00",
