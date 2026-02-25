@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-virtual-memory-thrashing",
+    "category": "ap",
+    "timestamp": "2026-02-25T19:22:01+09:00",
+    "title": "仮想記憶方式とスラッシングの解説",
+    "summary": "仮想記憶におけるページング方式とスラッシングのメカニズムについて解説し、重要な用語の違いを整理します。",
+    "tags": [
+      "OS",
+      "基本情報",
+      "応用情報",
+      "メモリ管理",
+      "スラッシング"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "OSと仮想化"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-25-ap-virtual-memory-thrashing/"
+  },
+  {
     "id": "ap-system-audit-criteria",
     "category": "ap",
     "timestamp": "2026-02-25T14:37:03+09:00",
