@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 集合演算の記号とベン図（空集合・全体集合・積・和・補・差・対称差）</title>
+  <meta name="description" content="数学や情報処理の基礎となる「集合」について、空集合・全体集合の概念と、主要な集合演算（積集合、和集合、補集合、差集合、対称差）の記号・読み方・意味をベン図を用いてわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="集合演算の記号とベン図（空集合・全体集合・積・和・補・差・対称差）" />
+  <meta property="og:description" content="数学や情報処理の基礎となる「集合」について、空集合・全体集合の概念と、主要な集合演算（積集合、和集合、補集合、差集合、対称差）の記号・読み方・意味をベン図を用いてわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 集合の基本ブロック */
+    .base-sets {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .set-box {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+      max-width: 250px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .set-symbol { font-size: 3em; font-family: serif; font-weight: bold; color: #1e293b; display: block; line-height: 1; }
+    .set-reading { font-size: 0.85em; color: #64748b; margin-bottom: 10px; display: block; font-weight: bold; }
+    .set-desc { font-size: 0.9em; color: #475569; }
+
+    /* ベン図カードグリッド */
+    .venn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .venn-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .v-header {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 15px;
+      border-bottom: 2px dashed #f1f5f9;
+      padding-bottom: 10px;
+    }
+    .v-name { font-weight: 900; font-size: 1.1em; color: #1e293b; display: block; }
+    .v-sym { font-size: 1.5em; font-family: serif; font-weight: bold; color: #3b82f6; display: block; margin: 5px 0; }
+    .v-read { font-size: 0.8em; color: #64748b; font-weight: bold; background: #f8fafc; padding: 2px 8px; border-radius: 12px; }
+    
+    .v-svg {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+    .v-desc {
+      font-size: 0.85em;
+      color: #475569;
+      text-align: left;
+      width: 100%;
+    }
+    .v-formula {
+      font-family: monospace;
+      font-weight: bold;
+      color: #047857;
+      background: #ecfdf5;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-top: 5px;
+      display: inline-block;
+      font-size: 0.8em;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-26">
+            2026.02.26
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">集合演算の記号とベン図（空集合・全体集合・積・和・補・差・対称差）</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#基礎理論</span>
+            <span class="tag">#数学</span>
+            <span class="tag">#集合</span>
+            <span class="tag">#基本情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>アルゴリズムやデータベースの基礎となる「集合」。それぞれの演算記号の読み方と、視覚的なイメージ（ベン図）をセットで覚えましょう。</p>
+<hr>
+
+<h2>1. 集合の基本となる「枠組み」と「空っぽ」</h2>
+<p>
+  集合を考える上で、最初に定義される「全体」と「何もない状態」です。
+</p>
+
+<div class="diagram-container">
+  <div class="base-sets">
+    
+    <div class="set-box">
+      <span class="set-symbol">Ω</span>
+      <span class="set-reading">全体集合（オメガ）</span>
+      <div class="set-desc">
+        その問題で<strong>「考える範囲のすべて」</strong>。<br>確率統計の分野では「標本空間」とも呼ばれます。<br>図で表す時の「一番外側の四角い枠」です。
+      </div>
+    </div>
+
+    <div class="set-box">
+      <span class="set-symbol">∅ / φ</span>
+      <span class="set-reading">空集合（くうしゅうごう / ファイ）</span>
+      <div class="set-desc">
+        要素が<strong>「1つもない」</strong>集合。<br>中身が空っぽの箱 <code>{ }</code> を意味します。（※ ∅ が正式な記号ですが、文脈で φ も使われます）
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 5つの主要な集合演算（ベン図）</h2>
+<p>
+  青く塗られている部分（#の結果領域）が、その演算が表す範囲です。
+</p>
+
+<div class="diagram-container">
+  <div class="venn-grid">
+    
+    <!-- 積集合 -->
+    <div class="venn-card">
+      <div class="v-header">
+        <span class="v-name">積集合 (Intersection)</span>
+        <span class="v-sym">A ∩ B</span>
+        <span class="v-read">エー キャップ ビー</span>
+      </div>
+      <svg class="v-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="190" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+        <text x="10" y="20" font-size="12" font-family="serif" fill="#64748b">Ω</text>
+        <clipPath id="cp-intersect">
+          <circle cx="75" cy="60" r="40"/>
+        </clipPath>
+        <circle cx="125" cy="60" r="40" fill="#3b82f6" fill-opacity="0.6" clip-path="url(#cp-intersect)"/>
+        <circle cx="75" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <circle cx="125" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <text x="50" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">A</text>
+        <text x="140" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">B</text>
+      </svg>
+      <div class="v-desc">
+        AとBの<strong>両方</strong>に入る要素。<br>（共通部分・重なり）
+      </div>
+    </div>
+
+    <!-- 和集合 -->
+    <div class="venn-card">
+      <div class="v-header">
+        <span class="v-name">和集合 (Union)</span>
+        <span class="v-sym">A ∪ B</span>
+        <span class="v-read">エー カップ ビー</span>
+      </div>
+      <svg class="v-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="190" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+        <text x="10" y="20" font-size="12" font-family="serif" fill="#64748b">Ω</text>
+        <circle cx="75" cy="60" r="40" fill="#3b82f6" fill-opacity="0.6"/>
+        <circle cx="125" cy="60" r="40" fill="#3b82f6" fill-opacity="0.6"/>
+        <circle cx="75" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <circle cx="125" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <text x="50" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">A</text>
+        <text x="140" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">B</text>
+      </svg>
+      <div class="v-desc">
+        AまたはBの<strong>どちらか</strong>に入る要素。<br>（両方含む・全部）
+      </div>
+    </div>
+
+    <!-- 補集合 -->
+    <div class="venn-card">
+      <div class="v-header">
+        <span class="v-name">補集合 (Complement)</span>
+        <span class="v-sym">A<sup style="font-size:0.6em;">C</sup>, <span style="text-decoration:overline;">A</span></span>
+        <span class="v-read">エー シー / エー バー</span>
+      </div>
+      <svg class="v-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <mask id="m-complement">
+          <rect x="0" y="0" width="200" height="120" fill="white"/>
+          <circle cx="100" cy="60" r="40" fill="black"/>
+        </mask>
+        <rect x="5" y="5" width="190" height="110" fill="#3b82f6" fill-opacity="0.6" mask="url(#m-complement)"/>
+        <rect x="5" y="5" width="190" height="110" fill="none" stroke="#94a3b8" stroke-width="2"/>
+        <text x="10" y="20" font-size="12" font-family="serif" fill="#1e293b" font-weight="bold">Ω</text>
+        <circle cx="100" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <text x="92" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">A</text>
+      </svg>
+      <div class="v-desc">
+        全体Ωの中で、Aに<strong>入っていない</strong>部分。<br>（Aの外側すべて）<br>※「Ω \ A」と書くこともあります。
+      </div>
+    </div>
+
+    <!-- 差集合 -->
+    <div class="venn-card">
+      <div class="v-header">
+        <span class="v-name">差集合 (Difference)</span>
+        <span class="v-sym">A \ B</span>
+        <span class="v-read">エー バックスラッシュ ビー</span>
+      </div>
+      <svg class="v-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="190" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+        <text x="10" y="20" font-size="12" font-family="serif" fill="#64748b">Ω</text>
+        <mask id="m-diff">
+          <rect x="0" y="0" width="200" height="120" fill="white"/>
+          <circle cx="125" cy="60" r="40" fill="black"/>
+        </mask>
+        <circle cx="75" cy="60" r="40" fill="#3b82f6" fill-opacity="0.6" mask="url(#m-diff)"/>
+        <circle cx="75" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <circle cx="125" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <text x="45" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">A</text>
+        <text x="145" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">B</text>
+      </svg>
+      <div class="v-desc">
+        Aには入っていて、Bには<strong>入っていない</strong>部分。<br>（Aから重なりを除いた左側の三日月）<br>
+        <span style="color:#ef4444; font-weight:bold; font-size:0.9em;">※ A \ B と B \ A は別の形になります。</span>
+      </div>
+    </div>
+
+    <!-- 対称差 -->
+    <div class="venn-card">
+      <div class="v-header">
+        <span class="v-name">対称差集合 (Symmetric diff.)</span>
+        <span class="v-sym">A △ B <span style="font-size:0.6em; color:#94a3b8;">(または A ⊕ B)</span></span>
+        <span class="v-read">エー デルタ ビー</span>
+      </div>
+      <svg class="v-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="190" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+        <text x="10" y="20" font-size="12" font-family="serif" fill="#64748b">Ω</text>
+        <mask id="m-sym-b">
+          <rect x="0" y="0" width="200" height="120" fill="white"/>
+          <circle cx="125" cy="60" r="40" fill="black"/>
+        </mask>
+        <mask id="m-sym-a">
+          <rect x="0" y="0" width="200" height="120" fill="white"/>
+          <circle cx="75" cy="60" r="40" fill="black"/>
+        </mask>
+        <circle cx="75" cy="60" r="40" fill="#3b82f6" fill-opacity="0.6" mask="url(#m-sym-b)"/>
+        <circle cx="125" cy="60" r="40" fill="#3b82f6" fill-opacity="0.6" mask="url(#m-sym-a)"/>
+        <circle cx="75" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <circle cx="125" cy="60" r="40" fill="none" stroke="#475569" stroke-width="2"/>
+        <text x="45" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">A</text>
+        <text x="145" y="65" font-size="16" font-family="serif" font-weight="bold" fill="#1e293b">B</text>
+      </svg>
+      <div class="v-desc">
+        AとBの<strong>どちらか片方にだけ</strong>入る要素。（共通部分は除く、論理演算のXORと同じ）
+        <div class="v-formula">(A \ B) ∪ (B \ A)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 記号と読み方の早見表</h2>
+<p>
+  情報処理試験や数学のテキストで迷ったときのためのまとめです。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>役割</th>
+      <th>記号</th>
+      <th>読み方</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>空集合</strong></td>
+      <td>∅ / φ</td>
+      <td>くうしゅうごう / ファイ</td>
+    </tr>
+    <tr>
+      <td><strong>全体集合</strong></td>
+      <td>Ω</td>
+      <td>オメガ</td>
+    </tr>
+    <tr>
+      <td><strong>積集合</strong></td>
+      <td>∩</td>
+      <td>キャップ（帽子の形）</td>
+    </tr>
+    <tr>
+      <td><strong>和集合</strong></td>
+      <td>∪</td>
+      <td>カップ（コップの形）</td>
+    </tr>
+    <tr>
+      <td><strong>補集合</strong></td>
+      <td>A<sup>C</sup>, <span style="text-decoration:overline;">A</span>, Ω \ A</td>
+      <td>シー / バー / バックスラッシュ</td>
+    </tr>
+    <tr>
+      <td><strong>差集合</strong></td>
+      <td>\ <span style="font-size:0.8em; color:#64748b;">(A−Bとも書く)</span></td>
+      <td>バックスラッシュ（A 差 B）</td>
+    </tr>
+    <tr>
+      <td><strong>対称差</strong></td>
+      <td>△, ⊕</td>
+      <td>デルタ / オープラス (XOR)</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
