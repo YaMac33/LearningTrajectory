@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-how-to-find-two-s-complement",
+    "category": "ap",
+    "timestamp": "2026-02-26T18:57:45+09:00",
+    "title": "(2進数)何の2の補数かの求め方",
+    "summary": "与えられた2進数がどの正の数のマイナスであるかを求める手順を解説します。王道の反転と＋1方式、重みを利用した計算を紹介します。",
+    "tags": [
+      "基礎理論",
+      "数学",
+      "2進数",
+      "2の補数",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基本情報"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-26-ap-how-to-find-two-s-complement/"
+  },
+  {
     "id": "ap-binary-weight-decimal-conversion",
     "category": "ap",
     "timestamp": "2026-02-26T07:24:01+09:00",
