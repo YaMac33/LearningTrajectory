@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-set-operations-venn-diagram",
+    "category": "ap",
+    "timestamp": "2026-02-26T20:47:31+09:00",
+    "title": "集合演算の記号とベン図による解説",
+    "summary": "集合演算において重要な記号の意味や読み方をベン図を通して説明します。演算の理解を深めるための必須知識を学べます。",
+    "tags": [
+      "集合",
+      "基礎理論",
+      "数学",
+      "基本情報",
+      "演算"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-26-ap-set-operations-venn-diagram/"
+  },
+  {
     "id": "ap-how-to-find-two-s-complement",
     "category": "ap",
     "timestamp": "2026-02-26T18:57:45+09:00",
