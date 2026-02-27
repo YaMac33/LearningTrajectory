@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-checkpoint-role-differences",
+    "category": "ap",
+    "timestamp": "2026-02-27T22:42:46+09:00",
+    "title": "チェックポイントの役割と関連用語の違い",
+    "summary": "データベースにおけるチェックポイントの仕組みと、セーブポイント等の類似用語との違いを解説します。",
+    "tags": [
+      "データベース",
+      "応用情報",
+      "障害回復",
+      "トランザクション",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-27-ap-checkpoint-role-differences/"
+  },
+  {
     "id": "ap-set-operations-venn-diagram",
     "category": "ap",
     "timestamp": "2026-02-26T20:47:31+09:00",
