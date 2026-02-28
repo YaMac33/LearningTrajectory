@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SAMLとシングルサインオン：チャレンジレスポンスとの違い</title>
+  <meta name="description" content="クラウドサービスで利用されるWeb SSOプロトコル「SAML」の仕組みと、IdP・SPの関係、およびチャレンジレスポンス認証との構造的な違いを図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SAMLとシングルサインオン：チャレンジレスポンスとの違い" />
+  <meta property="og:description" content="クラウドサービスで利用されるWeb SSOプロトコル「SAML」の仕組みと、IdP・SPの関係、およびチャレンジレスポンス認証との構造的な違いを図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* SAML基本構成の図解 */
+    .saml-actors {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .actor-box {
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      width: 100%;
+      max-width: 220px;
+      background: #fff;
+    }
+    .actor-user { border-color: #64748b; }
+    .actor-idp { border-color: #3b82f6; background: #eff6ff; }
+    .actor-sp { border-color: #10b981; background: #ecfdf5; }
+    
+    .a-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .a-name { font-weight: 900; font-size: 1.1em; color: #1e293b; display: block; }
+    .a-role { font-size: 0.85em; color: #475569; font-weight: bold; margin-bottom: 5px; display: block; }
+    .a-desc { font-size: 0.8em; color: #64748b; }
+    
+    /* アサーションのチケット */
+    .assertion-ticket {
+      background: #fef3c7;
+      border: 2px dashed #f59e0b;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      color: #b45309;
+      margin: 10px auto;
+      max-width: 300px;
+      position: relative;
+    }
+    .assertion-ticket::before {
+      content: "🎫 SAMLアサーション (XML)";
+      display: block; margin-bottom: 5px; font-size: 1.1em;
+    }
+    .ticket-content { font-size: 0.8em; color: #78350f; text-align: left; background: #fff; padding: 5px; border-radius: 4px; border: 1px solid #fcd34d; }
+
+    /* Initiated比較図解 */
+    .initiated-compare {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .init-row {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 15px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .init-badge {
+      position: absolute;
+      top: -12px; left: 15px;
+      background: #1e293b; color: #fff;
+      padding: 2px 10px; border-radius: 4px;
+      font-size: 0.85em; font-weight: bold;
+    }
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 10px;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #334155;
+    }
+    .f-node { padding: 5px 10px; border-radius: 4px; border: 1px solid currentColor; }
+    .n-usr { color: #475569; background: #f1f5f9; }
+    .n-sp { color: #047857; background: #dcfce7; }
+    .n-idp { color: #1d4ed8; background: #dbeafe; }
+    .f-arrow { color: #94a3b8; }
+
+    /* チャレンジレスポンスとの比較 */
+    .auth-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .auth-compare { grid-template-columns: 1fr; }
+    }
+    .auth-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .ac-title { font-weight: 900; font-size: 1.1em; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-bottom: 15px; display: block; text-align: center; }
+    
+    .auth-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.85em;
+    }
+    .ad-row { display: flex; justify-content: space-between; align-items: center; }
+    .ad-msg { background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #334155; position: relative; }
+    .ad-msg.right::after { content: "▶"; position: absolute; right: -15px; color: #cbd5e1; }
+    .ad-msg.left::before { content: "◀"; position: absolute; left: -15px; color: #cbd5e1; }
+    
+    .pw-status {
+      margin-top: 15px; padding: 10px; border-radius: 6px; font-weight: bold; text-align: center; font-size: 0.9em;
+    }
+    .pw-safe { background: #ecfdf5; color: #047857; border: 1px solid #10b981; }
+    .pw-need { background: #fef2f2; color: #b91c1c; border: 1px solid #ef4444; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-28">
+            2026.02.28
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SAMLとシングルサインオン：チャレンジレスポンスとの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#SAML</span>
+            <span class="tag">#SSO</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>クラウドサービスを安全に利用するための認証プロトコル「SAML（サムル）」。その仕組みと、試験で引っかけとして登場する「チャレンジレスポンス認証」との違いを図解で整理します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある誤答パターン】<br>
+  クラウドサービスにおける認証情報（パスワード等）の扱いについて、<strong>「クラウド側にパスワードと乱数のハッシュ値を送信して認証する」</strong>という選択肢は<strong>誤り</strong>です。<br>
+  SAMLを用いたSSOでは、クラウド側（SP）はパスワード自体を一切持ちません。
+</div>
+
+<h2>1. SAMLの登場人物とアサーション</h2>
+<p>
+  SAML（Security Assertion Markup Language）は、一度のログインで複数のクラウドサービスを利用できる「Web SSO（シングルサインオン）」を実現するためのXMLベースの規格です。
+</p>
+
+<!-- 図解：登場人物とアサーション -->
+<div class="diagram-container">
+  <div class="diagram-title">SAMLの主な登場人物</div>
+  <div class="saml-actors">
+    
+    <div class="actor-box actor-user">
+      <span class="a-icon">💻</span>
+      <span class="a-name">利用者 (User)</span>
+      <span class="a-role">Webブラウザ</span>
+      <span class="a-desc">サービスを利用したい人</span>
+    </div>
+    
+    <div class="actor-box actor-idp">
+      <span class="a-icon">🔑</span>
+      <span class="a-name">IdP</span>
+      <span class="a-role">Identity Provider</span>
+      <span class="a-desc">パスワードを管理し、本人確認を行う「認証サーバ」（例: Azure AD）</span>
+    </div>
+    
+    <div class="actor-box actor-sp">
+      <span class="a-icon">☁️</span>
+      <span class="a-name">SP</span>
+      <span class="a-role">Service Provider</span>
+      <span class="a-desc">提供されるクラウドサービス（例: Salesforce, AWS）</span>
+    </div>
+
+  </div>
+
+  <div class="assertion-ticket">
+    <div style="font-size:0.85em; margin-bottom:5px;">IdPが発行する「この人は本人です」という証明書</div>
+    <div class="ticket-content">
+      ・ユーザID: user01<br>
+      ・認証時刻: 2026-02-28T09:00:00Z<br>
+      ・属性: sales_dept<br>
+      ・✍️ IdPの電子署名
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; font-weight:bold; margin-top:5px;">
+    ※ SPはこの「アサーション」を受け取るだけで、ユーザのパスワードは知りません。
+  </p>
+</div>
+
+<h2>2. 2つの開始フロー（SP Initiated / IdP Initiated）</h2>
+<p>
+  SAMLによるログインの流れには、どこからアクセスを始めるかによって2つのパターンがあります。どちらも<strong>「IdPが認証し、アサーションをブラウザ経由でSPに渡す」</strong>という本質は同じです。
+</p>
+
+<!-- 図解：Initiated比較 -->
+<div class="diagram-container">
+  <div class="initiated-compare">
+    
+    <div class="init-row">
+      <div class="init-badge">SP Initiated (SP起点)</div>
+      <div class="flow-steps">
+        <span class="f-node n-usr">User</span>
+        <span class="f-arrow">➡</span>
+        <span class="f-node n-sp">① SP</span>
+        <span class="f-arrow">➡</span>
+        <span class="f-node n-idp">② IdP (認証)</span>
+        <span class="f-arrow">➡</span>
+        <span class="f-node n-sp">③ SPへ戻る</span>
+      </div>
+      <div style="font-size:0.8em; color:#475569; text-align:center; margin-top:5px; width:100%;">
+        （例）SalesforceのURLに直接アクセスし、会社のログイン画面に飛ばされるパターン。
+      </div>
+    </div>
+
+    <div class="init-row">
+      <div class="init-badge">IdP Initiated (IdP起点)</div>
+      <div class="flow-steps">
+        <span class="f-node n-usr">User</span>
+        <span class="f-arrow">➡</span>
+        <span class="f-node n-idp">① IdP (ログイン)</span>
+        <span class="f-arrow">➡</span>
+        <span class="f-node n-sp">② SPへ直接飛ぶ</span>
+      </div>
+      <div style="font-size:0.8em; color:#475569; text-align:center; margin-top:5px; width:100%;">
+        （例）社内ポータルにログイン後、アプリアイコンをクリックして各クラウドへ飛ぶパターン。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. SAMLとチャレンジレスポンス認証の違い</h2>
+<p>
+  試験でよく問われるのが<strong>「クラウド（SP）はパスワードを持っているのか？」</strong>という点です。
+</p>
+
+<!-- 図解：認証方式の比較 -->
+<div class="diagram-container">
+  <div class="auth-compare">
+    
+    <div class="auth-card">
+      <span class="ac-title">SAML方式 (Web SSO)</span>
+      <div class="auth-diagram">
+        <div class="ad-row"><span style="font-weight:bold;">User</span> <span style="font-weight:bold;">IdP</span></div>
+        <div class="ad-row" style="justify-content:center; color:#3b82f6;">パスワードで認証 🆗</div>
+        <div class="ad-row" style="margin-top:10px;"><span style="font-weight:bold;">User</span> <span style="font-weight:bold;">SP(クラウド)</span></div>
+        <div class="ad-row"><span class="ad-msg right">SAMLアサーション提出</span><span></span></div>
+        <div class="ad-row"><span></span><span class="ad-msg left">署名を確認して許可</span></div>
+      </div>
+      <div class="pw-status pw-safe">
+        クラウド(SP)はパスワードを<br>「保持しない・知らない」
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <span class="ac-title">チャレンジレスポンス方式</span>
+      <div class="auth-diagram">
+        <div class="ad-row"><span style="font-weight:bold;">Client</span> <span style="font-weight:bold;">Server</span></div>
+        <div class="ad-row"><span></span><span class="ad-msg left">乱数(チャレンジ)123</span></div>
+        <div class="ad-row"><span class="ad-msg right">Hash(パスワード＋123)</span><span></span></div>
+        <div class="ad-row"><span></span><span style="color:#f59e0b; font-weight:bold;">自らも計算して一致確認</span></div>
+      </div>
+      <div class="pw-status pw-need">
+        照合計算をするため<br>サーバ側もパスワードを「知っている」必要がある
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>項目</th>
+      <th>SAML</th>
+      <th>チャレンジレスポンス</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>やり取りする情報</strong></td>
+      <td><strong>SAMLアサーション</strong> (XML証明書)</td>
+      <td><strong>ハッシュ値</strong> (乱数＋パスワード)</td>
+    </tr>
+    <tr>
+      <td><strong>パスワードの保管場所</strong></td>
+      <td><strong>IdPのみ</strong></td>
+      <td>クライアント ＋ <strong>サーバ</strong></td>
+    </tr>
+    <tr>
+      <td><strong>サービス側(SP)のPW保持</strong></td>
+      <td><strong>しない（不要）</strong></td>
+      <td>必要</td>
+    </tr>
+    <tr>
+      <td><strong>主な用途</strong></td>
+      <td>クラウド間の <strong>Web SSO</strong></td>
+      <td>ネットワーク機器の認証 (CHAP等)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「SAMLは、IdPが認証して証明書（アサーション）を渡すだけ。クラウド側には絶対にパスワードを教えない！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
