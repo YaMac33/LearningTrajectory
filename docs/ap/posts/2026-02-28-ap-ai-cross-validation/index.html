@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AIにおける交差検証（Cross Validation）の仕組み</title>
+  <meta name="description" content="AIの教師あり学習モデルの性能を正しく評価するための「交差検証（Cross Validation）」について、なぜ必要なのか、k-fold法の仕組み、代表的な種類を図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AIにおける交差検証（Cross Validation）の仕組み" />
+  <meta property="og:description" content="AIの教師あり学習モデルの性能を正しく評価するための「交差検証（Cross Validation）」について、なぜ必要なのか、k-fold法の仕組み、代表的な種類を図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* ホールドアウト法 図解 */
+    .holdout-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .data-bar {
+      display: flex;
+      width: 100%;
+      max-width: 400px;
+      height: 40px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+    }
+    .db-train { background: #3b82f6; width: 80%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 0.9em; }
+    .db-test { background: #f59e0b; width: 20%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 0.9em; }
+    .holdout-issue {
+      background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 10px; border-radius: 6px; font-size: 0.85em; font-weight: bold; text-align: center; margin-top: 10px;
+    }
+
+    /* k-fold交差検証の図解 */
+    .kfold-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+    }
+    .fold-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .fold-label {
+      width: 60px; font-weight: bold; color: #475569; font-size: 0.9em; text-align: right;
+    }
+    .fold-blocks {
+      display: flex; flex: 1; height: 30px; border-radius: 4px; overflow: hidden; border: 1px solid #cbd5e1;
+    }
+    .f-block {
+      flex: 1; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: bold; border-right: 1px solid #fff;
+    }
+    .f-block:last-child { border-right: none; }
+    .fb-train { background: #dbeafe; color: #1d4ed8; }
+    .fb-test { background: #f59e0b; color: #fff; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+    
+    .kfold-result {
+      display: flex; flex-direction: column; align-items: center; margin-top: 15px; color: #1e293b; font-weight: bold;
+    }
+    .avg-arrow { font-size: 1.5em; color: #94a3b8; line-height: 1; margin: 5px 0; }
+    .avg-box { background: #10b981; color: #fff; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+
+    /* メリットのポイント */
+    .merit-points {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .merit-box {
+      background: #fff; border: 2px solid #10b981; border-radius: 8px; padding: 15px; text-align: center; flex: 1; min-width: 200px;
+    }
+    .merit-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+    .merit-title { font-weight: 900; color: #047857; display: block; margin-bottom: 5px; }
+    .merit-desc { font-size: 0.85em; color: #475569; }
+
+    /* 数式ボックス */
+    .math-box {
+      background: #1e293b; color: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; font-family: serif; font-size: 1.2em; margin-top: 20px;
+    }
+    .math-box span { color: #38bdf8; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-28">
+            2026.02.28
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AIにおける交差検証（Cross Validation）の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#AI</span>
+            <span class="tag">#機械学習</span>
+            <span class="tag">#モデル評価</span>
+            <span class="tag">#交差検証</span>
+            <span class="tag">#基本情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>AI（機械学習）のモデルを作った後、<strong>「本当にそのモデルは未知データにも通用するのか？」</strong>を正しく確認するための必須テクニックが「交差検証（Cross Validation）」です。</p>
+<hr>
+
+<h2>1. そもそもなぜ交差検証が必要なのか？</h2>
+<p>
+  教師あり学習では、モデルを学習させるためにデータを使います。しかし、学習に使ったデータそのものでテストを行うと、モデルが答えを<strong>「暗記（過学習）」</strong>しているだけで、未知のデータには全く対応できない可能性があります。
+</p>
+<p>
+  そこで、全データを「学習用」と「テスト用」に分ける<strong>ホールドアウト法</strong>がよく使われます。
+</p>
+
+<!-- 図解：ホールドアウト法 -->
+<div class="diagram-container">
+  <div class="diagram-title">ホールドアウト法（単純な分割）</div>
+  <div class="holdout-visual">
+    <div class="data-bar">
+      <div class="db-train">学習用データ (例: 80%)</div>
+      <div class="db-test">テスト用 (20%)</div>
+    </div>
+    <div class="holdout-issue">
+      【問題点】<br>
+      データが少ないとテスト用が少なすぎて評価がブレる。<br>
+      「たまたま簡単なテストデータだった」可能性がある。
+    </div>
+  </div>
+</div>
+
+<h2>2. 交差検証の基本アイデア（k-fold）</h2>
+<p>
+  ホールドアウト法の弱点を克服するために、<strong>「データを何分割かして、テスト用を入れ替えながら何度も評価する」</strong>のが交差検証です。<br>
+  最も一般的なのが、データを k 個に分割する <strong>k-fold（k分割）交差検証</strong> です。（例として k=5 で考えます）
+</p>
+
+<!-- 図解：k-fold交差検証 -->
+<div class="diagram-container">
+  <div class="diagram-title">5-fold 交差検証のイメージ</div>
+  <div class="kfold-visual">
+    
+    <div class="fold-row">
+      <div class="fold-label">1回目</div>
+      <div class="fold-blocks">
+        <div class="f-block fb-test">Test</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div>
+      </div>
+    </div>
+    <div class="fold-row">
+      <div class="fold-label">2回目</div>
+      <div class="fold-blocks">
+        <div class="f-block fb-train">Train</div><div class="f-block fb-test">Test</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div>
+      </div>
+    </div>
+    <div class="fold-row">
+      <div class="fold-label">3回目</div>
+      <div class="fold-blocks">
+        <div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-test">Test</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div>
+      </div>
+    </div>
+    <div class="fold-row">
+      <div class="fold-label">4回目</div>
+      <div class="fold-blocks">
+        <div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-test">Test</div><div class="f-block fb-train">Train</div>
+      </div>
+    </div>
+    <div class="fold-row">
+      <div class="fold-label">5回目</div>
+      <div class="fold-blocks">
+        <div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-train">Train</div><div class="f-block fb-test">Test</div>
+      </div>
+    </div>
+
+    <div class="kfold-result">
+      5回分の評価スコア（精度など）を算出
+      <div class="avg-arrow">⬇</div>
+      <div class="avg-box">✨ 全スコアを「平均」して最終性能とする</div>
+    </div>
+
+  </div>
+
+  <div class="math-box">
+    最終評価 ＝ <span>1 / k</span> × (M₁ + M₂ + ... + Mₖ)
+  </div>
+</div>
+
+<h2>3. なぜ交差検証が良いのか？</h2>
+<p>
+  交差検証を行うことで、モデルの評価がより信頼できるものになります。特に<strong>医療データや実験データなど、データの総量が少ない場面</strong>で非常に有効です。
+</p>
+
+<!-- 図解：メリット -->
+<div class="diagram-container">
+  <div class="merit-points">
+    <div class="merit-box">
+      <span class="merit-icon">⚖️</span>
+      <span class="merit-title">分割の偏りがなくなる</span>
+      <div class="merit-desc">「たまたまテストデータが簡単/難しかった」という偶然によるスコアのブレを平均化して吸収できます。</div>
+    </div>
+    <div class="merit-box">
+      <span class="merit-icon">💯</span>
+      <span class="merit-title">全データをテストに使える</span>
+      <div class="merit-desc">入れ替えることで、手元にあるすべてのデータが「必ず1回はテスト用」として評価に参加できます。</div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 交差検証の種類と注意点</h2>
+<p>
+  データの性質に合わせて、交差検証にもいくつか種類があります。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>種類</th>
+      <th>特徴・用途</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>k-fold (k分割)</strong></td>
+      <td>最も一般的な方法。ランダムにk個に分割する。</td>
+    </tr>
+    <tr>
+      <td><strong>Stratified k-fold</strong></td>
+      <td>クラス（正解ラベル）の比率がどの分割でも同じになるように分ける（不均衡データに有効）。</td>
+    </tr>
+    <tr>
+      <td><strong>Leave-One-Out (LOOCV)</strong></td>
+      <td>データ1件だけをテストとし、残りを学習にする。データ数が極端に少ない場合に使用。</td>
+    </tr>
+    <tr>
+      <td><strong>Time-series CV</strong></td>
+      <td>時系列データ用。「未来のデータで過去を学習する」という矛盾（データリーク）を防ぐ分け方。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="color:#ef4444; font-weight:bold; margin-top:20px;">
+  ⚠️ 注意点：計算コスト
+</p>
+<p>
+  k回学習と評価を繰り返すため、<strong>計算時間（コスト）が単純に k倍 に跳ね上がります。</strong> 大規模なディープラーニングなどでは実行が困難な場合もあります。
+</p>
+
+<div style="background:#1e293b; color:#fff; padding:20px; border-radius:8px; text-align:center; margin-top:30px;">
+  <span style="color:#facc15; font-weight:bold; font-size:1.2em; display:block; margin-bottom:10px;">🎯 試験対策のポイント</span>
+  交差検証とは、<strong>「データを分割してテスト用をローテーションしながら何度も評価し、最後に平均をとることで、少ないデータでも安定して性能を推定する方法」</strong>です。
+</div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
