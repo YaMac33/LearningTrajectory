@@ -1,0 +1,23 @@
+{
+  "id": "ap-saml-authentication-difference",
+  "category": "ap",
+  "timestamp": "2026-02-28T21:43:46+09:00",
+  "post_path": "ap/posts/2026-02-28-ap-saml-authentication-difference/",
+  "meta": {
+    "title": "SAMLとシングルサインオンの違い",
+    "summary": "SAMLによる認証プロトコルの仕組みと、チャレンジレスポンス認証との違いについて解説します。特に試験での注意点を整理します。",
+    "tags": [
+      "セキュリティ",
+      "SAML",
+      "SSO",
+      "認証",
+      "クラウド",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
