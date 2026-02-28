@@ -1,0 +1,22 @@
+{
+  "id": "ap-ultrasonic-sensor-usage",
+  "category": "ap",
+  "timestamp": "2026-02-28T12:57:58+09:00",
+  "post_path": "ap/posts/2026-02-28-ap-ultrasonic-sensor-usage/",
+  "meta": {
+    "title": "自動運転における超音波センサーの理解",
+    "summary": "超音波センサーの測定原理や、距離制限、環境影響について学ぶことで、試験対策に役立つ情報が得られます。",
+    "tags": [
+      "超音波",
+      "自動運転",
+      "センサ",
+      "距離測定",
+      "環境影響",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
