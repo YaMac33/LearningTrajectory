@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-millimeter-wave-radar-auto-driving",
+    "category": "ap",
+    "timestamp": "2026-02-28T13:01:26+09:00",
+    "title": "自動運転におけるミリ波レーダーの特徴",
+    "summary": "自動運転に重要なミリ波レーダーの基本原理や、他のセンサーとの統合について解説します。",
+    "tags": [
+      "IoT",
+      "自動運転",
+      "センサ",
+      "衝突防止",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-02-28-ap-millimeter-wave-radar-auto-driving/"
+  },
+  {
     "id": "ap-ultrasonic-sensor-usage",
     "category": "ap",
     "timestamp": "2026-02-28T12:57:58+09:00",
