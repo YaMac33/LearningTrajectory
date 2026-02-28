@@ -1,0 +1,21 @@
+{
+  "id": "ap-autonomous-vehicle-camera",
+  "category": "ap",
+  "timestamp": "2026-02-28T12:54:34+09:00",
+  "post_path": "ap/posts/2026-02-28-ap-autonomous-vehicle-camera/",
+  "meta": {
+    "title": "自動運転における可視光カメラの特徴と弱点",
+    "summary": "自動運転における可視光カメラの強みと弱点、特に環境依存性に関する理解が深まります。",
+    "tags": [
+      "IoT",
+      "自動運転",
+      "センサ",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
