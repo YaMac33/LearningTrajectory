@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 自動運転におけるLiDARの仕組みと特徴</title>
+  <meta name="description" content="自動運転で高精度な3D地図を作成するセンサー「LiDAR（ライダー）」について、ToF方式の原理や、ミリ波レーダー・カメラとの違い、悪天候時の弱点を図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="自動運転におけるLiDARの仕組みと特徴" />
+  <meta property="og:description" content="自動運転で高精度な3D地図を作成するセンサー「LiDAR（ライダー）」について、ToF方式の原理や、ミリ波レーダー・カメラとの違い、悪天候時の弱点を図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* ToF方式の原理図解 */
+    .tof-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      padding: 30px 20px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .node-car {
+      font-size: 2.5em;
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    .node-car span { display: block; font-size: 0.3em; font-weight: bold; color: #1e293b; margin-top: 5px; }
+    
+    .laser-lines {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      height: 60px;
+    }
+    .l-send {
+      position: absolute;
+      top: 0; left: 10px; right: 10px;
+      border-bottom: 3px solid #10b981;
+      color: #10b981;
+      font-weight: bold;
+      font-size: 0.85em;
+      text-align: center;
+      padding-bottom: 5px;
+    }
+    .l-send::after { content: "▶"; position: absolute; right: -5px; bottom: -12.5px; font-size: 1.5em; }
+    
+    .l-return {
+      position: absolute;
+      bottom: 0; left: 10px; right: 10px;
+      border-top: 3px dashed #10b981;
+      color: #047857;
+      font-weight: bold;
+      font-size: 0.85em;
+      text-align: center;
+      padding-top: 5px;
+    }
+    .l-return::before { content: "◀"; position: absolute; left: -5px; top: -12.5px; font-size: 1.5em; }
+
+    .formula-box {
+      background: #1e293b;
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-family: monospace;
+      font-size: 1.2em;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .formula-box span { color: #facc15; }
+
+    /* 高精度の理由カード */
+    .precision-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .prec-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-top: 4px solid #10b981;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+    }
+    .prec-icon { font-size: 2.5em; display: block; margin-bottom: 10px; }
+    .prec-title { font-weight: 900; color: #1e293b; font-size: 1.05em; display: block; margin-bottom: 5px; }
+    .prec-desc { font-size: 0.85em; color: #475569; text-align: left; }
+
+    /* 弱点図解（散乱と直進性） */
+    .weakness-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .weak-box {
+      background: #fff;
+      border: 2px solid #ef4444;
+      border-radius: 8px;
+      padding: 20px;
+      flex: 1;
+      min-width: 250px;
+    }
+    .w-title { font-weight: 900; color: #b91c1c; display: block; margin-bottom: 15px; text-align: center; border-bottom: 1px dashed #fca5a5; padding-bottom: 5px; }
+    
+    /* 散乱の図 */
+    .scatter-visual { position: relative; height: 100px; background: #f1f5f9; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+    .laser-beam { position: absolute; top: 45px; left: -10px; width: 50%; border-bottom: 3px solid #10b981; }
+    .rain-drop { position: absolute; width: 20px; height: 20px; background: #94a3b8; border-radius: 50%; top: 35px; left: 45%; }
+    .scatter-arrows { position: absolute; top: 10px; left: 55%; font-size: 1.5em; color: #10b981; line-height: 1; }
+    .scatter-arrows span { display: block; transform-origin: left center; }
+    
+    /* 回り込まない図 */
+    .diffract-visual { position: relative; height: 100px; background: #f1f5f9; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+    .laser-straight { position: absolute; top: 30px; left: -10px; width: 60%; border-bottom: 3px solid #10b981; }
+    .wall-block { position: absolute; width: 30px; height: 60px; background: #64748b; top: 20px; left: 40%; }
+    .hidden-obj { position: absolute; font-size: 1.5em; top: 40px; left: 70%; opacity: 0.3; }
+
+    .w-desc { font-size: 0.85em; color: #475569; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .val-good { color: #10b981; font-weight: bold; font-size: 1.2em; }
+    .val-soso { color: #f59e0b; font-weight: bold; font-size: 1.2em; }
+    .val-bad { color: #ef4444; font-weight: bold; font-size: 1.2em; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-02-28">
+            2026.02.28
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">自動運転におけるLiDARの仕組みと特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#IoT</span>
+            <span class="tag">#自動運転</span>
+            <span class="tag">#センサー</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>自動運転システムにおいて、周囲の状況を「立体的かつ極めて正確に」把握するための最強のセンサーが<strong>「LiDAR（ライダー）」</strong>です。その仕組みと、試験で問われる弱点について解説します。</p>
+<hr>
+
+<h2>1. LiDARとは？（基本原理：ToF）</h2>
+<p>
+  LiDAR（Light Detection and Ranging）は、<strong>「レーザー光」</strong>を発射し、物体に当たって跳ね返ってくるまでの時間から距離を計算するセンサーです。<br>
+  この時間から距離を測る方式を<strong>ToF（Time of Flight：飛行時間）方式</strong>と呼びます。
+</p>
+
+<!-- 図解：ToF測定原理 -->
+<div class="diagram-container">
+  <div class="diagram-title">ToF (Time of Flight) 方式による距離測定</div>
+  <div class="tof-flow">
+    <div class="node-car">
+      🚙
+      <span>自車 (LiDAR)</span>
+    </div>
+    <div class="laser-lines">
+      <div class="l-send">送信 (レーザー光)</div>
+      <div class="l-return">反射 (受信)</div>
+    </div>
+    <div class="node-car">
+      🚶
+      <span>歩行者など</span>
+    </div>
+  </div>
+  
+  <div class="formula-box" style="margin-top:20px;">
+    距離 ＝ ( 光速 × <span>往復時間</span> ) ÷ <span>2</span>
+    <span style="display:block; font-size:0.65em; color:#cbd5e1; margin-top:5px; font-family:sans-serif; font-weight:normal;">光速は秒速約30万km。往復の時間なので2で割ります。</span>
+  </div>
+</div>
+
+<h2>2. なぜLiDARは「高精度」なのか？</h2>
+<p>
+  ミリ波レーダーや超音波センサーと比較して、LiDARは物体の「形」までくっきりと捉えることができます。
+</p>
+
+<!-- 図解：高精度の理由 -->
+<div class="diagram-container">
+  <div class="precision-grid">
+    <div class="prec-card">
+      <span class="prec-icon">📏</span>
+      <span class="prec-title">波長が短い（高分解能）</span>
+      <div class="prec-desc">
+        ミリ波レーダーよりも波長が短いため、より細かい物体（縁石や歩行者の輪郭など）の形状を正確に判別できます。
+      </div>
+    </div>
+    <div class="prec-card">
+      <span class="prec-icon">🎯</span>
+      <span class="prec-title">ビームが細い（指向性）</span>
+      <div class="prec-desc">
+        レーザー光は広がらずに真っ直ぐ進むため、狙ったピンポイントの方向だけを高精度に測定できます。
+      </div>
+    </div>
+    <div class="prec-card">
+      <span class="prec-icon">🧊</span>
+      <span class="prec-title">3D点群（Point Cloud）</span>
+      <div class="prec-desc">
+        レーザーを全方位に大量に照射し、無数の距離データを集めることで、周囲の「立体的な3Dマップ」を作り出します。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>3. LiDARの2つの弱点（試験での頻出ポイント！）</h2>
+<p>
+  非常に優秀なLiDARですが、「光（レーザー）」を使っているがゆえの弱点が存在します。
+</p>
+
+<!-- 図解：弱点 -->
+<div class="diagram-container">
+  <div class="weakness-layout">
+    
+    <!-- 悪天候への弱さ -->
+    <div class="weak-box">
+      <span class="w-title">弱点① 悪天候に弱い（散乱）</span>
+      <div class="scatter-visual">
+        <div class="laser-beam"></div>
+        <div class="rain-drop"></div>
+        <div class="scatter-arrows">
+          <span style="transform: rotate(-30deg) translateY(-10px);">↗</span>
+          <span style="transform: rotate(30deg) translateY(10px);">↘</span>
+        </div>
+      </div>
+      <div class="w-desc">
+        雨や霧、雪の粒にレーザーが当たると光が「散乱」してしまい、正しく跳ね返ってきません。本来の物体がない場所にノイズが発生したり、検出距離が低下します。
+      </div>
+    </div>
+
+    <!-- 直進性の裏返し -->
+    <div class="weak-box">
+      <span class="w-title">弱点② 障害物の裏は見えない</span>
+      <div class="diffract-visual">
+        <div class="laser-straight"></div>
+        <div class="wall-block"></div>
+        <div class="hidden-obj">🚶</div>
+        <div style="position:absolute; top:8px; left:45%; color:#ef4444; font-weight:bold; font-size:1.5em;">✖</div>
+      </div>
+      <div class="w-desc">
+        レーザーは波長が極めて短く「直進性が高い」ため、音や低周波の電波のように障害物を「回り込む（回折する）」ことができません。遮蔽物の裏側は完全に死角になります。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 他センサーとの比較まとめ</h2>
+<p>
+  自動運転では、それぞれのセンサーの強みを組み合わせる<strong>「センサーフュージョン」</strong>が必須です。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="text-align:left;">センサー</th>
+      <th>距離・形状の精度</th>
+      <th>悪天候への強さ</th>
+      <th>色の識別</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align:left; font-weight:bold; color:#10b981;">LiDAR</td>
+      <td class="val-good">◎ (3D点群)</td>
+      <td class="val-soso">△ (散乱する)</td>
+      <td class="val-bad">×</td>
+    </tr>
+    <tr>
+      <td style="text-align:left; font-weight:bold;">ミリ波レーダー</td>
+      <td class="val-soso">○ (形状は苦手)</td>
+      <td class="val-good">◎ (最強)</td>
+      <td class="val-bad">×</td>
+    </tr>
+    <tr>
+      <td style="text-align:left; font-weight:bold;">可視光カメラ</td>
+      <td class="val-soso">△ (画像から推測)</td>
+      <td class="val-soso">△ (見えなくなる)</td>
+      <td class="val-good">◎ (標識が読める)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #10b981; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「LiDARはレーザー光で形を正確に測る！しかし、雨・霧に弱く、障害物の裏には回り込めない！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
