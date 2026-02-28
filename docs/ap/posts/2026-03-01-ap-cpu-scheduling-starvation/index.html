@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | CPUスケジューリング方式と「飢餓（Starvation）」</title>
+  <meta name="description" content="OSのCPUスケジューリングにおいて、SJF（処理時間順方式）で発生しやすい「飢餓（Starvation）」のメカニズムと、各方式の比較を図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CPUスケジューリング方式と「飢餓（Starvation）」" />
+  <meta property="og:description" content="OSのCPUスケジューリングにおいて、SJF（処理時間順方式）で発生しやすい「飢餓（Starvation）」のメカニズムと、各方式の比較を図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 飢餓状態のタイムライン図解 */
+    .starvation-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+    .timeline-label {
+      width: 60px;
+      font-weight: bold;
+      color: #475569;
+      font-size: 0.9em;
+    }
+    .task-queue {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px dashed #94a3b8;
+      overflow-x: auto;
+    }
+    .task-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.85em;
+    }
+    .task-short { background: #3b82f6; width: 40px; height: 30px; }
+    .task-long { background: #ef4444; width: 120px; height: 30px; }
+    .task-new { background: #10b981; width: 40px; height: 30px; animation: slideIn 1s infinite alternate; }
+
+    @keyframes slideIn {
+      0% { transform: translateY(-5px); }
+      100% { transform: translateY(5px); }
+    }
+
+    .cpu-core {
+      background: #1e293b;
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 80px;
+    }
+
+    .starvation-pointer {
+      position: relative;
+      margin-top: 10px;
+      text-align: right;
+      color: #b91c1c;
+      font-weight: bold;
+      font-size: 0.9em;
+      padding-right: 50px;
+    }
+    .starvation-pointer::before {
+      content: "↑";
+      position: absolute;
+      top: -20px;
+      right: 100px;
+      font-size: 1.5em;
+      color: #ef4444;
+    }
+
+    /* トレードオフの図解 */
+    .tradeoff-box {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 8px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .tradeoff-item {
+      text-align: center;
+      flex: 1;
+      min-width: 150px;
+    }
+    .t-icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+    .t-title { font-weight: 900; display: block; margin-bottom: 5px; }
+    .t-desc { font-size: 0.85em; color: #475569; }
+    .vs-mark { font-size: 1.5em; font-weight: bold; color: #cbd5e1; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .val-high { color: #ef4444; font-weight: bold; }
+    .val-low { color: #10b981; font-weight: bold; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-01">
+            2026.03.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CPUスケジューリング方式と「飢餓（Starvation）」</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#OS</span>
+            <span class="tag">#CPU</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>OSがどのプログラム（タスク）にCPUを使わせるかを決める「スケジューリング」。その中で特定のタスクが不遇な扱いを受ける「飢餓（Starvation）」という現象について解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「特定のタスクがずっとCPUの割当てを受けられず、待ち続ける可能性が最も高い方式はどれか？」<br><br>
+  ➡ 答え：<strong>SJF（Shortest Job First：処理時間順方式）</strong>
+</div>
+
+<h2>1. SJF（処理時間順方式）とは？</h2>
+<p>
+  SJFは、待っているタスクの中で<strong>「処理予定時間が最も短いものから順番に」</strong>CPUを割り当てる方式です。<br>
+  すぐに終わる仕事を先に片付けてしまうため、システム全体の<strong>「平均待ち時間」を最小にする</strong>ことができる、非常に効率の良い方式です。
+</p>
+
+<h2>2. なぜ「飢餓（Starvation）」が起きるのか？</h2>
+<p>
+  平均待ち時間が最小になる素晴らしい方式に見えますが、<strong>「長い仕事」にとっては地獄</strong>の環境になり得ます。これが「飢餓」です。
+</p>
+
+<!-- 図解：飢餓のタイムライン -->
+<div class="diagram-container">
+  <div class="diagram-title">SJFによる飢餓（Starvation）の発生メカニズム</div>
+  <div class="starvation-visual">
+    
+    <div class="timeline-row">
+      <span class="timeline-label">CPU</span>
+      <div class="cpu-core">処理中</div>
+      <div class="task-box task-short" style="margin-left:10px;">短</div>
+    </div>
+
+    <div class="timeline-row">
+      <span class="timeline-label">待ち行列</span>
+      <div class="task-queue">
+        <div class="task-box task-short">短</div>
+        <div class="task-box task-short">短</div>
+        <div class="task-box task-long">長 (100秒)</div>
+      </div>
+    </div>
+
+    <div class="timeline-row">
+      <span class="timeline-label">新着</span>
+      <div style="display:flex; gap:10px; margin-left:10px;">
+        <div class="task-box task-new">短!</div>
+        <div class="task-box task-new">短!</div>
+        <span style="font-size:0.8em; color:#475569; display:flex; align-items:center;">次々と短いタスクが到着</span>
+      </div>
+    </div>
+
+    <div class="starvation-pointer">
+      短いタスクが優先して割り込まれるため、<br>
+      この「長いタスク」は永遠に実行されない（飢餓状態）
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 効率性と公平性のトレードオフ</h2>
+<p>
+  SJFの性質を理解する上で、この2つのバランスを知っておくことが重要です。
+</p>
+
+<!-- 図解：トレードオフ -->
+<div class="diagram-container">
+  <div class="tradeoff-box">
+    <div class="tradeoff-item">
+      <span class="t-icon">⏱️</span>
+      <span class="t-title" style="color:#10b981;">平均待ち時間（効率）</span>
+      <div class="t-desc">SJFはこれが<strong>最小</strong>になる。<br>全体としてはサクサク動く。</div>
+    </div>
+    <div class="vs-mark">VS</div>
+    <div class="tradeoff-item">
+      <span class="t-icon">⚖️</span>
+      <span class="t-title" style="color:#ef4444;">公平性（フェ度）</span>
+      <div class="t-desc">SJFはこれが<strong>低い</strong>。<br>一部のタスクが極端に犠牲になる。</div>
+    </div>
+  </div>
+</div>
+
+<h2>4. 各スケジューリング方式の比較</h2>
+<p>
+  試験では他の方式と並べて出題されます。「飢餓が発生しやすいか」という視点で整理しましょう。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>方式</th>
+      <th>概要</th>
+      <th>飢餓（Starvation）の発生</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FIFO (到着順)</strong></td>
+      <td>来た順番に処理する。</td>
+      <td class="val-low">低い（順番は必ず回ってくる）</td>
+    </tr>
+    <tr>
+      <td><strong>ラウンドロビン</strong></td>
+      <td>一定時間ごとに交代で処理する。</td>
+      <td class="val-low">低い（全員に均等に時間が与えられる）</td>
+    </tr>
+    <tr>
+      <td><strong>SJF (処理時間順)</strong></td>
+      <td>短いものから処理する。</td>
+      <td class="val-high">高い（長いタスクが飢餓になる）</td>
+    </tr>
+    <tr>
+      <td><strong>優先度順</strong></td>
+      <td>優先度が高いものから処理する。</td>
+      <td class="val-high">高い（低優先度タスクが飢餓になる）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #ef4444; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「SJF（短い順）と 優先度順 は、後回しにされたタスクが一生実行されない（飢餓）リスクが最も高い！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
