@@ -1,0 +1,24 @@
+{
+  "id": "ap-lidar-mechanism-features",
+  "category": "ap",
+  "timestamp": "2026-02-28T13:04:05+09:00",
+  "post_path": "ap/posts/2026-02-28-ap-lidar-mechanism-features/",
+  "meta": {
+    "title": "自動運転におけるLiDARの仕組みと特徴",
+    "summary": "自動運転技術におけるLiDARの原理と特徴について解説し、その高精度さや試験で問われる弱点を理解できます。",
+    "tags": [
+      "LiDAR",
+      "自動運転",
+      "センサー",
+      "ToF",
+      "3Dマップ",
+      "弱点",
+      "センサーフュージョン",
+      "悪天候"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
