@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-savepoint-vs-checkpoint",
+    "category": "ap",
+    "timestamp": "2026-03-01T21:54:19+09:00",
+    "title": "セーブポイントとチェックポイントの違い",
+    "summary": "データベースにおけるセーブポイントとチェックポイントの目的及び影響範囲について解説します。試験においての重要な違いを理解できます。",
+    "tags": [
+      "データベース",
+      "トランザクション",
+      "障害回復",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-01-ap-savepoint-vs-checkpoint/"
+  },
+  {
     "id": "ap-distributed-transaction-2pc",
     "category": "ap",
     "timestamp": "2026-03-01T21:50:07+09:00",
