@@ -1,0 +1,21 @@
+{
+  "id": "ap-distributed-transaction-2pc",
+  "category": "ap",
+  "timestamp": "2026-03-01T21:50:07+09:00",
+  "post_path": "ap/posts/2026-03-01-ap-distributed-transaction-2pc/",
+  "meta": {
+    "title": "分散トランザクションと2相コミットの仕組み",
+    "summary": "分散データベースにおける原子性を保証する「2相コミット（2PC）」の仕組みを解説し、チェックポイントとの違いを理解します。",
+    "tags": [
+      "データベース",
+      "トランザクション",
+      "2相コミット",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
