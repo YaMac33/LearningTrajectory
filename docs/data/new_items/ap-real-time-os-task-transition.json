@@ -1,0 +1,23 @@
+{
+  "id": "ap-real-time-os-task-transition",
+  "category": "ap",
+  "timestamp": "2026-03-01T22:21:37+09:00",
+  "post_path": "ap/posts/2026-03-01-ap-real-time-os-task-transition/",
+  "meta": {
+    "title": "リアルタイムOSのタスク状態遷移",
+    "summary": "この資料では、リアルタイムOSにおけるタスクの基本状態やプリエンプションの仕組みについて解説します。試験準備のための重要な知識が得られます。",
+    "tags": [
+      "OS",
+      "リアルタイムOS",
+      "スケジューリング",
+      "タスク",
+      "プリエンプション",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "OSと仮想化"
+    ]
+  }
+}
