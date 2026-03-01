@@ -1,0 +1,22 @@
+{
+  "id": "ap-principal-component-analysis-pca",
+  "category": "ap",
+  "timestamp": "2026-03-01T20:39:11+09:00",
+  "post_path": "ap/posts/2026-03-01-ap-principal-component-analysis-pca/",
+  "meta": {
+    "title": "主成分分析（PCA）の理解と活用法",
+    "summary": "本記事では、主成分分析（PCA）の次元削減手法について解説し、他手法との違いを明確にします。試験対策として重要なポイントを網羅しています。",
+    "tags": [
+      "次元削減",
+      "データ分析",
+      "主成分分析",
+      "機械学習",
+      "情報処理",
+      "数学的圧縮"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
