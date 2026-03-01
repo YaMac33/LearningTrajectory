@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-database-checkpoint-comparison",
+    "category": "ap",
+    "timestamp": "2026-03-01T21:22:48+09:00",
+    "title": "制約チェックとチェックポイントの違い",
+    "summary": "データベースにおける制約チェックの即時制約と遅延制約の違いを解説し、チェックポイントとの決定的な違いを明確にします。",
+    "tags": [
+      "データベース",
+      "トランザクション",
+      "制約",
+      "チェックポイント",
+      "情報処理試験",
+      "整合性",
+      "SQL"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-01-ap-database-checkpoint-comparison/"
+  },
+  {
     "id": "ap-principal-component-analysis-pca",
     "category": "ap",
     "timestamp": "2026-03-01T20:39:11+09:00",
