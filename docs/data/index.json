@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-cross-validation-learning-techniques",
+    "category": "ap",
+    "timestamp": "2026-03-02T03:12:57+09:00",
+    "title": "交差検証と学習手法の違い",
+    "summary": "交差検証の概念とその他の学習手法である正則化・アンサンブル学習との違いを説明します。これにより試験での理解が深まります。",
+    "tags": [
+      "AI",
+      "機械学習",
+      "交差検証",
+      "正則化",
+      "アンサンブル学習",
+      "マルチタスク学習",
+      "過学習"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "アルゴリズムとデータ構造"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-02-ap-cross-validation-learning-techniques/"
+  },
+  {
     "id": "ap-os-task-state-transition",
     "category": "ap",
     "timestamp": "2026-03-02T02:54:16+09:00",
