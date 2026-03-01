@@ -1,0 +1,24 @@
+{
+  "id": "ap-regression-analysis-vs-association",
+  "category": "ap",
+  "timestamp": "2026-03-01T20:24:56+09:00",
+  "post_path": "ap/posts/2026-03-01-ap-regression-analysis-vs-association/",
+  "meta": {
+    "title": "回帰分析と最小二乗法の違い",
+    "summary": "回帰分析の基本や最小二乗法の仕組みを解説し、アソシエーション分析との違いを明確に理解することができます。",
+    "tags": [
+      "データサイエンス",
+      "機械学習",
+      "回帰分析",
+      "最小二乗法",
+      "アソシエーション分析",
+      "予測",
+      "数値モデリング",
+      "分析手法"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "アルゴリズムとデータ構造"
+    ]
+  }
+}
