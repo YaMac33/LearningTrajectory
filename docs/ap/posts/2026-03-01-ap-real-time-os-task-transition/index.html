@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | リアルタイムOSのタスク状態遷移とプリエンプション</title>
+  <meta name="description" content="RTOSにおけるタスクの3つの状態（実行、実行可能、待ち）と、プリエンプティブスケジューリングによるタスク切り替えの仕組みを図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="リアルタイムOSのタスク状態遷移とプリエンプション" />
+  <meta property="og:description" content="RTOSにおけるタスクの3つの状態（実行、実行可能、待ち）と、プリエンプティブスケジューリングによるタスク切り替えの仕組みを図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* タスク状態遷移図 */
+    .state-machine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      background: #fff;
+      padding: 30px 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      position: relative;
+    }
+    .state-top {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .state-bottom {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .state-node {
+      border: 3px solid;
+      border-radius: 12px;
+      padding: 15px 20px;
+      font-weight: 900;
+      font-size: 1.1em;
+      text-align: center;
+      background: #fff;
+      z-index: 2;
+      width: 130px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .node-running { border-color: #ef4444; color: #b91c1c; background: #fef2f2; }
+    .node-ready { border-color: #3b82f6; color: #1d4ed8; background: #eff6ff; }
+    .node-waiting { border-color: #f59e0b; color: #b45309; background: #fffbeb; }
+    
+    .node-sub { display: block; font-size: 0.7em; font-weight: normal; color: #475569; margin-top: 5px; }
+
+    /* SVG Arrows */
+    .sm-arrows {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .arrow-text {
+      font-size: 12px;
+      font-weight: bold;
+      fill: #475569;
+    }
+    .arrow-text.highlight {
+      fill: #ef4444;
+      font-size: 14px;
+    }
+
+    /* プリエンプションの仕組み図解 */
+    .preemption-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .cpu-box {
+      border: 4px solid #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      background: #f8fafc;
+      position: relative;
+      width: 160px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .cpu-label { position: absolute; top: -15px; background: #1e293b; color: #fff; padding: 2px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
+    
+    .task-item {
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-weight: bold;
+      color: #fff;
+      text-align: center;
+    }
+    .task-low { background: #94a3b8; }
+    .task-high { background: #ef4444; }
+    
+    .kick-arrow {
+      color: #ef4444; font-size: 2em; font-weight: bold;
+    }
+
+    /* 比較カード */
+    .vs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    @media (max-width: 600px) {
+      .vs-grid { grid-template-columns: 1fr; }
+    }
+    .vs-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .card-pre { border-top: 5px solid #ef4444; }
+    .card-nonpre { border-top: 5px solid #3b82f6; }
+    
+    .vs-title { font-weight: 900; font-size: 1.1em; display: block; margin-bottom: 10px; }
+    .card-pre .vs-title { color: #b91c1c; }
+    .card-nonpre .vs-title { color: #1d4ed8; }
+    .vs-desc { font-size: 0.9em; color: #475569; text-align: left; }
+
+    /* 注意ポイントハイライト */
+    .alert-box {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .alert-title { font-weight: 900; color: #b45309; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-01">
+            2026.03.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">リアルタイムOSのタスク状態遷移とプリエンプション</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#OS</span>
+            <span class="tag">#リアルタイムOS</span>
+            <span class="tag">#スケジューリング</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>常に「即応性（すぐに反応すること）」が求められるリアルタイムOS（RTOS）において、タスクがどのようにCPUを使い、奪い合うのか。その状態遷移とスケジューリングの仕組みを解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「実行中のタスクが、より優先度の高いタスクの発生によってプリエンプション（横取り）された。この直後、奪われた側のタスクはどの状態に遷移するか？」<br><br>
+  ➡ 答え：<strong>実行可能状態（Ready）</strong>
+</div>
+
+<h2>1. タスクの3つの基本状態</h2>
+<p>
+  OSの中で動いているプログラム（タスク）は、主に以下の3つの状態を行き来しながら処理を進めます。
+</p>
+
+<!-- 図解：状態遷移図 -->
+<div class="diagram-container">
+  <div class="diagram-title">タスクの状態遷移モデル</div>
+  <div class="state-machine">
+    
+    <div class="state-top">
+      <div class="state-node node-running">
+        実行状態<br>
+        <span class="node-sub">(Running)</span>
+        <span class="node-sub" style="color:#b91c1c; font-weight:bold;">CPUを使用中！</span>
+      </div>
+    </div>
+    
+    <div class="state-bottom">
+      <div class="state-node node-waiting">
+        待ち状態<br>
+        <span class="node-sub">(Waiting/Blocked)</span>
+        <span class="node-sub">I/Oやイベント待ち</span>
+      </div>
+      <div class="state-node node-ready">
+        実行可能状態<br>
+        <span class="node-sub">(Ready)</span>
+        <span class="node-sub">いつでも動ける(CPU待ち)</span>
+      </div>
+    </div>
+
+    <!-- SVG Arrows -->
+    <svg class="sm-arrows" viewBox="0 0 500 200" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto-start-reverse">
+          <polygon points="0 0, 6 3, 0 6" fill="#94a3b8" />
+        </marker>
+        <marker id="arrow-red" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto-start-reverse">
+          <polygon points="0 0, 6 3, 0 6" fill="#ef4444" />
+        </marker>
+      </defs>
+
+      <!-- 実行 -> 待ち (イベント発生待ち) -->
+      <path d="M 220 90 L 160 145" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+      <text x="130" y="110" class="arrow-text" transform="rotate(-35 150 110)">資源・I/O待ち</text>
+
+      <!-- 待ち -> 実行可能 (イベント発生) -->
+      <path d="M 200 170 L 320 170" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+      <text x="220" y="160" class="arrow-text">イベント発生</text>
+
+      <!-- 実行可能 -> 実行 (ディスパッチ) -->
+      <path d="M 340 145 L 280 90" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+      <text x="320" y="110" class="arrow-text" transform="rotate(35 320 110)">割当て(Dispatch)</text>
+
+      <!-- 実行 -> 実行可能 (プリエンプション) -->
+      <path d="M 285 75 Q 400 70 380 140" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="4" marker-end="url(#arrow-red)" />
+      <text x="385" y="90" class="arrow-text highlight">プリエンプション(横取り)</text>
+
+    </svg>
+
+  </div>
+</div>
+
+<h2>2. プリエンプティブ・スケジューリングとは？</h2>
+<p>
+  <strong>実行中のタスクを強制的に中断させ、別のタスクにCPUを切り替える方式</strong>です。<br>
+  リアルタイムOSでは、「緊急の処理（高優先度）」が来たときに、今の作業を放り出してでもすぐに対応する（応答時間を保証する）必要があるため、この方式が採用されます。
+</p>
+
+<!-- 図解：プリエンプションの仕組み -->
+<div class="diagram-container">
+  <div class="diagram-title">プリエンプション（横取り）のイメージ</div>
+  <div class="preemption-visual">
+    
+    <div style="text-align:center;">
+      <span style="font-size:0.8em; color:#475569; font-weight:bold;">🚨 緊急タスク発生！</span><br>
+      <div class="task-item task-high" style="margin-top:5px;">タスクB (優先度：高)</div>
+    </div>
+
+    <div class="kick-arrow">➡</div>
+
+    <div class="cpu-box">
+      <div class="cpu-label">CPU（実行状態）</div>
+      <div class="task-item task-low" style="text-decoration:line-through;">タスクA (優先度：低)</div>
+      <span style="font-size:0.8em; color:#b91c1c; font-weight:bold; margin-top:5px;">強制退出！</span>
+    </div>
+
+    <div class="kick-arrow" style="color:#94a3b8;">➡</div>
+    
+    <div style="text-align:center;">
+      <span style="font-size:0.8em; color:#475569; font-weight:bold;">順番待ちの列へ</span><br>
+      <div class="task-item task-low" style="margin-top:5px; border:2px solid #3b82f6; color:#1e293b; background:#fff;">タスクA (Ready)</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. なぜ「待ち状態」にならないのか？（重要）</h2>
+<p>
+  問題の核心です。CPUを追い出されたタスクAは、なぜ「待ち状態（Waiting）」ではなく「実行可能状態（Ready）」になるのでしょうか？
+</p>
+
+<div class="diagram-container">
+  <div class="alert-box">
+    <div class="alert-title">💡 理由は「資源は揃っているから」</div>
+    <p style="font-size:0.85em; color:#475569; margin:0;">
+      「待ち状態」になるのは、キーボード入力待ちや、ハードディスクの読み込み待ちなど<strong>「他の条件が揃っていないから、今CPUを渡されても計算が進められない状態」</strong>のときです。<br><br>
+      プリエンプションされたタスクは、<strong>「準備は万端だけど、自分より偉い（優先度が高い）タスクが来たから、一旦CPUという席を譲って並び直しただけ」</strong>です。したがって、いつでも実行できる「実行可能状態（Ready）」に遷移します。
+    </p>
+  </div>
+</div>
+
+<h2>4. ノンプリエンプティブとの違い</h2>
+
+<div class="diagram-container">
+  <div class="vs-grid">
+    <div class="vs-card card-pre">
+      <span class="vs-title">プリエンプティブ方式</span>
+      <div class="vs-desc">
+        OSが<strong>強制的に</strong>CPUの利用権を奪い取る。<br>
+        リアルタイムOSや現代のPC・スマホのOSの主流。緊急タスクにすぐ対応できる。
+      </div>
+    </div>
+    <div class="vs-card card-nonpre">
+      <span class="vs-title">ノンプリエンプティブ方式</span>
+      <div class="vs-desc">
+        実行中のタスクが<strong>自主的に</strong>CPUを手放すまで、OSは待つしかない。<br>
+        1つのタスクが暴走するとシステム全体が固まる（フリーズする）危険がある。
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>遷移前</th>
+      <th>きっかけ（イベント）</th>
+      <th>遷移後</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>実行状態 (Running)</td>
+      <td><strong>より優先度の高いタスクの発生 (プリエンプション)</strong></td>
+      <td style="color:#1d4ed8; font-weight:bold;">実行可能状態 (Ready)</td>
+    </tr>
+    <tr>
+      <td>実行状態 (Running)</td>
+      <td>I/O要求など（資源が足りない）</td>
+      <td style="color:#b45309; font-weight:bold;">待ち状態 (Waiting)</td>
+    </tr>
+    <tr>
+      <td>待ち状態 (Waiting)</td>
+      <td>I/O完了など（資源が揃った）</td>
+      <td style="color:#1d4ed8; font-weight:bold;">実行可能状態 (Ready)</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
