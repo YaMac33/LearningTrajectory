@@ -1,0 +1,21 @@
+{
+  "id": "ap-association-analysis-indicators",
+  "category": "ap",
+  "timestamp": "2026-03-01T20:38:35+09:00",
+  "post_path": "ap/posts/2026-03-01-ap-association-analysis-indicators/",
+  "meta": {
+    "title": "アソシエーション分析と3つの指標",
+    "summary": "アソシエーション分析の手法と、支持度・確信度・リフト値の計算式を解説します。これらの指標を理解することで、データの関連性を判断する力を養えます。",
+    "tags": [
+      "データマイニング",
+      "基本情報",
+      "応用情報",
+      "統計",
+      "アルゴリズム"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
