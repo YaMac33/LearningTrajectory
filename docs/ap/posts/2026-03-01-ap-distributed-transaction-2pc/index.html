@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 分散トランザクションと2相コミット（2PC）の仕組み</title>
+  <meta name="description" content="複数のデータベースをまたぐ分散トランザクションにおいて、全体の原子性を保証する「2相コミット（2PC）」の仕組みと、チェックポイントとの違いを図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="分散トランザクションと2相コミット（2PC）の仕組み" />
+  <meta property="og:description" content="複数のデータベースをまたぐ分散トランザクションにおいて、全体の原子性を保証する「2相コミット（2PC）」の仕組みと、チェックポイントとの違いを図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 分散トランザクションの課題 */
+    .problem-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .bank-db {
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      width: 140px;
+    }
+    .bank-db.success { border-color: #10b981; }
+    .bank-db.fail { border-color: #ef4444; background: #fef2f2; }
+    .tx-arrow {
+      color: #94a3b8; font-weight: bold; font-size: 1.2em; display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* 2PCの図解 (SVGラッパー) */
+    .twopc-phase {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .phase-badge {
+      font-weight: 900; font-size: 1.1em; margin-bottom: 15px; padding: 4px 12px; border-radius: 20px; color: #fff;
+    }
+    .badge-p1 { background: #3b82f6; }
+    .badge-p2 { background: #10b981; }
+    
+    .svg-diagram {
+      width: 100%;
+      max-width: 500px;
+      height: auto;
+    }
+
+    /* 比較カード（2PC vs チェックポイント） */
+    .vs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .vs-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .card-2pc { border-top: 5px solid #ef4444; }
+    .card-checkpoint { border-top: 5px solid #3b82f6; }
+    
+    .vs-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .vs-name { font-weight: 900; font-size: 1.2em; color: #1e293b; display: block; margin-bottom: 5px; }
+    .vs-purpose { font-size: 0.9em; font-weight: bold; padding: 5px; border-radius: 4px; margin-bottom: 15px; display: inline-block;}
+    .card-2pc .vs-purpose { color: #b91c1c; background: #fef2f2; }
+    .card-checkpoint .vs-purpose { color: #1d4ed8; background: #eff6ff; }
+    
+    .vs-features { list-style: none; padding: 0; margin: 0; font-size: 0.85em; text-align: left; color: #475569; }
+    .vs-features li { margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
+    .vs-features li strong { color: #1e293b; }
+
+    /* 弱点ハイライト */
+    .weakness-box {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    .weakness-title { color: #b45309; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-01">
+            2026.03.01
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">分散トランザクションと2相コミット（2PC）の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#データベース</span>
+            <span class="tag">#トランザクション</span>
+            <span class="tag">#2相コミット</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>複数のデータベースが関わるシステムにおいて、最も重要な「全員で一斉に成功するか、全員で失敗するか（原子性）」を保証するための仕組み「2相コミット（2PC）」について解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「分散データベースシステムにおいて、最終的なコミットまたはロールバックを<strong>調停者（Coordinator）が決定する時点</strong>はいつか？」<br><br>
+  ➡ 答え：<strong>第2段階の開始時（全参加者からの可否応答が揃った時点）</strong>
+</div>
+
+<h2>1. なぜ2相コミットが必要なのか？</h2>
+<p>
+  単一のデータベースなら「BEGIN → 処理 → COMMIT」で済みますが、銀行の振込のように<strong>「口座A（DB1）から減額し、口座B（DB2）へ加算する」</strong>といった複数のDBをまたぐ処理（分散トランザクション）では問題が起きます。
+</p>
+
+<!-- 図解：分散トランザクションの課題 -->
+<div class="diagram-container">
+  <div class="diagram-title">部分的な失敗による「データ不整合」の恐怖</div>
+  <div class="problem-visual">
+    <div class="bank-db success">
+      <span style="font-size:2em;">🏦</span><br>DB 1 (口座A)<br>
+      <span style="color:#10b981;">✔ 1万円 減額</span>
+    </div>
+    <div class="tx-arrow">
+      <span>振込処理</span>
+      <span>➡</span>
+    </div>
+    <div class="bank-db fail">
+      <span style="font-size:2em;">🏦</span><br>DB 2 (口座B)<br>
+      <span style="color:#ef4444;">❌ エラー発生!</span><br>
+      <span style="font-size:0.8em;">(加算できない)</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#ef4444; font-weight:bold; margin-top:10px;">
+    片方だけコミットされてしまうと、世界から「1万円」が消滅してしまいます。<br>これを防ぐため、全体の「原子性（Atomicity）」を保証する仕組みが必要です。
+  </p>
+</div>
+
+<h2>2. 2相コミット（Two-Phase Commit）の流れ</h2>
+<p>
+  この問題を解決するために、全体を統括する<strong>「調停者（Coordinator）」</strong>と、各DBの<strong>「参加者（Participant）」</strong>に役割を分け、2つの段階（フェーズ）を踏んで確定させます。
+</p>
+
+<!-- 図解：第1段階 -->
+<div class="diagram-container">
+  <div class="twopc-phase">
+    <span class="phase-badge badge-p1">第1段階（Prepare Phase：準備）</span>
+    <p style="font-size:0.85em; color:#475569; margin-bottom:10px; text-align:center;">調停者が全員に「コミット可能か？」を問い合わせ、各DBは処理をして結果（OK/NG）を返します。</p>
+    <svg class="svg-diagram" viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- 調停者 -->
+      <rect x="200" y="20" width="100" height="40" rx="8" fill="#1e293b" />
+      <text x="250" y="45" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">調停者</text>
+      
+      <!-- 参加者 -->
+      <rect x="50" y="140" width="80" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
+      <text x="90" y="165" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">DB 1</text>
+      
+      <rect x="210" y="140" width="80" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
+      <text x="250" y="165" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">DB 2</text>
+      
+      <rect x="370" y="140" width="80" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="2" />
+      <text x="410" y="165" font-size="14" font-weight="bold" fill="#1e293b" text-anchor="middle">DB 3</text>
+
+      <!-- 矢印マーカー -->
+      <defs>
+        <marker id="arrow-down" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+          <path d="M0,0 L6,0 L3,6 Z" fill="#3b82f6" />
+        </marker>
+        <marker id="arrow-up" markerWidth="6" markerHeight="6" refX="3" refY="0" orient="auto">
+          <path d="M0,6 L6,6 L3,0 Z" fill="#10b981" />
+        </marker>
+      </defs>
+
+      <!-- 通信（下向き: 問い合わせ） -->
+      <path d="M 220 60 Q 150 90 100 130" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-down)" />
+      <path d="M 250 60 L 250 130" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-down)" />
+      <path d="M 280 60 Q 350 90 400 130" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-down)" />
+      
+      <!-- 通信（上向き: 応答） -->
+      <path d="M 120 130 Q 170 90 230 65" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-up)" />
+      <text x="140" y="110" font-size="12" font-weight="bold" fill="#047857">OK (準備済)</text>
+      
+      <path d="M 265 130 L 265 65" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-up)" />
+      <text x="270" y="110" font-size="12" font-weight="bold" fill="#047857">OK</text>
+      
+      <path d="M 380 130 Q 330 90 270 65" fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-up)" />
+      <text x="320" y="110" font-size="12" font-weight="bold" fill="#047857">OK</text>
+    </svg>
+  </div>
+
+  <div class="twopc-phase">
+    <span class="phase-badge badge-p2">第2段階（Commit Phase：決定）</span>
+    <p style="font-size:0.85em; color:#475569; margin-bottom:10px; text-align:center;">全員の「OK」が揃った時点で調停者が「コミット」を決定し、全員に指令を出します。（誰か1人でもNGなら全員にロールバックを指示）</p>
+    <svg class="svg-diagram" viewBox="0 0 500 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- 調停者 -->
+      <rect x="200" y="20" width="100" height="40" rx="8" fill="#1e293b" />
+      <text x="250" y="45" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">調停者</text>
+      
+      <!-- 参加者 -->
+      <rect x="50" y="140" width="80" height="40" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2" />
+      <text x="90" y="165" font-size="14" font-weight="bold" fill="#047857" text-anchor="middle">DB 1</text>
+      
+      <rect x="210" y="140" width="80" height="40" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2" />
+      <text x="250" y="165" font-size="14" font-weight="bold" fill="#047857" text-anchor="middle">DB 2</text>
+      
+      <rect x="370" y="140" width="80" height="40" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2" />
+      <text x="410" y="165" font-size="14" font-weight="bold" fill="#047857" text-anchor="middle">DB 3</text>
+
+      <!-- 矢印マーカー -->
+      <defs>
+        <marker id="arrow-commit" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+          <path d="M0,0 L6,0 L3,6 Z" fill="#f59e0b" />
+        </marker>
+      </defs>
+
+      <!-- 通信（下向き: コミット指示） -->
+      <path d="M 220 60 Q 150 90 100 130" fill="none" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-commit)" />
+      <path d="M 250 60 L 250 130" fill="none" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-commit)" />
+      <path d="M 280 60 Q 350 90 400 130" fill="none" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrow-commit)" />
+      
+      <text x="140" y="100" font-size="14" font-weight="bold" fill="#b45309">全員 COMMIT せよ！</text>
+    </svg>
+  </div>
+</div>
+
+<h2>3. チェックポイントとの「決定的な違い」</h2>
+<p>
+  試験で最も狙われるのが、「チェックポイント」との混同です。対象とする範囲と目的が根本的に異なります。
+</p>
+
+<!-- 図解：比較カード -->
+<div class="diagram-container">
+  <div class="vs-grid">
+    
+    <div class="vs-card card-2pc">
+      <span class="vs-icon">🤝</span>
+      <span class="vs-name">2相コミット (2PC)</span>
+      <span class="vs-purpose">目的：全体で一致団結する（原子性）</span>
+      <ul class="vs-features">
+        <li><strong>対象：</strong> 分散データベース（複数のDB）</li>
+        <li><strong>仕組み：</strong> 調停者が全員の合意をとってから確定させる</li>
+        <li><strong>キーワード：</strong> 分散、調停者、可否確認、全員一致</li>
+      </ul>
+    </div>
+
+    <div class="vs-card card-checkpoint">
+      <span class="vs-icon">💾</span>
+      <span class="vs-name">チェックポイント</span>
+      <span class="vs-purpose">目的：障害からの回復を速くする</span>
+      <ul class="vs-features">
+        <li><strong>対象：</strong> 単一のデータベース</li>
+        <li><strong>仕組み：</strong> メモリの内容を定期的にディスクに書き出す「しおり」</li>
+        <li><strong>キーワード：</strong> バッファ書き出し、回復時間の短縮、ログ</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 2相コミットの弱点</h2>
+<p>
+  安全性を高めるための2PCですが、通信や確認の手間が増えるため、以下のような弱点があります。
+</p>
+
+<div class="diagram-container">
+  <div class="weakness-box">
+    <div class="weakness-title">⚠ 調停者の故障による「ブロッキング」</div>
+    <p style="font-size:0.85em; color:#475569; margin:0;">
+      第1段階で各DBが「OK（準備完了）」と返事をした直後に、<strong>調停者がダウン</strong>してしまうと、各DBは「コミットしていいのか、ロールバックすべきなのか」が分からず、<strong>指示が来るまで永遠に処理を待機（ロック）し続けてしまう</strong>という致命的な弱点があります。
+    </p>
+  </div>
+</div>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">用語</th>
+      <th>役割・目的</th>
+      <th>対象環境</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#ef4444; font-weight:bold;">2相コミット (2PC)</td>
+      <td>全員が成功するか、全員が失敗するかを保証する（<strong>原子性の保証</strong>）</td>
+      <td><strong>分散DB</strong>（複数）</td>
+    </tr>
+    <tr>
+      <td style="color:#3b82f6; font-weight:bold;">チェックポイント</td>
+      <td>障害発生時の<strong>回復処理の時間を短縮</strong>する</td>
+      <td><strong>単一DB</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #ef4444; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「"分散"・"調停者"・"可否の確認" ときたら『2相コミット』。回復を速くするのは『チェックポイント』！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
