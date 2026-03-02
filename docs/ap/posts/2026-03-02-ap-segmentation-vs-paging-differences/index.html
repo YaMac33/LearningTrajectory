@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 「論理構造重視のセグメンテーション」vs「物理管理重視のページング」の違い</title>
+  <meta name="description" content="仮想記憶における2つの管理方式「セグメンテーション」と「ページング」の違いを解説。特に試験で頻出の「外部断片化」と「内部断片化」の発生メカニズムを図解で比較します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="「論理構造重視のセグメンテーション」vs「物理管理重視のページング」の違い" />
+  <meta property="og:description" content="仮想記憶における2つの管理方式「セグメンテーション」と「ページング」の違いを解説。特に試験で頻出の「外部断片化」と「内部断片化」の発生メカニズムを図解で比較します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 分割方式の比較図解 */
+    .split-visual {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .split-col {
+      flex: 1;
+      min-width: 220px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .col-seg { border-color: #8b5cf6; }
+    .col-page { border-color: #3b82f6; }
+    
+    .split-title { font-weight: 900; font-size: 1.1em; display: block; margin-bottom: 15px; }
+    .col-seg .split-title { color: #6d28d9; }
+    .col-page .split-title { color: #1d4ed8; }
+
+    /* メモリブロック表現 */
+    .memory-wrap {
+      width: 100%;
+      max-width: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+    }
+    .mem-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.85em;
+      border-radius: 2px;
+    }
+    /* セグメンテーション（可変長） */
+    .seg-main { height: 60px; background: #8b5cf6; }
+    .seg-sub { height: 30px; background: #a78bfa; }
+    .seg-data { height: 40px; background: #c4b5fd; color: #4c1d95; }
+    
+    /* ページング（固定長） */
+    .page-block { height: 25px; background: #3b82f6; border-bottom: 1px dashed #bfdbfe; }
+    
+    .split-desc { font-size: 0.85em; color: #475569; font-weight: bold; margin-top: 15px; text-align: center; }
+
+    /* 断片化（フラグメンテーション）の図解 */
+    .frag-visual {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .frag-box {
+      flex: 1;
+      min-width: 200px;
+    }
+    .frag-title { font-weight: 900; color: #ef4444; display: block; margin-bottom: 10px; border-bottom: 2px dashed #fca5a5; padding-bottom: 5px; }
+    
+    .ram-space {
+      display: flex;
+      width: 100%;
+      height: 40px;
+      background: #f1f5f9;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    
+    /* 外部断片化 */
+    .f-used { background: #94a3b8; height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7em; }
+    .f-free { background: #fff; height: 100%; display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 0.7em; font-weight: bold; border-right: 1px dashed #cbd5e1; }
+    
+    /* 内部断片化 */
+    .p-frame { flex: 1; border-right: 1px solid #94a3b8; display: flex; align-items: flex-end; justify-content: flex-start; }
+    .p-frame:last-child { border-right: none; }
+    .p-data { background: #3b82f6; width: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7em; }
+    .p-waste { background: #fee2e2; width: 100%; height: 30%; display: flex; align-items: center; justify-content: center; color: #b91c1c; font-size: 0.7em; font-weight: bold; }
+
+    .frag-desc { font-size: 0.85em; color: #475569; line-height: 1.5; }
+
+    /* 長所リスト */
+    .pros-list { list-style: none; padding: 0; margin: 0; }
+    .pros-list li { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 15px; border-radius: 6px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .pros-icon { font-size: 1.5em; }
+    .pros-text strong { color: #1e293b; display: block; }
+    .pros-text span { font-size: 0.85em; color: #64748b; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .center-align { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-02">
+            2026.03.02
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">「論理構造重視のセグメンテーション」vs「物理管理重視のページング」の違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#OS</span>
+            <span class="tag">#仮想記憶</span>
+            <span class="tag">#メモリ管理</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>仮想記憶（実メモリより大きなメモリがあるように見せる仕組み）において、「データをどの単位で区切って管理するか」という2つのアプローチの違いを解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「ページング方式がセグメンテーション方式よりも優れている点はどれか？」<br><br>
+  ➡ 答え：<strong>主記憶に外部断片化（フラグメンテーション）が発生しないこと。</strong>
+</div>
+
+<h2>1. 区切り方の違い（可変長 vs 固定長）</h2>
+<p>
+  最大の決定的な違いは、データの「区切り方」にあります。
+</p>
+
+<!-- 図解：区切り方の違い -->
+<div class="diagram-container">
+  <div class="diagram-title">仮想記憶の2つの管理単位</div>
+  <div class="split-visual">
+    
+    <div class="split-col col-seg">
+      <span class="split-title">セグメンテーション方式</span>
+      <div class="memory-wrap">
+        <div class="mem-block seg-main">メイン (20KB)</div>
+        <div class="mem-block seg-sub">サブルーチン (8KB)</div>
+        <div class="mem-block seg-data">データ (12KB)</div>
+      </div>
+      <div class="split-desc">
+        プログラムの「意味（論理構造）」に沿って区切るため、サイズは<strong>可変長</strong>になる。
+      </div>
+    </div>
+
+    <div class="split-col col-page">
+      <span class="split-title">ページング方式</span>
+      <div class="memory-wrap">
+        <div class="mem-block page-block">Pg 0 (4KB)</div>
+        <div class="mem-block page-block">Pg 1 (4KB)</div>
+        <div class="mem-block page-block">Pg 2 (4KB)</div>
+        <div class="mem-block page-block">Pg 3 (4KB)</div>
+        <div class="mem-block page-block" style="border:none;">Pg 4 (4KB)</div>
+      </div>
+      <div class="split-desc">
+        内容に関係なく、機械的に<strong>固定長</strong>（例：4KB）の「ページ」に区切る。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. セグメンテーションの長所（論理管理の強み）</h2>
+<p>
+  意味のある単位で区切っているからこそ、以下のような柔軟な管理が可能になります。
+</p>
+
+<div class="diagram-container">
+  <ul class="pros-list">
+    <li>
+      <span class="pros-icon">🛡️</span>
+      <div class="pros-text">
+        <strong>論理単位で保護できる</strong>
+        <span>「このサブルーチンは読み取り専用」など、意味のある単位でアクセス権を設定できます。</span>
+      </div>
+    </li>
+    <li>
+      <span class="pros-icon">🤝</span>
+      <div class="pros-text">
+        <strong>プログラム間で共用しやすい</strong>
+        <span>共通のライブラリなどを1つのセグメントとしてまとめ、複数プログラムで使い回すのが容易です。</span>
+      </div>
+    </li>
+    <li>
+      <span class="pros-icon">📈</span>
+      <div class="pros-text">
+        <strong>動的な拡張が可能</strong>
+        <span>可変長なので、「データ領域」のセグメントだけを後から大きく拡張することができます。</span>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<h2>3. 宿命の弱点「断片化（フラグメンテーション）」</h2>
+<p>
+  試験で最も問われるのが、メモリ空間に生じる「無駄な空き（断片化）」の違いです。
+</p>
+
+<!-- 図解：断片化の違い -->
+<div class="diagram-container">
+  <div class="diagram-title">外部断片化と内部断片化のメカニズム</div>
+  <div class="frag-visual">
+    
+    <div class="frag-box">
+      <span class="frag-title">外部断片化 (セグメント方式)</span>
+      <div class="ram-space">
+        <div class="f-free" style="width:15%;">空<br>15</div>
+        <div class="f-used" style="width:30%;">使用中</div>
+        <div class="f-free" style="width:20%;">空<br>20</div>
+        <div class="f-used" style="width:25%;">使用中</div>
+        <div class="f-free" style="width:10%;">空<br>10</div>
+      </div>
+      <div class="frag-desc">
+        <strong>【発生する】</strong><br>
+        可変長のデータを出し入れするうちに、細かな「空き」がバラバラに発生します。合計すれば45KB空いているのに、連続した「30KB」のデータが入れられない（メモリ不足になる）という致命的な問題が起きます。
+      </div>
+    </div>
+
+    <div class="frag-box">
+      <span class="frag-title">内部断片化 (ページング方式)</span>
+      <div class="ram-space">
+        <div class="p-frame"><div class="p-data" style="height:100%;">4KB</div></div>
+        <div class="p-frame"><div class="p-data" style="height:100%;">4KB</div></div>
+        <div class="p-frame" style="flex-direction:column; justify-content:flex-end;">
+          <div class="p-waste">無駄 1KB</div>
+          <div class="p-data" style="height:70%;">使用 3KB</div>
+        </div>
+      </div>
+      <div class="frag-desc">
+        <strong>【発生する】</strong><br>
+        枠（ページ）が固定されているため、例えば4KBのページに3KBのデータを割り当てると、枠の中に「1KBの無駄」が生じます。<br>
+        （※ただし、バラバラの空きにはならないので<strong>外部断片化は発生しません</strong>。どの空きページ枠にもスッポリ入るからです）
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>4. 現在はページングが主流</h2>
+<p>
+  セグメンテーションは論理的には優れていますが、致命的な「外部断片化」を起こすため、現在では<strong>実装が単純で外部断片化を起こさない「ページング方式」</strong>が主流となっています。（あるいは、両者を組み合わせたページ化セグメンテーション方式が使われます）。
+</p>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:20%;">項目</th>
+      <th>セグメンテーション方式</th>
+      <th>ページング方式</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">区切り方</td>
+      <td>論理的な意味（プログラム構造）</td>
+      <td>機械的に<strong>固定長</strong>（物理重視）</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">長さ</td>
+      <td>可変長</td>
+      <td><strong>固定長</strong></td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">外部断片化</td>
+      <td style="color:#ef4444; font-weight:bold;">発生する（致命的弱点）</td>
+      <td style="color:#10b981; font-weight:bold;">発生しない（最大の長所）</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">内部断片化</td>
+      <td>ほとんど発生しない</td>
+      <td style="color:#f59e0b; font-weight:bold;">発生する（ページ内の無駄）</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">プログラム共用</td>
+      <td style="color:#10b981; font-weight:bold;">容易</td>
+      <td>難しい</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「セグメンテーションは論理的で可変長！ページングは固定長だから外部断片化が起きない！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
