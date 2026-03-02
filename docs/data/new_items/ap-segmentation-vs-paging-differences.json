@@ -1,0 +1,22 @@
+{
+  "id": "ap-segmentation-vs-paging-differences",
+  "category": "ap",
+  "timestamp": "2026-03-02T19:45:24+09:00",
+  "post_path": "ap/posts/2026-03-02-ap-segmentation-vs-paging-differences/",
+  "meta": {
+    "title": "セグメンテーションとページングの違い",
+    "summary": "仮想記憶におけるセグメンテーションとページングの違いを解説し、特に外部断片化と内部断片化のメカニズムについて理解を深めることができます。",
+    "tags": [
+      "OS",
+      "仮想記憶",
+      "メモリ管理",
+      "セグメンテーション",
+      "ページング",
+      "フラグメンテーション"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "OSと仮想化"
+    ]
+  }
+}
