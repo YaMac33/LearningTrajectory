@@ -1,5 +1,25 @@
 [
   {
+    "id": "ap-evm-basics-and-approaches",
+    "category": "ap",
+    "timestamp": "2026-03-04T07:18:40+09:00",
+    "title": "EVM（アーンド・バリュー・マネジメント）の基礎と問題の解き方",
+    "summary": "EVMの基本指標や計算方法を理解し、プロジェクト管理における効果的な対策を学ぶことができます。",
+    "tags": [
+      "プロジェクトマネジメント",
+      "EVM",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "プロジェクトマネジメント"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-04-ap-evm-basics-and-approaches/"
+  },
+  {
     "id": "ap-bayesian-statistics-explained",
     "category": "ap",
     "timestamp": "2026-03-04T07:10:22+09:00",
