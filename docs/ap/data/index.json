@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-system-audit-techniques",
+    "category": "ap",
+    "timestamp": "2026-03-04T06:53:21+09:00",
+    "title": "システム監査技法の解説と比較",
+    "summary": "システム監査で頻出のウォークスルー法に加え、他の監査技法との違いを解説し、試験対策に役立つ内容を提供します。",
+    "tags": [
+      "システム監査",
+      "ウォークスルー法",
+      "チェックリスト法",
+      "突合・照合法",
+      "ドキュメントレビュー法"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-04-ap-system-audit-techniques/"
+  },
+  {
     "id": "ap-two-phase-commit-blocking-issue",
     "category": "ap",
     "timestamp": "2026-03-04T06:49:36+09:00",
