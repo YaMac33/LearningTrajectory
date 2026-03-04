@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | DNSSECとは？デジタル署名によるDNSの改ざん防止の仕組み</title>
+  <meta name="description" content="DNSの応答改ざん（キャッシュポイズニングなど）を防ぐための拡張仕様「DNSSEC」について、公開鍵暗号方式を用いたデジタル署名と検証の仕組みを図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DNSSECとは？デジタル署名によるDNSの改ざん防止の仕組み" />
+  <meta property="og:description" content="DNSの応答改ざん（キャッシュポイズニングなど）を防ぐための拡張仕様「DNSSEC」について、公開鍵暗号方式を用いたデジタル署名と検証の仕組みを図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 通常のDNSの問題点図解 */
+    .dns-problem {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #ef4444;
+      flex-wrap: wrap;
+    }
+    .node-user { background: #f1f5f9; border: 2px solid #64748b; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; width: 120px; }
+    .node-server { background: #eff6ff; border: 2px solid #3b82f6; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; width: 120px; color: #1d4ed8; }
+    .node-attacker { background: #fef2f2; border: 2px solid #ef4444; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; width: 120px; color: #b91c1c; position: relative; }
+    
+    .attack-arrow { position: absolute; left: -30px; top: 10px; font-size: 2em; color: #ef4444; }
+
+    /* DNSSECの仕組み図解 */
+    .dnssec-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .flow-phase {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+    .phase-badge {
+      position: absolute;
+      top: -12px; left: 20px;
+      background: #1e293b; color: #fff;
+      padding: 2px 15px; border-radius: 20px;
+      font-size: 0.85em; font-weight: bold;
+    }
+    
+    .process-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .record-box { background: #f8fafc; border: 1px solid #94a3b8; padding: 10px; border-radius: 4px; font-family: monospace; font-weight: bold; color: #334155; text-align: center; }
+    .key-box { display: flex; flex-direction: column; align-items: center; font-weight: bold; font-size: 0.85em; }
+    .key-icon { font-size: 2.5em; line-height: 1; }
+    .key-secret { color: #ef4444; }
+    .key-public { color: #10b981; }
+    
+    .action-arrow { color: #64748b; font-size: 1.5em; font-weight: bold; }
+    
+    .sig-box { background: #fef3c7; border: 2px dashed #f59e0b; padding: 10px; border-radius: 4px; font-weight: bold; color: #b45309; text-align: center; }
+    .verify-box { background: #ecfdf5; border: 2px solid #10b981; padding: 10px 20px; border-radius: 8px; font-weight: bold; color: #047857; text-align: center; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+
+    /* 注意ポイントハイライト */
+    .alert-box {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .alert-title { font-weight: 900; color: #b45309; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-04">
+            2026.03.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">DNSSECとは？デジタル署名によるDNSの改ざん防止の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#DNS</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>インターネットの名前解決を担うDNSですが、元々の仕組みには「その返事が本当に正しいものか確認できない」という弱点がありました。これを解決するためのセキュリティ拡張が<strong>「DNSSEC（DNS Security Extensions）」</strong>です。</p>
+<hr>
+
+<div class="question-box">
+  【試験でのキーワード】<br>
+  「DNSの応答に<strong>ディジタル署名</strong>を付加することで、応答レコードの<strong>正当性と完全性</strong>を検証可能にする技術はどれか？」<br><br>
+  ➡ 答え：<strong>DNSSEC</strong>
+</div>
+
+<h2>1. なぜDNSSECが必要なのか？（通常のDNSの弱点）</h2>
+<p>
+  通常のDNSは、問い合わせに対して送られてきたIPアドレスを「無条件で信じて」しまいます。<br>
+  もし攻撃者が、本物のDNSサーバより先に「嘘のIPアドレス（偽サイトの住所）」を返してくると、利用者は気づかずに偽サイトへ誘導されてしまいます。（＝<strong>DNSキャッシュポイズニング攻撃</strong>）
+</p>
+
+<!-- 図解：通常DNSの問題 -->
+<div class="diagram-container">
+  <div class="diagram-title">通常のDNSの弱点（キャッシュポイズニングの危機）</div>
+  <div class="dns-problem">
+    <div class="node-user">利用者 (PC)</div>
+    <div style="color:#94a3b8; font-weight:bold;">← 応答待ち ─</div>
+    <div class="node-server">本物の<br>DNSサーバ</div>
+    
+    <div style="position:relative; margin-left:20px;">
+      <div class="attack-arrow">↖</div>
+      <div class="node-attacker">攻撃者<br><span style="font-size:0.7em;">「偽のIPだよ！」</span></div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#ef4444; margin-top:10px; font-weight:bold;">
+    利用者は「その応答が本物か、偽物か」を区別する手段を持っていません。
+  </p>
+</div>
+
+<h2>2. DNSSECの仕組み（デジタル署名と検証）</h2>
+<p>
+  この問題を解決するため、DNSSECでは<strong>公開鍵暗号方式</strong>を用いた「デジタル署名」の仕組みをDNSに組み込みます。
+</p>
+
+<!-- 図解：DNSSECのフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">DNSSECによる署名と検証の流れ</div>
+  <div class="dnssec-flow">
+    
+    <!-- フェーズ1: 署名 -->
+    <div class="flow-phase">
+      <div class="phase-badge">① ゾーン管理者側 (サーバ側での準備)</div>
+      <div class="process-row">
+        <div class="record-box">リソースレコード<br><span style="font-size:0.8em; font-weight:normal;">(例: IPは 1.2.3.4 だよ)</span></div>
+        <div class="action-arrow">➕</div>
+        <div class="key-box key-secret">
+          <span class="key-icon">🔑</span>
+          <span>秘密鍵で署名</span>
+        </div>
+        <div class="action-arrow">➡</div>
+        <div class="sig-box">RRSIGレコード<br><span style="font-size:0.7em; font-weight:normal;">(デジタル署名データ)</span></div>
+      </div>
+      <p style="text-align:center; font-size:0.8em; color:#475569; margin-top:15px; margin-bottom:0;">
+        IPアドレスなどの情報（Aレコード等）に、自分しか持っていない<strong>秘密鍵</strong>で署名を付け、セットで公開します。
+      </p>
+    </div>
+
+    <!-- フェーズ2: 検証 -->
+    <div class="flow-phase">
+      <div class="phase-badge" style="background:#3b82f6;">② 利用者側 (受け取った時の確認)</div>
+      <div class="process-row">
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <div class="record-box">リソースレコード</div>
+          <div class="sig-box">RRSIG (署名)</div>
+        </div>
+        <div class="action-arrow">➕</div>
+        <div class="key-box key-public">
+          <span class="key-icon">🗝️</span>
+          <span>公開鍵で検証</span><br>
+          <span style="font-size:0.8em; color:#64748b; font-weight:normal;">(DNSKEYレコードで取得)</span>
+        </div>
+        <div class="action-arrow">➡</div>
+        <div class="verify-box">
+          ✨ 一致！<br>
+          <span style="font-size:0.7em; color:#065f46;">(本物であり、改ざんされていない)</span>
+        </div>
+      </div>
+      <p style="text-align:center; font-size:0.8em; color:#475569; margin-top:15px; margin-bottom:0;">
+        受け取った署名を、DNS上に公開されている<strong>公開鍵</strong>を使って検証します。これで「本当に管理者が作ったデータか（正当性）」と「途中で書き換えられていないか（完全性）」を証明できます。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 試験で狙われる「引っかけ」ポイント</h2>
+<p>
+  DNSSECは「改ざん防止」には非常に強力ですが、万能ではありません。
+</p>
+
+<div class="diagram-container">
+  <div class="alert-box">
+    <div class="alert-title">⚠ DNSSECが「やらないこと」</div>
+    <p style="font-size:0.9em; color:#7f1d1d; margin:0; font-weight:bold; line-height:1.5;">
+      DNSSECは、あくまで「署名」による改ざん検知（完全性・正当性の保証）を行う仕組みです。<br>
+      そのため、<strong>通信内容自体の「暗号化（秘匿性）」は行いません。</strong><br>
+      （通信内容を盗み見られることや、DDoS攻撃などを防ぐ機能はありません。）
+    </p>
+  </div>
+</div>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">項目</th>
+      <th>DNSSECの特徴</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>目的</strong></td>
+      <td>DNSの応答データの<strong>改ざん防止・正当性の確認</strong></td>
+    </tr>
+    <tr>
+      <td><strong>防げる攻撃</strong></td>
+      <td><strong>DNSキャッシュポイズニング</strong>、なりすまし応答</td>
+    </tr>
+    <tr>
+      <td><strong>使う技術</strong></td>
+      <td>公開鍵暗号方式による<strong>デジタル署名</strong></td>
+    </tr>
+    <tr>
+      <td><strong>レコードの種類</strong></td>
+      <td>
+        署名データ： <strong>RRSIG</strong> レコード<br>
+        検証用の公開鍵： <strong>DNSKEY</strong> レコード
+      </td>
+    </tr>
+    <tr>
+      <td style="color:#ef4444;"><strong>防げないもの</strong></td>
+      <td><strong>通信の盗聴（暗号化はしない）</strong>、DDoS攻撃</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「DNSSECは、デジタル署名で『改ざん（ポイズニング）』を防ぐ！でも『暗号化』はしない！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
