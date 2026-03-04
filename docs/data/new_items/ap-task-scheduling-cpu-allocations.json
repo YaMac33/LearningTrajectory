@@ -1,0 +1,21 @@
+{
+  "id": "ap-task-scheduling-cpu-allocations",
+  "category": "ap",
+  "timestamp": "2026-03-04T09:26:36+09:00",
+  "post_path": "ap/posts/2026-03-04-ap-task-scheduling-cpu-allocations/",
+  "meta": {
+    "title": "タスクスケジューリング方式の特徴と比較",
+    "summary": "OSにおけるタスクスケジューリング方式について、FCFS、SJF、ラウンドロビンの特徴を理解し、特にSJF方式の飢餓状態に触れています。",
+    "tags": [
+      "OS",
+      "タスク管理",
+      "スケジューリング",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "OSと仮想化"
+    ]
+  }
+}
