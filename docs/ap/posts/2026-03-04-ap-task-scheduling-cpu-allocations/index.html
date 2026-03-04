@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | タスクスケジューリング方式のCPU割り当てと特徴</title>
+  <meta name="description" content="OSのタスクスケジューリング方式（FCFS、SJF、ラウンドロビン）の違いと、SJFで発生しやすい「飢餓状態（Starvation）」のメカニズム、デッドロックとの違いを図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="タスクスケジューリング方式のCPU割り当てと特徴" />
+  <meta property="og:description" content="OSのタスクスケジューリング方式（FCFS、SJF、ラウンドロビン）の違いと、SJFで発生しやすい「飢餓状態（Starvation）」のメカニズム、デッドロックとの違いを図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 3つのスケジューリング方式比較カード */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .method-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-top-width: 4px;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-fcfs { border-top-color: #94a3b8; }
+    .card-sjf { border-top-color: #ef4444; }
+    .card-rr { border-top-color: #10b981; }
+
+    .mc-title { font-weight: 900; font-size: 1.1em; color: #1e293b; display: block; margin-bottom: 5px; }
+    .mc-sub { font-size: 0.8em; color: #64748b; margin-bottom: 10px; display: block; font-weight: bold; }
+    
+    /* キューのミニ図解 */
+    .mini-queue {
+      display: flex;
+      gap: 5px;
+      background: #f1f5f9;
+      padding: 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      border: 1px dashed #cbd5e1;
+      align-items: center;
+      justify-content: flex-start;
+      height: 40px;
+    }
+    .q-task {
+      background: #3b82f6; color: #fff; font-size: 0.7em; font-weight: bold; padding: 2px 5px; border-radius: 3px; display: flex; align-items: center; justify-content: center;
+    }
+    .t-long { width: 50px; background: #64748b; }
+    .t-short { width: 25px; }
+    .t-slice { width: 20px; background: #10b981; border-right: 1px dashed #fff; }
+
+    .mc-desc { font-size: 0.85em; color: #475569; margin-bottom: 10px; flex: 1; }
+    .mc-alert { font-size: 0.8em; font-weight: bold; padding: 4px; border-radius: 4px; text-align: center; }
+    .card-fcfs .mc-alert { background: #f1f5f9; color: #475569; }
+    .card-sjf .mc-alert { background: #fef2f2; color: #b91c1c; }
+    .card-rr .mc-alert { background: #ecfdf5; color: #047857; }
+
+    /* 飢餓状態のタイムライン（シンプル版） */
+    .starvation-flow {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      overflow-x: auto;
+    }
+    .cpu-node { background: #1e293b; color: #fff; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; min-width: 80px; }
+    .wait-queue { display: flex; align-items: center; gap: 5px; padding: 10px; border-bottom: 2px solid #cbd5e1; flex: 1; position: relative; }
+    .task-box { padding: 5px 10px; border-radius: 4px; font-weight: bold; color: #fff; font-size: 0.85em; }
+    .tb-short { background: #3b82f6; animation: slideLeft 2s infinite; }
+    .tb-long { background: #ef4444; opacity: 0.5; position: absolute; right: 10px; }
+    
+    @keyframes slideLeft {
+      0% { transform: translateX(50px); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    /* デッドロックとの比較図解 */
+    .vs-layout {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .vs-box {
+      flex: 1;
+      min-width: 220px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .box-starve { border-color: #ef4444; }
+    .box-dead { border-color: #8b5cf6; }
+    
+    .vs-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .vs-title { font-weight: 900; font-size: 1.1em; display: block; margin-bottom: 10px; }
+    .box-starve .vs-title { color: #b91c1c; }
+    .box-dead .vs-title { color: #6d28d9; }
+    
+    .vs-cause { font-size: 0.85em; font-weight: bold; background: #f8fafc; padding: 5px; border-radius: 4px; margin-bottom: 10px; color: #334155; }
+    .vs-desc { font-size: 0.85em; color: #475569; text-align: left; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .td-left { text-align: left !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-04">
+            2026.03.04
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">タスクスケジューリング方式のCPU割り当てと特徴</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#OS</span>
+            <span class="tag">#タスク管理</span>
+            <span class="tag">#スケジューリング</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>コンピュータシステム内で同時に複数のタスク（プロセス）が存在する場合、OSは「どのタスクに、どの順番でCPUを使わせるか」を決定します。これをタスクスケジューリングと呼びます。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「タスクスケジューリング方式のうち、特定のタスクがCPU資源の割当てを長時間待ち続ける可能性が最も高いものはどれか？」<br><br>
+  ➡ 答え：<strong>処理予定時間が最も短いタスクから順に実行する方式（SJF）</strong>
+</div>
+
+<h2>1. 代表的な3つのスケジューリング方式</h2>
+<p>
+  OSがタスクを選ぶルールにはいくつか種類があり、それぞれに長所と短所があります。
+</p>
+
+<!-- 図解：方式の比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">主要なスケジューリング方式の比較</div>
+  <div class="method-grid">
+    
+    <!-- FCFS -->
+    <div class="method-card card-fcfs">
+      <span class="mc-title">到着順 (FCFS)</span>
+      <span class="mc-sub">First Come First Serve</span>
+      <div class="mini-queue">
+        <div class="q-task t-long">長</div>
+        <div class="q-task t-short">短</div>
+        <div class="q-task t-short">短</div>
+      </div>
+      <div class="mc-desc">単純に「列に並んだ順番」に実行する方式。分かりやすいが、前にとても長い処理がいると、後ろの短い処理が長時間待たされてしまう。</div>
+      <div class="mc-alert">全体効率：△</div>
+    </div>
+
+    <!-- SJF -->
+    <div class="method-card card-sjf">
+      <span class="mc-title">処理時間順 (SJF)</span>
+      <span class="mc-sub">Shortest Job First</span>
+      <div class="mini-queue">
+        <div class="q-task t-short">短</div>
+        <div class="q-task t-short">短</div>
+        <div class="q-task t-long" style="margin-left:auto;">長</div>
+      </div>
+      <div class="mc-desc">早く終わる（短い）タスクを最優先で実行する方式。全体の平均待ち時間を最小にできるが、長いタスクが後回しにされ続ける危険がある。</div>
+      <div class="mc-alert">飢餓のリスク：高！</div>
+    </div>
+
+    <!-- ラウンドロビン -->
+    <div class="method-card card-rr">
+      <span class="mc-title">ラウンドロビン (RR)</span>
+      <span class="mc-sub">Round Robin</span>
+      <div class="mini-queue">
+        <div class="q-task t-slice"></div><div class="q-task t-slice"></div><div class="q-task t-slice"></div>
+        <span style="font-size:0.8em; color:#64748b; margin-left:5px;">交代...</span>
+      </div>
+      <div class="mc-desc">全タスクに「一定の時間（タイムクォンタム）」ずつ均等にCPUを割り当て、時間が来たら強制的に最後尾に並び直させる方式。</div>
+      <div class="mc-alert">公平性：◎</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. SJFの落とし穴「飢餓状態（Starvation）」</h2>
+<p>
+  SJF（短い順）はシステム全体の効率は良くなりますが、「処理時間が長いタスク」にとっては非常に過酷な環境になります。
+</p>
+
+<!-- 図解：飢餓状態 -->
+<div class="diagram-container">
+  <div class="diagram-title">SJFにおける飢餓状態の発生イメージ</div>
+  <div class="starvation-flow">
+    <div class="cpu-node">CPU<br><span style="font-size:0.6em; font-weight:normal;">(短いタスク処理中)</span></div>
+    <div style="color:#94a3b8; font-weight:bold; font-size:1.5em;">←</div>
+    <div class="wait-queue">
+      <div class="task-box tb-short">短</div>
+      <div class="task-box tb-short" style="animation-delay: 0.5s;">短</div>
+      <div class="task-box tb-short" style="animation-delay: 1s;">短</div>
+      
+      <div class="task-box tb-long">長<br><span style="font-size:0.6em;">(永遠に待機)</span></div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#ef4444; font-weight:bold; margin-top:15px;">
+    次々と「短いタスク」が到着し続けると、SJFのルール上それらが常に優先されるため、<br>一番後ろに追いやられた「長いタスク」はいつまで経っても実行されません。これを飢餓状態と呼びます。
+  </p>
+</div>
+
+<h2>3. 混同注意！「デッドロック」との違い</h2>
+<p>
+  「処理が進まなくなる」という意味で似ているため、試験では「飢餓状態」と「デッドロック」を混同させる選択肢がよく出ます。原因が全く異なります。
+</p>
+
+<!-- 図解：デッドロックとの比較 -->
+<div class="diagram-container">
+  <div class="vs-layout">
+    
+    <div class="vs-box box-starve">
+      <span class="vs-icon">💀</span>
+      <span class="vs-title">飢餓状態 (Starvation)</span>
+      <div class="vs-cause">原因：スケジューリングの順番負け</div>
+      <div class="vs-desc">
+        リソース（CPU）は空いていて他のタスクは元気に動いているのに、<strong>「ルールのせいで自分だけ順番が回ってこない」</strong>状態。SJFや優先度順方式で発生する。
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; font-weight:900; font-size:1.5em; color:#cbd5e1;">VS</div>
+
+    <div class="vs-box box-dead">
+      <span class="vs-icon">🛑</span>
+      <span class="vs-title">デッドロック (Deadlock)</span>
+      <div class="vs-cause">原因：お互いのリソース待ち（膠着）</div>
+      <div class="vs-desc">
+        複数のタスクが、お互いに相手が持っているリソース（ファイルやDBのロックなど）が空くのを待ち合い、<strong>「全員が完全にフリーズして動けなくなった」</strong>状態。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>まとめ表</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th class="td-left" style="width:20%;">方式</th>
+      <th class="td-left">特徴</th>
+      <th>飢餓(Starvation)の発生</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="td-left" style="font-weight:bold; background:#f8fafc;">FCFS (到着順)</td>
+      <td class="td-left">先に来たものから順番に処理する。</td>
+      <td style="color:#10b981; font-weight:bold;">発生しない</td>
+    </tr>
+    <tr>
+      <td class="td-left" style="font-weight:bold; background:#f8fafc;">SJF (処理時間順)</td>
+      <td class="td-left">短いタスクを優先。平均待ち時間は最小。</td>
+      <td style="color:#ef4444; font-weight:bold;">発生する (長いタスク)</td>
+    </tr>
+    <tr>
+      <td class="td-left" style="font-weight:bold; background:#f8fafc;">ラウンドロビン</td>
+      <td class="td-left">一定時間ごとに強制交代させる（公平）。</td>
+      <td style="color:#10b981; font-weight:bold;">発生しない</td>
+    </tr>
+    <tr>
+      <td class="td-left" style="font-weight:bold; background:#f8fafc;">優先度順</td>
+      <td class="td-left">優先度が高いものを先に処理する。</td>
+      <td style="color:#ef4444; font-weight:bold;">発生する (低優先度タスク)</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
