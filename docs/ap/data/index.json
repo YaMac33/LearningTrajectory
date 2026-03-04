@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-dnssec-security-extensions",
+    "category": "ap",
+    "timestamp": "2026-03-04T09:04:25+09:00",
+    "title": "DNSSECによるデジタル署名の仕組み",
+    "summary": "DNSSECはDNSの応答の正当性と完全性を検証する技術であり、デジタル署名を利用したセキュリティ拡張です。試験対策として重要なポイントを解説します。",
+    "tags": [
+      "DNS",
+      "セキュリティ",
+      "ネットワーク",
+      "デジタル署名",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-04-ap-dnssec-security-extensions/"
+  },
+  {
     "id": "ap-evm-basics-and-approaches",
     "category": "ap",
     "timestamp": "2026-03-04T07:18:40+09:00",
