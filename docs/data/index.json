@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-two-phase-commit",
+    "category": "ap",
+    "timestamp": "2026-03-04T12:41:29+09:00",
+    "title": "2相コミット（2PC）とは？",
+    "summary": "2相コミットは分散システムにおいて、トランザクションの原子性と一貫性を保証する仕組みです。特に、すべての処理が成功するか失敗するかを確実に管理します。",
+    "tags": [
+      "データベース",
+      "トランザクション",
+      "2相コミット",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-04-ap-two-phase-commit/"
+  },
+  {
     "id": "ap-microservices-network-latency",
     "category": "ap",
     "timestamp": "2026-03-04T12:23:29+09:00",
