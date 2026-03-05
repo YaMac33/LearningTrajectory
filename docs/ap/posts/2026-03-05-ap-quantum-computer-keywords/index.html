@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 量子ゲート方式の量子コンピュータ：仕組みと5つの重要キーワード</title>
+  <meta name="description" content="GoogleやIBMが開発を進める「量子ゲート方式」の量子コンピュータについて、量子ビット、重ね合わせ、量子ゲート、量子干渉、測定という5つの重要概念を図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="量子ゲート方式の量子コンピュータ：仕組みと5つの重要キーワード" />
+  <meta property="og:description" content="GoogleやIBMが開発を進める「量子ゲート方式」の量子コンピュータについて、量子ビット、重ね合わせ、量子ゲート、量子干渉、測定という5つの重要概念を図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 量子ビットの比較図解 */
+    .qubit-compare {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .bit-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      padding: 20px;
+      border-radius: 8px;
+      width: 200px;
+    }
+    .box-classical { border-color: #64748b; }
+    .box-quantum { border-color: #8b5cf6; box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); }
+    
+    .bit-title { font-weight: 900; margin-bottom: 15px; }
+    .box-classical .bit-title { color: #334155; }
+    .box-quantum .bit-title { color: #6d28d9; }
+    
+    .c-bits { display: flex; gap: 10px; }
+    .c-bit-state { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; font-weight: bold; background: #f1f5f9; border: 2px solid #94a3b8; border-radius: 8px; color: #475569; }
+    .c-bit-state.active { background: #3b82f6; border-color: #1d4ed8; color: #fff; }
+    
+    .q-bit-state {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2em; font-weight: bold; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      animation: pulse 3s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+      100% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+    }
+
+    .bit-desc { font-size: 0.85em; color: #475569; font-weight: bold; margin-top: 15px; text-align: center; }
+
+    /* 並列計算のイメージ図解 */
+    .parallel-compare {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+    }
+    .p-col { flex: 1; text-align: center; }
+    .p-title { font-weight: bold; color: #1e293b; margin-bottom: 10px; display: block; }
+    .state-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .s-box { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px; border-radius: 4px; font-family: monospace; font-size: 0.85em; color: #94a3b8; }
+    .s-box.active-c { background: #3b82f6; color: #fff; border-color: #1d4ed8; }
+    .s-box.active-q { background: #8b5cf6; color: #fff; border-color: #6d28d9; }
+    .p-desc { font-size: 0.8em; color: #64748b; margin-top: 10px; }
+
+    /* 量子ゲートの流れ */
+    .gate-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+    }
+    .g-node { font-family: monospace; font-weight: bold; font-size: 1.2em; color: #334155; }
+    .g-arrow { color: #94a3b8; font-size: 1.5em; }
+    .gate-box { background: #1e293b; color: #fff; padding: 15px 25px; border-radius: 4px; font-weight: 900; font-size: 1.2em; position: relative; }
+    .gate-box::after { content: "アダマールゲート"; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 0.6em; color: #475569; white-space: nowrap; }
+
+    /* 量子干渉のグラフ図解 */
+    .interference-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 150px;
+      background: #fff;
+      padding: 20px 10px 0 10px;
+      border-radius: 8px;
+      border-bottom: 3px solid #cbd5e1;
+      margin-top: 20px;
+    }
+    .i-bar-wrap { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 60px; }
+    .i-arrow { font-size: 1.2em; font-weight: bold; }
+    .arr-up { color: #10b981; }
+    .arr-down { color: #ef4444; }
+    .i-bar { width: 40px; border-radius: 4px 4px 0 0; transition: height 0.5s; }
+    .bar-correct { background: #10b981; height: 100px; }
+    .bar-wrong { background: #94a3b8; height: 30px; opacity: 0.6; }
+    .i-label { font-weight: bold; color: #334155; font-size: 0.9em; margin-top: 5px; }
+
+    /* 測定の図解 */
+    .measure-flow {
+      display: flex; align-items: center; justify-content: center; gap: 15px; background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #e2e8f0;
+    }
+    .measure-box { background: #f59e0b; color: #fff; font-weight: bold; padding: 10px 20px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; }
+    .measure-box span { font-size: 2em; line-height: 1; }
+    
+    /* 数式ボックス */
+    .math-box {
+      font-family: serif; font-size: 1.2em; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px dashed #94a3b8; text-align: center; color: #1e293b; margin: 10px 0;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-05">
+            2026.03.05
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">量子ゲート方式の量子コンピュータ：仕組みと5つの重要キーワード</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#最新技術</span>
+            <span class="tag">#量子コンピュータ</span>
+            <span class="tag">#ハードウェア</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>GoogleやIBMが研究開発をリードし、現在主流となっている「量子ゲート方式」の量子コンピュータ。従来のコンピュータとは全く異なる、その魔法のような計算の仕組みを5つのステップで解説します。</p>
+<hr>
+
+<h2>1. 量子ビット（Qubit）と重ね合わせ</h2>
+<p>
+  普通のコンピュータの最小単位は「ビット（0か1のどちらか）」ですが、量子コンピュータは<strong>「量子ビット（Qubit）」</strong>を使います。最大の特徴は<strong>「0と1の両方を同時に持つ（重ね合わせ）」</strong>ことができる点です。
+</p>
+
+<!-- 図解：量子ビットと並列性 -->
+<div class="diagram-container">
+  <div class="diagram-title">古典ビットと量子ビットの違い</div>
+  <div class="qubit-compare">
+    <div class="bit-box box-classical">
+      <span class="bit-title">古典ビット</span>
+      <div class="c-bits">
+        <div class="c-bit-state">0</div>
+        <div class="c-bit-state active">1</div>
+      </div>
+      <div class="bit-desc">「0」か「1」の<br>どちらか1つだけ</div>
+    </div>
+    <div class="bit-box box-quantum">
+      <span class="bit-title">量子ビット (Qubit)</span>
+      <div class="q-bit-state">0 + 1</div>
+      <div class="bit-desc">「0」と「1」が<br>同時に混ざり合った状態</div>
+    </div>
+  </div>
+  
+  <div class="math-box">
+    |ψ⟩ ＝ α|0⟩ ＋ β|1⟩<br>
+    <span style="font-size:0.6em; font-family:sans-serif; color:#64748b;">(αとβは確率振幅。状態が数式で表現される)</span>
+  </div>
+
+  <div class="diagram-title" style="margin-top:20px;">重ね合わせ（Superposition）がもたらす「並列性」</div>
+  <div class="parallel-compare">
+    <div class="p-col">
+      <span class="p-title">2ビットの場合 (古典)</span>
+      <div class="state-grid">
+        <div class="s-box">00</div>
+        <div class="s-box active-c">01</div>
+        <div class="s-box">10</div>
+        <div class="s-box">11</div>
+      </div>
+      <div class="p-desc">4つの状態のうち、<br><strong>どれか1つ</strong>しか表現できない</div>
+    </div>
+    <div class="p-col">
+      <span class="p-title">2量子ビットの場合</span>
+      <div class="state-grid">
+        <div class="s-box active-q">00</div>
+        <div class="s-box active-q">01</div>
+        <div class="s-box active-q">10</div>
+        <div class="s-box active-q">11</div>
+      </div>
+      <div class="p-desc">4つの状態を<strong>すべて同時に</strong>持つ。<br>（一気に並列計算が可能！）</div>
+    </div>
+  </div>
+</div>
+
+<h2>2. 量子ゲートによる操作</h2>
+<p>
+  普通のコンピュータの論理回路（AND, OR, NOT）に相当するものが<strong>「量子ゲート」</strong>です。量子ビットをこのゲートに通すことで、状態を変化させて計算を進めます。<br>
+  （代表例：Xゲート、Hゲート、CNOTゲート、Zゲートなど）
+</p>
+
+<!-- 図解：量子ゲート -->
+<div class="diagram-container">
+  <div class="diagram-title">Hゲート（アダマールゲート）の働き</div>
+  <div class="gate-flow">
+    <div class="g-node">|0⟩<br><span style="font-size:0.6em; font-weight:normal; color:#64748b;">ただの「0」</span></div>
+    <div class="g-arrow">➡</div>
+    <div class="gate-box">H</div>
+    <div class="g-arrow">➡</div>
+    <div class="g-node" style="color:#8b5cf6;">0 + 1<br><span style="font-size:0.6em; font-weight:normal; color:#64748b;">重ね合わせ状態に！</span></div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:10px; margin-bottom:0;">
+    Hゲートは、ただの「0」や「1」を、魔法のように「0と1の重ね合わせ状態」に変換する重要なゲートです。
+  </p>
+</div>
+
+<h2>3. 量子干渉（Interference）と測定</h2>
+<p>
+  大量の答えの候補を同時に計算したあと、<strong>「正しい答えの波（確率）を強め、間違った答えの波を打ち消す」</strong>操作を行います。これを<strong>量子干渉</strong>と呼びます。
+</p>
+
+<!-- 図解：量子干渉 -->
+<div class="diagram-container">
+  <div class="diagram-title">量子干渉による確率の操作</div>
+  <div class="interference-chart">
+    <div class="i-bar-wrap">
+      <span class="i-arrow arr-up">⬆</span>
+      <div class="i-bar bar-correct"></div>
+      <span class="i-label">正解 A</span>
+    </div>
+    <div class="i-bar-wrap">
+      <span class="i-arrow arr-down">⬇</span>
+      <div class="i-bar bar-wrong"></div>
+      <span class="i-label">候補 B</span>
+    </div>
+    <div class="i-bar-wrap">
+      <span class="i-arrow arr-down">⬇</span>
+      <div class="i-bar bar-wrong"></div>
+      <span class="i-label">候補 C</span>
+    </div>
+    <div class="i-bar-wrap">
+      <span class="i-arrow arr-down">⬇</span>
+      <div class="i-bar bar-wrong"></div>
+      <span class="i-label">候補 D</span>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:15px; font-weight:bold;">
+    波の性質を利用して、正解だけが「目立つ」ように加工します。
+  </p>
+</div>
+
+<p>
+  そして最後に、この量子状態を<strong>「測定（Measurement）」</strong>します。計算中はフワフワした重ね合わせ状態でしたが、<strong>測定した瞬間にどれか1つの状態に確定（収縮）</strong>し、最終的な計算結果が得られます。
+</p>
+
+<!-- 図解：測定 -->
+<div class="diagram-container">
+  <div class="measure-flow">
+    <div class="q-bit-state" style="width:60px; height:60px; font-size:0.9em; animation:none;">0 + 1</div>
+    <div class="g-arrow">➡</div>
+    <div class="measure-box"><span>👁️</span>測定</div>
+    <div class="g-arrow">➡</div>
+    <div class="c-bit-state active" style="border-radius:50%; background:#1e293b; border-color:#0f172a;">1</div>
+  </div>
+  <div style="text-align:center; font-size:0.85em; color:#475569; font-weight:bold; margin-top:10px;">計算途中は「重ね合わせ」だが、最後は必ず「1つの結果」になる。</div>
+</div>
+
+<h2>試験対策まとめ：5つの重要キーワード</h2>
+<p>
+  情報処理試験では、以下の用語と意味の結びつけがよく問われます。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:30%;">用語</th>
+      <th>意味・特徴</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold;">量子ビット (qubit)</td>
+      <td>0と1の<strong>重ね合わせ状態</strong>を持つ基本単位。</td>
+    </tr>
+    <tr>
+      <td style="color:#6d28d9; font-weight:bold;">重ね合わせ (Superposition)</td>
+      <td><strong>複数の状態を同時に持つ</strong>こと。並列計算の源。</td>
+    </tr>
+    <tr>
+      <td style="color:#047857; font-weight:bold;">量子ゲート</td>
+      <td>量子状態を変化させる演算回路（Hゲート等）。</td>
+    </tr>
+    <tr>
+      <td style="color:#ef4444; font-weight:bold;">量子干渉 (Interference)</td>
+      <td>波の性質を利用し、<strong>正解の確率を高める（強め合う）</strong>操作。</td>
+    </tr>
+    <tr>
+      <td style="color:#f59e0b; font-weight:bold;">測定 (Measurement)</td>
+      <td>重ね合わせ状態を観測し、<strong>1つの状態に確定</strong>させること。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
