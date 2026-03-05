@@ -1,0 +1,26 @@
+{
+  "id": "ap-tdma-cdma-fdma-differences",
+  "category": "ap",
+  "timestamp": "2026-03-05T20:29:48+09:00",
+  "post_path": "ap/posts/2026-03-05-ap-tdma-cdma-fdma-differences/",
+  "meta": {
+    "title": "TDMAと多元接続方式の違い解説",
+    "summary": "TDMA、FDMA、CDMAの3つの多元接続方式の理解を深めることができる。試験対策として重要なポイントも整理されている。",
+    "tags": [
+      "ネットワーク",
+      "無線通信",
+      "基本情報",
+      "応用情報",
+      "通信方式",
+      "多元接続",
+      "TDMA",
+      "FDMA",
+      "CDMA",
+      "多重化"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
