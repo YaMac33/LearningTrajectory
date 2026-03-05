@@ -1,5 +1,30 @@
 [
   {
+    "id": "ap-digital-twin-metaverse-cps",
+    "category": "ap",
+    "timestamp": "2026-03-05T18:04:57+09:00",
+    "title": "デジタルツインとメタバースの違い",
+    "summary": "デジタルツイン、メタバース、サイバーフィジカルシステム（CPS）の違いと相互関係を整理し、試験対策に役立つキーワードを解説します。",
+    "tags": [
+      "デジタルツイン",
+      "メタバース",
+      "CPS",
+      "IoT",
+      "AI",
+      "再現",
+      "仮想空間",
+      "社会システム",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-05-ap-digital-twin-metaverse-cps/"
+  },
+  {
     "id": "ap-fault-avoidance",
     "category": "ap",
     "timestamp": "2026-03-05T18:01:15+09:00",
