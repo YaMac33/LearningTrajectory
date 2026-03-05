@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-ftp-communication-structure",
+    "category": "ap",
+    "timestamp": "2026-03-05T22:39:10+09:00",
+    "title": "FTPの制御チャネルとデータチャネル",
+    "summary": "FTPの構造を理解し、制御用コネクションとデータコネクションの違いや、セキュリティ対策について学びます。",
+    "tags": [
+      "ネットワーク",
+      "プロトコル",
+      "FTP",
+      "セキュリティ",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-05-ap-ftp-communication-structure/"
+  },
+  {
     "id": "ap-risc-5-stage-pipeline",
     "category": "ap",
     "timestamp": "2026-03-05T22:04:21+09:00",
