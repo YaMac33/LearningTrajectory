@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | RISCの5段階パイプラインとハザードの仕組み</title>
+  <meta name="description" content="CPUの処理効率を劇的に高める「5段階パイプライン」の仕組み（IF, ID, EX, MEM, WB）と、試験で頻出の3つの「パイプラインハザード」を図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="RISCの5段階パイプラインとハザードの仕組み" />
+  <meta property="og:description" content="CPUの処理効率を劇的に高める「5段階パイプライン」の仕組み（IF, ID, EX, MEM, WB）と、試験で頻出の3つの「パイプラインハザード」を図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* パイプラインのタイムライン図解 */
+    .pipeline-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-family: monospace;
+    }
+    .pl-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .pl-label {
+      width: 60px;
+      font-weight: bold;
+      color: #334155;
+    }
+    .pl-stages {
+      display: flex;
+      gap: 2px;
+    }
+    .stage-box {
+      width: 40px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.85em;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .s-if { background: #3b82f6; }
+    .s-id { background: #8b5cf6; }
+    .s-ex { background: #ef4444; }
+    .s-mem { background: #f59e0b; }
+    .s-wb { background: #10b981; }
+    
+    .s-empty { width: 40px; height: 30px; }
+
+    /* 5段階のフロー図解 */
+    .stage-flow {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sf-node {
+      flex: 1;
+      min-width: 120px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px 10px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .node-if { border-color: #3b82f6; }
+    .node-id { border-color: #8b5cf6; }
+    .node-ex { border-color: #ef4444; }
+    .node-mem { border-color: #f59e0b; }
+    .node-wb { border-color: #10b981; }
+    
+    .sf-name { font-weight: 900; font-size: 1.2em; display: block; margin-bottom: 5px; }
+    .node-if .sf-name { color: #1d4ed8; }
+    .node-id .sf-name { color: #6d28d9; }
+    .node-ex .sf-name { color: #b91c1c; }
+    .node-mem .sf-name { color: #b45309; }
+    .node-wb .sf-name { color: #047857; }
+    
+    .sf-desc { font-size: 0.8em; color: #475569; font-weight: bold; line-height: 1.4; }
+
+    .sf-arrow { font-size: 1.5em; color: #cbd5e1; font-weight: bold; display: flex; align-items: center; }
+
+    /* ハザードのカード */
+    .hazard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .hazard-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-top: 5px solid #ef4444;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .hz-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+    .hz-title { font-weight: 900; color: #1e293b; display: block; margin-bottom: 5px; }
+    .hz-desc { font-size: 0.85em; color: #475569; margin-bottom: 10px; }
+    .hz-example { font-size: 0.8em; background: #fef2f2; color: #b91c1c; padding: 5px; border-radius: 4px; font-weight: bold; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-05">
+            2026.03.05
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">RISCの5段階パイプラインとハザードの仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#ハードウェア</span>
+            <span class="tag">#CPU</span>
+            <span class="tag">#アーキテクチャ</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>CPUが命令を効率よく処理するための仕組み「パイプライン」。命令の処理を5つの段階（ステージ）に分け、工場でのベルトコンベア作業のように並行して実行する技術について解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「RISCプロセッサにおいて、命令の実行を5つのステージに分割して処理するパイプライン方式で、正しいステージの順番はどれか？」<br><br>
+  ➡ 答え：<strong>IF → ID → EX → MEM → WB</strong>
+</div>
+
+<h2>1. パイプライン処理とは？（逐次処理との違い）</h2>
+<p>
+  通常、1つの命令が終わってから次の命令を開始する「逐次処理」では、CPUの各部品に「待ち時間」ができてしまいます。<br>
+  パイプライン処理では、処理の各段階を少しずつずらしながら<strong>重ねて実行する</strong>ことで、全体のスループット（処理量）を大幅に向上させます。
+</p>
+
+<!-- 図解：パイプラインのタイムライン -->
+<div class="diagram-container">
+  <div class="diagram-title">パイプライン処理のイメージ（階段状の並列処理）</div>
+  <div class="pipeline-visual">
+    <div style="font-size:0.8em; color:#64748b; text-align:right;">時間 ➡</div>
+    <div class="pl-row">
+      <span class="pl-label">命令 1</span>
+      <div class="pl-stages">
+        <div class="stage-box s-if">IF</div><div class="stage-box s-id">ID</div><div class="stage-box s-ex">EX</div><div class="stage-box s-mem">MEM</div><div class="stage-box s-wb">WB</div>
+      </div>
+    </div>
+    <div class="pl-row">
+      <span class="pl-label">命令 2</span>
+      <div class="pl-stages">
+        <div class="s-empty"></div><div class="stage-box s-if">IF</div><div class="stage-box s-id">ID</div><div class="stage-box s-ex">EX</div><div class="stage-box s-mem">MEM</div><div class="stage-box s-wb">WB</div>
+      </div>
+    </div>
+    <div class="pl-row">
+      <span class="pl-label">命令 3</span>
+      <div class="pl-stages">
+        <div class="s-empty"></div><div class="s-empty"></div><div class="stage-box s-if">IF</div><div class="stage-box s-id">ID</div><div class="stage-box s-ex">EX</div><div class="stage-box s-mem">MEM</div><div class="stage-box s-wb">WB</div>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:10px;">
+    5段パイプラインなら、理論上は処理速度が最大で<strong>約5倍</strong>になります。
+  </p>
+</div>
+
+<h2>2. 5つのステージの役割</h2>
+<p>
+  試験で最も問われる「5段階の名称と順番」です。それぞれのステージで何を行っているのかを理解しましょう。
+</p>
+
+<!-- 図解：5段階のフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">命令処理の5段階ステップ</div>
+  <div class="stage-flow">
+    
+    <div class="sf-node node-if">
+      <span class="sf-name">IF</span>
+      <span class="sf-desc">命令取得<br>(Fetch)</span>
+      <p style="font-size:0.7em; margin:5px 0 0 0; color:#64748b;">メモリから実行する<br>命令を読み出す</p>
+    </div>
+    <div class="sf-arrow">➡</div>
+    
+    <div class="sf-node node-id">
+      <span class="sf-name">ID</span>
+      <span class="sf-desc">命令解読<br>(Decode)</span>
+      <p style="font-size:0.7em; margin:5px 0 0 0; color:#64748b;">命令を解析し<br>レジスタの値を読む</p>
+    </div>
+    <div class="sf-arrow">➡</div>
+
+    <div class="sf-node node-ex">
+      <span class="sf-name">EX</span>
+      <span class="sf-desc">実行<br>(Execute)</span>
+      <p style="font-size:0.7em; margin:5px 0 0 0; color:#64748b;">ALUを使って<br>実際の計算を行う</p>
+    </div>
+    <div class="sf-arrow">➡</div>
+
+    <div class="sf-node node-mem">
+      <span class="sf-name">MEM</span>
+      <span class="sf-desc">メモリアクセス<br>(Memory)</span>
+      <p style="font-size:0.7em; margin:5px 0 0 0; color:#64748b;">必要なデータのみ<br>メモリから読み書き</p>
+    </div>
+    <div class="sf-arrow">➡</div>
+
+    <div class="sf-node node-wb">
+      <span class="sf-name">WB</span>
+      <span class="sf-desc">書き戻し<br>(Write Back)</span>
+      <p style="font-size:0.7em; margin:5px 0 0 0; color:#64748b;">最終的な結果を<br>レジスタに保存する</p>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. パイプラインを乱す「ハザード」</h2>
+<p>
+  パイプライン処理は「命令が途切れることなく流れる」ことが前提ですが、処理の都合で流れが止まってしまうことがあります。これを<strong>パイプラインハザード</strong>と呼びます。
+</p>
+
+<!-- 図解：ハザードのカード -->
+<div class="diagram-container">
+  <div class="diagram-title">3種類のパイプラインハザード</div>
+  <div class="hazard-grid">
+    
+    <div class="hazard-card">
+      <span class="hz-icon">⏳</span>
+      <span class="hz-title">データハザード</span>
+      <div class="hz-desc">前の命令の「計算結果」が出ないと、次の命令が計算を始められず、待ち時間が発生する現象。</div>
+      <div class="hz-example">例：命令1の結果(R1)を、命令2がすぐ使う場合</div>
+    </div>
+
+    <div class="hazard-card">
+      <span class="hz-icon">🔀</span>
+      <span class="hz-title">制御ハザード</span>
+      <div class="hz-desc">「条件分岐」が発生し、次に実行する予定で先読みしていた命令が破棄されてしまう現象。</div>
+      <div class="hz-example">対策：分岐予測（どっちに進むかあらかじめ予想する）</div>
+    </div>
+
+    <div class="hazard-card">
+      <span class="hz-icon">💥</span>
+      <span class="hz-title">構造ハザード</span>
+      <div class="hz-desc">複数の命令が、同時に同じハードウェア（メモリやALUなど）を使おうとして競合する現象。</div>
+      <div class="hz-example">対策：命令メモリとデータメモリを分ける（ハーバードアーキテクチャ）</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:15%;" class="td-center">略称</th>
+      <th style="width:25%;">日本語名</th>
+      <th>役割のキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="td-center" style="color:#3b82f6; font-weight:bold;">IF</td>
+      <td>命令フェッチ</td>
+      <td>命令メモリから命令を<strong>読み出す</strong>（PCの更新）</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="color:#8b5cf6; font-weight:bold;">ID</td>
+      <td>命令デコード</td>
+      <td>命令の意味を<strong>解析</strong>し、レジスタの値を読む</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="color:#ef4444; font-weight:bold;">EX</td>
+      <td>実行</td>
+      <td>ALUで<strong>演算</strong>処理を行う、アドレスを計算する</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="color:#f59e0b; font-weight:bold;">MEM</td>
+      <td>メモリアクセス</td>
+      <td>データメモリへの<strong>読み書き</strong>（ロード/ストア時のみ重要）</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="color:#10b981; font-weight:bold;">WB</td>
+      <td>書き戻し</td>
+      <td>計算結果をレジスタへ<strong>保存（書き込む）</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 覚え方の合言葉<br>
+  「アイフ(IF)・アイディー(ID)・イーエックス(EX)・メム(MEM)・ダブリュービー(WB)！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
