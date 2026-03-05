@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-performance-evaluation-comparison",
+    "category": "ap",
+    "timestamp": "2026-03-05T19:05:56+09:00",
+    "title": "解析的手法とシミュレーションの違い",
+    "summary": "システム評価における解析的手法とシミュレーションの特徴を解説し、適用範囲の違いやメリット・デメリットを理解することができる。",
+    "tags": [
+      "性能評価",
+      "システム評価",
+      "シミュレーション",
+      "解析的手法",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "システムアーキテクチャ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-05-ap-performance-evaluation-comparison/"
+  },
+  {
     "id": "ap-digital-twin-metaverse-cps",
     "category": "ap",
     "timestamp": "2026-03-05T18:04:57+09:00",
