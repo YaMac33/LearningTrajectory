@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-fault-avoidance",
+    "category": "ap",
+    "timestamp": "2026-03-05T18:01:15+09:00",
+    "title": "フォールトアボイダンスの基本概念と対策",
+    "summary": "フォールトアボイダンスの概念と具体例を通じて、システムの信頼性設計の重要性を理解できます。試験頻出の関連用語との違いも整理します。",
+    "tags": [
+      "システム設計",
+      "信頼性",
+      "フォールトアボイダンス",
+      "フォールトトレランス",
+      "フェールセーフ",
+      "品質管理",
+      "信頼性設計"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "システムアーキテクチャ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-05-ap-fault-avoidance/"
+  },
+  {
     "id": "ap-quantum-computer-keywords",
     "category": "ap",
     "timestamp": "2026-03-05T17:44:21+09:00",
