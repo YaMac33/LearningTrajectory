@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | フォールトアボイダンスとは？信頼性設計3つの基本概念の違い</title>
+  <meta name="description" content="システムの信頼性設計の基本である「フォールトアボイダンス」の概念と具体例を解説。さらに試験で頻出の「フォールトトレランス」「フェールセーフ」との決定的な違いを図解で整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="フォールトアボイダンスとは？信頼性設計3つの基本概念の違い" />
+  <meta property="og:description" content="システムの信頼性設計の基本である「フォールトアボイダンス」の概念と具体例を解説。さらに試験で頻出の「フォールトトレランス」「フェールセーフ」との決定的な違いを図解で整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* フォールトアボイダンスのイメージ図解 */
+    .avoidance-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      border: 2px dashed #3b82f6;
+      flex-wrap: wrap;
+    }
+    .af-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      min-width: 120px;
+    }
+    .node-cause { background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; }
+    .node-action { background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; font-weight: bold; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); }
+    .node-result { background: #ecfdf5; border: 2px solid #10b981; color: #047857; font-weight: bold; }
+    
+    .af-icon { font-size: 2em; margin-bottom: 5px; }
+    .af-arrow { font-size: 1.5em; color: #94a3b8; font-weight: bold; }
+
+    /* 具体例のリスト */
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .ex-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 6px;
+    }
+    .ex-title { font-weight: 900; color: #1e293b; display: block; margin-bottom: 8px; }
+    .ex-items { list-style: none; padding: 0; margin: 0; font-size: 0.85em; color: #475569; }
+    .ex-items li { margin-bottom: 4px; padding-left: 15px; position: relative; }
+    .ex-items li::before { content: "✔"; position: absolute; left: 0; color: #10b981; font-size: 0.8em; }
+
+    /* 3つの概念の比較カード */
+    .reliability-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .rel-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .card-avoid { border-color: #3b82f6; }
+    .card-tolerate { border-color: #f59e0b; }
+    .card-safe { border-color: #10b981; }
+
+    .rc-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .rc-title { font-weight: 900; font-size: 1.1em; display: block; margin-bottom: 5px; }
+    .card-avoid .rc-title { color: #1d4ed8; }
+    .card-tolerate .rc-title { color: #b45309; }
+    .card-safe .rc-title { color: #047857; }
+
+    .rc-catchphrase {
+      font-weight: bold;
+      padding: 5px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+    }
+    .card-avoid .rc-catchphrase { background: #eff6ff; color: #1d4ed8; }
+    .card-tolerate .rc-catchphrase { background: #fffbeb; color: #b45309; }
+    .card-safe .rc-catchphrase { background: #ecfdf5; color: #047857; }
+
+    .rc-desc { font-size: 0.85em; color: #475569; text-align: left; margin-bottom: 10px; flex: 1; }
+    .rc-example { font-size: 0.8em; font-weight: bold; color: #64748b; background: #f8fafc; padding: 5px; border-radius: 4px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .td-left { text-align: left !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-05">
+            2026.03.05
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">フォールトアボイダンスとは？信頼性設計3つの基本概念の違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#システム設計</span>
+            <span class="tag">#信頼性</span>
+            <span class="tag">#フォールトアボイダンス</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>システムの信頼性を高めるための設計思想には、大きく分けて3つのアプローチがあります。今回はその基本となる「そもそも故障を起こさない」という考え方と、他の2つとの違いを整理します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「システムの信頼性を高めるために、<strong>システム構成要素の個々の品質を高めて故障が発生しないようにする</strong>設計思想はどれか？」<br><br>
+  ➡ 答え：<strong>フォールトアボイダンス（Fault Avoidance）</strong>
+</div>
+
+<h2>1. フォールトアボイダンス（Fault Avoidance）の概念</h2>
+<p>
+  アボイダンス（Avoidance）は「回避・防ぐ」という意味です。<br>
+  つまり、システムに問題が起きないように、<strong>あらかじめ部品の質を上げたり、作り方を厳重にしたりして「故障の発生確率を極限まで下げる」アプローチ</strong>を指します。
+</p>
+
+<!-- 図解：アボイダンスのイメージ -->
+<div class="diagram-container">
+  <div class="diagram-title">フォールトアボイダンスの基本プロセス</div>
+  <div class="avoidance-flow">
+    <div class="af-node node-cause">
+      <span class="af-icon">🐛</span>
+      <span>故障の原因<br><span style="font-size:0.8em;">(安い部品・バグ)</span></span>
+    </div>
+    <div class="af-arrow">➡</div>
+    <div class="af-node node-action">
+      <span class="af-icon">🛡️</span>
+      <span>品質の向上<br><span style="font-size:0.8em;">(テスト徹底・高級品)</span></span>
+    </div>
+    <div class="af-arrow">➡</div>
+    <div class="af-node node-result">
+      <span class="af-icon">✨</span>
+      <span>故障を防ぐ<br><span style="font-size:0.8em;">(発生しない)</span></span>
+    </div>
+  </div>
+</div>
+
+<h3>具体的な対策例</h3>
+<p>
+  システムを二重化（冗長化）する前に、まずは1つ1つの要素を頑丈にするのが基本です。
+</p>
+
+<div class="diagram-container">
+  <div class="example-grid">
+    <div class="ex-card">
+      <span class="ex-title">💎 高品質部品の採用</span>
+      <ul class="ex-items">
+        <li>高信頼サーバ部品の使用</li>
+        <li>エラーを自動訂正するECCメモリ</li>
+        <li>高耐久の産業用SSDや長寿命ファン</li>
+      </ul>
+    </div>
+    <div class="ex-card">
+      <span class="ex-title">📋 厳格な品質管理</span>
+      <ul class="ex-items">
+        <li>製造時の徹底した品質検査</li>
+        <li>ソフトウェアのコードレビュー</li>
+        <li>静的解析ツールによるバグ排除</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h2>2. 混同注意！試験で頻出の「3つの違い」</h2>
+<p>
+  情報処理試験では、フォールトアボイダンスの説明に対して「フォールトトレランス」や「フェールセーフ」といった選択肢が並びます。これらの違いを明確に区別しましょう。
+</p>
+
+<!-- 図解：3つの概念比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">信頼性設計の3つのアプローチ</div>
+  <div class="reliability-grid">
+    
+    <div class="rel-card card-avoid">
+      <span class="rc-icon">🛡️</span>
+      <span class="rc-title">フォールトアボイダンス</span>
+      <span class="rc-catchphrase">「故障を防ぐ」</span>
+      <div class="rc-desc">部品の品質を高めたり、バグをなくしたりして、そもそもシステムが壊れないようにする。</div>
+      <div class="rc-example">例：高品質部品、徹底したテスト</div>
+    </div>
+
+    <div class="rel-card card-tolerate">
+      <span class="rc-icon">🔄</span>
+      <span class="rc-title">フォールトトレランス</span>
+      <span class="rc-catchphrase">「故障しても動く」</span>
+      <div class="rc-desc">一部が故障しても、予備のシステムが処理を引き継ぎ、システム全体を止めずに稼働させ続ける。</div>
+      <div class="rc-example">例：RAID、サーバのクラスタリング</div>
+    </div>
+
+    <div class="rel-card card-safe">
+      <span class="rc-icon">🛑</span>
+      <span class="rc-title">フェールセーフ</span>
+      <span class="rc-catchphrase">「故障したら安全にする」</span>
+      <div class="rc-desc">システムが故障したとき、被害を最小限に抑えるため、安全な状態（停止など）へ移行させる。</div>
+      <div class="rc-example">例：信号機が故障で「全赤」になる</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ：英語の意味で覚える</h2>
+<p>
+  英語の意味を理解しておくと、試験本番で迷うことがなくなります。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">用語</th>
+      <th style="width:25%;">英語の意味</th>
+      <th class="td-left">設計の目的</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold;">Fault Avoidance</td>
+      <td>Avoidance = <strong>回避</strong></td>
+      <td class="td-left">品質を上げて、故障を<strong>起こさない</strong>ようにする。</td>
+    </tr>
+    <tr>
+      <td style="color:#b45309; font-weight:bold;">Fault Tolerance</td>
+      <td>Tolerance = <strong>耐性、寛容</strong></td>
+      <td class="td-left">予備を用意して、故障に<strong>耐えて動き続ける</strong>。</td>
+    </tr>
+    <tr>
+      <td style="color:#047857; font-weight:bold;">Fail Safe</td>
+      <td>Safe = <strong>安全</strong></td>
+      <td class="td-left">壊れたら、とにかく<strong>安全な状態</strong>にする。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 覚える順番のコツ<br>
+  ① まず防ぐ（Avoidance） ➡ ② 壊れても耐える（Tolerance） ➡ ③ ダメなら安全に止める（Safe）
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
