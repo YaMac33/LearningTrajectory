@@ -1,0 +1,22 @@
+{
+  "id": "ap-osi-tcp-ip-aws-map",
+  "category": "ap",
+  "timestamp": "2026-03-06T15:37:35+09:00",
+  "post_path": "ap/posts/2026-03-06-ap-osi-tcp-ip-aws-map/",
+  "meta": {
+    "title": "【図解】OSI・TCP/IPとAWSの関係",
+    "summary": "OSI 7階層とTCP/IPモデルの相関、Webアクセスの流れ、AWSのサービスを一体的に理解することができる。ネットワークトラブルシューティングの基盤を築く。",
+    "tags": [
+      "ネットワーク",
+      "AWS",
+      "インフラ",
+      "トラブルシューティング",
+      "OSI",
+      "TCP/IP"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
