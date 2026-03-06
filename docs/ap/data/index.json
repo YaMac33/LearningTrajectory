@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-behavior-method-sandbox-virus-detection",
+    "category": "ap",
+    "timestamp": "2026-03-06T12:29:04+09:00",
+    "title": "ビヘイビア法によるマルウェア検知の仕組み",
+    "summary": "ビヘイビア法はサンドボックスを利用した未知のマルウェア検出手法です。この手法により、プログラムの挙動を監視することで従来の方法では検出できない脅威を見つけることができます。",
+    "tags": [
+      "セキュリティ",
+      "マルウェア対策",
+      "ビヘイビア法",
+      "動的ヒューリスティック",
+      "サンドボックス",
+      "ウイルス",
+      "検知手法"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-06-ap-behavior-method-sandbox-virus-detection/"
+  },
+  {
     "id": "ap-ftp-communication-structure",
     "category": "ap",
     "timestamp": "2026-03-05T22:39:10+09:00",
