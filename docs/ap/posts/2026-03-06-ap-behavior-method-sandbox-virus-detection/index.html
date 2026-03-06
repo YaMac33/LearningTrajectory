@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ビヘイビア法とは？未知のウイルスを検知するサンドボックスの仕組み</title>
+  <meta name="description" content="マルウェア検知手法である「ビヘイビア法」の仕組みや、仮想環境（サンドボックス）を用いた監視のイメージ、従来のパターンマッチング法などの他手法との違いを図解でわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ビヘイビア法とは？未知のウイルスを検知するサンドボックスの仕組み" />
+  <meta property="og:description" content="マルウェア検知手法である「ビヘイビア法」の仕組みや、仮想環境（サンドボックス）を用いた監視のイメージ、従来のパターンマッチング法などの他手法との違いを図解でわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* サンドボックス監視フロー図解 */
+    .sandbox-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      font-family: sans-serif;
+    }
+    .incoming-file {
+      background: #f1f5f9;
+      border: 2px dashed #94a3b8;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .flow-arrow span { font-size: 0.5em; color: #ef4444; }
+
+    .sandbox-area {
+      background: #fff;
+      border: 3px solid #f59e0b;
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.15);
+    }
+    .sb-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #f59e0b;
+      color: #fff;
+      padding: 2px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .sb-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .run-box {
+      background: #fef2f2;
+      border: 2px solid #ef4444;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      color: #b91c1c;
+      font-weight: bold;
+    }
+    .monitor-box {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+      padding: 15px;
+      border-radius: 8px;
+      color: #1d4ed8;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+    .monitor-list {
+      list-style: none; padding: 0; margin: 10px 0 0 0; text-align: left; font-size: 0.85em; color: #334155;
+    }
+    .monitor-list li { margin-bottom: 5px; }
+
+    .result-split {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 10px;
+    }
+    .result-node {
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 45%;
+    }
+    .node-safe { background: #ecfdf5; border: 2px solid #10b981; color: #047857; }
+    .node-danger { background: #fef2f2; border: 2px solid #ef4444; color: #b91c1c; }
+
+    /* 他の検知手法との比較カード */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .method-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-top-width: 5px;
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+    .card-pattern { border-top-color: #64748b; }
+    .card-static { border-top-color: #8b5cf6; }
+    .card-compare { border-top-color: #10b981; }
+
+    .mc-title { font-weight: 900; font-size: 1.1em; color: #1e293b; display: block; margin-bottom: 5px; }
+    .mc-focus { font-size: 0.8em; font-weight: bold; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; color: #475569; margin-bottom: 10px; display: inline-block; }
+    .mc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; margin-bottom: 10px; }
+    .mc-vs { font-size: 0.8em; background: #f8fafc; padding: 8px; border-radius: 4px; border-left: 3px solid #3b82f6; color: #334155; font-weight: bold; }
+
+    /* 注意ポイントハイライト */
+    .alert-box {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .alert-title { font-weight: 900; color: #b45309; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-06">
+            2026.03.06
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ビヘイビア法とは？未知のウイルスを検知するサンドボックスの仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#マルウェア対策</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>従来のウイルス対策ソフト（パターンマッチング方式）では、「新種のウイルス」や「指紋を隠した（暗号化された）ウイルス」は素通りしてしまいます。それらを見つけ出すために、プログラムの<strong>「怪しい振る舞い（挙動）」</strong>を監視する手法が<strong>「ビヘイビア法（動的ヒューリスティック法）」</strong>です。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「検査対象のプログラムを<strong>サンドボックスなどの仮想環境で実行</strong>し、ファイル操作や通信などの<strong>振る舞いを監視</strong>することで、未知のマルウェアを検出する手法はどれか？」<br><br>
+  ➡ 答え：<strong>ビヘイビア法（動的ヒューリスティック法）</strong>
+</div>
+
+<h2>1. サンドボックスを使った監視の仕組み</h2>
+<p>
+  ビヘイビア（Behavior）は「振る舞い、態度」という意味です。<br>
+  プログラムを実際のパソコン本体に感染させる前に、<strong>「サンドボックス（砂場）」と呼ばれるシステムから隔離された安全な仮想環境</strong>でテスト実行し、その行動を監視カメラでチェックします。
+</p>
+
+<!-- 図解：サンドボックスのフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">ビヘイビア法による検査プロセス</div>
+  <div class="sandbox-flow">
+    
+    <div class="incoming-file">
+      <span>📩 外部からの怪しいファイル</span>
+    </div>
+    
+    <div class="flow-arrow">⬇ <br><span>(いきなりPCで開かない！)</span></div>
+
+    <div class="sandbox-area">
+      <div class="sb-label">隔離された仮想環境（サンドボックス）</div>
+      <div class="sb-content">
+        <div class="run-box">
+          <span style="font-size:2em;">🏃‍♂️💨</span><br>プログラムを実行
+        </div>
+        <div style="font-size:2em; color:#94a3b8;">⬅👀</div>
+        <div class="monitor-box">
+          ビヘイビア監視<br>
+          <ul class="monitor-list">
+            <li>❌ レジストリを書き換えた</li>
+            <li>❌ 外部の怪しい鯖と通信</li>
+            <li>❌ 自身を複製し始めた</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">⬇</div>
+
+    <div class="result-split">
+      <div class="result-node node-danger">クロ判定：駆除・隔離</div>
+      <div class="result-node node-safe">シロ判定：実際のPCへ届ける</div>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:20px; font-weight:bold;">
+    ※暗号化されたウイルスも、実行する際には必ず自らを「復号」して活動を始めるため、このサンドボックス環境で動かせば正体を暴くことができます。
+  </p>
+</div>
+
+<h2>2. 実務での活用シーン</h2>
+<p>
+  ビヘイビア法は、近年の企業向けセキュリティ対策の主役として活躍しています。
+</p>
+<ul>
+  <li><strong>EDR (Endpoint Detection and Response)：</strong> パソコン（エンドポイント）上で常にプログラムの挙動を監視し、未知のランサムウェアがファイルを暗号化し始めた瞬間に強制停止させます。</li>
+  <li><strong>標的型攻撃メール対策：</strong> 社員宛てに届いた添付ファイルを、システムが裏側のサンドボックスで自動的に「開封・実行」し、安全なものだけをメールボックスに届けます。</li>
+</ul>
+
+<h2>3. 他の検知手法との違い（混同注意）</h2>
+<p>
+  試験では、他の検知手法と特徴を入れ替えた選択肢が並びます。それぞれの違いを明確にしておきましょう。
+</p>
+
+<!-- 図解：他手法との比較 -->
+<div class="diagram-container">
+  <div class="method-grid">
+    
+    <div class="method-card card-pattern">
+      <span class="mc-title">パターンマッチング法</span>
+      <span class="mc-focus">焦点：既知のウイルスの「指紋」</span>
+      <div class="mc-desc">ウイルスの特徴を記録した「辞書（定義ファイル）」と照合する、最もオーソドックスな手法。</div>
+      <div class="mc-vs">ビヘイビアとの違い：既知のウイルスは高速・確実に見つけるが、未知のウイルスには全くの無力。</div>
+    </div>
+
+    <div class="method-card card-static">
+      <span class="mc-title">静的ヒューリスティック法</span>
+      <span class="mc-focus">焦点：ソースコードの「書き方」</span>
+      <div class="mc-desc">プログラムを「動かさずに」、ソースコードの特徴や構造を分析して「ウイルスっぽさ」を判定する手法。</div>
+      <div class="mc-vs">ビヘイビアとの違い：仮想環境で「実際に動かす」のがビヘイビア（動的）。「動かさない」のが静的。</div>
+    </div>
+
+    <div class="method-card card-compare">
+      <span class="mc-title">コンペア法</span>
+      <span class="mc-focus">焦点：元の状態との「差分」</span>
+      <div class="mc-desc">安全な場所に保管してある「原本（クリーンなファイル）」と現在のファイルを比較し、改ざんをチェックする。</div>
+      <div class="mc-vs">ビヘイビアとの違い：プログラムの動きを見るのではなく、ファイル自体の変更履歴を確認する。</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="diagram-container">
+  <div class="alert-box">
+    <div class="alert-title">⚠ ビヘイビア法の弱点（誤検知）</div>
+    <p style="font-size:0.85em; color:#78350f; margin:0; line-height:1.5; font-weight:bold;">
+      プログラムの「怪しい動き」で判断するため、正常なソフトウェアであっても、OSの深い部分に触れるような処理を行うと「ウイルスだ！」と勘違いされる（誤検知：フォールス・ポジティブ）可能性があります。
+    </p>
+  </div>
+</div>
+
+<h2>試験対策まとめ：キーワードで見抜く</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;" class="td-center">検知手法</th>
+      <th>特徴と試験でのキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="td-center" style="color:#3b82f6; font-weight:bold; font-size:1.1em;">ビヘイビア法<br><span style="font-size:0.7em;">(動的ヒューリスティック)</span></td>
+      <td><strong>未知のマルウェア</strong>を検知。<strong>サンドボックス（仮想環境）</strong>で<strong>実行</strong>し、<strong>振る舞い（挙動）</strong>を監視する。</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; background:#f8fafc;">パターンマッチング法</td>
+      <td><strong>シグネチャ（定義ファイル）</strong>との照合。<strong>既知</strong>のウイルスに有効。</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; background:#f8fafc;">静的ヒューリスティック法</td>
+      <td>プログラムを<strong>実行せずに</strong>、コードの特徴からウイルスらしさを判定。</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; background:#f8fafc;">コンペア法</td>
+      <td>安全な<strong>原本（マスター）と比較</strong>し、改ざんを検知する。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
