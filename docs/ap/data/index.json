@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-cluster-analysis",
+    "category": "ap",
+    "timestamp": "2026-03-07T20:43:13+09:00",
+    "title": "クラスター分析と多変量解析手法の違い",
+    "summary": "クラスター分析はデータ間の類似性に基づいてグループ化する手法であり、主成分分析・因子分析・回帰分析との違いを理解することが重要です。",
+    "tags": [
+      "データサイエンス",
+      "機械学習",
+      "多変量解析",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-07-ap-cluster-analysis/"
+  },
+  {
     "id": "ap-osi-tcp-ip-aws-map",
     "category": "ap",
     "timestamp": "2026-03-06T15:37:35+09:00",
