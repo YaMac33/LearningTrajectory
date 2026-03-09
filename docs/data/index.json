@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-star-schema-dwh",
+    "category": "ap",
+    "timestamp": "2026-03-09T13:46:00+09:00",
+    "title": "スタースキーマについて学ぼう",
+    "summary": "スタースキーマはデータウェアハウスの基本モデルであり、ファクトテーブルとディメンションテーブルの役割や構造が理解できる。分析の効率化に寄与する。",
+    "tags": [
+      "データベース",
+      "データウェアハウス",
+      "BIツール",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-09-ap-star-schema-dwh/"
+  },
+  {
     "id": "ap-bubble-sort-basics",
     "category": "ap",
     "timestamp": "2026-03-09T12:34:08+09:00",
