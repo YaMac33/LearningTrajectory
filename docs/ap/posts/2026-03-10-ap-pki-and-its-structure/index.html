@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | PKIとは？インターネットの「信頼の出発点」と証明書の仕組み</title>
+  <meta name="description" content="HTTPS通信の安全性を根底から支えるPKI（公開鍵基盤）の仕組みについて。インターネットの「信頼の出発点」がOS・ブラウザ開発元にある理由と、証明書検証のフローを図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="PKIとは？インターネットの「信頼の出発点」と証明書の仕組み" />
+  <meta property="og:description" content="HTTPS通信の安全性を根底から支えるPKI（公開鍵基盤）の仕組みについて。インターネットの「信頼の出発点」がOS・ブラウザ開発元にある理由と、証明書検証のフローを図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 信頼のピラミッド（ツリー構造）図解 */
+    .trust-pyramid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      font-family: sans-serif;
+    }
+    
+    .pyramid-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .node-god { background: #f5f3ff; border: 3px solid #8b5cf6; color: #4c1d95; }
+    .node-ca { background: #ecfdf5; border: 2px solid #10b981; color: #047857; width: 80%; }
+    .node-server { background: #fffbeb; border: 2px solid #f59e0b; color: #b45309; width: 60%; }
+    
+    .node-title { font-weight: 900; font-size: 1.1em; margin-bottom: 5px; }
+    .node-desc { font-size: 0.8em; font-weight: normal; }
+
+    .pyramid-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 1.5em;
+      line-height: 1.2;
+    }
+    .pyramid-arrow span { font-size: 0.5em; color: #64748b; background: #fff; padding: 2px 8px; border-radius: 12px; border: 1px dashed #cbd5e1; transform: translateY(-5px); }
+
+    /* 4ステップのフローカード */
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .step-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-top-width: 4px;
+      border-radius: 8px;
+      padding: 20px;
+      position: relative;
+    }
+    .sc-1 { border-top-color: #8b5cf6; }
+    .sc-2 { border-top-color: #3b82f6; }
+    .sc-3 { border-top-color: #f59e0b; }
+    .sc-4 { border-top-color: #10b981; }
+
+    .sc-badge {
+      position: absolute;
+      top: -12px;
+      left: 15px;
+      background: #1e293b;
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.9em;
+      padding: 2px 10px;
+      border-radius: 12px;
+    }
+    
+    .sc-title { font-weight: 900; color: #1e293b; margin-top: 5px; margin-bottom: 10px; display: block; font-size: 1.05em; }
+    .sc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; }
+    
+    .sc-visual {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #334155;
+      text-align: center;
+    }
+
+    /* リストのイメージボックス */
+    .list-box {
+      background: #1e293b;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 10px auto;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .list-title { font-weight: 900; color: #38bdf8; margin-bottom: 15px; display: block; text-align: center; border-bottom: 1px solid #475569; padding-bottom: 10px; }
+    .list-ul { list-style: none; padding: 0; margin: 0; font-size: 0.9em; font-family: monospace; }
+    .list-ul li { margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+    .list-ul li::before { content: "├"; color: #94a3b8; }
+    .list-ul li:last-child::before { content: "└"; color: #94a3b8; }
+    .list-key { color: #a7f3d0; font-weight: bold; }
+
+    /* 注意ポイントハイライト */
+    .alert-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .alert-title { font-weight: 900; color: #1d4ed8; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">PKIとは？インターネットの「信頼の出発点」と証明書の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#PKI</span>
+            <span class="tag">#認証局</span>
+            <span class="tag">#HTTPS</span>
+            <span class="tag">#基本情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>私たちが毎日使っているインターネット。ブラウザは「このWebサイトは本物だ（安全だ）」と判断して通信を行いますが、そもそも<strong>「最初の最初」に誰を信じているのでしょうか？</strong><br>
+今回は、インターネットの信頼の連鎖を支える仕組み<strong>「PKI（公開鍵基盤）」</strong>の全体像と、出発点について解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：最も重要な結論】<br>
+  インターネット（HTTPS）の信頼の出発点は、<strong>「OSやブラウザの開発元（Apple, Google, Microsoft等）が、あらかじめ安全だと認めた認証局のリスト（公開鍵）を端末に組み込んでいること」</strong>にあります。
+</div>
+
+<h2>1. 登場人物と「信頼のピラミッド」</h2>
+<p>
+  PKI（Public Key Infrastructure）の世界には、4つの階層化された登場人物が存在します。上から下へ向かって「信頼」が受け継がれていく構造（チェーン・オブ・トラスト）になっています。
+</p>
+
+<!-- 図解：信頼のピラミッド -->
+<div class="diagram-container">
+  <div class="diagram-title">PKIにおける「信頼の連鎖（チェーン・オブ・トラスト）」</div>
+  <div class="trust-pyramid">
+    
+    <div class="pyramid-node node-god">
+      <span class="node-title">👑 OS / ブラウザの開発元</span>
+      <span class="node-desc">Apple, Google, Microsoft など</span>
+    </div>
+    
+    <div class="pyramid-arrow">
+      ⬇<br><span>この認証局は信頼できる！と認定</span>
+    </div>
+
+    <div class="pyramid-node node-ca">
+      <span class="node-title">🏛️ 認証局 (CA)</span>
+      <span class="node-desc">Let's Encrypt, DigiCert, GlobalSign など</span>
+    </div>
+
+    <div class="pyramid-arrow">
+      ⬇<br><span>身元を確認し、証明書を発行</span>
+    </div>
+
+    <div class="pyramid-node node-server">
+      <span class="node-title">🏢 Webサーバ</span>
+      <span class="node-desc">Amazon, Yahoo, 一般企業のサイト</span>
+    </div>
+
+    <div class="pyramid-arrow">
+      ⬇<br><span>証明書を提示して通信</span>
+    </div>
+
+    <div class="pyramid-node" style="background:#f1f5f9; border:2px solid #94a3b8; color:#334155; width:40%;">
+      <span class="node-title">🧑 ユーザー</span>
+      <span class="node-desc">PCやスマホのブラウザ</span>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 最初から入っている「信頼リスト」</h2>
+<p>
+  あなたが新しく買ったPCやスマホの電源を初めて入れたとき、その中には既に<strong>「OS開発元が厳選した、世界中の信頼できる認証局の『公開鍵（ルート証明書）』のリスト」</strong>がインストールされています。これがすべての出発点です。
+</p>
+
+<div class="diagram-container">
+  <div class="list-box">
+    <span class="list-title">📱 スマホ / PC の内部イメージ</span>
+    <ul class="list-ul">
+      <li>信頼済み認証局 (ルート証明書ストア)</li>
+      <li>&nbsp;&nbsp;├ Let's Encrypt の <span class="list-key">公開鍵 🔓</span></li>
+      <li>&nbsp;&nbsp;├ DigiCert の <span class="list-key">公開鍵 🔓</span></li>
+      <li>&nbsp;&nbsp;└ GlobalSign の <span class="list-key">公開鍵 🔓</span></li>
+      <li>...</li>
+      <li>🌐 Webブラウザ (Chrome, Safari等)</li>
+    </ul>
+  </div>
+</div>
+
+<h2>3. PKIが機能するまでの4つのステップ</h2>
+<p>
+  この「あらかじめ組み込まれたリスト」を使って、どのように安全な通信が成立するのかを時系列で見てみましょう。
+</p>
+
+<!-- 図解：4ステップのカード -->
+<div class="diagram-container">
+  <div class="step-grid">
+    
+    <div class="step-card sc-1">
+      <span class="sc-badge">Step 1</span>
+      <span class="sc-title">開発元がリストを組み込む</span>
+      <div class="sc-desc">OSやブラウザを作る企業が、厳しい審査をクリアした「認証局」を選び、その公開鍵を製品（端末）に最初から組み込んで出荷します。</div>
+      <div class="sc-visual">開発元 ➡ 端末(公開鍵リスト内蔵)</div>
+    </div>
+
+    <div class="step-card sc-2">
+      <span class="sc-badge" style="background:#3b82f6;">Step 2</span>
+      <span class="sc-title">Webサイトが証明書を取得</span>
+      <div class="sc-desc">Webサイト（example.com等）の運営者が認証局に申請し、「この公開鍵は間違いなくうちのサイトのものです」という<strong>電子署名入りの証明書</strong>を発行してもらいます。</div>
+      <div class="sc-visual">サイト ➡ 申請 ➡ 認証局(証明書発行)</div>
+    </div>
+
+    <div class="step-card sc-3">
+      <span class="sc-badge" style="background:#f59e0b;">Step 3</span>
+      <span class="sc-title">ユーザーがアクセス</span>
+      <div class="sc-desc">ユーザーがサイトにアクセスすると、Webサーバは「私の身分証です」と、Step2でもらった証明書をブラウザに送ってきます。</div>
+      <div class="sc-visual">Webサーバ ➡ (証明書) ➡ ブラウザ</div>
+    </div>
+
+    <div class="step-card sc-4">
+      <span class="sc-badge" style="background:#10b981;">Step 4</span>
+      <span class="sc-title">ブラウザが手元のリストで検証</span>
+      <div class="sc-desc">ブラウザはこう考えます。「この証明書はLet's Encryptが署名しているな。<strong>Let's Encryptの公開鍵なら最初から私の信頼リストに入っているぞ。</strong>これで検証できたから、このサーバは本物だ！」</div>
+      <div class="sc-visual">手元のリストの公開鍵で「署名」を確認✅</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="diagram-container">
+  <div class="alert-box">
+    <div class="alert-title">💡 逆に「警告画面」が出るのはなぜ？</div>
+    <p style="font-size:0.85em; color:#1e3a8a; margin:0; line-height:1.5;">
+      たまに「この接続ではプライバシーが保護されません」という警告画面が出ることがあります。<br>
+      これは、サーバから送られてきた証明書に署名している認証局が、<strong>「端末の中の『信頼リスト』に載っていない無名の認証局（あるいは自作のオレオレ証明書）」</strong>だった場合に発生します。ブラウザが「誰これ？知らない人だから信じられない！」と判断して通信をブロックしているのです。
+    </p>
+  </div>
+</div>
+
+<h2>試験対策まとめ：PKI関連キーワード</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">キーワード</th>
+      <th>意味・役割</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold;">PKI<br><span style="font-size:0.8em; font-weight:normal;">(Public Key Infrastructure)</span></td>
+      <td><strong>公開鍵基盤。</strong>公開鍵が「間違いなく本人のものである」ことを第三者（認証局）が保証し、安全に通信を行うための社会的な仕組み全体のこと。</td>
+    </tr>
+    <tr>
+      <td style="color:#047857; font-weight:bold;">ルート証明書</td>
+      <td>信頼の出発点となる、最上位の認証局自身の証明書（公開鍵）。OSやブラウザに<strong>あらかじめインストール</strong>されている。</td>
+    </tr>
+    <tr>
+      <td style="color:#b45309; font-weight:bold;">証明書の検証</td>
+      <td>ブラウザは、あらかじめ保持している<strong>「ルート認証局の公開鍵」</strong>を使って、サーバから送られてきた証明書の電子署名が正しいかを確認する。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
