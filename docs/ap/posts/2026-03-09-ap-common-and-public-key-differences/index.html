@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 共通鍵と公開鍵の違い：暗号方式と必要な鍵の数</title>
+  <meta name="description" content="セキュリティ分野で必須の「共通鍵暗号方式」と「公開鍵暗号方式」について、4人で通信する場合の図解を交えながら、仕組みや必要な鍵の数の計算式（n(n-1)/2 と 2n）の違いを徹底解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="共通鍵と公開鍵の違い：暗号方式と必要な鍵の数" />
+  <meta property="og:description" content="セキュリティ分野で必須の「共通鍵暗号方式」と「公開鍵暗号方式」について、4人で通信する場合の図解を交えながら、仕組みや必要な鍵の数の計算式（n(n-1)/2 と 2n）の違いを徹底解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文・ポイントボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 4人の図解比較レイアウト */
+    .key-compare-layout {
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .key-box {
+      flex: 1;
+      min-width: 260px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .box-common { border-color: #ef4444; }
+    .box-public { border-color: #3b82f6; }
+    
+    .kb-title { font-weight: 900; font-size: 1.2em; display: block; margin-bottom: 15px; }
+    .box-common .kb-title { color: #b91c1c; }
+    .box-public .kb-title { color: #1d4ed8; }
+
+    /* 共通鍵のネットワーク図 */
+    .net-diagram {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 10px 0 20px 0;
+    }
+    .nd-lines {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    }
+    .nd-node {
+      position: absolute;
+      width: 36px; height: 36px;
+      background: #1e293b; color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 1.1em;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .node-a { top: 15%; left: 15%; }
+    .node-b { top: 15%; left: 85%; }
+    .node-c { top: 85%; left: 15%; }
+    .node-d { top: 85%; left: 85%; }
+
+    /* 公開鍵の独立図 */
+    .pub-diagram {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 240px;
+      margin: 10px 0 20px 0;
+    }
+    .pub-node-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .pn-circle {
+      width: 36px; height: 36px; background: #1e293b; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1em;
+    }
+    .pn-keys {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .pk-badge {
+      font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-align: center;
+    }
+    .badge-pub { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .badge-sec { background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+
+    /* 計算式と特徴のテーブル */
+    .kb-formula {
+      background: #f8fafc;
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .form-text { font-family: monospace; font-size: 1.3em; font-weight: 900; color: #334155; }
+    
+    .kb-features {
+      width: 100%; font-size: 0.85em; color: #475569; list-style: none; padding: 0; margin: 0;
+    }
+    .kb-features li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+    .kb-features li::before { content: "✔"; position: absolute; left: 0; top: 0; color: #94a3b8; font-weight: bold; }
+    .box-common .kb-features li::before { color: #ef4444; }
+    .box-public .kb-features li::before { color: #3b82f6; }
+
+    /* ハイブリッド方式の図解 */
+    .hybrid-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px dashed #8b5cf6;
+      flex-wrap: wrap;
+    }
+    .hf-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
+      width: 200px;
+    }
+    .hf-icon { font-size: 2em; margin-bottom: 5px; }
+    .hf-title { font-weight: 900; color: #6d28d9; margin-bottom: 5px; }
+    .hf-desc { font-size: 0.8em; color: #4c1d95; font-weight: bold; }
+    .hf-arrow { font-size: 1.5em; color: #a78bfa; font-weight: bold; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .td-left { text-align: left !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-09">
+            2026.03.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">共通鍵と公開鍵の違い：暗号方式と必要な鍵の数</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#公開鍵暗号</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>インターネット上で安全にデータをやり取りするための暗号化技術。その中核をなす「共通鍵暗号方式」と「公開鍵暗号方式」について、<strong>「4人が通信する場合」</strong>の図解を用いて違いを徹底比較します。</p>
+<hr>
+
+<div class="question-box">
+  【試験で最も重要な公式】<br>
+  「n人が互いに暗号通信を行う場合、システム全体で必要な鍵の数はいくつか？」<br>
+  ➡ 共通鍵なら <strong>n(n-1)/2</strong> 個<br>
+  ➡ 公開鍵なら <strong>2n</strong> 個
+</div>
+
+<h2>1. 図解で見る「鍵の持ち方」の違い</h2>
+<p>
+  A、B、C、Dの4人がお互いに秘密の通信をする場合、2つの方式で鍵の作り方や数が大きく異なります。
+</p>
+
+<div class="diagram-container">
+  <div class="key-compare-layout">
+    
+    <!-- 共通鍵 -->
+    <div class="key-box box-common">
+      <span class="kb-title">共通鍵暗号方式</span>
+      <div style="font-size:0.85em; color:#475569; font-weight:bold;">通信するペアごとに「線（鍵）」を結ぶ</div>
+      
+      <div class="net-diagram">
+        <svg class="nd-lines">
+          <!-- 外周 -->
+          <line x1="15%" y1="15%" x2="85%" y2="15%" stroke="#ef4444" stroke-width="3" />
+          <line x1="15%" y1="85%" x2="85%" y2="85%" stroke="#ef4444" stroke-width="3" />
+          <line x1="15%" y1="15%" x2="15%" y2="85%" stroke="#ef4444" stroke-width="3" />
+          <line x1="85%" y1="15%" x2="85%" y2="85%" stroke="#ef4444" stroke-width="3" />
+          <!-- 対角線 -->
+          <line x1="15%" y1="15%" x2="85%" y2="85%" stroke="#ef4444" stroke-width="3" />
+          <line x1="85%" y1="15%" x2="15%" y2="85%" stroke="#ef4444" stroke-width="3" />
+        </svg>
+        <div class="nd-node node-a">A</div>
+        <div class="nd-node node-b">B</div>
+        <div class="nd-node node-c">C</div>
+        <div class="nd-node node-d">D</div>
+      </div>
+      
+      <div class="kb-formula">
+        <div style="font-size:0.8em; color:#64748b;">4人の場合の鍵の数</div>
+        <div class="form-text">6 個</div>
+        <div style="font-size:0.75em; color:#ef4444; margin-top:5px;">公式：n(n-1) / 2</div>
+      </div>
+
+      <ul class="kb-features">
+        <li>暗号化と復号で<strong>同じ鍵</strong>を使う</li>
+        <li>計算処理が<strong>速い</strong>（軽い）</li>
+        <li>人数が増えると鍵の数が<strong>爆発的に増え、管理が破綻する</strong>（100人なら4950個）</li>
+      </ul>
+    </div>
+
+    <!-- 公開鍵 -->
+    <div class="key-box box-public">
+      <span class="kb-title">公開鍵暗号方式</span>
+      <div style="font-size:0.85em; color:#475569; font-weight:bold;">各人が「2つの鍵のセット」を個人で持つ</div>
+      
+      <div class="pub-diagram">
+        <div class="pub-node-wrap"><div class="pn-circle">A</div><div class="pn-keys"><span class="pk-badge badge-pub">公開</span><span class="pk-badge badge-sec">秘密</span></div></div>
+        <div class="pub-node-wrap"><div class="pn-circle">B</div><div class="pn-keys"><span class="pk-badge badge-pub">公開</span><span class="pk-badge badge-sec">秘密</span></div></div>
+        <div class="pub-node-wrap"><div class="pn-circle">C</div><div class="pn-keys"><span class="pk-badge badge-pub">公開</span><span class="pk-badge badge-sec">秘密</span></div></div>
+        <div class="pub-node-wrap"><div class="pn-circle">D</div><div class="pn-keys"><span class="pk-badge badge-pub">公開</span><span class="pk-badge badge-sec">秘密</span></div></div>
+      </div>
+
+      <div class="kb-formula">
+        <div style="font-size:0.8em; color:#64748b;">4人の場合の鍵の数</div>
+        <div class="form-text">8 個</div>
+        <div style="font-size:0.75em; color:#3b82f6; margin-top:5px;">公式：2n</div>
+      </div>
+
+      <ul class="kb-features">
+        <li>「公開鍵」で暗号化し、「秘密鍵」で復号する</li>
+        <li>鍵の受け渡しが安全で、<strong>管理が容易</strong>（100人でも200個）</li>
+        <li>複雑な数学を使うため、計算処理が<strong>遅い</strong>（重い）</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 通信のイメージ（AさんからBさんへ送る場合）</h2>
+<p>
+  公開鍵暗号方式でAさんがBさんに機密のメッセージを送る場合、以下のように鍵を使います。
+</p>
+<ol>
+  <li>Aさんは、世界中に公開されている<strong>「Bさんの公開鍵」</strong>を使ってメッセージを暗号化する。</li>
+  <li>暗号化されたメッセージがBさんに届く。</li>
+  <li>Bさんは、自分しか持っていない<strong>「Bさんの秘密鍵」</strong>を使って復号し、メッセージを読む。</li>
+</ol>
+<p style="background:#f8fafc; padding:10px; border-left:3px solid #3b82f6; font-size:0.9em; color:#334155; font-weight:bold;">
+  ※Bさんの公開鍵でロックした箱は、Bさんの秘密鍵でしか開けられないという関係性がミソです。
+</p>
+
+<h2>3. 実務での活用：ハイブリッド方式（SSL/TLS）</h2>
+<p>
+  実際のインターネット（WebサイトのHTTPS通信など）では、「共通鍵の速さ」と「公開鍵の安全な鍵交換」の**いいとこ取り（ハイブリッド方式）**が使われています。
+</p>
+
+<!-- 図解：ハイブリッド方式 -->
+<div class="diagram-container">
+  <div class="diagram-title">ハイブリッド方式（SSL/TLSの基本）のフロー</div>
+  <div class="hybrid-flow">
+    <div class="hf-step">
+      <span class="hf-icon">🤝</span>
+      <span class="hf-title">① 鍵の受け渡し</span>
+      <span class="hf-desc">安全な「公開鍵暗号」を使って、今回だけ使う「共通鍵」を相手に送る。</span>
+    </div>
+    <div class="hf-arrow">➡</div>
+    <div class="hf-step">
+      <span class="hf-icon">⚡</span>
+      <span class="hf-title">② 実際のデータ通信</span>
+      <span class="hf-desc">無事に共有できた「共通鍵」を使って、大容量のデータを高速に暗号化通信する。</span>
+    </div>
+  </div>
+</div>
+
+<h2>試験対策まとめ</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:20%;">方式</th>
+      <th>必要な鍵の数</th>
+      <th class="td-left">メリット</th>
+      <th class="td-left">デメリット</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#ef4444; font-weight:bold;">共通鍵暗号</td>
+      <td style="font-family:monospace; font-size:1.1em; font-weight:bold; color:#b91c1c;">n(n-1)/2</td>
+      <td class="td-left">暗号化・復号の<strong>処理が速い</strong></td>
+      <td class="td-left">人数が増えると鍵の管理が困難になる</td>
+    </tr>
+    <tr>
+      <td style="color:#3b82f6; font-weight:bold;">公開鍵暗号</td>
+      <td style="font-family:monospace; font-size:1.1em; font-weight:bold; color:#1d4ed8;">2n</td>
+      <td class="td-left">鍵の配送・<strong>管理が容易</strong>で安全</td>
+      <td class="td-left">数学的な処理が重く、<strong>処理が遅い</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
