@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-spf-dkim-difference",
+    "category": "ap",
+    "timestamp": "2026-03-09T20:13:05+09:00",
+    "title": "SPFとDKIMの違いを理解しよう",
+    "summary": "メールのなりすまし防止におけるSPFとDKIMの認証方法について詳しく解説します。それぞれのメリット・デメリットを理解することが重要です。",
+    "tags": [
+      "セキュリティ",
+      "ネットワーク",
+      "メール",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-09-ap-spf-dkim-difference/"
+  },
+  {
     "id": "ap-snmp-sdn-differences",
     "category": "ap",
     "timestamp": "2026-03-09T19:03:06+09:00",
