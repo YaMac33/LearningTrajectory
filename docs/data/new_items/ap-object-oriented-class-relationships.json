@@ -1,0 +1,24 @@
+{
+  "id": "ap-object-oriented-class-relationships",
+  "category": "ap",
+  "timestamp": "2026-03-10T06:49:57+09:00",
+  "post_path": "ap/posts/2026-03-10-ap-object-oriented-class-relationships/",
+  "meta": {
+    "title": "オブジェクト指向のクラス間の関係とUML",
+    "summary": "オブジェクト指向におけるクラス間の関係性を6つのパターンで整理し、UMLクラス図の矢印の形を解説します。is-a関係とpart-of関係の見分け方が理解できます。",
+    "tags": [
+      "オブジェクト指向",
+      "UML",
+      "クラス図",
+      "汎化",
+      "集約",
+      "コンポジション",
+      "依存",
+      "実現"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ソフトウェア工学"
+    ]
+  }
+}
