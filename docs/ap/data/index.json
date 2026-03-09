@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-amdahls-law-performance-limits",
+    "category": "ap",
+    "timestamp": "2026-03-09T09:10:13+09:00",
+    "title": "アムダールの法則と並列処理の限界",
+    "summary": "アムダールの法則を通じて、並列処理の性能向上の限界を理解します。この法則が示すボトルネックの影響について詳しく解説します。",
+    "tags": [
+      "アムダールの法則",
+      "性能評価",
+      "並列処理",
+      "計算理論",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-09-ap-amdahls-law-performance-limits/"
+  },
+  {
     "id": "ap-cluster-analysis",
     "category": "ap",
     "timestamp": "2026-03-07T20:43:13+09:00",
