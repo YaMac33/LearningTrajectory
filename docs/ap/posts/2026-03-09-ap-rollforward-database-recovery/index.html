@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ロールフォワードとは？データベースの障害復旧とタイムライン</title>
+  <meta name="description" content="データベースの障害復旧技法「ロールフォワード」について、チェックポイントから更新後ログを使ってコミット済みの処理を「早送り」する仕組みや、ロールバックとの違いをタイムライン図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ロールフォワードとは？データベースの障害復旧とタイムライン" />
+  <meta property="og:description" content="データベースの障害復旧技法「ロールフォワード」について、チェックポイントから更新後ログを使ってコミット済みの処理を「早送り」する仕組みや、ロールバックとの違いをタイムライン図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 登場人物カード */
+    .term-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .term-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      padding: 15px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .term-icon { font-size: 2.5em; }
+    .term-content { display: flex; flex-direction: column; }
+    .term-title { font-weight: 900; color: #1e293b; font-size: 1.1em; }
+    .term-desc { font-size: 0.85em; color: #475569; font-weight: bold; margin-top: 5px; }
+
+    /* タイムライン図解 */
+    .timeline-wrapper {
+      position: relative;
+      background: #fff;
+      padding: 40px 20px 80px 20px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-top: 10px;
+    }
+    .time-axis {
+      position: relative;
+      height: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+      margin-bottom: 40px;
+    }
+    .time-axis::after {
+      content: "▶ 時間";
+      position: absolute;
+      right: -40px;
+      top: -8px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #64748b;
+    }
+    
+    .tl-point {
+      position: absolute;
+      top: -8px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 4px solid;
+      transform: translateX(-50%);
+      z-index: 2;
+    }
+    .tl-label {
+      position: absolute;
+      top: -35px;
+      transform: translateX(-50%);
+      font-weight: bold;
+      font-size: 0.85em;
+      white-space: nowrap;
+    }
+    
+    .pt-cp { left: 20%; border-color: #3b82f6; }
+    .lbl-cp { left: 20%; color: #1d4ed8; }
+    
+    .pt-commit { left: 60%; border-color: #10b981; }
+    .lbl-commit { left: 60%; color: #047857; }
+    
+    .pt-crash { left: 85%; border-color: #ef4444; background: #ef4444; }
+    .lbl-crash { left: 85%; color: #b91c1c; top: -45px !important; }
+    .crash-icon { position: absolute; top: -25px; left: -15px; font-size: 2em; }
+
+    /* トランザクションのバー */
+    .trx-bar {
+      position: absolute;
+      top: 15px;
+      left: 30%;
+      width: 30%;
+      height: 12px;
+      background: #dbeafe;
+      border: 1px solid #3b82f6;
+      border-radius: 6px;
+    }
+    .trx-label {
+      position: absolute;
+      top: 30px;
+      left: 45%;
+      transform: translateX(-50%);
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #3b82f6;
+    }
+
+    /* 復旧アクションのアニメーション */
+    .recovery-action {
+      position: absolute;
+      bottom: 20px;
+      left: 20%;
+      width: 40%;
+      height: 30px;
+      display: flex;
+      align-items: center;
+    }
+    .recv-line {
+      height: 6px;
+      background: #f59e0b;
+      width: 0%;
+      border-radius: 3px;
+      position: relative;
+      animation: fastForward 3s infinite;
+    }
+    .recv-line::after {
+      content: "▶▶";
+      position: absolute;
+      right: -15px;
+      top: -6px;
+      color: #f59e0b;
+      font-size: 1.2em;
+    }
+    .recv-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 900;
+      color: #b45309;
+      font-size: 0.9em;
+      white-space: nowrap;
+    }
+    
+    @keyframes fastForward {
+      0% { width: 0%; opacity: 1; }
+      70% { width: 100%; opacity: 1; }
+      80% { width: 100%; opacity: 0; }
+      100% { width: 0%; opacity: 0; }
+    }
+
+    /* ロールバックとの比較カード */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .comp-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .card-forward { border-color: #f59e0b; }
+    .card-back { border-color: #3b82f6; }
+    
+    .cc-title { font-weight: 900; font-size: 1.1em; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .card-forward .cc-title { color: #b45309; }
+    .card-back .cc-title { color: #1d4ed8; }
+
+    .cc-condition {
+      background: #f8fafc;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+    .cc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; }
+    .cc-log { margin-top: 10px; font-weight: bold; font-size: 0.85em; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-09">
+            2026.03.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ロールフォワードとは？データベースの障害復旧とタイムライン</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#データベース</span>
+            <span class="tag">#障害回復</span>
+            <span class="tag">#トランザクション</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>データベースが突然クラッシュしたとき、ユーザーの大切なデータをどうやって守るのか。障害復旧の要となる「ロールフォワード（前進）」の仕組みと、試験で問われる「ロールバック」との見分け方を解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「データベースシステムにおいて、トランザクションが<strong>コミットされた後</strong>にシステム障害が発生した場合、<strong>更新後ログ</strong>を用いてデータベースを障害発生直前の状態に復旧させる処理はどれか？」<br><br>
+  ➡ 答え：<strong>ロールフォワード</strong>
+</div>
+
+<h2>1. 障害復旧の重要人物（基本用語）</h2>
+<p>
+  仕組みを理解するために、まずは3つの重要な用語を押さえておきましょう。
+</p>
+
+<div class="diagram-container">
+  <div class="term-grid">
+    <div class="term-card">
+      <span class="term-icon">💾</span>
+      <div class="term-content">
+        <span class="term-title">チェックポイント</span>
+        <span class="term-desc">ゲームの「セーブデータ」。メモリ上の変更をディスクに書き込んで確定させた地点。</span>
+      </div>
+    </div>
+    <div class="term-card">
+      <span class="term-icon">📝</span>
+      <div class="term-content">
+        <span class="term-title">コミット (Commit)</span>
+        <span class="term-desc">「処理完了！」の宣言。コミットされたデータは何があっても守り抜くのが鉄則。</span>
+      </div>
+    </div>
+    <div class="term-card">
+      <span class="term-icon">📖</span>
+      <div class="term-content">
+        <span class="term-title">ログ (更新履歴)</span>
+        <span class="term-desc">変更の記録。本体より先に必ずログを書くルールがある（WALプロトコル）。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>2. タイムラインで見る「ロールフォワード」の仕組み</h2>
+<p>
+  ATMで「1万円振り込みました（コミット）」と画面に出た直後に、銀行のシステムが停電で落ちてしまった状況を想像してください。この消えかけた振込データを復活させるのがロールフォワードです。
+</p>
+
+<!-- 図解：タイムライン -->
+<div class="diagram-container">
+  <div class="diagram-title">ロールフォワードの復旧プロセス</div>
+  <div class="timeline-wrapper">
+    <div class="time-axis">
+      <!-- ノード -->
+      <span class="tl-label lbl-cp">① チェックポイント<br><span style="font-size:0.8em; font-weight:normal;">(セーブ完了)</span></span>
+      <div class="tl-point pt-cp"></div>
+      
+      <span class="tl-label lbl-commit">② コミット<br><span style="font-size:0.8em; font-weight:normal;">(処理完了宣言)</span></span>
+      <div class="tl-point pt-commit"></div>
+      
+      <span class="tl-label lbl-crash">③ システム障害！</span>
+      <div class="tl-point pt-crash"><span class="crash-icon">💥</span></div>
+    </div>
+
+    <!-- トランザクションのバー -->
+    <div class="trx-bar"></div>
+    <span class="trx-label">トランザクション (処理中)</span>
+
+    <!-- 復旧アクション -->
+    <div class="recovery-action">
+      <div class="recv-line"></div>
+      <div class="recv-label">⏪ ①をロードして、ログを見ながら②まで「早送り(やり直し)」！</div>
+    </div>
+  </div>
+</div>
+
+<p>
+  <strong>【復旧の手順】</strong><br>
+  1. 直近の「①チェックポイント（確実なセーブデータ）」を読み込みます。<br>
+  2. そこから先は、残しておいた「更新後ログ（日記）」を見ながら、<strong>コミットされた処理をもう一度やり直し（早送り＝ロールフォワード）</strong>して、障害直前の状態まで追いつきます。
+</p>
+
+<h2>3. 1秒で解ける！「ロールバック」との使い分け</h2>
+<p>
+  情報処理試験の午前問題では、障害が起きたタイミングによって「ロールフォワード」と「ロールバック」を使い分ける問題が超頻出です。
+</p>
+
+<!-- 図解：比較カード -->
+<div class="diagram-container">
+  <div class="compare-grid">
+    
+    <div class="comp-card card-forward">
+      <span class="cc-title">⏩ ロールフォワード (前進)</span>
+      <span class="cc-condition">条件：コミット「後」の障害</span>
+      <div class="cc-desc">
+        すでに完了宣言（コミット）を出してしまったため、なかったことにはできない。ログを見て操作を「やり直し」て復元する。
+      </div>
+      <div class="cc-log" style="color:#b45309;">▶ 使うもの：「更新後」ログ</div>
+    </div>
+
+    <div class="comp-card card-back">
+      <span class="cc-title">⏪ ロールバック (後退)</span>
+      <span class="cc-condition">条件：コミット「前」の障害</span>
+      <div class="cc-desc">
+        処理の途中で止まってしまい、データが中途半端な状態。矛盾を防ぐため、トランザクション開始前の状態まで「巻き戻し」て取り消す。
+      </div>
+      <div class="cc-log" style="color:#1d4ed8;">▶ 使うもの：「更新前」ログ</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ：このキーワードを探せ！</h2>
+<p>
+  問題文を読んだら、まずは<strong>「コミット」という言葉がどこにあるか</strong>を探してください。それだけで正解が確定します。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:30%;" class="td-center">障害発生のタイミング</th>
+      <th class="td-center">復旧技法</th>
+      <th class="td-center">使用するログ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="td-center" style="font-weight:bold; background:#fffbeb;">コミット「後」</td>
+      <td class="td-center" style="color:#f59e0b; font-weight:bold;">ロールフォワード</td>
+      <td class="td-center" style="font-weight:bold;">更新「後」ログ</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; background:#eff6ff;">コミット「前」（処理中）</td>
+      <td class="td-center" style="color:#3b82f6; font-weight:bold;">ロールバック</td>
+      <td class="td-center" style="font-weight:bold;">更新「前」ログ</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #f59e0b; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 試験対策の合言葉<br>
+  「コミット【後】なら、更新【後】ログを使って、ロール【フォワード】！」（全部"後(前進)"で統一！）
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
