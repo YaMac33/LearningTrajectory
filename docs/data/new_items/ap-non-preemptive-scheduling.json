@@ -1,0 +1,23 @@
+{
+  "id": "ap-non-preemptive-scheduling",
+  "category": "ap",
+  "timestamp": "2026-03-09T10:20:01+09:00",
+  "post_path": "ap/posts/2026-03-09-ap-non-preemptive-scheduling/",
+  "meta": {
+    "title": "ノンプリエンプティブ方式とその特徴",
+    "summary": "OSのタスクスケジューリング方式であるノンプリエンプティブについて理解し、その特徴やプリエンプティブ方式との違いを学べます。",
+    "tags": [
+      "OS",
+      "タスク管理",
+      "スケジューリング",
+      "基本情報",
+      "応用情報",
+      "CPU",
+      "システムフリーズ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "OSと仮想化"
+    ]
+  }
+}
