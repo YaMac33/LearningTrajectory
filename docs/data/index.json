@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-pki-and-its-structure",
+    "category": "ap",
+    "timestamp": "2026-03-10T07:19:24+09:00",
+    "title": "PKIとその信頼の構造解説",
+    "summary": "PKI（公開鍵基盤）の基本概念と、インターネット通信における信頼の出発点を理解することができます。",
+    "tags": [
+      "PKI",
+      "セキュリティ",
+      "HTTPS",
+      "認証局",
+      "公開鍵",
+      "信頼"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-10-ap-pki-and-its-structure/"
+  },
+  {
     "id": "ap-https-communication-flows",
     "category": "ap",
     "timestamp": "2026-03-10T07:14:19+09:00",
