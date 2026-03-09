@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ドキュメンテーションジェネレータと関連ツールの役割と違い</title>
+  <meta name="description" content="開発効率を上げる「ドキュメンテーションジェネレータ（Javadoc等）」の仕組みと、混同しやすい関連ツール（Webブラウザ、TeX、テンプレートエンジン）の役割の違いを図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ドキュメンテーションジェネレータと関連ツールの役割と違い" />
+  <meta property="og:description" content="開発効率を上げる「ドキュメンテーションジェネレータ（Javadoc等）」の仕組みと、混同しやすい関連ツール（Webブラウザ、TeX、テンプレートエンジン）の役割の違いを図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 全体フローの図解 */
+    .doc-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .df-node {
+      padding: 15px 25px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .node-source { background: #f1f5f9; border: 2px solid #94a3b8; color: #334155; }
+    .node-generator { background: #eff6ff; border: 3px solid #3b82f6; color: #1d4ed8; font-size: 1.1em; }
+    .node-output { background: #ecfdf5; border: 2px dashed #10b981; color: #047857; }
+    
+    .df-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.2;
+    }
+    .df-arrow span { font-size: 0.5em; color: #64748b; }
+
+    .df-branches {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
+      flex-wrap: wrap;
+    }
+    .branch-node {
+      flex: 1;
+      min-width: 140px;
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      padding: 15px 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #475569;
+    }
+    .branch-icon { font-size: 2em; display: block; margin-bottom: 5px; }
+
+    /* 4つのツールの比較カード */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .tool-card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-top-width: 5px;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-gen { border-top-color: #3b82f6; }
+    .card-web { border-top-color: #f59e0b; }
+    .card-tex { border-top-color: #8b5cf6; }
+    .card-tpl { border-top-color: #10b981; }
+
+    .tc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .tc-icon { font-size: 2em; }
+    .tc-title { font-weight: 900; font-size: 1.05em; color: #1e293b; }
+    
+    .tc-role { font-size: 0.8em; font-weight: bold; background: #f8fafc; padding: 4px 8px; border-radius: 4px; color: #475569; margin-bottom: 10px; align-self: flex-start; }
+    .card-gen .tc-role { background: #eff6ff; color: #1d4ed8; }
+
+    .tc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; margin-bottom: 15px; flex: 1; }
+    .tc-example { font-size: 0.8em; color: #64748b; border-top: 1px dashed #e2e8f0; padding-top: 10px; font-weight: bold; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-09">
+            2026.03.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ドキュメンテーションジェネレータと関連ツールの役割と違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#開発ツール</span>
+            <span class="tag">#ドキュメント生成</span>
+            <span class="tag">#プログラミング</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ソースコードを書いて、さらに別で設計書やAPI仕様書を作るのは非常に手間がかかります。そこで活躍するのが「ドキュメンテーションジェネレータ」です。試験で混同しやすい関連ツールとの役割の違いを図解で整理します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  ドキュメンテーションジェネレータとは、<strong>ソースコードの中に書かれたコメントやプログラムの構造を解析し、自動で仕様書（ドキュメント）を作成してくれるツール</strong>のことです。（例：Javadoc, Doxygenなど）
+</div>
+
+<h2>1. 全体の処理フローと役割分担</h2>
+<p>
+  ドキュメンテーションジェネレータは「文書を作る本体」です。そして作られた文書を「表示・整形する手段」として他のツールが関わってきます。
+</p>
+
+<!-- 図解：全体の処理フロー -->
+<div class="diagram-container">
+  <div class="diagram-title">ドキュメント生成から出力までの流れ</div>
+  <div class="doc-flow">
+    
+    <div class="df-node node-source">
+      📄 ソースコード<br>
+      <span style="font-size:0.8em; font-weight:normal;">(プログラムのコードと説明コメント)</span>
+    </div>
+    
+    <div class="df-arrow">
+      <span>解析して自動作成</span>
+      ⬇
+    </div>
+
+    <div class="df-node node-generator">
+      ⚙️ ドキュメンテーションジェネレータ<br>
+      <span style="font-size:0.7em; font-weight:normal; color:#3b82f6;">(ここが主役！構造を読み取って文書化する)</span>
+    </div>
+
+    <div class="df-arrow">
+      <span>出力</span>
+      ⬇
+    </div>
+
+    <div class="df-node node-output">
+      出力されたデータ<br>
+      <span style="font-size:0.8em; font-weight:normal;">(HTML, PDF, Markdown形式など)</span>
+    </div>
+
+    <div class="df-arrow">⬇</div>
+
+    <div class="df-branches">
+      <div class="branch-node">
+        <span class="branch-icon">🌐</span>
+        Webブラウザ<br>
+        <span style="font-size:0.8em; font-weight:normal; color:#64748b;">画面に「表示」する</span>
+      </div>
+      <div class="branch-node">
+        <span class="branch-icon">🖨️</span>
+        TeX / LaTeX<br>
+        <span style="font-size:0.8em; font-weight:normal; color:#64748b;">印刷用に「組版」する</span>
+      </div>
+      <div class="branch-node">
+        <span class="branch-icon">🧩</span>
+        テンプレートエンジン<br>
+        <span style="font-size:0.8em; font-weight:normal; color:#64748b;">出力形式を「整形」する</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 4つのツールの目的と特徴</h2>
+<p>
+  それぞれのツールが「何をするためのものか」を比較しましょう。試験ではこれらが選択肢として並びます。
+</p>
+
+<!-- 図解：ツールの比較カード -->
+<div class="diagram-container">
+  <div class="tool-grid">
+    
+    <div class="tool-card card-gen">
+      <div class="tc-header">
+        <span class="tc-icon">🏭</span>
+        <span class="tc-title">ドキュメンテーション<br>ジェネレータ</span>
+      </div>
+      <span class="tc-role">役割：自動生成の「本体」</span>
+      <div class="tc-desc">ソースコードを解析し、APIリファレンスや設計書を自動で作るツール。コードの変更に自動で追従できるのが強み。</div>
+      <div class="tc-example">例：Javadoc, Doxygen, Sphinx</div>
+    </div>
+
+    <div class="tool-card card-web">
+      <div class="tc-header">
+        <span class="tc-icon">🌐</span>
+        <span class="tc-title">Webブラウザ</span>
+      </div>
+      <span class="tc-role">役割：出力結果の「表示専用」</span>
+      <div class="tc-desc">生成されたHTMLなどのコンテンツを、人間が見やすいように画面に表示するソフトウェア。ドキュメントを「作る」機能はありません。</div>
+      <div class="tc-example">例：Chrome, Edge, Safari</div>
+    </div>
+
+    <div class="tool-card card-tex">
+      <div class="tc-header">
+        <span class="tc-icon">🖨️</span>
+        <span class="tc-title">TeX / LaTeX</span>
+      </div>
+      <span class="tc-role">役割：高品質な「印刷用組版」</span>
+      <div class="tc-desc">論文や書籍など、複雑な数式や文書構造を美しく整形するためのシステム。自動生成ではなく、手動でのレイアウト記述が中心です。</div>
+      <div class="tc-example">用途：学術論文、PDFの出力フォーマット</div>
+    </div>
+
+    <div class="tool-card card-tpl">
+      <div class="tc-header">
+        <span class="tc-icon">🧩</span>
+        <span class="tc-title">テンプレートエンジン</span>
+      </div>
+      <span class="tc-role">役割：フォーマットの「整形補助」</span>
+      <div class="tc-desc">定型的な「ひな形（テンプレート）」に、プログラムのデータを流し込んでHTMLなどを生成する仕組み。ジェネレータの内部で使われる部品です。</div>
+      <div class="tc-example">例：Jinja2, Thymeleaf, Smarty</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ：どう見分けるか？</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">ツール</th>
+      <th>試験問題での判別ポイント（キーワード）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold;">ドキュメンテーション<br>ジェネレータ</td>
+      <td><strong>「ソースコードから」「コメントを解析」「ドキュメントを自動生成」</strong></td>
+    </tr>
+    <tr>
+      <td style="color:#b45309; font-weight:bold;">Webブラウザ</td>
+      <td>HTML等のコンテンツを<strong>「閲覧する」「表示する」</strong>（作成はしない）</td>
+    </tr>
+    <tr>
+      <td style="color:#6d28d9; font-weight:bold;">TeX / LaTeX</td>
+      <td><strong>「高品質な印刷」「組版システム」「数式の整形」</strong></td>
+    </tr>
+    <tr>
+      <td style="color:#047857; font-weight:bold;">テンプレートエンジン</td>
+      <td><strong>「ひな形」「データを流し込んで動的に生成」</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 覚え方のコツ<br>
+  「"ソースコードから仕様書を作る" ときたらジェネレータ！ ブラウザは"見るだけ"、TeXは"印刷用"、テンプレートは"ひな形"！」
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
