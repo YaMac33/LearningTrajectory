@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-bubble-sort-basics",
+    "category": "ap",
+    "timestamp": "2026-03-09T12:34:08+09:00",
+    "title": "バブルソートの基本概念と特徴",
+    "summary": "バブルソートは隣り合うデータを交換することで並べ替える基本的なアルゴリズムです。計算量はO(N^2)であり、特に教育用途に適していることが理解できます。",
+    "tags": [
+      "アルゴリズム",
+      "バブルソート",
+      "プログラミング",
+      "基本情報",
+      "教育"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "アルゴリズムとデータ構造"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-09-ap-bubble-sort-basics/"
+  },
+  {
     "id": "ap-non-preemptive-scheduling",
     "category": "ap",
     "timestamp": "2026-03-09T10:20:01+09:00",
