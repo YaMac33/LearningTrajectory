@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SNMPとSDNの違いと関係性：ネットワーク管理の新旧比較</title>
+  <meta name="description" content="ネットワーク管理手法である「SNMP」と「SDN」の違いについて、コントロールプレーンとデータプレーンの分離という概念を図解でわかりやすく解説します。試験頻出キーワードも整理。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SNMPとSDNの違いと関係性：ネットワーク管理の新旧比較" />
+  <meta property="og:description" content="ネットワーク管理手法である「SNMP」と「SDN」の違いについて、コントロールプレーンとデータプレーンの分離という概念を図解でわかりやすく解説します。試験頻出キーワードも整理。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* ネットワーク構造の比較図解 */
+    .network-compare {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .nc-box {
+      flex: 1;
+      min-width: 260px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .box-snmp { border-color: #64748b; }
+    .box-sdn { border-color: #8b5cf6; }
+
+    .nc-title { font-weight: 900; font-size: 1.1em; display: block; margin-bottom: 20px; }
+    .box-snmp .nc-title { color: #334155; }
+    .box-sdn .nc-title { color: #6d28d9; }
+
+    /* SNMPの図解用 */
+    .snmp-manager {
+      background: #f1f5f9; border: 2px dashed #94a3b8; padding: 10px 20px; border-radius: 8px; font-weight: bold; color: #475569; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;
+    }
+    .snmp-routers { display: flex; gap: 20px; align-items: center; }
+    .snmp-router {
+      background: #eff6ff; border: 2px solid #3b82f6; padding: 15px; border-radius: 8px; text-align: center; color: #1d4ed8; font-weight: bold; display: flex; flex-direction: column; gap: 5px;
+    }
+    .brain-icon { font-size: 1.5em; }
+    
+    /* SDNの図解用 */
+    .sdn-controller {
+      background: #f5f3ff; border: 3px solid #8b5cf6; padding: 15px 30px; border-radius: 8px; font-weight: 900; color: #6d28d9; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
+    }
+    .sdn-switches { display: flex; gap: 20px; align-items: center; }
+    .sdn-switch {
+      background: #f8fafc; border: 2px solid #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; color: #64748b; font-weight: bold; display: flex; flex-direction: column; gap: 5px;
+    }
+    .robot-icon { font-size: 1.5em; }
+
+    .arrow-down { color: #94a3b8; font-size: 1.5em; display: flex; flex-direction: column; align-items: center; line-height: 1; margin-bottom: 5px; }
+    .arrow-down span { font-size: 0.5em; font-weight: bold; margin-bottom: 5px; }
+
+    /* 役割比較カード */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .role-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-top: 4px solid;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .rc-snmp { border-top-color: #3b82f6; }
+    .rc-sdn { border-top-color: #f59e0b; }
+    
+    .rc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .rc-icon { font-size: 2em; }
+    .rc-title { font-weight: 900; font-size: 1.1em; color: #1e293b; }
+    .rc-concept { font-size: 0.85em; font-weight: bold; background: #f8fafc; padding: 5px; border-radius: 4px; color: #475569; margin-bottom: 10px; display: inline-block; }
+    .rc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; margin-bottom: 10px; }
+    .rc-usecase { font-size: 0.8em; color: #64748b; border-top: 1px dashed #e2e8f0; padding-top: 10px; font-weight: bold; }
+
+    /* 関連用語のハイライト */
+    .term-box {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 15px;
+    }
+    .term-title { font-weight: 900; color: #b45309; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .term-desc { font-size: 0.85em; color: #78350f; font-weight: bold; line-height: 1.5; }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-09">
+            2026.03.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SNMPとSDNの違いと関係性：ネットワーク管理の新旧比較</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#SDN</span>
+            <span class="tag">#プロトコル</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ネットワークの管理手法において、午前試験でも非常によく対比される2つの概念があります。各機器を個別に監視する従来型の「SNMP」と、ネットワーク全体をソフトウェアで一括操作する次世代の「SDN」の違いを図解で解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  <strong>SNMP</strong>は自律的に動く機器たちの状態を外から確認する「見回りカメラ」。<br>
+  <strong>SDN</strong>は機器の「考える頭脳」を取り上げて、中央からプログラムで直接操る「巨大な司令塔」です。
+</div>
+
+<h2>1. 構造の違い：「頭脳」はどこにある？</h2>
+<p>
+  この2つの最大の違いは、通信の経路を決定する「頭脳（コントロールプレーン）」がどこに配置されているか、というアーキテクチャ（設計思想）の違いにあります。
+</p>
+
+<!-- 図解：ネットワーク構造の比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">従来型ネットワークとSDNの構造比較</div>
+  <div class="network-compare">
+    
+    <!-- SNMP (従来型) -->
+    <div class="nc-box box-snmp">
+      <span class="nc-title">従来型（SNMPで監視）</span>
+      
+      <div class="snmp-manager">
+        <span>👀 マネージャ (監督)</span>
+        <span style="font-size:0.7em; font-weight:normal; margin-top:5px;">「調子どう？(ポーリング)」</span>
+      </div>
+      
+      <div class="snmp-routers">
+        <div class="snmp-router">
+          <span class="brain-icon">🧠</span>
+          ルータ A
+          <span style="font-size:0.7em; font-weight:normal;">自分で経路を考える</span>
+        </div>
+        <span style="color:#94a3b8; font-weight:bold;">⇔</span>
+        <div class="snmp-router">
+          <span class="brain-icon">🧠</span>
+          ルータ B
+          <span style="font-size:0.7em; font-weight:normal;">自分で経路を考える</span>
+        </div>
+      </div>
+      <p style="font-size:0.8em; color:#475569; margin-top:15px; text-align:center; font-weight:bold;">
+        各機器が自律的に動いているため、<br>個別の設定と監視が必要。
+      </p>
+    </div>
+
+    <!-- SDN -->
+    <div class="nc-box box-sdn">
+      <span class="nc-title">SDNのネットワーク</span>
+      
+      <div class="sdn-controller">
+        <span style="font-size:2em; line-height:1;">🧠</span>
+        SDNコントローラ<br>
+        <span style="font-size:0.6em; font-weight:normal;">(中央の巨大な頭脳)</span>
+      </div>
+      
+      <div class="arrow-down">
+        <span style="color:#8b5cf6;">OpenFlow等で一括命令！</span>
+        ⬇
+      </div>
+      
+      <div class="sdn-switches">
+        <div class="sdn-switch">
+          <span class="robot-icon">🤖</span>
+          スイッチ A
+          <span style="font-size:0.7em; font-weight:normal;">命令通りに転送する手足</span>
+        </div>
+        <span style="color:#94a3b8; font-weight:bold;">⇔</span>
+        <div class="sdn-switch">
+          <span class="robot-icon">🤖</span>
+          スイッチ B
+          <span style="font-size:0.7em; font-weight:normal;">命令通りに転送する手足</span>
+        </div>
+      </div>
+      <p style="font-size:0.8em; color:#475569; margin-top:15px; text-align:center; font-weight:bold;">
+        頭脳を一箇所に集約したことで、<br>ソフトウェアから一瞬で構成を変更可能！
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. それぞれの「概念」と「実務イメージ」</h2>
+<p>
+  この2つは完全に敵対するものではなく、目的が異なります。
+</p>
+
+<div class="diagram-container">
+  <div class="role-grid">
+    
+    <div class="role-card rc-snmp">
+      <div class="rc-header">
+        <span class="rc-icon">📹</span>
+        <span class="rc-title">SNMP</span>
+      </div>
+      <span class="rc-concept">自律機器の「監視・管理」ルール</span>
+      <div class="rc-desc">
+        機器のCPU使用率や通信量を「状態として把握する」ためのプロトコル。機器の設定変更もできるが、経路を根本的に制御する仕組みではない。
+      </div>
+      <div class="rc-usecase">【実務例】社内ネットワークの監視画面（Zabbix等）で、障害発生を検知するためのアラート用通信。</div>
+    </div>
+
+    <div class="role-card rc-sdn">
+      <div class="rc-header">
+        <span class="rc-icon">💻</span>
+        <span class="rc-title">SDN</span>
+      </div>
+      <span class="rc-concept">ネットワークの「ソフトウェア制御」思想</span>
+      <div class="rc-desc">
+        物理的なケーブルの繋ぎ変えやルータの個別設定をやめ、中央のソフトウェアからプログラム（コード）でネットワーク全体を動的に構築・変更する技術。
+      </div>
+      <div class="rc-usecase">【実務例】AWSなどのクラウドで、画面のボタンを押すだけで瞬時に新しいネットワーク環境（VPC）が作られる裏側の技術。</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 混同しやすい「関連用語」の違い</h2>
+<p>
+  試験では、SDNに関連する用語をすり替えた引っかけ問題が頻出します。
+</p>
+
+<div class="diagram-container">
+  
+  <div class="term-box">
+    <div class="term-title">💡 SDN と OpenFlow の違い</div>
+    <div class="term-desc">
+      ・<strong>SDN</strong>は「ネットワークをソフトウェアで制御する」という<strong>概念（コンセプト）</strong>。<br>
+      ・<strong>OpenFlow</strong>は、そのSDNを実現するための具体的な<strong>通信プロトコル（通信のルール）</strong>の一つです。
+    </div>
+  </div>
+
+  <div class="term-box" style="border-left-color:#3b82f6; background:#eff6ff;">
+    <div class="term-title" style="color:#1d4ed8;">💡 SDN と NFV の違い</div>
+    <div class="term-desc" style="color:#1e3a8a;">
+      ・<strong>SDN</strong>は「通信の経路制御（道案内）」をソフトウェア化するもの。<br>
+      ・<strong>NFV</strong>（Network Functions Virtualization）は、ファイアウォールやロードバランサといった「専用ハードウェア」を仮想化し、<strong>汎用サーバ上のソフトウェアとして動かす技術</strong>のことです。
+    </div>
+  </div>
+
+</div>
+
+<h2>試験対策まとめ：このキーワードを探せ！</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:20%;">技術・用語</th>
+      <th>試験問題で反応すべきキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold; background:#f8fafc;">SNMP</td>
+      <td><strong>マネージャ</strong>、<strong>エージェント</strong>、<strong>MIB</strong>（状態データベース）、ポーリング、トラップ</td>
+    </tr>
+    <tr>
+      <td style="color:#b45309; font-weight:bold; background:#f8fafc;">SDN</td>
+      <td><strong>コントロールプレーンとデータプレーンの分離</strong>、ソフトウェアによる動的制御、一括設定</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">OpenFlow</td>
+      <td>SDNを実現するための<strong>通信プロトコル</strong>、コントローラとスイッチ間のインターフェース</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">NFV</td>
+      <td>ネットワーク機器（ルータやFW）の機能を<strong>仮想化</strong>し、汎用サーバ上で実行する</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
