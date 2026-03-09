@@ -1,0 +1,21 @@
+{
+  "id": "ap-nosql-database-models",
+  "category": "ap",
+  "timestamp": "2026-03-09T18:20:36+09:00",
+  "post_path": "ap/posts/2026-03-09-ap-nosql-database-models/",
+  "meta": {
+    "title": "NoSQLとRDBの違いとデータモデル",
+    "summary": "NoSQLの概要とRDBとの違い、4つの代表的なデータモデル（キー・バリュー型、ドキュメント型、カラム指向型、グラフ型）について解説します。",
+    "tags": [
+      "データベース",
+      "NoSQL",
+      "ビッグデータ",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
