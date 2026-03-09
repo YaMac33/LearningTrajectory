@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-override-mechanism",
+    "category": "ap",
+    "timestamp": "2026-03-09T20:30:21+09:00",
+    "title": "オーバーライドの仕組みと試験対策",
+    "summary": "オーバーライドの概念を理解し、親クラスと子クラス間での動作の上書きについて学びます。また、試験における関連キーワードの重要性を解説します。",
+    "tags": [
+      "オブジェクト指向",
+      "プログラミング",
+      "オーバーライド",
+      "オーバーロード",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ソフトウェア工学"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-09-ap-override-mechanism/"
+  },
+  {
     "id": "ap-spf-dkim-difference",
     "category": "ap",
     "timestamp": "2026-03-09T20:13:05+09:00",
