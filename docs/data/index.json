@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-public-key-cryptography",
+    "category": "ap",
+    "timestamp": "2026-03-09T22:20:31+09:00",
+    "title": "公開鍵暗号の使い方と試験対策",
+    "summary": "公開鍵暗号の「暗号化」と「電子署名」の違いを、試験視点で理解しやすく説明します。特に鍵の使い方に関する重要ポイントを深掘りします。",
+    "tags": [
+      "セキュリティ",
+      "公開鍵暗号",
+      "電子署名",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-09-ap-public-key-cryptography/"
+  },
+  {
     "id": "ap-override-mechanism",
     "category": "ap",
     "timestamp": "2026-03-09T20:30:21+09:00",
