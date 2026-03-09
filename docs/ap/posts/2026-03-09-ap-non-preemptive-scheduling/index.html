@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ノンプリエンプティブとは？プリエンプティブとの違い</title>
+  <meta name="description" content="OSのタスクスケジューリング方式「ノンプリエンプティブ」について、タスクが自らCPUを返す仕組みと、現代主流の「プリエンプティブ方式」との決定的な違い、システムがフリーズする弱点を図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ノンプリエンプティブとは？プリエンプティブとの違い" />
+  <meta property="og:description" content="OSのタスクスケジューリング方式「ノンプリエンプティブ」について、タスクが自らCPUを返す仕組みと、現代主流の「プリエンプティブ方式」との決定的な違い、システムがフリーズする弱点を図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 問題文ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* タスクの流れ図解（タイムライン） */
+    .timeline-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+    .os-track {
+      background: #1e293b;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .track-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+    }
+    .task-track {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 60px;
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 5px;
+      position: relative;
+    }
+    .task-block {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      border-radius: 4px;
+      position: relative;
+    }
+    .block-a { background: #3b82f6; width: 40%; }
+    .block-b { background: #8b5cf6; width: 30%; }
+    .block-c { background: #10b981; width: 30%; }
+    
+    .return-msg {
+      position: absolute;
+      top: -30px;
+      right: -10px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      font-size: 0.75em;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
+    .return-msg::after {
+      content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+      border-width: 5px 5px 0; border-style: solid; border-color: #cbd5e1 transparent transparent transparent;
+    }
+
+    /* VS 比較カード */
+    .vs-layout {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .vs-box {
+      flex: 1;
+      min-width: 220px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .box-non { border-color: #3b82f6; }
+    .box-pre { border-color: #f59e0b; }
+    
+    .vs-icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .vs-title { font-weight: 900; font-size: 1.1em; display: block; margin-bottom: 10px; }
+    .box-non .vs-title { color: #1d4ed8; }
+    .box-pre .vs-title { color: #b45309; }
+    
+    .vs-focus { font-size: 0.85em; font-weight: bold; padding: 5px; border-radius: 4px; margin-bottom: 15px; }
+    .box-non .vs-focus { background: #eff6ff; color: #1e3a8a; }
+    .box-pre .vs-focus { background: #fffbeb; color: #78350f; }
+
+    .vs-desc { font-size: 0.85em; color: #475569; text-align: left; line-height: 1.5; flex: 1; }
+
+    /* フリーズ問題の図解 */
+    .freeze-alert {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: #fef2f2;
+      border: 2px dashed #ef4444;
+      padding: 20px;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .freeze-task {
+      background: #ef4444;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      position: relative;
+      animation: shake 0.5s infinite;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      50% { transform: translateX(2px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+    .freeze-os {
+      background: #475569;
+      color: #cbd5e1;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      flex: 1;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .td-left { text-align: left !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-09">
+            2026.03.09
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ノンプリエンプティブとは？プリエンプティブとの違い</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#OS</span>
+            <span class="tag">#タスク管理</span>
+            <span class="tag">#スケジューリング</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>コンピュータの中で複数のプログラム（タスク）を動かす際、CPUという限られた資源を誰がどうやって使い回すかを取り決める「タスクスケジューリング」。その古典的な方式である<strong>「ノンプリエンプティブ」</strong>について解説します。</p>
+<hr>
+
+<div class="question-box">
+  【よくある問題パターン】<br>
+  「実行中のタスクが<strong>自らCPUの使用を終了したときだけ</strong>、OSが別のタスクへ切り替えるスケジューリング方式はどれか？」<br><br>
+  ➡ 答え：<strong>ノンプリエンプティブ（Non-preemptive）</strong>
+</div>
+
+<h2>1. ノンプリエンプティブの仕組み（自発的な交代）</h2>
+<p>
+  ノンプリエンプティブ（Non-preemptive）とは、直訳すると「横取りしない」という意味です。<br>
+  この方式では、<strong>OSは実行中のタスクを強制的に途中で止めることができません。</strong>タスク自身が「処理が終わりました」「入力待ちになります」と宣言して<strong>自発的にCPUをOSに返却するまで、他のタスクはずっと待ち続ける</strong>ことになります。
+</p>
+
+<!-- 図解：タスクの流れ -->
+<div class="diagram-container">
+  <div class="diagram-title">ノンプリエンプティブのタスク実行フロー</div>
+  <div class="timeline-flow">
+    <div style="font-size:0.8em; color:#64748b; font-weight:bold;">時間 ➡</div>
+    
+    <div class="task-track">
+      <div class="task-block block-a">
+        タスクA 実行中
+        <div class="return-msg">自ら終了・返却</div>
+      </div>
+      <div class="task-block block-b">
+        タスクB 実行中
+        <div class="return-msg">自ら返却</div>
+      </div>
+      <div class="task-block block-c">
+        タスクC 実行
+      </div>
+    </div>
+
+    <div class="os-track">
+      <span>OS が CPU を回収</span>
+      <span class="track-arrow">➡</span>
+      <span>次のタスクへ渡す</span>
+      <span class="track-arrow">➡</span>
+      <span>OS が回収</span>
+    </div>
+  </div>
+</div>
+
+<h2>2. 現代主流の「プリエンプティブ」との決定的な違い</h2>
+<p>
+  情報処理試験では、現代のOS（Windows, macOS, Linuxなど）で主流となっている「プリエンプティブ方式」との違いが必ず問われます。
+</p>
+
+<!-- 図解：比較カード -->
+<div class="diagram-container">
+  <div class="vs-layout">
+    
+    <div class="vs-box box-non">
+      <span class="vs-icon">🏃‍♂️💨</span>
+      <span class="vs-title">ノンプリエンプティブ</span>
+      <div class="vs-focus">主導権：タスク（プログラム）側</div>
+      <div class="vs-desc">
+        タスクが自らCPUを手放す（返却する）まで、OSは手出しできない。構造が単純なため、昔のOS（初期のMac OSなど）や一部の組込みOSで使われていた方式。
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:center; font-weight:900; font-size:1.5em; color:#cbd5e1;">VS</div>
+
+    <div class="vs-box box-pre">
+      <span class="vs-icon">⏱️🛑</span>
+      <span class="vs-title">プリエンプティブ</span>
+      <div class="vs-focus">主導権：OS側</div>
+      <div class="vs-desc">
+        OSが絶対的な権力を持ち、<strong>一定時間（タイムスライス）</strong>が経過したり、優先度の高いタスクが来たら、実行中のタスクを<strong>強制的に中断して交代</strong>させる方式。現代の主流。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. なぜ今は「ノンプリエンプティブ」が使われないのか？</h2>
+<p>
+  ノンプリエンプティブ方式には、<strong>「1つの行儀の悪いプログラムのせいで、システム全体が死ぬ」</strong>という致命的な弱点があります。
+</p>
+
+<!-- 図解：フリーズの恐怖 -->
+<div class="diagram-container">
+  <div class="diagram-title">無限ループによるシステム停止（フリーズ）の発生</div>
+  <div class="freeze-alert">
+    <div class="freeze-task">
+      <span style="font-size:1.5em;">💥</span><br>
+      タスクA<br>
+      <span style="font-size:0.7em;">(バグで無限ループ中)</span>
+    </div>
+    
+    <div style="font-size:1.5em; font-weight:bold; color:#ef4444;">永遠にCPUを返さない！</div>
+    
+    <div class="freeze-os">
+      OS（管理者）<br>
+      <span style="font-size:0.8em; font-weight:normal;">「タスクAが返してくれないから、<br>他のタスクに回せない...詰んだ...」</span>
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#475569; margin-top:10px; font-weight:bold; text-align:center;">
+    ※ プリエンプティブ方式なら、OSが強制的にタスクAからCPUをひっぺがすことができるため、システム全体がフリーズすることはありません。
+  </p>
+</div>
+
+<h2>試験対策まとめ：キーワードで見抜く</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">用語</th>
+      <th class="td-left">試験問題で反応すべきキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold;">ノンプリエンプティブ</td>
+      <td class="td-left">タスクが<strong>自らCPUを解放（返却）する</strong>、OSは<strong>強制中断しない</strong>。</td>
+    </tr>
+    <tr>
+      <td style="color:#b45309; font-weight:bold;">プリエンプティブ</td>
+      <td class="td-left">OSが<strong>強制的に割り込む（中断する）</strong>、優先度、強制切替。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">タイムスライス</td>
+      <td class="td-left">プリエンプティブ方式でOSが割り当てる<strong>「一定の時間枠」</strong>のこと。（ラウンドロビン方式などで使用）</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">コンテキストスイッチ</td>
+      <td class="td-left">タスクを切り替える際、現在の状態（レジスタ等の値）を保存し、次のタスクの状態を復元する<strong>切り替え処理自体</strong>のこと。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #3b82f6; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 覚え方のコツ<br>
+  「ノン」プリエンプティブ ＝ OSが「横取りしない（Non）」。だからタスクが自分で返すのを待つ！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
