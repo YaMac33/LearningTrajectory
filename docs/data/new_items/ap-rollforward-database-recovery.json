@@ -1,0 +1,24 @@
+{
+  "id": "ap-rollforward-database-recovery",
+  "category": "ap",
+  "timestamp": "2026-03-09T18:09:18+09:00",
+  "post_path": "ap/posts/2026-03-09-ap-rollforward-database-recovery/",
+  "meta": {
+    "title": "ロールフォワードの障害復旧方法解説",
+    "summary": "データベースのロールフォワード技法について、障害復旧の仕組みやロールバックとの違いを理解します。",
+    "tags": [
+      "データベース",
+      "障害回復",
+      "トランザクション",
+      "ロールフォワード",
+      "ロールバック",
+      "情報処理",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
