@@ -1,0 +1,22 @@
+{
+  "id": "ap-common-and-public-key-differences",
+  "category": "ap",
+  "timestamp": "2026-03-09T14:33:10+09:00",
+  "post_path": "ap/posts/2026-03-09-ap-common-and-public-key-differences/",
+  "meta": {
+    "title": "共通鍵と公開鍵の違いを徹底解説",
+    "summary": "共通鍵暗号方式と公開鍵暗号方式の違いを、対話形式や図解でわかりやすく解説します。試験で重要な公式も紹介します。",
+    "tags": [
+      "セキュリティ",
+      "暗号技術",
+      "公開鍵暗号",
+      "共通鍵暗号",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
