@@ -1,0 +1,21 @@
+{
+  "id": "ap-snmp-sdn-differences",
+  "category": "ap",
+  "timestamp": "2026-03-09T19:03:06+09:00",
+  "post_path": "ap/posts/2026-03-09-ap-snmp-sdn-differences/",
+  "meta": {
+    "title": "SNMPとSDNの違いと関係性",
+    "summary": "ネットワーク管理の手法としてのSNMPとSDNの違いを明確にし、試験における理解を深める内容です。特にコントロールプレーンとデータプレーンの分離に焦点を当てています。",
+    "tags": [
+      "ネットワーク",
+      "SDN",
+      "プロトコル",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
