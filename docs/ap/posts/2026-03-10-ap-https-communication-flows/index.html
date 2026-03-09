@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | HTTPS通信の仕組み：サーバ証明書と公開鍵で本物を確認する流れ</title>
+  <meta name="description" content="HTTPS通信において、ブラウザが接続先のWebサーバを「本物」だと確認し、安全な暗号通信を開始するまでのフローを解説。「認証局の公開鍵」と「サーバの公開鍵」の役割の違いを図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="HTTPS通信の仕組み：サーバ証明書と公開鍵で本物を確認する流れ" />
+  <meta property="og:description" content="HTTPS通信において、ブラウザが接続先のWebサーバを「本物」だと確認し、安全な暗号通信を開始するまでのフローを解説。「認証局の公開鍵」と「サーバの公開鍵」の役割の違いを図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 登場人物と持ち物カード */
+    .actor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .actor-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .actor-browser { border-color: #3b82f6; }
+    .actor-server { border-color: #10b981; }
+    .actor-ca { border-color: #8b5cf6; }
+
+    .ac-icon { font-size: 2.5em; margin-bottom: 5px; }
+    .ac-title { font-weight: 900; font-size: 1.1em; margin-bottom: 10px; }
+    .actor-browser .ac-title { color: #1d4ed8; }
+    .actor-server .ac-title { color: #047857; }
+    .actor-ca .ac-title { color: #6d28d9; }
+
+    .ac-item-box {
+      background: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      padding: 8px;
+      border-radius: 6px;
+      width: 100%;
+      font-size: 0.85em;
+    }
+    .ac-item-label { display: block; font-weight: bold; color: #64748b; margin-bottom: 5px; font-size: 0.9em; }
+    .ac-item { font-weight: bold; color: #1e293b; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+    /* 証明書の構造図解 */
+    .cert-box {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      width: 100%;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cert-title { font-weight: 900; color: #b45309; text-align: center; margin-bottom: 10px; border-bottom: 1px solid #fcd34d; padding-bottom: 5px; }
+    .cert-list { list-style: none; padding: 0; margin: 0; font-size: 0.9em; color: #78350f; font-weight: bold; }
+    .cert-list li { margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+
+    /* 縦型ステップフロー */
+    .step-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .step-row {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .step-num {
+      background: #334155;
+      color: #fff;
+      padding: 15px;
+      font-weight: 900;
+      font-size: 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      flex-shrink: 0;
+    }
+    .step-content {
+      padding: 15px;
+      flex: 1;
+    }
+    .step-title {
+      font-weight: 900;
+      color: #1e293b;
+      margin-bottom: 5px;
+      font-size: 1.05em;
+    }
+    .step-desc {
+      font-size: 0.85em;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    .step-visual {
+      background: #f8fafc;
+      padding: 10px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #334155;
+      text-align: center;
+      border-left: 1px solid #e2e8f0;
+      width: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .sv-arrow { color: #94a3b8; font-size: 1.2em; line-height: 1; margin: 2px 0; }
+    .sv-box { background: #fff; border: 1px solid #cbd5e1; padding: 4px 8px; border-radius: 4px; }
+    .sv-hl { color: #3b82f6; }
+
+    /* 錠と鍵の例えボックス */
+    .analogy-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .analogy-title { font-weight: 900; color: #1d4ed8; display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
+    .analogy-text { font-size: 0.85em; color: #1e3a8a; line-height: 1.6; font-weight: bold; }
+    .analogy-list { margin: 10px 0 0 0; padding-left: 20px; font-size: 0.85em; color: #1e3a8a; }
+    .analogy-list li { margin-bottom: 5px; }
+
+    /* テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">HTTPS通信の仕組み：サーバ証明書と公開鍵で本物を確認する流れ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#HTTPS</span>
+            <span class="tag">#公開鍵暗号</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>Webサイトにアクセスしたとき、URLが「https://〜」で始まり鍵マークがついていれば安全と言われます。しかし、そもそも<strong>「その接続先が偽サイトではなく、本物のサーバである」</strong>ことをブラウザはどうやって確認しているのでしょうか？<br>公開鍵暗号方式の応用である「サーバ証明書」の検証フローを解説します。</p>
+<hr>
+
+<div class="question-box">
+  【HTTPS通信の要点】<br>
+  安全に通信するためには、サーバから送られてくる「証明書」を、ブラウザが元々持っている「認証局の公開鍵」で検証し、<strong>本物だと確認してから</strong>暗号通信を始めます。
+</div>
+
+<h2>1. 登場人物と「最初の持ち物」</h2>
+<p>
+  一番混乱しやすいのが「誰が、どの鍵を最初から持っているのか？」という点です。ここを整理しましょう。
+</p>
+
+<!-- 図解：登場人物 -->
+<div class="diagram-container">
+  <div class="diagram-title">通信開始前の「持ち物」状況</div>
+  <div class="actor-grid">
+    
+    <div class="actor-card actor-browser">
+      <span class="ac-icon">🌐</span>
+      <span class="ac-title">ブラウザ (見る側)</span>
+      <div class="ac-item-box">
+        <span class="ac-item-label">最初から持っている物</span>
+        <span class="ac-item">🔓 認証局の公開鍵</span>
+        <span style="font-size:0.7em; color:#64748b;">(※OSやブラウザに内蔵済)</span>
+      </div>
+    </div>
+
+    <div class="actor-card actor-server">
+      <span class="ac-icon">🏢</span>
+      <span class="ac-title">Webサーバ (サイト)</span>
+      <div class="ac-item-box">
+        <span class="ac-item-label">自分で用意した物</span>
+        <span class="ac-item">🔑 サーバの秘密鍵</span>
+      </div>
+    </div>
+
+    <div class="actor-card actor-ca">
+      <span class="ac-icon">🏛️</span>
+      <span class="ac-title">認証局 (CA)</span>
+      <div class="ac-item-box">
+        <span class="ac-item-label">厳重に保管している物</span>
+        <span class="ac-item">🔒 認証局の秘密鍵</span>
+        <span style="font-size:0.7em; color:#64748b;">(※これで証明書にハンコを押す)</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="cert-box">
+    <div class="cert-title">📄 サーバ証明書の中身</div>
+    <p style="font-size:0.8em; color:#92400e; margin:0 0 10px 0; text-align:center;">サーバが認証局にお願いして発行してもらう身分証</p>
+    <ul class="cert-list">
+      <li>🏷️ ドメイン名 (例: example.com)</li>
+      <li>🔓 <strong>サーバの公開鍵</strong></li>
+      <li>✍️ <strong>認証局の電子署名</strong> (認証局の秘密鍵で押したハンコ)</li>
+    </ul>
+  </div>
+</div>
+
+<h2>2. 5つのステップで追うHTTPS通信の流れ</h2>
+<p>
+  準備が整ったところで、ブラウザがサイトにアクセスしてから、安全な通信が始まるまでの流れを見てみましょう。
+</p>
+
+<!-- 図解：ステップフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">「本物のサーバか」を確認して通信を始めるフロー</div>
+  <div class="step-flow">
+    
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">サーバが証明書をもらう（準備）</div>
+        <div class="step-desc">Webサーバは、信頼できる第三者機関である「認証局（CA）」に申請し、自分の公開鍵を含んだ「サーバ証明書」を発行してもらいます。この証明書には認証局のデジタルハンコ（電子署名）が押されています。</div>
+      </div>
+      <div class="step-visual">
+        認証局<br>
+        <span class="sv-arrow">⬇</span><br>
+        <span class="sv-box">📄 証明書</span><br>
+        <span class="sv-arrow">⬇</span><br>
+        サーバ
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#3b82f6;">2</div>
+      <div class="step-content">
+        <div class="step-title">ブラウザがアクセスする</div>
+        <div class="step-desc">ユーザーがブラウザに「https://〜」と入力し、Webサーバへ通信の開始を要求します。</div>
+      </div>
+      <div class="step-visual">
+        ブラウザ<br>
+        <span class="sv-arrow">⬇</span><br>
+        <span class="sv-hl">アクセス要求</span><br>
+        <span class="sv-arrow">⬇</span><br>
+        サーバ
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#3b82f6;">3</div>
+      <div class="step-content">
+        <div class="step-title">サーバが証明書を送る</div>
+        <div class="step-desc">要求を受けたWebサーバは、挨拶代わりに自分の身分証である「サーバ証明書」をブラウザに送り返します。</div>
+      </div>
+      <div class="step-visual">
+        サーバ<br>
+        <span class="sv-arrow">⬇</span><br>
+        <span class="sv-box">📄 サーバ証明書</span><br>
+        <span class="sv-arrow">⬇</span><br>
+        ブラウザ
+      </div>
+    </div>
+
+    <div class="step-row" style="border: 2px solid #f59e0b;">
+      <div class="step-num" style="background:#f59e0b;">4</div>
+      <div class="step-content">
+        <div class="step-title" style="color:#b45309;">【超重要】ブラウザが証明書を検証する</div>
+        <div class="step-desc">ブラウザは、<strong>「最初から持っている認証局の公開鍵」</strong>を使って、届いた証明書の署名（ハンコ）を検証します。これが成功すれば、「この証明書は本物で、中に入っているサーバの公開鍵も本物だ！」と確認できます。</div>
+      </div>
+      <div class="step-visual">
+        <span class="sv-hl">🔓 認証局の公開鍵</span><br>
+        <span class="sv-arrow">⬇</span><br>
+        <span class="sv-box" style="border-color:#f59e0b;">署名を確認✅</span>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#10b981;">5</div>
+      <div class="step-content">
+        <div class="step-title">本物の公開鍵で暗号通信を開始</div>
+        <div class="step-desc">相手が本物だとわかったので、ブラウザは証明書から取り出した<strong>「サーバの公開鍵」</strong>を使ってデータを暗号化し、送信します。サーバは自身の「秘密鍵」でそれを復号し、安全な通信が成立します。</div>
+      </div>
+      <div class="step-visual">
+        ブラウザ<br>
+        <span class="sv-arrow">⬇</span><br>
+        <span class="sv-box">🔒 サーバの公開鍵で<br>暗号化して送信</span><br>
+        <span class="sv-arrow">⬇</span><br>
+        サーバ
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 錠と鍵の例えで理解する</h2>
+<p>
+  ここまでの流れを、前回学習した「錠と鍵」のイメージに当てはめると、誰が何をしているかがスッキリします。
+</p>
+
+<div class="diagram-container">
+  <div class="analogy-box">
+    <div class="analogy-title">💡 「錠と鍵」による役割のまとめ</div>
+    <div class="analogy-text">
+      <ul class="analogy-list">
+        <li><strong>① 認証局（CA）：</strong> 「この公開錠（サーバの公開鍵）は間違いなくこのサイトのものです」と保証書に<strong>署名（ハンコ）</strong>を押す。</li>
+        <li><strong>② ブラウザ：</strong> 手元のリスト（認証局の公開鍵）を見て、その保証書が本物かを確認し、本物なら中にある<strong>「サーバの公開錠」</strong>を取り出す。</li>
+        <li><strong>③ 通　信：</strong> 取り出した「サーバの公開錠」で、送りたいデータを<strong>ガチガチにロック</strong>してサーバに送る。（※実際にはここで共通鍵の受け渡しを行いますが、基本概念としてはこうなります）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h2>試験対策まとめ：このキーワードを探せ！</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">用語</th>
+      <th>役割と試験でのキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold; background:#f8fafc;">サーバ証明書</td>
+      <td>Webサーバの身分証。中に<strong>「サーバの公開鍵」</strong>と<strong>「認証局のデジタル署名」</strong>が含まれている。</td>
+    </tr>
+    <tr>
+      <td style="color:#6d28d9; font-weight:bold; background:#f8fafc;">認証局（CA）</td>
+      <td>証明書を発行する信頼された第三者機関。（例：Let's Encryptなど）</td>
+    </tr>
+    <tr>
+      <td style="color:#047857; font-weight:bold; background:#f8fafc;">証明書の検証</td>
+      <td>ブラウザは、あらかじめ組み込まれている<strong>「認証局の公開鍵（ルート証明書）」</strong>を用いて、サーバ証明書の正当性を検証する。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
