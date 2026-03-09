@@ -1,0 +1,22 @@
+{
+  "id": "ap-https-communication-flows",
+  "category": "ap",
+  "timestamp": "2026-03-10T07:14:19+09:00",
+  "post_path": "ap/posts/2026-03-10-ap-https-communication-flows/",
+  "meta": {
+    "title": "HTTPS通信の仕組みとサーバ証明書の役割",
+    "summary": "本記事では、HTTPS通信におけるサーバ証明書の検証フローを解説し、ブラウザが安全な通信を始めるための確認手順を学びます。",
+    "tags": [
+      "HTTPS",
+      "セキュリティ",
+      "公開鍵暗号",
+      "証明書",
+      "認証局",
+      "暗号通信"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
