@@ -1,0 +1,22 @@
+{
+  "id": "ap-binary-tree-reverse-polish-notation",
+  "category": "ap",
+  "timestamp": "2026-03-10T12:49:11+09:00",
+  "post_path": "ap/posts/2026-03-10-ap-binary-tree-reverse-polish-notation/",
+  "meta": {
+    "title": "逆ポーランド表記法と構文木の作り方",
+    "summary": "数式を2分木で表現する方法と、逆ポーランド表記法について解説します。試験での実践的な理解を深めることができます。",
+    "tags": [
+      "アルゴリズム",
+      "データ構造",
+      "逆ポーランド表記法",
+      "構文木",
+      "コンパイラ",
+      "試験対策"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "アルゴリズムとデータ構造"
+    ]
+  }
+}
