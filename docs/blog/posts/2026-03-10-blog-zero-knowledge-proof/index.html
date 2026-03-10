@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ゼロ知識証明（ZKP）とは？秘密を明かさずに証明する魔法の暗号技術</title>
+  <meta name="description" content="今後のデジタル社会を根底から変える「ゼロ知識証明（ZKP）」について解説。ウォーリーをさがせ！の例え話や、ネット投票への応用、ZKPが満たすべき3つの絶対条件（完全性、健全性、ゼロ知識性）を図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ゼロ知識証明（ZKP）とは？秘密を明かさずに証明する魔法の暗号技術" />
+  <meta property="og:description" content="今後のデジタル社会を根底から変える「ゼロ知識証明（ZKP）」について解説。ウォーリーをさがせ！の例え話や、ネット投票への応用、ZKPが満たすべき3つの絶対条件（完全性、健全性、ゼロ知識性）を図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* ウォーリーの図解 */
+    .wally-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    .wd-friend {
+      background: #f8fafc;
+      border: 2px dashed #94a3b8;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #475569;
+      font-weight: bold;
+    }
+    .wd-paper {
+      position: relative;
+      width: 100%;
+      max-width: 350px;
+      height: 200px;
+      background: #1e293b;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    .wd-paper-label {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      color: #64748b;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+    .wd-hole {
+      width: 70px;
+      height: 70px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      box-shadow: inset 0 4px 6px rgba(0,0,0,0.5);
+      border: 2px solid #cbd5e1;
+    }
+    .wd-result {
+      background: #ecfdf5;
+      border: 2px solid #10b981;
+      color: #047857;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ネット投票の図解 */
+    .vote-diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+    }
+    .vd-user {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      width: 100%;
+      max-width: 350px;
+    }
+    .vd-secret {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    
+    .vd-arrow {
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 1.2em;
+      text-align: center;
+    }
+    .vd-arrow span { font-size: 0.7em; }
+    
+    .vd-proof {
+      background: #1e293b;
+      color: #a7f3d0;
+      padding: 15px 20px;
+      border-radius: 20px;
+      font-weight: bold;
+      text-align: center;
+      font-family: monospace;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    
+    .vd-server {
+      background: #f8fafc;
+      border: 2px solid #64748b;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      width: 100%;
+      max-width: 350px;
+    }
+    .vd-ok {
+      color: #10b981;
+      font-weight: 900;
+      margin-top: 10px;
+      font-size: 1.1em;
+    }
+
+    /* 3つの条件カード */
+    .condition-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .cond-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-top-width: 5px;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-comp { border-top-color: #3b82f6; }
+    .card-sound { border-top-color: #ef4444; }
+    .card-zk { border-top-color: #8b5cf6; }
+
+    .cc-title { font-weight: 900; font-size: 1.1em; color: #1e293b; margin-bottom: 5px; }
+    .cc-sub { font-size: 0.8em; font-weight: bold; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; color: #475569; margin-bottom: 10px; align-self: flex-start; }
+    .cc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ゼロ知識証明（ZKP）とは？秘密を明かさずに証明する魔法の暗号技術</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#Web3</span>
+            <span class="tag">#最新技術</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>今後のデジタル社会を根底から変えるかもしれない、まさに「魔法のような暗号技術」として注目を集めている「ゼロ知識証明（ZKP：Zero-Knowledge Proof）」。一見矛盾しているように思えるこの概念を、有名な例え話を使って解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  ゼロ知識証明とは、<strong>「自分がその秘密（情報）を知っていること」を、その秘密自体を一切相手に明かすことなく、数学的に証明する技術</strong>です。
+</div>
+
+<h2>1. 「ウォーリーをさがせ！」で分かるゼロ知識証明</h2>
+<p>
+  あなたと友人が「ウォーリーをさがせ！」の絵本を見て遊んでいます。あなたはウォーリーを見つけましたが、<strong>「ウォーリーの場所（秘密）」を友人に教えることなく、「自分はウォーリーを見つけた（証明）」ということだけを信じさせたい</strong>と考えました。どうすればいいでしょうか？
+</p>
+
+<!-- 図解：ウォーリーの例え -->
+<div class="diagram-container">
+  <div class="diagram-title">黒い画用紙を使った「秘密を明かさない証明」</div>
+  <div class="wally-diagram">
+    <div class="wd-friend">
+      🧑 友人（証明を検証する人）
+    </div>
+    
+    <div class="wd-paper">
+      <span class="wd-paper-label">真っ黒で巨大な画用紙</span>
+      <div class="wd-hole">🥸</div>
+    </div>
+    
+    <div class="wd-result">
+      💡 【結果】<br>
+      画用紙が大きすぎて、絵本の「どの位置」にいるのか、周りに「どんな景色」があるのかは全く分からない（ゼロ知識）。<br>
+      しかし、穴からウォーリーが見えている以上、<strong>「あなたが見つけた」ことは100%信じざるを得ない（証明完了）！</strong>
+    </div>
+  </div>
+</div>
+
+<h2>2. ネット投票や年齢確認への応用</h2>
+<p>
+  この「ウォーリー」を「あなたの個人情報」に置き換えてみてください。現在のシステムでは「18歳以上です」と証明するために、免許証の画像など（秘密）を丸ごとサーバーに見せる必要がありますが、ZKPを使えばこれが劇的に変わります。
+</p>
+
+<!-- 図解：ネット投票のフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">ゼロ知識証明を使ったネット投票のイメージ</div>
+  <div class="vote-diagram">
+    
+    <div class="vd-user">
+      <span style="font-weight:900; color:#1e3a8a;">📱 ユーザー（スマホ端末）</span>
+      <div class="vd-secret">
+        🔒 決して明かさない秘密：<br>名前、住所、生年月日、マイナンバー
+      </div>
+    </div>
+
+    <div class="vd-arrow">
+      <span>手元のスマホ内でZKPの暗号計算を実行</span><br>⬇
+    </div>
+
+    <div class="vd-proof">
+      【数学的な証明データのみ生成】<br>
+      <span style="font-size:0.7em; color:#64748b;">(※個人情報は一切含まれない文字列)</span>
+    </div>
+
+    <div class="vd-arrow">
+      <span>証明データだけを送信</span><br>⬇
+    </div>
+
+    <div class="vd-server">
+      <span style="font-weight:900; color:#334155;">🏢 管理サーバー（国・自治体）</span>
+      <div class="vd-ok">
+        「誰かは全く分からないが、<br>確実に投票権を持った1人の人間だ！」<br>➡ 匿名で投票を受付！
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. ZKPが満たす「3つの絶対条件」</h2>
+<p>
+  この技術が「ゼロ知識証明」として数学的に成立するためには、以下の3つのルールを必ずクリアしている必要があります。
+</p>
+
+<!-- 図解：3つの条件 -->
+<div class="diagram-container">
+  <div class="condition-grid">
+    
+    <div class="cond-card card-comp">
+      <span class="cc-title">① 完全性 (Completeness)</span>
+      <span class="cc-sub">真なら必ず証明できる</span>
+      <div class="cc-desc">あなたが本当に条件を満たしている（真である）なら、システムは検証をパスし、必ず「OK」を出します。正しい人が拒否されることはありません。</div>
+    </div>
+
+    <div class="cond-card card-sound">
+      <span class="cc-title">② 健全性 (Soundness)</span>
+      <span class="cc-sub">偽なら絶対に誤魔化せない</span>
+      <div class="cc-desc">もしあなたが年齢を偽っていたり、嘘をついている（偽である）なら、システムはどんな確率の偶然があっても絶対に騙されません。不正は必ず見抜かれます。</div>
+    </div>
+
+    <div class="cond-card card-zk">
+      <span class="cc-title">③ ゼロ知識性 (Zero-Knowledge)</span>
+      <span class="cc-sub">秘密は絶対に漏れない</span>
+      <div class="cc-desc">検証を行うシステム側は、「条件を満たしている」という事実以外、あなたの情報（秘密）を1ビットも得ることができません。</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策・実務での関連キーワード</h2>
+<p>
+  ゼロ知識証明は、ブロックチェーン（仮想通貨）やプライバシー保護の文脈で近年非常によく出題されるようになっています。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">キーワード</th>
+      <th>関連する技術と利用シーン</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold; background:#f8fafc;">ゼロ知識証明<br><span style="font-size:0.8em; font-weight:normal;">(ZKP)</span></td>
+      <td><strong>「パスワードそのものを送らずに、パスワードを知っていることを証明する」</strong>ような認証方式や、仮想通貨（誰が誰にいくら送金したかを隠す技術）で使われます。</td>
+    </tr>
+    <tr>
+      <td style="color:#6d28d9; font-weight:bold; background:#f8fafc;">ブラインド署名</td>
+      <td>電子投票や電子マネーでよく使われる別の技術です。「中身を見ずに署名（ハンコ）だけを押してもらう」ことで、発行者から利用者の匿名性を守ります。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
