@@ -1,5 +1,20 @@
 [
   {
+    "id": "blog-zero-knowledge-proof",
+    "category": "blog",
+    "timestamp": "2026-03-10T21:52:56+09:00",
+    "title": "ゼロ知識証明の巧妙な技術について",
+    "summary": "ゼロ知識証明は、秘密を明かさずに情報を証明する技術です。",
+    "tags": [],
+    "taxonomy": [
+      "journal",
+      "note"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "blog/posts/2026-03-10-blog-zero-knowledge-proof/"
+  },
+  {
     "id": "ap-memory-address-calculation",
     "category": "ap",
     "timestamp": "2026-03-10T20:16:52+09:00",
