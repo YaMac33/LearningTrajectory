@@ -1,5 +1,20 @@
 [
   {
+    "id": "blog-blind-signature",
+    "category": "blog",
+    "timestamp": "2026-03-10T21:59:14+09:00",
+    "title": "ブラインド署名の仕組みについてメモ",
+    "summary": "ブラインド署名は電子投票の匿名性を保つための技術です。",
+    "tags": [],
+    "taxonomy": [
+      "journal",
+      "note"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "blog/posts/2026-03-10-blog-blind-signature/"
+  },
+  {
     "id": "blog-zero-knowledge-proof",
     "category": "blog",
     "timestamp": "2026-03-10T21:52:56+09:00",
