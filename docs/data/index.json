@@ -1,5 +1,20 @@
 [
   {
+    "id": "blog-ultimate-voting-system",
+    "category": "blog",
+    "timestamp": "2026-03-10T22:30:42+09:00",
+    "title": "究極のネット投票システムの全貌",
+    "summary": "ネット投票の5つのフェーズを解説します。",
+    "tags": [],
+    "taxonomy": [
+      "journal",
+      "note"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "blog/posts/2026-03-10-blog-ultimate-voting-system/"
+  },
+  {
     "id": "blog-prevent-buying",
     "category": "blog",
     "timestamp": "2026-03-10T22:23:49+09:00",
