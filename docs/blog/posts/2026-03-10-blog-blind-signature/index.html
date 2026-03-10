@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ブラインド署名とは？電子的な封筒による匿名投票の仕組み</title>
+  <meta name="description" content="ネット投票の匿名性を守る暗号技術「ブラインド署名」について解説。「カーボン紙付きの封筒」の例えを用いた仕組みの図解や、ゼロ知識証明・ブロックチェーンとの組み合わせについてわかりやすくまとめます。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ブラインド署名とは？電子的な封筒による匿名投票の仕組み" />
+  <meta property="og:description" content="ネット投票の匿名性を守る暗号技術「ブラインド署名」について解説。「カーボン紙付きの封筒」の例えを用いた仕組みの図解や、ゼロ知識証明・ブロックチェーンとの組み合わせについてわかりやすくまとめます。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* カーボン紙付き封筒のステップフロー */
+    .step-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .step-row {
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .step-num {
+      background: #334155;
+      color: #fff;
+      padding: 15px;
+      font-weight: 900;
+      font-size: 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      flex-shrink: 0;
+    }
+    .step-content {
+      padding: 15px;
+      flex: 1;
+    }
+    .step-title {
+      font-weight: 900;
+      color: #1e293b;
+      margin-bottom: 5px;
+      font-size: 1.05em;
+    }
+    .step-desc {
+      font-size: 0.85em;
+      color: #475569;
+      line-height: 1.5;
+    }
+    
+    .step-visual {
+      background: #f8fafc;
+      padding: 15px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #334155;
+      text-align: center;
+      border-left: 1px solid #e2e8f0;
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    /* 封筒と投票用紙のビジュアル */
+    .sv-envelope {
+      background: #fef08a; border: 2px solid #eab308; padding: 10px 20px; border-radius: 4px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; max-width: 120px;
+    }
+    .sv-envelope::before { content: "✉ 封筒 (外側)"; font-size: 0.85em; color: #a16207; }
+    
+    .sv-paper {
+      background: #fff; border: 1px dashed #94a3b8; padding: 10px 20px; border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; max-width: 120px;
+    }
+    .sv-paper::before { content: "📄 投票用紙"; font-size: 0.85em; color: #475569; display: block; margin-bottom: 5px;}
+    
+    .sv-stamp {
+      position: absolute; bottom: -10px; right: -10px; background: #fef2f2; color: #ef4444; border: 2px solid #ef4444; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7em; transform: rotate(-15deg); font-weight: 900; z-index: 2;
+    }
+    .sv-stamp-inner {
+      color: #ef4444; border: 2px solid #ef4444; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 0.9em; margin-left: auto; transform: rotate(-15deg); font-weight: 900;
+    }
+
+    /* 選挙システムの役割分担図解 */
+    .system-divide {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .sd-server {
+      flex: 1;
+      min-width: 250px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .svr-auth { border-color: #3b82f6; }
+    .svr-vote { border-color: #10b981; }
+    
+    .sd-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 10px; }
+    .sd-icon { font-size: 2em; }
+    .sd-title { font-weight: 900; font-size: 1.1em; }
+    .svr-auth .sd-title { color: #1d4ed8; }
+    .svr-vote .sd-title { color: #047857; }
+
+    .sd-knows { font-size: 0.85em; background: #f8fafc; padding: 10px; border-radius: 6px; margin-bottom: 15px; }
+    .sd-knows ul { padding-left: 20px; margin: 5px 0 0 0; color: #475569; }
+    .sd-knows li { margin-bottom: 5px; }
+    
+    .sd-desc { font-size: 0.85em; color: #475569; line-height: 1.5; }
+
+    /* 組み合わせ技術のカード */
+    .tech-combo {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .combo-card {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-top-width: 4px;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cc-auth { border-top-color: #3b82f6; }
+    .cc-secret { border-top-color: #f59e0b; }
+    .cc-protect { border-top-color: #8b5cf6; }
+
+    .cc-role { font-size: 0.8em; font-weight: bold; color: #64748b; margin-bottom: 5px; }
+    .cc-tech { font-weight: 900; font-size: 1.1em; color: #1e293b; margin-bottom: 10px; }
+    .cc-desc { font-size: 0.8em; color: #475569; line-height: 1.5; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ブラインド署名とは？電子的な封筒による匿名投票の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#電子投票</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ネット投票を実現するための最大の壁は、「確実に本人確認をすること（二重投票の防止）」と「誰が誰に投票したかを絶対に秘密にすること（匿名性）」という、一見矛盾する2つの要件を同時に満たすことです。<br>
+これを解決する非常に賢い暗号技術<strong>「ブラインド署名（Blind Signature）」</strong>の仕組みを解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  ブラインド署名とは、<strong>中身（データ）を隠したまま、管理者から『正当なものである』というハンコ（電子署名）をもらう技術</strong>です。電子的な「カーボン紙付きの封筒」によく例えられます。
+</div>
+
+<h2>1. 「カーボン紙付きの封筒」の例え</h2>
+<p>
+  あなたが実際の選挙管理委員会に行って、絶対に誰にもバレずに「候補者X」に投票したいとします。その際の手順を4つのステップで見てみましょう。
+</p>
+
+<!-- 図解：ステップフロー -->
+<div class="diagram-container">
+  <div class="diagram-title">ブラインド署名の仕組み（カーボン紙付き封筒）</div>
+  <div class="step-flow">
+    
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">封入（データを隠す）</div>
+        <div class="step-desc">あなたは「候補者X」と書いた投票用紙を、中が透けない特殊な封筒に入れます。この封筒の内側には、上からなぞると下に写る「カーボン紙」が貼ってあります。</div>
+      </div>
+      <div class="step-visual">
+        <div class="sv-envelope"></div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#3b82f6;">2</div>
+      <div class="step-content">
+        <div class="step-title">署名（ハンコをもらう）</div>
+        <div class="step-desc">身分証と一緒に封筒を委員会に提出します。委員会は「有権者であること」は確認できますが、封筒の中身は見えません。確認後、委員会は<strong>封筒の外側から「投票権利アリ」のハンコ</strong>を押して返してくれます。</div>
+      </div>
+      <div class="step-visual">
+        <div class="sv-envelope">
+          <div class="sv-stamp">公認</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#f59e0b;">3</div>
+      <div class="step-content">
+        <div class="step-title">開封（封筒から出す）</div>
+        <div class="step-desc">家に帰り、封筒を開けて投票用紙を取り出します。カーボン紙の仕組みにより、委員会は中身を見ていないのに、<strong>委員会の本物のハンコが押された「候補者X」という投票用紙</strong>が完成します。</div>
+      </div>
+      <div class="step-visual">
+        <div class="sv-paper">
+          <span style="font-weight:bold; color:#1e293b;">候補者 X</span>
+          <div class="sv-stamp-inner">公認</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-num" style="background:#10b981;">4</div>
+      <div class="step-content">
+        <div class="step-title">投票（匿名で提出）</div>
+        <div class="step-desc">あなたは、自分の名前を一切書かずに、その「ハンコ付きの投票用紙」だけをこっそり投票箱に入れます。ハンコがあるので不正な票ではないと証明されつつ、誰が入れたかは絶対に分かりません。</div>
+      </div>
+      <div class="step-visual">
+        <span style="font-size:2em;">🗳️</span><br>
+        <span style="color:#047857; font-weight:bold;">正当な匿名票</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 選挙システムでの役割分担</h2>
+<p>
+  この仕組みの最大のポイントは、システムにおいて<strong>「本人確認をする係」と「票を集計する係」を完全に切り離せる</strong>ことです。
+</p>
+
+<!-- 図解：システム構造 -->
+<div class="diagram-container">
+  <div class="diagram-title">「本人確認」と「集計」の分離</div>
+  <div class="system-divide">
+    
+    <!-- 本人確認サーバー -->
+    <div class="sd-server svr-auth">
+      <div class="sd-header">
+        <span class="sd-icon">🏛️</span>
+        <span class="sd-title">本人確認サーバー<br><span style="font-size:0.7em; font-weight:normal; color:#475569;">(選挙管理委員会)</span></span>
+      </div>
+      <div class="sd-knows">
+        <strong>【知っていること】</strong>
+        <ul>
+          <li>✔ 誰がハンコをもらいに来たか</li>
+          <li>✔ 二重投票していないか</li>
+        </ul>
+        <strong style="color:#ef4444;">【知らないこと】</strong>
+        <ul>
+          <li style="color:#ef4444;">❌ 誰に投票するつもりか</li>
+        </ul>
+      </div>
+      <div class="sd-desc">封筒（暗号化されたデータ）の外側から、システムが電子署名を付与する役割だけを担います。</div>
+    </div>
+
+    <!-- 投票箱サーバー -->
+    <div class="sd-server svr-vote">
+      <div class="sd-header">
+        <span class="sd-icon">🗳️</span>
+        <span class="sd-title">投票箱サーバー<br><span style="font-size:0.7em; font-weight:normal; color:#475569;">(集計係)</span></span>
+      </div>
+      <div class="sd-knows">
+        <strong>【知っていること】</strong>
+        <ul>
+          <li>✔ 誰に投票された票か</li>
+          <li>✔ 委員会の本物のハンコがあるか</li>
+        </ul>
+        <strong style="color:#ef4444;">【知らないこと】</strong>
+        <ul>
+          <li style="color:#ef4444;">❌ この票を誰が入れたのか</li>
+        </ul>
+      </div>
+      <div class="sd-desc">送られてきた票を開票します。本物の署名があるので不正投票（偽造）は弾けますが、匿名で届くため個人は特定できません。</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 未来のネット投票を支える「3つの技術」</h2>
+<p>
+  現実のネット投票システムを構築するには、ブラインド署名だけでなく、他の最新技術との組み合わせが必要になります。
+</p>
+
+<div class="diagram-container">
+  <div class="tech-combo">
+    <div class="combo-card cc-auth">
+      <span class="cc-role">① 本人確認の壁</span>
+      <span class="cc-tech">マイナンバーカード<br><span style="font-size:0.7em;">(電子証明書)</span></span>
+      <div class="cc-desc">実在する有権者であり、本人であることを厳格に証明する。</div>
+    </div>
+    <div class="combo-card cc-secret">
+      <span class="cc-role">② 秘密投票の壁</span>
+      <span class="cc-tech">ブラインド署名<br><span style="font-size:0.7em;">(または ゼロ知識証明)</span></span>
+      <div class="cc-desc">「本人情報」と「投票内容」を完全に切り離し、紐づかないようにする。</div>
+    </div>
+    <div class="combo-card cc-protect">
+      <span class="cc-role">③ データ保護の壁</span>
+      <span class="cc-tech">ブロックチェーン<br><span style="font-size:0.7em;">(分散型台帳)</span></span>
+      <div class="cc-desc">集まった「誰が書いたか分からないが正当な票」を記録し、改ざんを不可能にする。</div>
+    </div>
+  </div>
+</div>
+
+<h2>試験対策まとめ：ZKPとの違い</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">技術</th>
+      <th>目的・キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#f59e0b; font-weight:bold; background:#f8fafc;">ブラインド署名<br><span style="font-size:0.8em; font-weight:normal;">(Blind Signature)</span></td>
+      <td><strong>「中身を見せずに署名（ハンコ）だけをもらう」</strong>技術。電子投票や電子マネーの匿名性を守るために使われる。</td>
+    </tr>
+    <tr>
+      <td style="color:#3b82f6; font-weight:bold; background:#f8fafc;">ゼロ知識証明<br><span style="font-size:0.8em; font-weight:normal;">(ZKP)</span></td>
+      <td><strong>「秘密の情報を教えずに、自分がその秘密を知っていることだけを証明する」</strong>技術。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
