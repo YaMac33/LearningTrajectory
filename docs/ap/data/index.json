@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-memory-address-calculation",
+    "category": "ap",
+    "timestamp": "2026-03-10T20:16:52+09:00",
+    "title": "画像データのメモリアドレス計算のコツ",
+    "summary": "画像データのVRAMアドレス計算問題について解説し、2次元から1次元への変換発想を理解できるようにする内容です。",
+    "tags": [
+      "アルゴリズム",
+      "メモリ管理",
+      "計算問題",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "アルゴリズムとデータ構造"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-10-ap-memory-address-calculation/"
+  },
+  {
     "id": "ap-logarithm-change",
     "category": "ap",
     "timestamp": "2026-03-10T19:06:49+09:00",
