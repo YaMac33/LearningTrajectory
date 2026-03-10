@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | TorとMixネット：IPアドレスを隠す匿名通信の仕組み</title>
+  <meta name="description" content="送信元のIPアドレスを隠蔽する匿名通信技術「Tor（オニオンルーティング）」と「Mixネット」の仕組みを図解。ブラインド署名やブロックチェーンと組み合わせた究極のネット投票システムの全体像も解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="TorとMixネット：IPアドレスを隠す匿名通信の仕組み" />
+  <meta property="og:description" content="送信元のIPアドレスを隠蔽する匿名通信技術「Tor（オニオンルーティング）」と「Mixネット」の仕組みを図解。ブラインド署名やブロックチェーンと組み合わせた究極のネット投票システムの全体像も解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 矢印共通 */
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Torの図解 */
+    .tor-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 600px;
+    }
+    .tf-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100px;
+    }
+    .tf-label { font-weight: bold; color: #334155; font-size: 0.85em; margin-bottom: 5px; }
+    .tf-sub { font-size: 0.7em; color: #64748b; }
+    
+    .onion-container {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .onion {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid;
+    }
+    .layer3 { width: 70px; height: 70px; background: #c4b5fd; border-color: #8b5cf6; }
+    .layer2 { width: 50px; height: 50px; background: #ddd6fe; border-color: #a78bfa; }
+    .layer1 { width: 30px; height: 30px; background: #ede9fe; border-color: #c4b5fd; font-size: 0.8em; }
+    .core-data { background: #fff; border: 2px dashed #94a3b8; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 0.8em; }
+
+    .tf-server {
+      background: #eff6ff; border: 2px solid #3b82f6; padding: 15px; border-radius: 8px; font-weight: bold; color: #1d4ed8; font-size: 0.9em;
+    }
+
+    /* Mixネットの図解 */
+    .mix-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      min-width: 500px;
+    }
+    .mf-data-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .data-item {
+      padding: 5px 15px;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.85em;
+      text-align: center;
+    }
+    .c-red { background: #ef4444; }
+    .c-blue { background: #3b82f6; }
+    .c-green { background: #10b981; }
+
+    .mf-server {
+      background: #1e293b;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 900;
+      border: 3px solid #cbd5e1;
+      position: relative;
+    }
+    .mf-server::after {
+      content: "🔄 シャッフル";
+      display: block;
+      margin-top: 10px;
+      color: #a7f3d0;
+      font-size: 0.9em;
+    }
+
+    /* 究極のシステムの全体像 */
+    .ultimate-system {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .us-step {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .step-auth { border-left-color: #3b82f6; }
+    .step-blind { border-left-color: #8b5cf6; }
+    .step-tor { border-left-color: #f59e0b; }
+    .step-bc { border-left-color: #10b981; }
+
+    .us-icon { font-size: 2em; width: 60px; text-align: center; }
+    .us-content { flex: 1; }
+    .us-title { font-weight: 900; color: #1e293b; font-size: 1.05em; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+    .us-tech { font-size: 0.75em; background: #f1f5f9; padding: 2px 8px; border-radius: 12px; color: #475569; }
+    .us-desc { font-size: 0.85em; color: #475569; line-height: 1.5; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">TorとMixネット：IPアドレスを隠す匿名通信の仕組み</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#ネットワーク</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#匿名通信</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ブラインド署名などで「中身が誰のものかわからない完璧なデータ」を作れたとしても、それを自分の家のWi-Fiやスマホから直接送信してしまうと、<strong>「IPアドレス（ネット上の住所）」という痕跡</strong>から送信者が特定されてしまいます。<br>
+このデータの送信経路すらも完全に匿名化する2つの技術を解説します。</p>
+<hr>
+
+<div class="question-box">
+  【IPアドレスを隠すには？】<br>
+  「差出人不明の手紙を、自分の家のポストから投函して防犯カメラに映ってしまう」のを防ぐため、<strong>世界中の見知らぬ人たち（中継サーバー）に何度もバケツリレーをしてもらい、出どころを分からなくする技術</strong>です。
+</div>
+
+<h2>1. Tor（オニオンルーティング）：玉ねぎの皮むき</h2>
+<p>
+  Tor（The Onion Router）は、インターネット上の身元隠蔽ツールとして最も有名な技術です。Onion（玉ねぎ）という名前の通り、データを何重もの暗号化の層で包み込みます。
+</p>
+
+<!-- 図解：Torの通信フロー -->
+<div class="diagram-container" style="overflow-x: auto;">
+  <div class="diagram-title">Torの仕組み（マトリョーシカのような暗号化）</div>
+  <div class="tor-flow">
+    
+    <div class="tf-node">
+      <div class="onion-container">
+        <div class="onion layer3">
+          <div class="onion layer2">
+            <div class="onion layer1">✉️</div>
+          </div>
+        </div>
+      </div>
+      <span class="tf-label">送信者</span>
+      <span class="tf-sub">(暗号を3重にかける)</span>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <div class="tf-node">
+      <div class="onion-container">
+        <div class="onion layer2">
+          <div class="onion layer1">✉️</div>
+        </div>
+      </div>
+      <span class="tf-label">中継ノード A</span>
+      <span class="tf-sub">(一番外の皮だけ剥く)</span>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <div class="tf-node">
+      <div class="onion-container">
+        <div class="onion layer1">✉️</div>
+      </div>
+      <span class="tf-label">中継ノード B</span>
+      <span class="tf-sub">(さらに皮を剥く)</span>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <div class="tf-node">
+      <div class="onion-container">
+        <div class="core-data">✉️</div>
+      </div>
+      <span class="tf-label">出口ノード C</span>
+      <span class="tf-sub">(最後の皮を剥く)</span>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <div class="tf-server">
+      🏢 最終目的地<br>
+      <span style="font-size:0.8em; font-weight:normal; color:#475569;">「データは『C』から来たな。<br>元の送信者は分からないぞ」</span>
+    </div>
+
+  </div>
+</div>
+<p style="font-size:0.85em; color:#475569; font-weight:bold;">
+  💡 各ノードは「自分の一つ前」と「自分の一つ先」しか知りません。そのため、誰も「最初の送信者から最終目的地までの全ルート」を把握することができなくなります。
+</p>
+
+<h2>2. Mixネット：最強のシャッフルマシーン</h2>
+<p>
+  電子投票の分野などで特に研究されているのが「Mixネット」です。こちらは通信経路の途中でデータを一旦ためて、<strong>「まとめて混ぜる（シャッフルする）」</strong>ことに特化しています。
+</p>
+
+<!-- 図解：Mixネットのフロー -->
+<div class="diagram-container" style="overflow-x: auto;">
+  <div class="diagram-title">Mixネットの仕組み（巨大なカプセルトイ）</div>
+  <div class="mix-flow">
+    
+    <div class="mf-data-group">
+      <span style="font-size:0.8em; color:#64748b; font-weight:bold; text-align:center;">送信順</span>
+      <div class="data-item c-red">データ A (1番)</div>
+      <div class="data-item c-blue">データ B (2番)</div>
+      <div class="data-item c-green">データ C (3番)</div>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <div class="mf-server">
+      Mix サーバー<br>
+      <span style="font-size:0.6em; font-weight:normal;">(一定数たまるまで待機)</span>
+    </div>
+
+    <div class="flow-arrow">➡</div>
+
+    <div class="mf-data-group">
+      <span style="font-size:0.8em; color:#64748b; font-weight:bold; text-align:center;">出力順</span>
+      <div class="data-item c-blue">データ B</div>
+      <div class="data-item c-green">データ C</div>
+      <div class="data-item c-red">データ A</div>
+    </div>
+
+  </div>
+</div>
+<p style="font-size:0.85em; color:#475569; font-weight:bold;">
+  💡 もしハッカーが通信経路をすべて盗聴していたとしても、サーバーの中で順番がランダムに入れ替わるため、「入力されたデータ」と「出力されたデータ」の対応関係が誰にも追跡できなくなります。
+</p>
+
+<h2>3. 【総まとめ】究極のネット投票システムの全体像</h2>
+<p>
+  ここまで学習してきたセキュリティ技術をすべて組み合わせると、理論上、以下のような完璧なネット投票システムが完成します。
+</p>
+
+<!-- 図解：究極のシステムの全体像 -->
+<div class="diagram-container">
+  <div class="ultimate-system">
+    
+    <div class="us-step step-auth">
+      <div class="us-icon">🆔</div>
+      <div class="us-content">
+        <div class="us-title">1. 確実な本人確認 <span class="us-tech">マイナンバーカード / PKI</span></div>
+        <div class="us-desc">電子証明書を用いて、「実在する有権者であり、二重投票ではないこと」を厳格に証明します。</div>
+      </div>
+    </div>
+
+    <div class="us-step step-blind">
+      <div class="us-icon">✉️</div>
+      <div class="us-content">
+        <div class="us-title">2. 投票の秘密（内容の隠蔽） <span class="us-tech">ブラインド署名 / ZKP</span></div>
+        <div class="us-desc">「誰が」という個人情報と、「誰に」という投票内容を完全に切り離し、中身を見せずに「正当な票である」というハンコだけをもらいます。</div>
+      </div>
+    </div>
+
+    <div class="us-step step-tor">
+      <div class="us-icon">🧅</div>
+      <div class="us-content">
+        <div class="us-title">3. 経路の匿名化 <span class="us-tech">Tor / Mixネット</span></div>
+        <div class="us-desc">出来上がったハンコ付きの匿名票を送信する際、IPアドレスから身元がバレないように、通信経路を暗号化・シャッフルして投票箱へ届けます。</div>
+      </div>
+    </div>
+
+    <div class="us-step step-bc">
+      <div class="us-icon">⛓️</div>
+      <div class="us-content">
+        <div class="us-title">4. データの保護と集計 <span class="us-tech">ブロックチェーン</span></div>
+        <div class="us-desc">投票箱に集まった「誰が書いたか分からないが100%正当な票」を分散型台帳に記録し、事後的な改ざんを不可能にします。</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ：匿名通信のキーワード</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">技術</th>
+      <th>特徴とキーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold; background:#f8fafc;">Tor<br><span style="font-size:0.8em; font-weight:normal;">(The Onion Router)</span></td>
+      <td><strong>「玉ねぎ」</strong>のようにデータを多重に暗号化し、複数の中継ノードを経由させることで、<strong>送信元のIPアドレスを隠蔽する</strong>技術。</td>
+    </tr>
+    <tr>
+      <td style="color:#b45309; font-weight:bold; background:#f8fafc;">Mixネット</td>
+      <td>複数から受け取ったメッセージを一定数蓄積し、<strong>暗号化を解いて「順序をランダムに並べ替え（シャッフル）」てから出力する</strong>ことで、入力と出力の対応関係を断ち切る技術。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
