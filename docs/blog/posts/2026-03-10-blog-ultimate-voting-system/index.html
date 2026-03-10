@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 究極のネット投票システム：5つのフェーズと全体像</title>
+  <meta name="description" content="「厳格な本人確認」と「絶対的な匿名性」を両立させる究極のネット投票システム。マイナンバーカード、ブラインド署名、Tor、ブロックチェーンなど、これまでの暗号技術を総動員した全体像を図解で解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="究極のネット投票システム：5つのフェーズと全体像" />
+  <meta property="og:description" content="「厳格な本人確認」と「絶対的な匿名性」を両立させる究極のネット投票システム。マイナンバーカード、ブラインド署名、Tor、ブロックチェーンなど、これまでの暗号技術を総動員した全体像を図解で解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 5フェーズのプロセスフロー */
+    .system-phases {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-left: 30px;
+    }
+    /* 縦の線 */
+    .system-phases::before {
+      content: "";
+      position: absolute;
+      top: 20px;
+      bottom: 20px;
+      left: 14px;
+      width: 4px;
+      background: #cbd5e1;
+      border-radius: 2px;
+    }
+
+    .phase-item {
+      position: relative;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .phase-item:last-child { margin-bottom: 0; }
+
+    /* ドット */
+    .phase-item::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -25px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border: 4px solid;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+
+    /* 色分け */
+    .ph-1 { border-color: #3b82f6; } .ph-1::before { border-color: #3b82f6; }
+    .ph-2 { border-color: #8b5cf6; } .ph-2::before { border-color: #8b5cf6; }
+    .ph-3 { border-color: #f59e0b; } .ph-3::before { border-color: #f59e0b; }
+    .ph-4 { border-color: #10b981; } .ph-4::before { border-color: #10b981; }
+    .ph-5 { border-color: #ef4444; } .ph-5::before { border-color: #ef4444; }
+
+    .ph-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .ph-num {
+      font-size: 0.8em;
+      font-weight: 900;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .ph-1 .ph-num { background: #3b82f6; }
+    .ph-2 .ph-num { background: #8b5cf6; }
+    .ph-3 .ph-num { background: #f59e0b; }
+    .ph-4 .ph-num { background: #10b981; }
+    .ph-5 .ph-num { background: #ef4444; }
+
+    .ph-title {
+      font-weight: 900;
+      font-size: 1.1em;
+      color: #1e293b;
+    }
+
+    .ph-tech {
+      font-size: 0.85em;
+      font-weight: bold;
+      background: #f1f5f9;
+      border: 1px dashed #94a3b8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      color: #334155;
+      margin-bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ph-tech span { color: #64748b; }
+
+    .ph-desc {
+      font-size: 0.9em;
+      color: #475569;
+      line-height: 1.6;
+    }
+    .ph-desc strong { color: #1e293b; }
+
+    /* 解決する壁のハイライト */
+    .ph-solve {
+      margin-top: 10px;
+      font-size: 0.85em;
+      font-weight: bold;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ph-1 .ph-solve { background: #eff6ff; color: #1d4ed8; }
+    .ph-2 .ph-solve { background: #f5f3ff; color: #6d28d9; }
+    .ph-3 .ph-solve { background: #fffbeb; color: #b45309; }
+    .ph-4 .ph-solve { background: #ecfdf5; color: #047857; }
+    .ph-5 .ph-solve { background: #fef2f2; color: #b91c1c; }
+
+    /* まとめメッセージ */
+    .conclusion-box {
+      background: #1e293b;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 20px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+    .c-title { font-weight: 900; font-size: 1.2em; color: #38bdf8; margin-bottom: 10px; display: block; }
+    .c-text { font-size: 0.95em; line-height: 1.6; color: #cbd5e1; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">究極のネット投票システム：5つのフェーズと全体像</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#電子投票</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#ブロックチェーン</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「厳格な本人確認」と「絶対的な匿名性」という、本来なら矛盾する２つの課題。これまで学習してきたすべての暗号技術のピースを組み合わせることで見えてくる、見事なまでに美しい未来の選挙システムの全体像を解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  究極のネット投票とは、<strong>「PKI」から始まり、「ブラインド署名」で票を作り、「Tor」で運び、「ブロックチェーン」で守り抜く</strong>という、人類の暗号技術の集大成とも言えるシステムです。
+</div>
+
+<h2>ネット投票を完成させる5つのフェーズ</h2>
+<p>
+  有権者がスマホを開いてから、その一票が安全に集計されるまでの流れを、5つのフェーズ（段階）で追ってみましょう。
+</p>
+
+<!-- 図解：5フェーズのプロセス -->
+<div class="diagram-container">
+  <div class="system-phases">
+    
+    <!-- フェーズ1 -->
+    <div class="phase-item ph-1">
+      <div class="ph-header">
+        <span class="ph-num">フェーズ 1</span>
+        <span class="ph-title">ログインと本人確認（入り口のチェック）</span>
+      </div>
+      <div class="ph-tech"><span>🔑 活用技術：</span> マイナンバーカード / 公的個人認証サービス (PKI)</div>
+      <div class="ph-desc">
+        スマホにカードをかざし、パスワードを入力します。ここで「あなたが実在する有権者であり、まだこの選挙で投票していないこと（二重投票の防止）」をシステム（選挙管理委員会）に証明します。
+      </div>
+      <div class="ph-solve">🛡️ 越える壁： 偽造・なりすまし・二重投票の防止</div>
+    </div>
+
+    <!-- フェーズ2 -->
+    <div class="phase-item ph-2">
+      <div class="ph-header">
+        <span class="ph-num">フェーズ 2</span>
+        <span class="ph-title">投票データの作成（中身を隠してハンコをもらう）</span>
+      </div>
+      <div class="ph-tech"><span>✉️ 活用技術：</span> ブラインド署名 / ゼロ知識証明 (ZKP)</div>
+      <div class="ph-desc">
+        自分が誰に投票したかというデータを暗号化し、「中身が見えない状態」でシステムに提出します。システムは「正当な有権者からのデータである」という証明の電子署名（ハンコ）だけを押し、あなたに返却します。これで<strong>「誰が作ったかは分からないが、100%有効な票」</strong>が完成します。
+      </div>
+      <div class="ph-solve">🛡️ 越える壁： 投票内容の秘密（誰に投票したかをシステムにも隠す）</div>
+    </div>
+
+    <!-- フェーズ3 -->
+    <div class="phase-item ph-3">
+      <div class="ph-header">
+        <span class="ph-num">フェーズ 3</span>
+        <span class="ph-title">匿名でのデータ送信（足跡を消す）</span>
+      </div>
+      <div class="ph-tech"><span>🧅 活用技術：</span> Tor (オニオンルーティング) / Mixネット</div>
+      <div class="ph-desc">
+        完成した票をそのまま送信すると、IPアドレス（ネット上の住所）で身元がバレてしまいます。そのため、データを世界中の複数の中継サーバーで「シャッフル」したり「何重にも暗号化」したりしてから投票箱サーバーに届けます。
+      </div>
+      <div class="ph-solve">🛡️ 越える壁： 通信経路からの身元特定（IPアドレスの隠蔽）</div>
+    </div>
+
+    <!-- フェーズ4 -->
+    <div class="phase-item ph-4">
+      <div class="ph-header">
+        <span class="ph-num">フェーズ 4</span>
+        <span class="ph-title">改ざん防止と集計（透明な投票箱）</span>
+      </div>
+      <div class="ph-tech"><span>⛓️ 活用技術：</span> ブロックチェーン / ハッシュ関数</div>
+      <div class="ph-desc">
+        投票箱サーバーに届いた「有効なハンコ付きの匿名票」を開票し、その結果をブロックチェーン（分散型台帳）に記録します。ブロックチェーン上のデータは世界中から監視されているため、事後的な改ざんや票の削除が実質不可能になります。
+      </div>
+      <div class="ph-solve">🛡️ 越える壁： サーバー攻撃による票の書き換えや集計不正</div>
+    </div>
+
+    <!-- フェーズ5 -->
+    <div class="phase-item ph-5">
+      <div class="ph-header">
+        <span class="ph-num">フェーズ 5</span>
+        <span class="ph-title">強要と買収の防止（人間の悪意への対策）</span>
+      </div>
+      <div class="ph-tech"><span>🧠 活用技術：</span> 上書き投票 / ダミー暗証番号 / レシートフリー性</div>
+      <div class="ph-desc">
+        「誰が誰に投票したか」を証明する画面（レシート）を絶対に発行しないことで買収を無効化します。さらに、誰かに監視されながら強制的に投票させられても、後から「何度でも上書き投票」ができるようにシステムを設計します。
+      </div>
+      <div class="ph-solve">🛡️ 越える壁： 物理的な脅迫や金銭による票の売買</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>パズルの完成</h2>
+
+<div class="diagram-container">
+  <div class="conclusion-box">
+    <span class="c-title">✨ これが「トラスト・レス（誰も信じなくていい）」システム</span>
+    <p class="c-text">
+      「電子署名が選挙に使えるのでは？」「ブロックチェーンで改ざんを防げるのでは？」という直感から始まった学習が、ついに一つの完璧なシステムとして結実しました。<br><br>
+      このシステムの最も美しい点は、<strong>「選挙管理委員会すら信じる必要がない（トラスト・レス）」</strong>ということです。暗号と数学の力だけで、システム管理者の不正すらも防ぐことができる。これが、私たちが生きている間に実現するかもしれない「未来の民主主義のインフラ」です。
+    </p>
+  </div>
+</div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
