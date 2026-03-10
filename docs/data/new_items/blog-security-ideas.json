@@ -1,0 +1,15 @@
+{
+  "id": "blog-security-ideas",
+  "category": "blog",
+  "timestamp": "2026-03-10T22:49:03+09:00",
+  "post_path": "blog/posts/2026-03-10-blog-security-ideas/",
+  "meta": {
+    "title": "マイナンバーカードの仕組みを考える",
+    "summary": "マイナンバーカードの本人確認に関する技術的背景を解説します。",
+    "tags": [],
+    "taxonomy": [
+      "journal",
+      "note"
+    ]
+  }
+}
