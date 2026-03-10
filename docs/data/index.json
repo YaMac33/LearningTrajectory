@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-waiting-line-calculation",
+    "category": "ap",
+    "timestamp": "2026-03-10T12:41:57+09:00",
+    "title": "待ち行列計算の3大公式と逆数関係",
+    "summary": "待ち行列モデル（M/M/1）の計算問題で必要な3つの公式と、率と時間の逆数関係を解説します。試験での引っかけ対策も含まれています。",
+    "tags": [
+      "アルゴリズム",
+      "待ち行列",
+      "計算問題",
+      "基本情報",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "アルゴリズムとデータ構造"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-10-ap-waiting-line-calculation/"
+  },
+  {
     "id": "ap-pki-and-its-structure",
     "category": "ap",
     "timestamp": "2026-03-10T07:19:24+09:00",
