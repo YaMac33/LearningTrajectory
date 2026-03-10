@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 画像データとメモリアドレス計算のコツ：2次元から1次元への変換</title>
+  <meta name="description" content="画像データのVRAMアドレス計算問題の解き方を解説。画面の「2次元マス目」を「1本のテープ」に変換する発想や、ゼロオリジンの罠を避ける「(n-1)×サイズ」の考え方を図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="画像データとメモリアドレス計算のコツ：2次元から1次元への変換" />
+  <meta property="og:description" content="画像データのVRAMアドレス計算問題の解き方を解説。画面の「2次元マス目」を「1本のテープ」に変換する発想や、ゼロオリジンの罠を避ける「(n-1)×サイズ」の考え方を図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 2次元から1次元への変換図解 */
+    .memory-tape-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .screen-grid {
+      display: flex;
+      flex-direction: column;
+      border: 2px solid #cbd5e1;
+      background: #fff;
+    }
+    .grid-row {
+      display: flex;
+      height: 30px;
+    }
+    .grid-cell {
+      width: 40px;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7em;
+      color: #64748b;
+    }
+    .row-skip .grid-cell { background: #f1f5f9; }
+    .cell-target { background: #ef4444 !important; color: #fff; font-weight: bold; }
+    .cell-current { background: #dbeafe; }
+    .grid-label-left { display: flex; align-items: center; font-weight: bold; font-size: 0.8em; color: #475569; margin-right: 10px; width: 60px; justify-content: flex-end; }
+    
+    .tape-view {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+    }
+    .tape-skip {
+      background: #f1f5f9;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #64748b;
+      border-right: 2px dashed #cbd5e1;
+      flex: 3;
+    }
+    .tape-current {
+      background: #dbeafe;
+      padding: 10px;
+      text-align: center;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #1d4ed8;
+      flex: 1;
+    }
+    .tape-target {
+      background: #ef4444;
+      color: #fff;
+      padding: 10px 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 1.5em;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .flow-arrow span { font-size: 0.5em; color: #3b82f6; margin-bottom: 5px; }
+
+    /* ゼロオリジンの図解 */
+    .zero-origin-view {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+    }
+    .zo-row {
+      display: flex;
+      align-items: center;
+    }
+    .zo-label { width: 100px; font-weight: bold; font-size: 0.85em; color: #475569; text-align: right; padding-right: 15px; }
+    .zo-boxes { display: flex; gap: 2px; flex: 1; position: relative; }
+    .zo-box {
+      width: 50px; height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      border-radius: 4px; font-weight: bold;
+    }
+    .box-pixel { background: #3b82f6; color: #fff; font-size: 0.8em; }
+    .box-addr { background: #f8fafc; border: 1px solid #cbd5e1; color: #334155; font-size: 0.7em; }
+    
+    .zo-arrow-area {
+      position: absolute; top: -25px; left: 0; width: 150px; height: 20px;
+      border-top: 2px solid #ef4444; border-left: 2px solid #ef4444; border-right: 2px solid #ef4444;
+    }
+    .zo-arrow-label {
+      position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 0.75em; color: #ef4444; font-weight: bold; white-space: nowrap; background: #fff; padding: 0 5px;
+    }
+
+    /* ミニ実験図 */
+    .mini-experiment {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      gap: 2px;
+      background: #cbd5e1;
+      border: 2px solid #94a3b8;
+      padding: 2px;
+    }
+    .mini-cell {
+      background: #fff;
+      height: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7em;
+      font-weight: bold;
+      color: #334155;
+    }
+    .mc-target { background: #fef2f2; border: 2px solid #ef4444; color: #b91c1c; }
+    
+    .mini-calc {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      color: #78350f;
+    }
+    .mini-calc ul { padding-left: 20px; margin: 10px 0 0 0; }
+    .mini-calc li { margin-bottom: 5px; }
+
+    /* 公式・鉄則のハイライト */
+    .rule-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .rule-title { font-weight: 900; color: #1d4ed8; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .rule-text { font-size: 0.9em; color: #1e3a8a; line-height: 1.6; font-weight: bold; }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">画像データとメモリアドレス計算のコツ：2次元から1次元への変換</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#アルゴリズム</span>
+            <span class="tag">#メモリ管理</span>
+            <span class="tag">#計算問題</span>
+            <span class="tag">#基本情報</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>画面上のピクセル（画素）が、コンピュータのメモリ上の「何番地」に保存されているかを求める計算問題。解説を読めばわかるのに、自力では式を思いつけない…という方向けに、頭の中でどう発想を転換すればよいかを図解します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：発想の出発点】<br>
+  画像データの計算は、画面の「2次元のマス目」を<strong>「1本の長いテープ（1次元）」</strong>として脳内変換し、<strong>「目的地にたどり着くまでに、手前にあるデータをいくつ読み飛ばすか？」</strong>を考えることがすべてです。
+</div>
+
+<h2>1. 発想のコツ①：「上の行をまるごとスキップする」</h2>
+<p>
+  画面上では「下に移動する」という単純な話に見えますが、メモリは0番地から順番に<strong>一直線に並んでいます</strong>。横に割り当てていき、端（右端）まで行ったら次の行へ移るというルールです。
+</p>
+<p>
+  例として、<strong>横幅640ピクセル</strong>の画面で、<strong>座標 (x=7, y=6)</strong> にある画素が全体で何番目かを考えてみましょう。（※座標は0から始まるとします）
+</p>
+
+<!-- 図解：2次元から1次元へ -->
+<div class="diagram-container">
+  <div class="diagram-title">横書きの原稿用紙のように「1本のテープ」に引き伸ばす</div>
+  <div class="memory-tape-flow">
+    
+    <div style="display:flex;">
+      <div style="display:flex; flex-direction:column; justify-content:space-around;">
+        <span class="grid-label-left">y=0<br>|<br>y=5</span>
+        <span class="grid-label-left" style="color:#1d4ed8;">y=6</span>
+        <span class="grid-label-left">y=7...</span>
+      </div>
+      <div class="screen-grid">
+        <!-- 上のスキップ行 (イメージ) -->
+        <div class="grid-row row-skip">
+          <div class="grid-cell" style="width:280px; text-align:center;">上の 6行分 (y=0〜5) が完全に埋まっている</div>
+        </div>
+        <!-- ターゲット行 -->
+        <div class="grid-row">
+          <div class="grid-cell cell-current">x=0</div><div class="grid-cell cell-current">...</div><div class="grid-cell cell-current">x=6</div>
+          <div class="grid-cell cell-target">x=7</div>
+          <div class="grid-cell" style="width:120px;"></div>
+        </div>
+        <div class="grid-row row-skip"><div class="grid-cell" style="width:280px;"></div></div>
+      </div>
+    </div>
+
+    <div class="flow-arrow">
+      <span>これをメモリ上に並べると...</span>
+      ⬇
+    </div>
+
+    <div class="tape-view">
+      <div class="tape-skip">
+        スキップする画素<br>
+        <span style="font-size:0.8em; font-weight:normal;">(横幅640 × 6行分 = 3,840個)</span>
+      </div>
+      <div class="tape-current">
+        手前の列<br>
+        <span style="font-size:0.8em; font-weight:normal;">(x=0~6の 7個)</span>
+      </div>
+      <div class="tape-target">目的<br>(x=7)</div>
+      <div style="flex:1; background:#f8fafc;"></div>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.85em; color:#475569; margin-top:15px; font-weight:bold;">
+    上の6行分（640×6＝3840）を読み飛ばし、そこから現在の行の左端から目的の列（8列目＝7個飛ばして次）まで進むため、<br>目的の画素は「3,840 ＋ 7 ＋ 1 ＝ 3,848番目」だとわかります。
+  </p>
+</div>
+
+<h2>2. 発想のコツ②：「自分より前に何人並んでいるか？」</h2>
+<p>
+  「全体で何番目か」がわかったら、次はその画素の<strong>「開始メモリアドレス」</strong>を求めます。ここで重要になるのが、情報処理における<strong>「ゼロオリジンの罠（0から数え始めること）」</strong>を回避する「(n - 1)」という発想です。
+</p>
+
+<!-- 図解：ゼロオリジン -->
+<div class="diagram-container">
+  <div class="diagram-title">n番目の開始位置を求める「(n - 1) × サイズ」</div>
+  <div class="zero-origin-view">
+    
+    <div class="zo-row">
+      <div class="zo-label">画素の順番<br><span style="font-size:0.8em; font-weight:normal;">(人が数える時)</span></div>
+      <div class="zo-boxes">
+        <div class="zo-arrow-area"><div class="zo-arrow-label">手前に 3個 (n-1) 並んでいる</div></div>
+        <div class="zo-box box-pixel" style="margin-top:25px;">1番目</div>
+        <div class="zo-box box-pixel" style="margin-top:25px;">2番目</div>
+        <div class="zo-box box-pixel" style="margin-top:25px;">3番目</div>
+        <div class="zo-box box-pixel" style="margin-top:25px; background:#ef4444;">4番目<br>(目的)</div>
+      </div>
+    </div>
+
+    <div class="zo-row">
+      <div class="zo-label">メモリアドレス<br><span style="font-size:0.8em; font-weight:normal;">(1画素2番地とする)</span></div>
+      <div class="zo-boxes">
+        <div class="zo-box box-addr">0<br>1</div>
+        <div class="zo-box box-addr">2<br>3</div>
+        <div class="zo-box box-addr">4<br>5</div>
+        <div class="zo-box box-addr" style="border:2px solid #ef4444; background:#fffbeb;">6<br>7</div>
+      </div>
+    </div>
+
+  </div>
+  <p style="font-size:0.85em; color:#475569; margin-top:10px; font-weight:bold;">
+    1番目のデータは「0番地」からスタートします。<br>
+    4番目のデータの開始位置を知りたければ、「自分の手前にある画素数 (4 - 1 = 3個)」に「1画素のサイズ (2番地)」を掛けて、<br>「3 × 2 ＝ 6番地からスタート」と計算します。これが「(n - 1) × サイズ」の式の正体です。
+  </p>
+</div>
+
+<h2>3. 本番でパニックになった時の最強のリカバリー法</h2>
+<p>
+  試験本番で「あれ、掛けるんだっけ？足すんだっけ？(n-1)だっけ？」と迷うことは絶対にあります。「横幅640」なんて大きな数字で頭の中だけで考えるから混乱するのです。
+</p>
+
+<div class="diagram-container">
+  <div class="rule-box">
+    <div class="rule-title">💡 鉄則：余白に「超ミニサイズの図」を描いて実験する！</div>
+    <div class="rule-text">
+      本番では、問題用紙の余白に<strong>「横幅3、縦幅3の小さなマス目」</strong>を書いて、左上から順番に座標と番号を振ってみてください。そこで作った式が正しいか実験できれば、あとは巨大な数字に置き換えるだけです。
+    </div>
+  </div>
+
+  <div class="mini-experiment">
+    <div class="mini-grid">
+      <div class="mini-cell">0,0<br>(1番)</div>
+      <div class="mini-cell">1,0<br>(2番)</div>
+      <div class="mini-cell">2,0<br>(3番)</div>
+      <div class="mini-cell">0,1<br>(4番)</div>
+      <div class="mini-cell mc-target">1,1<br>(5番)</div>
+      <div class="mini-cell">2,1<br>(6番)</div>
+      <div class="mini-cell">0,2<br>(7番)</div>
+      <div class="mini-cell">1,2<br>(8番)</div>
+      <div class="mini-cell">2,2<br>(9番)</div>
+    </div>
+
+    <div class="mini-calc">
+      <strong>【実験：座標(1,1)が何番目か求める】</strong>
+      <ul>
+        <li>上の1行を飛ばす ➡ 横幅3 × 1行 ＝ 3個</li>
+        <li>現在の行で左から進む ➡ x=1 なので、あと1個進む（目的の1個前まで）</li>
+        <li>手前に「3＋1＝4個」あるから、自分は<strong>5番目</strong>だ！</li>
+        <li>開始アドレスは？ ➡ 手前に4個あるから「4 × サイズ」だ！</li>
+      </ul>
+      <span style="color:#b45309; font-weight:bold; display:block; margin-top:10px;">★この理屈（式）が確認できたら、問題文の640に当てはめる！</span>
+    </div>
+  </div>
+</div>
+
+<h2>試験対策まとめ：計算の手順</h2>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:20%;">ステップ</th>
+      <th>考えること・計算式</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">Step 1<br>データの単位</td>
+      <td>問題文から、<strong>1画素が何バイト（何番地分）か</strong>を求める。<br>例：1画素16ビット、1メモリ8ビットなら ➡ 「16 ÷ 8 ＝ 2番地/画素」</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">Step 2<br>手前の数</td>
+      <td>目的地 (x, y) の<strong>手前にいくつ画素があるか</strong>を求める。<br>式：<code>(横幅 × y) ＋ x</code></td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">Step 3<br>アドレス計算</td>
+      <td>手前の数に、Step1で求めたサイズを掛けて開始アドレスを出す。<br>式：<code>手前の数 × 1画素のサイズ(番地)</code></td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
