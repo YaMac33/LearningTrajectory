@@ -1,0 +1,21 @@
+{
+  "id": "ap-session-key-hybrid-encryption",
+  "category": "ap",
+  "timestamp": "2026-03-11T07:06:11+09:00",
+  "post_path": "ap/posts/2026-03-11-ap-session-key-hybrid-encryption/",
+  "meta": {
+    "title": "通信の「最初」と「それ以降」とは？",
+    "summary": "この内容は、ハイブリッド暗号方式におけるセッション鍵の役割とその仕組みを理解するのに役立つ。特に、通信の開始から終了までの流れを解説。",
+    "tags": [
+      "セキュリティ",
+      "暗号技術",
+      "ハイブリッド暗号",
+      "SSL/TLS",
+      "セッション鍵"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
