@@ -1,5 +1,29 @@
 [
   {
+    "id": "ap-pki-and-hybrid-encryption",
+    "category": "ap",
+    "timestamp": "2026-03-11T06:56:29+09:00",
+    "title": "現代インターネット通信のPKIとハイブリッド暗号",
+    "summary": "PKIとハイブリッド暗号の融合により、情報処理安全確保支援士試験で問われるSSL/TLSの背景が理解できる。全体の通信フローを把握し、鍵の役割を明確にすることが学べる。",
+    "tags": [
+      "セキュリティ",
+      "暗号技術",
+      "PKI",
+      "ハイブリッド暗号",
+      "共通鍵",
+      "電子署名",
+      "電子証明書",
+      "暗号化"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-11-ap-pki-and-hybrid-encryption/"
+  },
+  {
     "id": "blog-security-ideas",
     "category": "blog",
     "timestamp": "2026-03-10T22:49:03+09:00",
