@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | ネット投票の強要・買収を防ぐ！3つの物理的対策とレシートフリー性</title>
+  <meta name="description" content="ネット投票の最後の壁である「強要や買収」を防ぐシステム設計について解説。ダミー暗証番号（フェイク投票）、上書き投票（マルチプル・ボート）、レシートフリー性の仕組みを図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="ネット投票の強要・買収を防ぐ！3つの物理的対策とレシートフリー性" />
+  <meta property="og:description" content="ネット投票の最後の壁である「強要や買収」を防ぐシステム設計について解説。ダミー暗証番号（フェイク投票）、上書き投票（マルチプル・ボート）、レシートフリー性の仕組みを図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* ダミー投票のフロー図解 */
+    .dummy-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      min-width: 500px;
+    }
+    .df-actor-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fef2f2;
+      border: 2px dashed #ef4444;
+      padding: 15px;
+      border-radius: 8px;
+      width: 200px;
+      position: relative;
+    }
+    .df-label { font-weight: 900; color: #b91c1c; margin-bottom: 10px; }
+    .df-screen {
+      background: #fff; border: 2px solid #cbd5e1; padding: 10px; border-radius: 4px; text-align: center; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .df-input { font-family: monospace; font-size: 1.2em; font-weight: bold; color: #1e293b; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; }
+    
+    .df-arrow { color: #94a3b8; font-size: 2em; font-weight: bold; }
+
+    .df-system {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #1e293b;
+      padding: 15px;
+      border-radius: 8px;
+      width: 220px;
+      color: #fff;
+    }
+    .sys-front {
+      background: #ecfdf5; border: 2px solid #10b981; color: #047857; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.85em; text-align: center; margin-bottom: 10px; width: 100%;
+    }
+    .sys-back {
+      background: #334155; border: 2px dashed #64748b; color: #cbd5e1; padding: 10px; border-radius: 4px; font-size: 0.85em; text-align: center; width: 100%;
+    }
+    .trash-icon { font-size: 1.5em; display: block; margin-top: 5px; }
+
+    /* 上書き投票のタイムライン */
+    .timeline-container {
+      position: relative;
+      padding: 40px 20px;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+    .time-axis {
+      position: absolute;
+      top: 50%;
+      left: 5%;
+      right: 5%;
+      height: 4px;
+      background: #e2e8f0;
+      transform: translateY(-50%);
+    }
+    .time-point {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tp-dot {
+      width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 4px solid; z-index: 2;
+    }
+    .tp-label {
+      position: absolute; top: -35px; font-weight: bold; font-size: 0.85em; white-space: nowrap; color: #475569;
+    }
+    .tp-desc {
+      position: absolute; top: 25px; background: #f8fafc; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; font-weight: bold; white-space: nowrap; text-align: center;
+    }
+
+    .tp1 { left: 15%; }
+    .tp1 .tp-dot { border-color: #ef4444; }
+    .tp1 .tp-desc { color: #b91c1c; border-color: #fca5a5; background: #fef2f2; }
+
+    .tp2 { left: 55%; }
+    .tp2 .tp-dot { border-color: #3b82f6; }
+    .tp2 .tp-desc { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; }
+
+    .tp3 { left: 90%; }
+    .tp3 .tp-dot { border-color: #10b981; background: #10b981; }
+    .tp3 .tp-label { color: #047857; }
+    .tp3 .tp-desc { color: #047857; border-color: #a7f3d0; background: #ecfdf5; }
+
+    /* レシートフリーのチャット風図解 */
+    .receipt-chat {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .chat-msg {
+      display: flex;
+      gap: 10px;
+      max-width: 80%;
+    }
+    .chat-left { align-self: flex-start; }
+    .chat-right { align-self: flex-end; flex-direction: row-reverse; }
+    
+    .chat-icon { font-size: 1.5em; }
+    .chat-bubble {
+      padding: 10px 15px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      font-weight: bold;
+      line-height: 1.4;
+      position: relative;
+    }
+    .chat-left .chat-bubble { background: #fff; border: 1px solid #cbd5e1; color: #334155; border-top-left-radius: 0; }
+    .chat-right .chat-bubble { background: #3b82f6; color: #fff; border-top-right-radius: 0; }
+    
+    .chat-result {
+      text-align: center; font-weight: 900; color: #ef4444; background: #fee2e2; padding: 8px; border-radius: 4px; margin-top: 10px;
+    }
+
+    /* ネット投票の4つの壁まとめ */
+    .ultimate-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 8px;
+      color: #fff;
+    }
+    .us-title { text-align: center; font-weight: 900; color: #38bdf8; margin-bottom: 10px; font-size: 1.1em; border-bottom: 1px solid #475569; padding-bottom: 10px; }
+    .us-item { display: flex; align-items: center; gap: 15px; background: #334155; padding: 10px 15px; border-radius: 6px; }
+    .us-num { font-weight: 900; font-size: 1.2em; color: #94a3b8; }
+    .us-content { flex: 1; }
+    .us-wall { font-size: 0.8em; color: #cbd5e1; margin-bottom: 2px; }
+    .us-tech { font-weight: bold; color: #a7f3d0; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-10">
+            2026.03.10
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">ネット投票の強要・買収を防ぐ！3つの物理的対策とレシートフリー性</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#電子投票</span>
+            <span class="tag">#強要耐性</span>
+            <span class="tag">#最新技術</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>ハッキングなどのサイバー攻撃は暗号技術で防ぐことができますが、<strong>「親や上司が横に立ってスマホの画面を監視している状況（強要）」</strong>や<strong>「1万円あげるから投票完了画面を見せてと言われる状況（買収）」</strong>は、システムの外側の物理的な問題です。<br>
+ネット投票を実現する上で最大のハードルとなる、人間の悪意を無効化する3つの対抗策（強要耐性）を解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  システムを騙そうとする人間に対して、逆に<strong>システム側が「監視者を騙す」「証拠を残させない」</strong>といったアプローチをとることで、強要や買収を無意味にする仕組みです。
+</div>
+
+<h2>1. ダミー暗証番号（フェイク投票）</h2>
+<p>
+  監視されている状況を逆手に取り、見ている相手を安心させた上で、裏でその票を無効にするアプローチです。
+</p>
+
+<!-- 図解：ダミー投票のフロー -->
+<div class="diagram-container" style="overflow-x: auto;">
+  <div class="diagram-title">ダミー暗証番号による「監視者の無力化」</div>
+  <div class="dummy-flow">
+    
+    <div class="df-actor-group">
+      <span class="df-label">👁️ 監視されている状況</span>
+      <div style="font-size:0.8em; color:#475569; margin-bottom:5px; text-align:center;">「候補者Aに入れろ！」</div>
+      <div class="df-screen">
+        <div style="font-size:0.8em; font-weight:bold; margin-bottom:5px;">暗証番号を入力</div>
+        <span class="df-input">9999 (偽物)</span><br>
+        <button style="margin-top:5px; font-size:0.7em;">投票する</button>
+      </div>
+    </div>
+
+    <div class="df-arrow">➡</div>
+
+    <div class="df-system">
+      <span style="font-weight:bold; margin-bottom:10px;">💻 選挙システム</span>
+      
+      <div class="sys-front">
+        【画面の表示 (表向き)】<br>
+        「投票が完了しました！」<br>
+        <span style="font-size:0.8em; color:#065f46;">(※監視者はこれを見て満足する)</span>
+      </div>
+
+      <div class="sys-back">
+        【裏側の処理 (システム内)】<br>
+        「おっと、これはダミー番号だ」<br>
+        ⬇<br>
+        無効票として破棄！
+        <span class="trash-icon">🗑️</span>
+      </div>
+    </div>
+
+  </div>
+  <p style="font-size:0.85em; color:#475569; font-weight:bold; text-align:center; margin-top:10px;">
+    後で1人になった時に、本物の暗証番号を使って、自分が本当に選びたい候補者へ投票し直します。
+  </p>
+</div>
+
+<h2>2. 何度でも上書き投票（マルチプル・ボート）</h2>
+<p>
+  エストニアなど、世界で最もネット投票が進んでいる国で実際に導入されている、非常にシンプルかつ強力な方法です。
+</p>
+
+<!-- 図解：上書き投票のタイムライン -->
+<div class="diagram-container">
+  <div class="diagram-title">何度でもやり直せる「上書き投票」のタイムライン</div>
+  <div class="timeline-container">
+    <div class="time-axis"></div>
+    
+    <div class="time-point tp1">
+      <div class="tp-label">10:00 (職場)</div>
+      <div class="tp-dot"></div>
+      <div class="tp-desc">上司に監視され<br>不本意な「A」に投票</div>
+    </div>
+
+    <div class="time-point tp2">
+      <div class="tp-label">22:00 (自宅)</div>
+      <div class="tp-dot"></div>
+      <div class="tp-desc">布団の中でこっそり<br>本当に入れたい「B」に投票</div>
+    </div>
+
+    <div class="time-point tp3">
+      <div class="tp-label">23:59 投票終了</div>
+      <div class="tp-dot"></div>
+      <div class="tp-desc">最新の「B」だけが<br>有効票として集計される！</div>
+    </div>
+  </div>
+</div>
+
+<h2>3. レシートフリー性（証拠を残さない）</h2>
+<p>
+  これは「買収」を防ぐための必須条件です。システムは、「自分が誰に投票したか」を第三者に証明できる画面（レシートや完了証明書）を<strong>絶対に発行してはいけません</strong>。
+</p>
+
+<!-- 図解：レシートフリー性のチャット -->
+<div class="diagram-container">
+  <div class="diagram-title">証拠がないから買収が成立しない</div>
+  <div class="receipt-chat">
+    <div class="chat-msg chat-left">
+      <span class="chat-icon">👿</span>
+      <div class="chat-bubble">「候補者Aに投票した完了画面のスクショを送ってくれたら、1万円あげるよ！」</div>
+    </div>
+    
+    <div class="chat-msg chat-right">
+      <span class="chat-icon">🧑</span>
+      <div class="chat-bubble">「投票システム上、誰に入れたかが表示される画面が存在しないから、証拠は出せません。」</div>
+    </div>
+
+    <div class="chat-msg chat-left">
+      <span class="chat-icon">👿</span>
+      <div class="chat-bubble" style="background:#f1f5f9; border-color:#94a3b8; color:#64748b;">「えっ、じゃあ本当に入れてくれたか確認できないじゃん…」</div>
+    </div>
+
+    <div class="chat-result">
+      ❌ 確認できないことにお金は払えないため、買収不成立！
+    </div>
+  </div>
+</div>
+
+<h2>【総まとめ】ネット投票を完成させる「4つの壁と技術」</h2>
+<p>
+  これまで学習してきた技術を組み合わせることで、ついに完璧なネット投票システムのパズルが完成します。
+</p>
+
+<div class="diagram-container">
+  <div class="ultimate-summary">
+    <div class="us-title">🌐 究極のネット投票システム構成</div>
+    
+    <div class="us-item">
+      <span class="us-num">01</span>
+      <div class="us-content">
+        <div class="us-wall">壁①「確実な本人確認」への対策</div>
+        <div class="us-tech">マイナンバーカード ＋ PKI (公開鍵基盤)</div>
+      </div>
+    </div>
+
+    <div class="us-item">
+      <span class="us-num">02</span>
+      <div class="us-content">
+        <div class="us-wall">壁②「投票内容の秘密」への対策</div>
+        <div class="us-tech">ブラインド署名 / ゼロ知識証明 (ZKP)</div>
+      </div>
+    </div>
+
+    <div class="us-item">
+      <span class="us-num">03</span>
+      <div class="us-content">
+        <div class="us-wall">壁③「通信経路の匿名化」への対策</div>
+        <div class="us-tech">Tor (オニオンルーティング) / Mixネット</div>
+      </div>
+    </div>
+
+    <div class="us-item">
+      <span class="us-num">04</span>
+      <div class="us-content">
+        <div class="us-wall">壁④「データの改ざん・強要」への対策</div>
+        <div class="us-tech">ブロックチェーン ＋ 上書き投票・レシートフリー性</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
