@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-http-is-dangerous",
+    "category": "ap",
+    "timestamp": "2026-03-11T20:14:04+09:00",
+    "title": "HTTPの危険性と盗聴の実態",
+    "summary": "HTTP通信が暗号化されていないため、パスワードや個人情報が容易に盗聴される仕組みを解説します。実際のデータ流れを理解し、HTTPSとの違いを把握しましょう。",
+    "tags": [
+      "セキュリティ",
+      "ネットワーク",
+      "HTTP",
+      "パケットキャプチャ",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-11-ap-http-is-dangerous/"
+  },
+  {
     "id": "ap-session-key-hybrid-encryption",
     "category": "ap",
     "timestamp": "2026-03-11T07:06:11+09:00",
