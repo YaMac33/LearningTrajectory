@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | 情報セキュリティ7要素の覚え方：語呂合わせ「CIAのARAN」</title>
+  <meta name="description" content="情報セキュリティの基本3要素（CIA）と追加の4要素（ARAN）を絶対に忘れないための語呂合わせを解説。英語の「CIAのARAN君」と日本語の「きかんか！親戚は必死！」で試験対策は完璧です。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="情報セキュリティ7要素の覚え方：語呂合わせ「CIAのARAN」" />
+  <meta property="og:description" content="情報セキュリティの基本3要素（CIA）と追加の4要素（ARAN）を絶対に忘れないための語呂合わせを解説。英語の「CIAのARAN君」と日本語の「きかんか！親戚は必死！」で試験対策は完璧です。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* エージェントプロフィール（CIA + ARAN）図解 */
+    .agent-profile {
+      background: #1e293b;
+      color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .ap-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 2px solid #475569;
+      padding-bottom: 15px;
+    }
+    .ap-icon { font-size: 3em; }
+    .ap-title { font-weight: 900; font-size: 1.2em; color: #38bdf8; display: block; margin-bottom: 5px; }
+    .ap-sub { font-size: 0.85em; color: #cbd5e1; }
+
+    .mission-group {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 15px;
+      border-left: 4px solid;
+    }
+    .mg-cia { border-left-color: #f59e0b; }
+    .mg-aran { border-left-color: #10b981; }
+    
+    .mg-title { font-weight: 900; font-size: 1.05em; margin-bottom: 15px; display: block; }
+    .mg-cia .mg-title { color: #fcd34d; }
+    .mg-aran .mg-title { color: #6ee7b7; }
+
+    .mission-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .mission-item {
+      background: #334155;
+      padding: 10px 15px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mi-letter { font-size: 1.5em; font-weight: 900; font-family: monospace; }
+    .mg-cia .mi-letter { color: #f59e0b; }
+    .mg-aran .mi-letter { color: #10b981; }
+    
+    .mi-content { display: flex; flex-direction: column; }
+    .mi-name { font-weight: bold; font-size: 0.85em; color: #cbd5e1; }
+    .mi-desc { font-size: 0.8em; font-weight: bold; margin-top: 2px; }
+
+    /* 日本語の語呂合わせボックス */
+    .goro-box {
+      background: #fff;
+      border: 2px dashed #ef4444;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .goro-title { font-weight: 900; color: #b91c1c; font-size: 1.1em; margin-bottom: 10px; display: block; }
+    .goro-phrase { font-size: 1.5em; font-weight: 900; color: #1e293b; background: #fef2f2; padding: 10px; border-radius: 8px; display: inline-block; margin-bottom: 15px; }
+    .goro-phrase span { color: #ef4444; }
+    
+    .goro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      text-align: left;
+    }
+    .goro-item { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85em; display: flex; align-items: center; gap: 8px; }
+    .goro-item span { color: #ef4444; font-size: 1.2em; }
+
+    /* 実務イメージボックス */
+    .dev-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .dev-title { font-weight: 900; color: #1d4ed8; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .dev-desc { font-size: 0.85em; color: #1e3a8a; line-height: 1.6; font-weight: bold; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-11">
+            2026.03.11
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">情報セキュリティ7要素の覚え方：語呂合わせ「CIAのARAN」</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#情報セキュリティ7要素</span>
+            <span class="tag">#CIA</span>
+            <span class="tag">#暗記法</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「機密性」「完全性」…似たような言葉が並んでなかなか覚えられない情報セキュリティの7要素。今回は、英語と日本語の両方で、試験本番でも一瞬で思い出せる最強の語呂合わせを解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：英語で覚えるなら】<br>
+  英語の頭文字で覚えるなら、凄腕スパイをイメージした<strong>「CIAのアラン（ARAN）君」</strong>が最強です！
+</div>
+
+<h2>1. エージェント「CIAのARAN（アラン）」の任務</h2>
+<p>
+  情報セキュリティの世界標準である基本の3要素「CIA」に、追加された高度な4要素「ARAN」をくっつけるだけで、非常に覚えやすいキャラクターが誕生します。
+</p>
+
+<!-- 図解：エージェントプロフィール -->
+<div class="diagram-container">
+  <div class="diagram-title">情報セキュリティ局 エージェント「ARAN」の任務</div>
+  <div class="agent-profile">
+    
+    <div class="ap-header">
+      <div class="ap-icon">🕵️‍♂️</div>
+      <div>
+        <span class="ap-title">エージェント ARAN</span>
+        <span class="ap-sub">所属：情報セキュリティ局 CIA</span>
+      </div>
+    </div>
+
+    <!-- CIA -->
+    <div class="mission-group mg-cia">
+      <span class="mg-title">▼ 必須の基礎訓練（CIA）</span>
+      <div class="mission-list">
+        <div class="mission-item">
+          <span class="mi-letter">C</span>
+          <div class="mi-content">
+            <span class="mi-name">Confidentiality (機密性)</span>
+            <span class="mi-desc" style="color:#fcd34d;">情報を絶対に漏らさない！</span>
+          </div>
+        </div>
+        <div class="mission-item">
+          <span class="mi-letter">I</span>
+          <div class="mi-content">
+            <span class="mi-name">Integrity (完全性)</span>
+            <span class="mi-desc" style="color:#fcd34d;">情報を書き換えさせない！</span>
+          </div>
+        </div>
+        <div class="mission-item">
+          <span class="mi-letter">A</span>
+          <div class="mi-content">
+            <span class="mi-name">Availability (可用性)</span>
+            <span class="mi-desc" style="color:#fcd34d;">いつでも動かせるようにする！</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARAN -->
+    <div class="mission-group mg-aran">
+      <span class="mg-title">▼ 高度な追加任務（ARAN）</span>
+      <div class="mission-list">
+        <div class="mission-item">
+          <span class="mi-letter">A</span>
+          <div class="mi-content">
+            <span class="mi-name">Authenticity (真正性)</span>
+            <span class="mi-desc" style="color:#6ee7b7;">偽物を見破る！（署名の確認）</span>
+          </div>
+        </div>
+        <div class="mission-item">
+          <span class="mi-letter">R</span>
+          <div class="mi-content">
+            <span class="mi-name">Reliability (信頼性)</span>
+            <span class="mi-desc" style="color:#6ee7b7;">確実に任務を遂行する！</span>
+          </div>
+        </div>
+        <div class="mission-item">
+          <span class="mi-letter">A</span>
+          <div class="mi-content">
+            <span class="mi-name">Accountability (責任追跡性)</span>
+            <span class="mi-desc" style="color:#6ee7b7;">犯人の足跡を逃さない！（ログ）</span>
+          </div>
+        </div>
+        <div class="mission-item">
+          <span class="mi-letter">N</span>
+          <div class="mi-content">
+            <span class="mi-name">Non-repudiation (否認防止)</span>
+            <span class="mi-desc" style="color:#6ee7b7;">言い逃れを許さない！（証拠）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 日本語で覚えるなら「親戚は必死！」</h2>
+<p>
+  「試験では日本語の選択肢で出るかもしれないし…」という不安な方へ、強烈なインパクトを残す日本語の語呂合わせをご紹介します。
+</p>
+
+<!-- 図解：日本語の語呂合わせ -->
+<div class="diagram-container">
+  <div class="goro-box">
+    <span class="goro-title">🎌 日本語頭文字のおすすめ語呂合わせ</span>
+    <div class="goro-phrase">
+      <span>き</span>・<span>かん</span>・<span>か</span>！ <span>親戚</span>(は)<span>必死</span>！<br>
+      <span style="font-size:0.5em; font-weight:normal; color:#475569;">（聞かんか！親戚は必死に守ってるんだ！）</span>
+    </div>
+    
+    <div class="goro-grid">
+      <div class="goro-item"><span>き</span> 機密性</div>
+      <div class="goro-item"><span>かん</span> 完全性</div>
+      <div class="goro-item"><span>か</span> 可用性</div>
+      <div class="goro-item"><span>親</span> 真正性 (しん)</div>
+      <div class="goro-item"><span>戚</span> 責任追跡性 (せき)</div>
+      <div class="goro-item"><span>必</span> 否認防止 (ひ)</div>
+      <div class="goro-item"><span>死</span> 信頼性 (しん)</div>
+    </div>
+  </div>
+</div>
+
+<div class="diagram-container">
+  <div class="dev-box">
+    <div class="dev-title">💻 実務イメージ：外資系企業や世界標準の現場</div>
+    <div class="dev-desc">
+      実際のセキュリティの実務現場や外資系企業では、日本語の「機密性」よりも「それってC（シー）が担保されてる？」「CIAの観点でシステムをレビューしよう」といったように、<strong>英語の頭文字だけで会話が進む</strong>ことが非常に多いです。「CIAのARAN」を覚えておけば、プロの現場でもそのまま通用します！
+    </div>
+  </div>
+</div>
+
+<h2>試験対策まとめ：一番の難敵に注意！</h2>
+<p>
+  午前試験では、日本語ではなく<strong>英語の頭文字そのもの</strong>が問題文や選択肢に出ることがあります。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">出題パターン</th>
+      <th>試験問題での正解の選び方</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold; background:#f8fafc;">「CIAとは何の略か？」</td>
+      <td>
+        情報セキュリティの基本3要素を指します。迷わず<strong>「Confidentiality, Integrity, Availability」</strong>の組み合わせを選んでください。
+      </td>
+    </tr>
+    <tr>
+      <td style="color:#b91c1c; font-weight:bold; background:#f8fafc;">一番の難敵<br>「Non-repudiation」</td>
+      <td>
+        英語の選択肢で一番受験生が「？」となりやすいのが<strong>「否認防止」</strong>です。<br>
+        「Non（無い）」という否定語がついているのは7要素の中でこれだけなので、<strong>「言い逃れ（repudiation）が出来ない（Non）」</strong>とセットで覚えておくと、消去法で一発で正解を導き出せます！
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #10b981; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 知識の繋がり<br>
+  「CIA」という目標（目的）を守るために、これまで学習してきた「暗号化（Cを守る）」「ハッシュ関数・デジタル署名（IやNを守る）」「バックアップ（Aを守る）」といった具体的な手段（技術）が使われています！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
