@@ -1,0 +1,21 @@
+{
+  "id": "ap-logical-operations-venn-diagram",
+  "category": "ap",
+  "timestamp": "2026-03-13T12:45:43+09:00",
+  "post_path": "ap/posts/2026-03-13-ap-logical-operations-venn-diagram/",
+  "meta": {
+    "title": "論理演算とベン図の解説",
+    "summary": "応用情報技術者試験で頻出の論理演算とベン図の複雑な条件式を視覚的に理解する方法を解説します。",
+    "tags": [
+      "論理演算",
+      "ベン図",
+      "数理論理",
+      "集合演算",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ]
+  }
+}
