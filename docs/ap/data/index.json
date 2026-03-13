@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-flip-flop-circuit-memory",
+    "category": "ap",
+    "timestamp": "2026-03-13T21:34:33+09:00",
+    "title": "フリップフロップ回路の記憶の仕組み",
+    "summary": "フリップフロップ回路の「2つの安定状態」による記憶の仕組みを解説し、他の論理回路との違いを理解することができます。",
+    "tags": [
+      "ハードウェア",
+      "論理回路",
+      "フリップフロップ",
+      "メモリ",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "コンピュータ構成要素"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-13-ap-flip-flop-circuit-memory/"
+  },
+  {
     "id": "ap-logical-operations-venn-diagram",
     "category": "ap",
     "timestamp": "2026-03-13T12:45:43+09:00",
