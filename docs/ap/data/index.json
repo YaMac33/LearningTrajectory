@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-cisc-vs-risc-cpu-design",
+    "category": "ap",
+    "timestamp": "2026-03-16T07:10:00+09:00",
+    "title": "CISCとRISCの違いを理解しよう",
+    "summary": "CPU設計思想であるCISCとRISCの違いを、料理の例えを通じて解説します。特に、命令の長さやパイプライン処理との相性について理解が深まります。",
+    "tags": [
+      "CISC",
+      "RISC",
+      "CPU",
+      "ハードウェア",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "コンピュータ構成要素"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-16-ap-cisc-vs-risc-cpu-design/"
+  },
+  {
     "id": "ap-cpu-execution-cycle-fdoe",
     "category": "ap",
     "timestamp": "2026-03-15T22:40:39+09:00",
