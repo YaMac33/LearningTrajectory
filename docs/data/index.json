@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-cpu-execution-cycle-fdoe",
+    "category": "ap",
+    "timestamp": "2026-03-15T22:40:39+09:00",
+    "title": "CPUの命令実行サイクル「FDOE」を解説",
+    "summary": "CPUの命令実行サイクル「FDOE」の各ステージと役割を理解し、高速化テクニック「パイプライン処理」について学びます。",
+    "tags": [
+      "ハードウェア",
+      "CPU",
+      "命令実行サイクル",
+      "パイプライン",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "コンピュータ構成要素"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-15-ap-cpu-execution-cycle-fdoe/"
+  },
+  {
     "id": "ap-flip-flop-circuit-memory",
     "category": "ap",
     "timestamp": "2026-03-13T21:34:33+09:00",
