@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | CPUの命令実行サイクル「FDOE」とは？料理人でわかる4拍子のリズム</title>
+  <meta name="description" content="CPUがプログラムを処理する基本リズム「命令実行サイクル（FDOE：フェッチ、デコード、オペランド、エグゼキュート）」を料理人の動きに例えて図解。高速化テクニックの「パイプライン処理」も解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="CPUの命令実行サイクル「FDOE」とは？料理人でわかる4拍子のリズム" />
+  <meta property="og:description" content="CPUがプログラムを処理する基本リズム「命令実行サイクル（FDOE：フェッチ、デコード、オペランド、エグゼキュート）」を料理人の動きに例えて図解。高速化テクニックの「パイプライン処理」も解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* FDOEカードグリッド */
+    .fdoe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      position: relative;
+    }
+    
+    .fdoe-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .card-f { border-color: #fca5a5; }
+    .card-d { border-color: #fcd34d; }
+    .card-o { border-color: #6ee7b7; }
+    .card-e { border-color: #93c5fd; }
+
+    .fc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .fc-icon { font-size: 2em; }
+    .fc-badge { font-weight: 900; font-size: 1.2em; padding: 2px 8px; border-radius: 4px; color: #fff; font-family: monospace; }
+    .card-f .fc-badge { background: #ef4444; }
+    .card-d .fc-badge { background: #f59e0b; }
+    .card-o .fc-badge { background: #10b981; }
+    .card-e .fc-badge { background: #3b82f6; }
+
+    .fc-name { font-weight: 900; color: #1e293b; margin-bottom: 5px; }
+    .fc-desc { font-size: 0.85em; color: #475569; line-height: 1.5; flex: 1; }
+    
+    .fc-chef {
+      margin-top: 15px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      font-weight: bold;
+      color: #334155;
+    }
+    .card-f .fc-chef { border-color: #fca5a5; background: #fef2f2; color: #b91c1c; }
+    .card-d .fc-chef { border-color: #fcd34d; background: #fffbeb; color: #b45309; }
+    .card-o .fc-chef { border-color: #6ee7b7; background: #ecfdf5; color: #047857; }
+    .card-e .fc-chef { border-color: #93c5fd; background: #eff6ff; color: #1d4ed8; }
+
+    /* 実務イメージボックス */
+    .dev-box {
+      background: #f8fafc;
+      border-left: 5px solid #64748b;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 15px;
+    }
+    .dev-title { font-weight: 900; color: #334155; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .dev-desc { font-size: 0.85em; color: #475569; line-height: 1.6; font-weight: bold; }
+
+    /* パイプライン図解 (ガントチャート風) */
+    .pipeline-compare {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .pc-section {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .pc-title { font-weight: 900; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+    .title-bad { color: #b91c1c; }
+    .title-good { color: #1d4ed8; }
+
+    .pc-grid {
+      display: grid;
+      grid-template-columns: 60px repeat(7, 1fr);
+      gap: 2px;
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .pc-time-header {
+      grid-column: 2 / -1;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7em;
+      color: #64748b;
+      font-weight: bold;
+      padding-bottom: 5px;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 5px;
+    }
+    .pc-row-label {
+      font-size: 0.8em; font-weight: bold; color: #334155; display: flex; align-items: center;
+    }
+    .pc-cell {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: #fff;
+      border-radius: 2px;
+      font-size: 0.9em;
+    }
+    .cell-f { background: #ef4444; }
+    .cell-d { background: #f59e0b; }
+    .cell-o { background: #10b981; }
+    .cell-e { background: #3b82f6; }
+    .cell-empty { background: transparent; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-12">
+            2026.03.12
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">CPUの命令実行サイクル「FDOE」とは？料理人でわかる4拍子のリズム</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#ハードウェア</span>
+            <span class="tag">#CPU</span>
+            <span class="tag">#命令実行サイクル</span>
+            <span class="tag">#パイプライン</span>
+            <span class="tag">#基本情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>コンピュータの頭脳であるCPUは、私たちがクリックや文字入力をするたびに、雷のような速さで細かな作業を繰り返しています。このCPUがプログラムの命令を1つ処理する際の一連の流れ（命令実行サイクル）を表す**「FDOE」**を、料理人の動きに例えて解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約】<br>
+  最後の「E」は、実際に計算や処理を行う<strong>「Execute（実行）」</strong>です！<br>「取ってくる・読む・材料を揃える・料理する」の4拍子が、CPUが働くための基本リズムになります。
+</div>
+
+<h2>1. CPUの中の「料理人」の動き</h2>
+<p>
+  アルファベットの羅列だと覚えにくいですが、CPUの中に「凄腕の料理人」がいると想像すると、それぞれのステージの役割がスッと頭に入ってきます。
+</p>
+
+<!-- 図解：FDOEのカード -->
+<div class="diagram-container">
+  <div class="diagram-title">CPUの命令実行サイクル（4拍子のバケツリレー）</div>
+  <div class="fdoe-grid">
+    
+    <!-- F -->
+    <div class="fdoe-card card-f">
+      <div class="fc-header">
+        <span class="fc-icon">🗂️</span>
+        <span class="fc-badge">F</span>
+      </div>
+      <span class="fc-name">Fetch (フェッチ)</span>
+      <span class="fc-desc">メモリ（本棚）から、次にやるべき「命令」を取ってくること。（命令取出し）</span>
+      <div class="fc-chef">👨‍🍳「おっ、次の注文票(レシピ)が来たぞ！棚から取ってこよう。」</div>
+    </div>
+
+    <!-- D -->
+    <div class="fdoe-card card-d">
+      <div class="fc-header">
+        <span class="fc-icon">🔍</span>
+        <span class="fc-badge">D</span>
+      </div>
+      <span class="fc-name">Decode (デコード)</span>
+      <span class="fc-desc">取ってきた命令が「足し算」か「データ移動」か等を解読し、各パーツに準備指示を出す。（命令解読）</span>
+      <div class="fc-chef">👨‍🍳「ふむふむ、今回は『カレーを作る(足し算)』命令だな！鍋や包丁を準備しろ！」</div>
+    </div>
+
+    <!-- O -->
+    <div class="fdoe-card card-o">
+      <div class="fc-header">
+        <span class="fc-icon">📦</span>
+        <span class="fc-badge">O</span>
+      </div>
+      <span class="fc-name">Operand Fetch (オペランド)</span>
+      <span class="fc-desc">命令を実行するために必要な「データそのもの（オペランド）」をメモリ等から取ってくる。（対象データの準備）</span>
+      <div class="fc-chef">👨‍🍳「カレー作りには『じゃがいもとお肉(データ)』が必要だな！冷蔵庫から出してこよう！」</div>
+    </div>
+
+    <!-- E -->
+    <div class="fdoe-card card-e">
+      <div class="fc-header">
+        <span class="fc-icon">💥</span>
+        <span class="fc-badge">E</span>
+      </div>
+      <span class="fc-name">Execute (エグゼキュート)</span>
+      <span class="fc-desc">準備したデータを使って、実際にALU（算術論理演算装置）で計算などの処理を行う。（実行）</span>
+      <div class="fc-chef">👨‍🍳「よし、材料も揃った！実際に包丁で切って煮込むぞ（計算開始）！」</div>
+    </div>
+
+  </div>
+  <p style="text-align:center; font-size:0.8em; color:#64748b; margin-top:10px;">
+    ※この後、計算結果をメモリに書き込む「Write back（W）」が続くアーキテクチャもあります。
+  </p>
+</div>
+
+<div class="diagram-container">
+  <div class="dev-box">
+    <div class="dev-title">💻 実務イメージ：パソコンの「フリーズ」の正体</div>
+    <div class="dev-desc">
+      私たちが操作をするたび、パソコンの中でこの「F・D・O・E」のサイクルが1秒間に何十億回という速さで回ります。もし「O（オペランド）」の段階で、データが入っているメモリ（冷蔵庫）の反応が遅かったり、データが大きすぎたりすると、料理人は「材料が来ないよ〜」と待ちぼうけを食らってしまいます。<br>
+      これが、パソコンの画面がクルクル回って「フリーズ」している時の裏側の状態です。
+    </div>
+  </div>
+</div>
+
+<h2>2. 最強の効率化「パイプライン処理」</h2>
+<p>
+  午前試験では、このFDOEのサイクルを利用した<strong>「パイプライン処理」</strong>というCPUの高速化テクニックについて必ず出題されます。<br>
+  1人の料理人が「F→D→O→E」を全部順番にやるのではなく、<strong>「4人の担当者に分けて、流れ作業（工場レーン）にしてしまえ！」</strong>という非常に頭の良い仕組みです。
+</p>
+
+<!-- 図解：パイプラインの比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">流れ作業で無駄をなくす「パイプライン処理」</div>
+  <div class="pipeline-compare">
+    
+    <!-- 逐次制御 -->
+    <div class="pc-section">
+      <span class="pc-title title-bad">❌ 1人で順番にやる場合（逐次制御）</span>
+      <div class="pc-grid">
+        <div class="pc-time-header"><span>時間 ➡</span></div>
+        
+        <div class="pc-row-label">命令 1</div>
+        <div class="pc-cell cell-f">F</div><div class="pc-cell cell-d">D</div><div class="pc-cell cell-o">O</div><div class="pc-cell cell-e">E</div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div>
+        
+        <div class="pc-row-label">命令 2</div>
+        <div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-f">F</div><div class="pc-cell cell-d">D</div><div class="pc-cell cell-o">O</div>
+      </div>
+      <p style="font-size:0.8em; color:#475569; margin:10px 0 0 0;">前の命令が完全に「E」まで終わるのを待たないと、次の命令に取り掛かれません。待ち時間が多くて非効率です。</p>
+    </div>
+
+    <!-- パイプライン -->
+    <div class="pc-section">
+      <span class="pc-title title-good">✨ 流れ作業でやる場合（パイプライン処理）</span>
+      <div class="pc-grid">
+        <div class="pc-time-header"><span>時間 ➡</span></div>
+        
+        <div class="pc-row-label">命令 1</div>
+        <div class="pc-cell cell-f">F</div><div class="pc-cell cell-d">D</div><div class="pc-cell cell-o">O</div><div class="pc-cell cell-e">E</div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div>
+        
+        <div class="pc-row-label">命令 2</div>
+        <div class="pc-cell cell-empty"></div><div class="pc-cell cell-f">F</div><div class="pc-cell cell-d">D</div><div class="pc-cell cell-o">O</div><div class="pc-cell cell-e">E</div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div>
+        
+        <div class="pc-row-label">命令 3</div>
+        <div class="pc-cell cell-empty"></div><div class="pc-cell cell-empty"></div><div class="pc-cell cell-f">F</div><div class="pc-cell cell-d">D</div><div class="pc-cell cell-o">O</div><div class="pc-cell cell-e">E</div><div class="pc-cell cell-empty"></div>
+      </div>
+      <p style="font-size:0.8em; color:#1d4ed8; font-weight:bold; margin:10px 0 0 0;">「前の人がD（解読）をしている間に、後ろの人は次の命令のF（取出し）を始める」というように、全員が休まず同時に働くことで、全体の処理スピードが劇的に上がります！</p>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ：FDOEと周辺用語</h2>
+<p>
+  それぞれのアルファベットの意味と、関連する専門用語を紐づけて覚えましょう。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">用語</th>
+      <th>意味・試験でのポイント</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#ef4444; font-weight:bold; background:#f8fafc;">フェッチ (Fetch)</td>
+      <td>メモリから命令やデータを取り出すこと。この時、次に実行する命令のアドレスは<strong>「プログラムカウンタ」</strong>というレジスタ（メモ帳）に書かれています。</td>
+    </tr>
+    <tr>
+      <td style="color:#10b981; font-weight:bold; background:#f8fafc;">オペランド (Operand)</td>
+      <td>計算式の中の<strong>「演算の対象となるデータ」</strong>のこと。（例：「A + B」におけるAやBのこと。「+」はオペコード/命令部と呼びます）</td>
+    </tr>
+    <tr>
+      <td style="color:#1d4ed8; font-weight:bold; background:#f8fafc;">パイプライン処理</td>
+      <td>命令の実行ステージを分割し、複数の命令を<strong>少しずつずらしながら並行して（同時に）実行する</strong>ことで、CPUの全体的なスループット（処理能力）を向上させる方式。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
