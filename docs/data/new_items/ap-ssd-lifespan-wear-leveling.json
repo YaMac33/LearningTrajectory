@@ -1,0 +1,21 @@
+{
+  "id": "ap-ssd-lifespan-wear-leveling",
+  "category": "ap",
+  "timestamp": "2026-03-17T07:16:53+09:00",
+  "post_path": "ap/posts/2026-03-17-ap-ssd-lifespan-wear-leveling/",
+  "meta": {
+    "title": "SSDの寿命とウェアレベリング解説",
+    "summary": "SSDの書き込み上限となる物理的理由と、寿命を延ばすためのウェアレベリングの重要性を理解できます。",
+    "tags": [
+      "SSD",
+      "フラッシュメモリ",
+      "ハードウェア",
+      "記憶装置",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "データベース"
+    ]
+  }
+}
