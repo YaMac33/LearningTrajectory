@@ -1,5 +1,20 @@
 [
   {
+    "id": "blog-minimum-units",
+    "category": "blog",
+    "timestamp": "2026-03-17T21:28:51+09:00",
+    "title": "知識の構造を見える化する方法",
+    "summary": "知識を思い出すための最小単位について考えます。",
+    "tags": [],
+    "taxonomy": [
+      "journal",
+      "note"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "blog/posts/2026-03-17-blog-minimum-units/"
+  },
+  {
     "id": "ap-isochronous-transfer-udp",
     "category": "ap",
     "timestamp": "2026-03-17T20:30:41+09:00",
