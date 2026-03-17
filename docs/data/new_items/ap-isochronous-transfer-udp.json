@@ -1,0 +1,23 @@
+{
+  "id": "ap-isochronous-transfer-udp",
+  "category": "ap",
+  "timestamp": "2026-03-17T20:30:41+09:00",
+  "post_path": "ap/posts/2026-03-17-ap-isochronous-transfer-udp/",
+  "meta": {
+    "title": "アイソクロナス転送とUDPの設計思想",
+    "summary": "アイソクロナス転送とUDPは、スピードとリアルタイム性を最優先する共通の設計思想を持っています。この技術の理解がAP試験に役立ちます。",
+    "tags": [
+      "ネットワーク",
+      "USB",
+      "プロトコル",
+      "リアルタイム",
+      "エラー訂正",
+      "データ転送",
+      "アーキテクチャ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ]
+  }
+}
