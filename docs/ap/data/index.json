@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-amdahls-law-formula",
+    "category": "ap",
+    "timestamp": "2026-03-18T20:21:55+09:00",
+    "title": "アムダールの法則の数式比較と解説",
+    "summary": "アムダールの法則に基づく2つの公式の相互変換を解説し、試験対策に役立つポイントを示します。",
+    "tags": [
+      "アムダールの法則",
+      "CPU",
+      "計算問題",
+      "ハードウェア",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "基礎理論(離散/確率/情報量)"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-18-ap-amdahls-law-formula/"
+  },
+  {
     "id": "ap-isochronous-transfer-udp",
     "category": "ap",
     "timestamp": "2026-03-17T20:30:41+09:00",
