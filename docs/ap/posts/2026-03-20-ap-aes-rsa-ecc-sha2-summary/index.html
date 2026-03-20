@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | AES, RSA, ECC, SHA-2とは？代表的な暗号アルゴリズムの役割まとめ</title>
+  <meta name="description" content="情報セキュリティで頻出の暗号アルゴリズム「AES」「RSA」「ECC」「SHA-2」のフルネームと役割を解説。それぞれの特徴と、「データを守る・身元を守る・改ざんを見破る」という役割分担を図解でわかりやすく整理します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AES, RSA, ECC, SHA-2とは？代表的な暗号アルゴリズムの役割まとめ" />
+  <meta property="og:description" content="情報セキュリティで頻出の暗号アルゴリズム「AES」「RSA」「ECC」「SHA-2」のフルネームと役割を解説。それぞれの特徴と、「データを守る・身元を守る・改ざんを見破る」という役割分担を図解でわかりやすく整理します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* アルゴリズムのカードグリッド */
+    .crypto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .crypto-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .card-aes { border-color: #3b82f6; }
+    .card-rsa { border-color: #ef4444; }
+    .card-ecc { border-color: #8b5cf6; }
+    .card-sha { border-color: #10b981; }
+
+    .cc-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+    .cc-icon { font-size: 2.5em; }
+    .cc-title-area { display: flex; flex-direction: column; }
+    .cc-abbr { font-weight: 900; font-size: 1.4em; color: #1e293b; letter-spacing: 1px; }
+    .cc-full { font-size: 0.7em; color: #64748b; font-weight: bold; }
+    
+    .card-aes .cc-abbr { color: #1d4ed8; }
+    .card-rsa .cc-abbr { color: #b91c1c; }
+    .card-ecc .cc-abbr { color: #6d28d9; }
+    .card-sha .cc-abbr { color: #047857; }
+
+    .cc-type {
+      position: absolute;
+      top: -12px;
+      right: 15px;
+      background: #1e293b;
+      color: #fff;
+      font-size: 0.75em;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+    .card-aes .cc-type { background: #3b82f6; }
+    .card-rsa .cc-type { background: #ef4444; }
+    .card-ecc .cc-type { background: #8b5cf6; }
+    .card-sha .cc-type { background: #10b981; }
+
+    .cc-desc {
+      font-size: 0.85em; color: #475569; line-height: 1.6; font-weight: bold; margin-bottom: 10px;
+    }
+    .cc-points {
+      list-style: none; padding: 0; margin: 0; font-size: 0.8em; color: #334155;
+    }
+    .cc-points li {
+      margin-bottom: 5px; position: relative; padding-left: 15px;
+    }
+    .cc-points li::before {
+      content: "✔"; position: absolute; left: 0; font-weight: bold;
+    }
+    .card-aes .cc-points li::before { color: #3b82f6; }
+    .card-rsa .cc-points li::before { color: #ef4444; }
+    .card-ecc .cc-points li::before { color: #8b5cf6; }
+    .card-sha .cc-points li::before { color: #10b981; }
+
+    /* 役割分担図解 */
+    .role-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .role-row {
+      display: flex;
+      align-items: stretch;
+      background: #334155;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .rr-icon {
+      width: 60px; display: flex; align-items: center; justify-content: center; font-size: 2em; background: #0f172a;
+    }
+    .rr-content {
+      flex: 1; padding: 15px; display: flex; flex-direction: column; justify-content: center;
+    }
+    .rr-target { font-weight: 900; color: #fff; font-size: 1.1em; margin-bottom: 5px; }
+    .rr-algo { font-family: monospace; font-size: 1.2em; font-weight: bold; }
+    
+    .target-data .rr-target { color: #60a5fa; }
+    .target-data .rr-algo { color: #93c5fd; }
+    
+    .target-auth .rr-target { color: #f87171; }
+    .target-auth .rr-algo { color: #fca5a5; }
+    
+    .target-hash .rr-target { color: #34d399; }
+    .target-hash .rr-algo { color: #6ee7b7; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-20">
+            2026.03.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">AES, RSA, ECC, SHA-2とは？代表的な暗号アルゴリズムの役割まとめ</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#AES</span>
+            <span class="tag">#RSA</span>
+            <span class="tag">#SHA-2</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>情報セキュリティの学習をしていると必ず登場する、アルファベットの略語たち。これらはすべて、インターネットを安全に保つための「暗号技術（アルゴリズム）」の名前です。<br>
+それぞれが「何の略か」と「何をしているか」をセットで整理することで、一気に知識が固まります。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：役割分担】<br>
+  現代の通信（TLSなど）では、<strong>AES</strong>がデータを守り、<strong>RSA/ECC</strong>が鍵や身元を守り、<strong>SHA-2</strong>が改ざんを見破る、という完璧なチームワークで動いています。
+</div>
+
+<h2>1. 4つの主要アルゴリズムの特徴</h2>
+<p>
+  それぞれの技術が属するカテゴリー（共通鍵か、公開鍵か、ハッシュか）を意識しながら確認しましょう。
+</p>
+
+<!-- 図解：アルゴリズムのカード -->
+<div class="diagram-container">
+  <div class="crypto-grid">
+    
+    <!-- AES -->
+    <div class="crypto-card card-aes">
+      <span class="cc-type">共通鍵暗号</span>
+      <div class="cc-header">
+        <div class="cc-icon">📦</div>
+        <div class="cc-title-area">
+          <span class="cc-abbr">AES</span>
+          <span class="cc-full">Advanced Encryption Standard</span>
+        </div>
+      </div>
+      <div class="cc-desc">データをブロック単位に分け、同じ鍵を使ってぐちゃぐちゃに変換（暗号化・復号）する技術です。</div>
+      <ul class="cc-points">
+        <li>現代の共通鍵暗号の「世界標準」</li>
+        <li>処理が非常に<strong>高速</strong>で安全</li>
+        <li>TLSなどでの「実際のデータ通信（大容量）」に使われる</li>
+      </ul>
+    </div>
+
+    <!-- RSA -->
+    <div class="crypto-card card-rsa">
+      <span class="cc-type">公開鍵暗号</span>
+      <div class="cc-header">
+        <div class="cc-icon">🔐</div>
+        <div class="cc-title-area">
+          <span class="cc-abbr">RSA</span>
+          <span class="cc-full">Rivest–Shamir–Adleman</span>
+        </div>
+      </div>
+      <div class="cc-desc">公開鍵と秘密鍵のペアを使い、「巨大な数の素因数分解の難しさ」を安全性の根拠とした技術です。</div>
+      <ul class="cc-points">
+        <li>開発者3人の名前の頭文字</li>
+        <li>共通鍵の受け渡し（鍵交換）や電子署名に使う</li>
+        <li>処理が<strong>遅い</strong>ため、データ本体の暗号化にはあまり使わない</li>
+      </ul>
+    </div>
+
+    <!-- ECC -->
+    <div class="crypto-card card-ecc">
+      <span class="cc-type">公開鍵暗号</span>
+      <div class="cc-header">
+        <div class="cc-icon">📈</div>
+        <div class="cc-title-area">
+          <span class="cc-abbr">ECC</span>
+          <span class="cc-full">Elliptic Curve Cryptography</span>
+        </div>
+      </div>
+      <div class="cc-desc">「楕円曲線上の計算の難しさ」を利用した、RSAに代わる次世代の公開鍵暗号技術です。</div>
+      <ul class="cc-points">
+        <li>RSAよりも<strong>短い鍵の長さで同じ強度</strong>を出せる</li>
+        <li>計算負荷が低いため、スマホやIoT機器、最新のTLSでよく使われる</li>
+        <li>鍵交換や電子署名に使う</li>
+      </ul>
+    </div>
+
+    <!-- SHA-2 -->
+    <div class="crypto-card card-sha">
+      <span class="cc-type">ハッシュ関数</span>
+      <div class="cc-header">
+        <div class="cc-icon">🔍</div>
+        <div class="cc-title-area">
+          <span class="cc-abbr">SHA-2</span>
+          <span class="cc-full">Secure Hash Algorithm 2</span>
+        </div>
+      </div>
+      <div class="cc-desc">どんな長さのデータからも、固定長のデタラメな値（ハッシュ値・指紋）を生成する技術です。</div>
+      <ul class="cc-points">
+        <li><strong>一方向関数</strong>であり、ハッシュ値から元のデータには戻せない（暗号化ではない）</li>
+        <li>電子署名やデータの「改ざん検知」で使う</li>
+        <li>SHA-256などが代表的</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 通信システムにおける一言整理</h2>
+<p>
+  ハイブリッド暗号方式（SSL/TLS）において、これらのアルゴリズムは以下のように美しく役割を分担しています。
+</p>
+
+<!-- 図解：役割分担 -->
+<div class="diagram-container">
+  <div class="diagram-title">セキュアな通信を守る「3つの守備範囲」</div>
+  <div class="role-diagram">
+    
+    <div class="role-row target-data">
+      <div class="rr-icon">📦</div>
+      <div class="rr-content">
+        <span class="rr-target">① データを守る（暗号化）</span>
+        <span class="rr-algo">▶ AES</span>
+      </div>
+    </div>
+
+    <div class="role-row target-auth">
+      <div class="rr-icon">🔐</div>
+      <div class="rr-content">
+        <span class="rr-target">② 鍵や身元を守る（鍵交換・署名）</span>
+        <span class="rr-algo">▶ RSA / ECC</span>
+      </div>
+    </div>
+
+    <div class="role-row target-hash">
+      <div class="rr-icon">👀</div>
+      <div class="rr-content">
+        <span class="rr-target">③ 改ざんを見破る（要約・検知）</span>
+        <span class="rr-algo">▶ SHA-2</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ表</h2>
+<p>
+  午前試験では、「アルゴリズム名」と「種類」の組み合わせを問う問題が頻出します。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:15%;">略称</th>
+      <th style="width:30%;">フルネーム</th>
+      <th style="width:15%;">種類</th>
+      <th>主な役割</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="td-center" style="font-weight:bold; color:#1d4ed8;">AES</td>
+      <td style="font-size:0.9em;">Advanced Encryption Standard</td>
+      <td class="td-center" style="font-weight:bold; background:#eff6ff;">共通鍵</td>
+      <td>実際のデータ通信の暗号化（大容量・高速）</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; color:#b91c1c;">RSA</td>
+      <td style="font-size:0.9em;">Rivest–Shamir–Adleman</td>
+      <td class="td-center" style="font-weight:bold; background:#fef2f2;">公開鍵</td>
+      <td>共通鍵の安全な受け渡し、電子署名（素因数分解）</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; color:#6d28d9;">ECC</td>
+      <td style="font-size:0.9em;">Elliptic Curve Cryptography</td>
+      <td class="td-center" style="font-weight:bold; background:#fef2f2;">公開鍵</td>
+      <td>RSAの進化版。短い鍵で鍵交換や電子署名を行う（楕円曲線）</td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; color:#047857;">SHA-2</td>
+      <td style="font-size:0.9em;">Secure Hash Algorithm 2</td>
+      <td class="td-center" style="font-weight:bold; background:#ecfdf5;">ハッシュ</td>
+      <td>データの要約作成（メッセージダイジェスト）、改ざん検知</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
