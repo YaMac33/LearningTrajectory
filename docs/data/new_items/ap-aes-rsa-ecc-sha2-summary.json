@@ -1,0 +1,22 @@
+{
+  "id": "ap-aes-rsa-ecc-sha2-summary",
+  "category": "ap",
+  "timestamp": "2026-03-20T21:52:22+09:00",
+  "post_path": "ap/posts/2026-03-20-ap-aes-rsa-ecc-sha2-summary/",
+  "meta": {
+    "title": "代表的な暗号アルゴリズムの役割まとめ",
+    "summary": "暗号アルゴリズム「AES」「RSA」「ECC」「SHA-2」のフルネームと役割を解説し、各アルゴリズムの特徴を整理します。",
+    "tags": [
+      "セキュリティ",
+      "暗号技術",
+      "AES",
+      "RSA",
+      "SHA-2",
+      "ECC"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
