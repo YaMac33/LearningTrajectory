@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | RSA, ECC, DHとは？公開鍵暗号の家系図と3つの役割を図解</title>
+  <meta name="description" content="情報セキュリティで頻出のRSA, ECC, DH, ECDSAなどの略語をわかりやすく整理。公開鍵暗号の「家系図」と、鍵配送・鍵共有・電子署名という「3つの役割」の違いを図解で完全解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="RSA, ECC, DHとは？公開鍵暗号の家系図と3つの役割を図解" />
+  <meta property="og:description" content="情報セキュリティで頻出のRSA, ECC, DH, ECDSAなどの略語をわかりやすく整理。公開鍵暗号の「家系図」と、鍵配送・鍵共有・電子署名という「3つの役割」の違いを図解で完全解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 家系図（ツリー構造）図解 */
+    .family-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid #cbd5e1;
+    }
+    .ft-root {
+      background: #1e293b; color: #fff; font-weight: 900; padding: 10px 20px; border-radius: 8px; font-size: 1.1em; margin-bottom: 20px; position: relative;
+    }
+    .ft-root::after {
+      content: ""; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #94a3b8;
+    }
+    
+    .ft-branches {
+      display: flex; justify-content: center; gap: 20px; position: relative; width: 100%; max-width: 600px;
+    }
+    .ft-branches::before {
+      content: ""; position: absolute; top: -2px; left: 16%; right: 16%; height: 2px; background: #94a3b8;
+    }
+    
+    .ft-branch {
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
+    }
+    .ft-branch::before {
+      content: ""; position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #94a3b8;
+    }
+    
+    .ft-group-title {
+      background: #f8fafc; border: 2px solid; padding: 8px 15px; border-radius: 20px; font-weight: 900; margin-top: 18px; margin-bottom: 15px; width: 140px; text-align: center;
+    }
+    .branch-rsa .ft-group-title { border-color: #ef4444; color: #b91c1c; }
+    .branch-ecc .ft-group-title { border-color: #3b82f6; color: #1d4ed8; }
+    .branch-dh .ft-group-title { border-color: #f59e0b; color: #b45309; }
+
+    .ft-items {
+      display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center;
+    }
+    .ft-item {
+      background: #fff; border: 1px solid #cbd5e1; padding: 10px; border-radius: 6px; width: 90%; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .ft-abbr { font-weight: 900; font-size: 1.1em; display: block; color: #1e293b; }
+    .ft-role { font-size: 0.75em; font-weight: bold; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 5px; }
+
+    /* 役割図解共通 */
+    .role-flow {
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 20px;
+    }
+    .rf-header {
+      font-weight: 900; font-size: 1.1em; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;
+    }
+    .rf-actors {
+      display: flex; justify-content: space-between; align-items: stretch; position: relative;
+    }
+    .rf-actor {
+      width: 140px; display: flex; flex-direction: column; align-items: center; text-align: center;
+    }
+    .rf-name { font-weight: 900; color: #334155; margin-bottom: 10px; }
+    
+    .rf-box {
+      background: #fff; border: 1px solid #94a3b8; padding: 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; width: 100%; margin-bottom: 10px; box-sizing: border-box;
+    }
+    .box-sec { background: #fef2f2; border-color: #fca5a5; color: #ef4444; }
+    .box-pub { background: #eff6ff; border-color: #bfdbfe; color: #3b82f6; }
+    .box-com { background: #fffbeb; border-color: #fcd34d; color: #d97706; }
+
+    .rf-arrow-area {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 0 15px;
+    }
+    .rf-arrow {
+      width: 100%; height: 3px; background: #64748b; position: relative; margin: 15px 0;
+    }
+    .rf-arrow.right::after { content: "▶"; position: absolute; right: -5px; top: -12px; color: #64748b; font-size: 1.5em; }
+    .rf-arrow.left::before { content: "◀"; position: absolute; left: -5px; top: -12px; color: #64748b; font-size: 1.5em; }
+    .rf-arrow.both::after { content: "▶"; position: absolute; right: -5px; top: -12px; color: #64748b; font-size: 1.5em; }
+    .rf-arrow.both::before { content: "◀"; position: absolute; left: -5px; top: -12px; color: #64748b; font-size: 1.5em; }
+    
+    .rf-label {
+      position: absolute; top: -10px; background: #fff; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; color: #334155; border: 1px solid #cbd5e1; white-space: nowrap;
+    }
+    .rf-down { color: #94a3b8; font-weight: bold; font-size: 1.2em; margin: 5px 0; }
+    
+    .rf-result {
+      background: #1e293b; color: #a7f3d0; font-weight: 900; font-size: 0.9em; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; text-align: center;
+    }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.9em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 8px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+      color: #1e293b;
+    }
+    .td-center { text-align: center !important; }
+    .mark-o { color: #10b981; font-weight: bold; font-size: 1.2em; }
+    .mark-x { color: #ef4444; font-weight: bold; font-size: 1.2em; }
+    .mark-t { color: #f59e0b; font-weight: bold; font-size: 1.2em; }
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-20">
+            2026.03.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">RSA, ECC, DHとは？公開鍵暗号の家系図と3つの役割を図解</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#RSA</span>
+            <span class="tag">#ECC</span>
+            <span class="tag">#鍵共有</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「RSA」「ECDSA」「DH」……情報セキュリティの試験で次々と登場するアルファベットの略語たち。これらはすべて「公開鍵暗号」の仲間ですが、役割が全く異なります。<br>
+これらの略語は、<strong>「どの家系（ベース技術）か」</strong>と<strong>「何の役割（機能）か」</strong>の2軸で整理すると、一発で頭に入ります。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：3つの役割】<br>
+  これらの技術はすべて、<strong>①鍵を「送る」</strong>、<strong>②鍵を「作る（共有する）」</strong>、<strong>③「本人の証明（電子署名）」</strong>のいずれかの役割を担当しています。
+</div>
+
+<h2>1. 公開鍵暗号の世界の「家系図」</h2>
+<p>
+  まずは、ベースとなっている数学の技術（家系）でグループ分けしてみましょう。
+</p>
+
+<!-- 図解：家系図 -->
+<div class="diagram-container">
+  <div class="diagram-title">公開鍵暗号の3つのグループ</div>
+  <div class="family-tree">
+    
+    <div class="ft-root">公開鍵暗号の世界</div>
+    
+    <div class="ft-branches">
+      
+      <!-- RSA系 -->
+      <div class="ft-branch branch-rsa">
+        <div class="ft-group-title">RSA 系<br><span style="font-size:0.6em; color:#475569; font-weight:normal;">(古典的・重い)</span></div>
+        <div class="ft-items">
+          <div class="ft-item">
+            <span class="ft-abbr">RSA</span>
+            <span class="ft-role">暗号化・鍵配送</span>
+          </div>
+          <div class="ft-item">
+            <span class="ft-abbr">RSA署名</span>
+            <span class="ft-role">電子署名</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ECC系 -->
+      <div class="ft-branch branch-ecc">
+        <div class="ft-group-title">ECC 系<br><span style="font-size:0.6em; color:#475569; font-weight:normal;">(軽くて現代的)</span></div>
+        <div class="ft-items">
+          <div class="ft-item">
+            <span class="ft-abbr">ECC</span>
+            <span class="ft-role">楕円曲線暗号 (総称)</span>
+          </div>
+          <div class="ft-item">
+            <span class="ft-abbr">ECDH</span>
+            <span class="ft-role">鍵共有</span>
+          </div>
+          <div class="ft-item">
+            <span class="ft-abbr">ECDSA</span>
+            <span class="ft-role">電子署名</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DH系 -->
+      <div class="ft-branch branch-dh">
+        <div class="ft-group-title">DH 独立系<br><span style="font-size:0.6em; color:#475569; font-weight:normal;">(鍵共有の専門)</span></div>
+        <div class="ft-items">
+          <div class="ft-item">
+            <span class="ft-abbr">DH</span>
+            <span class="ft-role">鍵共有専用</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<h2>2. 役割ごとの動きの違い（送る・作る・証明する）</h2>
+<p>
+  次に、それぞれの技術が「どうやって通信を安全にしているか」を図解で比較します。特に<strong>「RSA（送る）」と「DH（作る）」の違い</strong>は超重要です。
+</p>
+
+<!-- 図解：役割フロー -->
+<div class="diagram-container">
+  
+  <!-- 鍵共有 (DH) -->
+  <div class="role-flow">
+    <div class="rf-header" style="color:#b45309;">
+      <span style="font-size:1.5em;">🤝</span> 鍵共有（DH / ECDH）の動き
+    </div>
+    <p style="font-size:0.85em; color:#475569; margin-top:0;">共通鍵をネットワークに流さず、お互いの情報から手元で<strong>「合成して作る」</strong>安全な方式。</p>
+    
+    <div class="rf-actors">
+      <div class="rf-actor">
+        <span class="rf-name">送信者</span>
+        <div class="rf-box box-sec">秘密値 A</div>
+        <div class="rf-down">⬇</div>
+        <div class="rf-box box-pub">公開値 A</div>
+      </div>
+      
+      <div class="rf-arrow-area">
+        <div class="rf-arrow both"><span class="rf-label">お互いの公開値を交換</span></div>
+      </div>
+      
+      <div class="rf-actor">
+        <span class="rf-name">受信者</span>
+        <div class="rf-box box-sec">秘密値 B</div>
+        <div class="rf-down">⬇</div>
+        <div class="rf-box box-pub">公開値 B</div>
+      </div>
+    </div>
+    
+    <div class="rf-actors" style="margin-top:10px;">
+      <div class="rf-actor"><div class="rf-result">共通鍵を生成✨</div></div>
+      <div class="rf-arrow-area" style="font-weight:bold; color:#d97706; font-size:0.8em;">(全く同じ鍵が完成する！)</div>
+      <div class="rf-actor"><div class="rf-result">共通鍵を生成✨</div></div>
+    </div>
+  </div>
+
+  <!-- 鍵配送 (RSA) -->
+  <div class="role-flow">
+    <div class="rf-header" style="color:#1d4ed8;">
+      <span style="font-size:1.5em;">📦</span> 鍵配送（RSA）の動き
+    </div>
+    <p style="font-size:0.85em; color:#475569; margin-top:0;">送信者が作った共通鍵を、受信者の公開鍵で暗号化して<strong>「安全に送る」</strong>方式。</p>
+    
+    <div class="rf-actors">
+      <div class="rf-actor">
+        <span class="rf-name">送信者</span>
+        <div class="rf-box box-com">共通鍵を作る</div>
+        <div class="rf-down">⬇</div>
+        <div class="rf-box box-pub">相手の公開鍵で暗号化</div>
+      </div>
+      
+      <div class="rf-arrow-area">
+        <div class="rf-arrow right"><span class="rf-label">暗号化した共通鍵を送る</span></div>
+      </div>
+      
+      <div class="rf-actor">
+        <span class="rf-name">受信者</span>
+        <div style="height:35px;"></div>
+        <div class="rf-down">⬇</div>
+        <div class="rf-box box-sec">自分の秘密鍵で復号</div>
+      </div>
+    </div>
+    
+    <div class="rf-actors" style="margin-top:10px;">
+      <div class="rf-actor"></div>
+      <div class="rf-arrow-area"></div>
+      <div class="rf-actor"><div class="rf-result">共通鍵をゲット✨</div></div>
+    </div>
+  </div>
+
+  <!-- 電子署名 (RSA署名 / ECDSA) -->
+  <div class="role-flow">
+    <div class="rf-header" style="color:#b91c1c;">
+      <span style="font-size:1.5em;">✍️</span> 電子署名（RSA署名 / ECDSA）の動き
+    </div>
+    <p style="font-size:0.85em; color:#475569; margin-top:0;">データのハッシュ値を自分の秘密鍵で暗号化し、<strong>「本人の証明」</strong>として送る方式。</p>
+    
+    <div class="rf-actors">
+      <div class="rf-actor">
+        <span class="rf-name">送信者</span>
+        <div class="rf-box">ハッシュ値</div>
+        <div class="rf-down">⬇</div>
+        <div class="rf-box box-sec">自分の秘密鍵で署名</div>
+      </div>
+      
+      <div class="rf-arrow-area">
+        <div class="rf-arrow right"><span class="rf-label">[データ ＋ 署名] を送る</span></div>
+      </div>
+      
+      <div class="rf-actor">
+        <span class="rf-name">受信者</span>
+        <div style="height:35px;"></div>
+        <div class="rf-down">⬇</div>
+        <div class="rf-box box-pub">相手の公開鍵で検証</div>
+      </div>
+    </div>
+    
+    <div class="rf-actors" style="margin-top:10px;">
+      <div class="rf-actor"></div>
+      <div class="rf-arrow-area"></div>
+      <div class="rf-actor"><div class="rf-result">本人確認OK✨</div></div>
+    </div>
+  </div>
+
+</div>
+
+<h2>3. 実際の通信（TLS）での組み合わせ</h2>
+<p>
+  現代のインターネット通信では、これらの技術を組み合わせて安全を確保しています。大まかな流れは以下の通りです。
+</p>
+<ol style="background:#f8fafc; padding:20px 20px 20px 40px; border-radius:8px; border:1px solid #e2e8f0; font-weight:bold; color:#334155; line-height:1.8;">
+  <li><strong>【鍵の準備】</strong> <span style="color:#b45309;">DH または ECDH</span> でお互いに共通鍵を生成する。（または <span style="color:#1d4ed8;">RSA</span> で鍵を送る）</li>
+  <li><strong>【本人の証明】</strong> <span style="color:#b91c1c;">RSA署名 または ECDSA</span> を使って、相手が本物か確認する。</li>
+  <li><strong>【本通信】</strong> 準備できた共通鍵を使って、<span style="color:#047857;">AES（共通鍵暗号）</span> で実際のデータを高速にやり取りする。</li>
+</ol>
+
+<h2>試験対策！6つの暗号方式の完全比較表</h2>
+<p>
+  午前試験で確実に得点するため、それぞれの「できること・できないこと」を整理した最強の比較表です。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:15%;">略語</th>
+      <th style="width:15%;">分類</th>
+      <th style="width:12%;">データ<br>暗号化</th>
+      <th style="width:12%;">電子<br>署名</th>
+      <th style="width:12%;">鍵<br>共有</th>
+      <th>試験での特徴・キーワード</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="font-weight:bold; color:#b91c1c;">RSA</td>
+      <td class="td-center">公開鍵</td>
+      <td class="td-center mark-o">○</td>
+      <td class="td-center mark-t">△</td>
+      <td class="td-center mark-t">△</td>
+      <td>素因数分解。共通鍵の<strong>配送</strong>や暗号化に使う。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; color:#b91c1c;">RSA署名</td>
+      <td class="td-center">電子署名</td>
+      <td class="td-center mark-x">×</td>
+      <td class="td-center mark-o">◎</td>
+      <td class="td-center mark-x">×</td>
+      <td>RSAの仕組みを使った<strong>本人証明</strong>専用。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; color:#d97706;">DH</td>
+      <td class="td-center">鍵共有</td>
+      <td class="td-center mark-x">×</td>
+      <td class="td-center mark-x">×</td>
+      <td class="td-center mark-o">◎</td>
+      <td>安全に共通鍵を<strong>生成（共有）</strong>する専用プロトコル。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; color:#1d4ed8;">ECC</td>
+      <td class="td-center">公開鍵(総称)</td>
+      <td class="td-center mark-t">△</td>
+      <td class="td-center mark-t">△</td>
+      <td class="td-center mark-t">△</td>
+      <td><strong>楕円曲線</strong>。RSAより短い鍵で同等の強度を出せる（高効率）。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; color:#1d4ed8;">ECDSA</td>
+      <td class="td-center">電子署名</td>
+      <td class="td-center mark-x">×</td>
+      <td class="td-center mark-o">◎</td>
+      <td class="td-center mark-x">×</td>
+      <td>ECCベースの<strong>電子署名</strong>アルゴリズム。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; color:#1d4ed8;">ECDH</td>
+      <td class="td-center">鍵共有</td>
+      <td class="td-center mark-x">×</td>
+      <td class="td-center mark-x">×</td>
+      <td class="td-center mark-o">◎</td>
+      <td>ECCベースの<strong>鍵共有</strong>プロトコル。</td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
