@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-sha-2-sha-3-difference",
+    "category": "ap",
+    "timestamp": "2026-03-20T22:38:34+09:00",
+    "title": "SHA-2とSHA-3の違いを図解で理解",
+    "summary": "ハッシュ関数SHA-2とSHA-3の違いや特徴を図解し、情報セキュリティの試験に役立つ知識を得ることができます。",
+    "tags": [
+      "セキュリティ",
+      "ハッシュ関数",
+      "SHA-2",
+      "SHA-3",
+      "暗号技術",
+      "Merkle-Damgård",
+      "スポンジ構造"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-20-ap-sha-2-sha-3-difference/"
+  },
+  {
     "id": "ap-dh-ecdh-technology",
     "category": "ap",
     "timestamp": "2026-03-20T22:28:45+09:00",
