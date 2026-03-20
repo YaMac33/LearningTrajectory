@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-ssl-tls-overview",
+    "category": "ap",
+    "timestamp": "2026-03-20T23:34:49+09:00",
+    "title": "SSL/TLSの全体像と仕組みを解説",
+    "summary": "SSL/TLSは、通信の安全を実現するための暗号技術群を解説します。特に前方秘匿性(PFS)やハンドシェイクの流れに焦点を当てます。",
+    "tags": [
+      "セキュリティ",
+      "SSL",
+      "TLS",
+      "暗号化",
+      "前方秘匿性"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-20-ap-ssl-tls-overview/"
+  },
+  {
     "id": "ap-sha-2-sha-3-difference",
     "category": "ap",
     "timestamp": "2026-03-20T22:38:34+09:00",
