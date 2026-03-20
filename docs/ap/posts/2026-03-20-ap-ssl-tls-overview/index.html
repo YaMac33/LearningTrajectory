@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SSL/TLSの全体像と仕組み：暗号技術のオールスターチーム</title>
+  <meta name="description" content="インターネットの安全を守る「SSL/TLS」の全体像を解説。AES、RSA、ECC、SHA-2などの暗号技術がどう連携しているか、ハンドシェイクの流れ、そして現代の主流である「前方秘匿性（PFS）」を図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SSL/TLSの全体像と仕組み：暗号技術のオールスターチーム" />
+  <meta property="og:description" content="インターネットの安全を守る「SSL/TLS」の全体像を解説。AES、RSA、ECC、SHA-2などの暗号技術がどう連携しているか、ハンドシェイクの流れ、そして現代の主流である「前方秘匿性（PFS）」を図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* オールスターチーム（役割図解） */
+    .allstar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+    .as-card {
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .as-purpose { font-weight: 900; font-size: 1.1em; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+    .as-desc { font-size: 0.8em; color: #64748b; font-weight: bold; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1; }
+    .as-tech { display: flex; align-items: center; justify-content: center; font-family: monospace; font-weight: 900; font-size: 1.2em; padding: 8px; border-radius: 6px; }
+
+    .card-auth { border-color: #ef4444; }
+    .card-auth .as-purpose { color: #b91c1c; }
+    .card-auth .as-tech { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; }
+
+    .card-key { border-color: #f59e0b; }
+    .card-key .as-purpose { color: #b45309; }
+    .card-key .as-tech { background: #fffbeb; color: #d97706; border: 1px solid #fcd34d; }
+
+    .card-enc { border-color: #3b82f6; }
+    .card-enc .as-purpose { color: #1d4ed8; }
+    .card-enc .as-tech { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+
+    .card-hash { border-color: #10b981; }
+    .card-hash .as-purpose { color: #047857; }
+    .card-hash .as-tech { background: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; }
+
+    /* シーケンス図（ハンドシェイク） */
+    .sequence-flow {
+      display: flex;
+      flex-direction: column;
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 8px;
+      min-width: 500px;
+      color: #fff;
+    }
+    .seq-actors {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #475569;
+      padding-bottom: 10px;
+    }
+    .seq-actor { font-weight: 900; font-size: 1.2em; color: #f8fafc; width: 140px; text-align: center; }
+    
+    .seq-phase {
+      position: relative; margin-bottom: 15px; padding: 15px 0; border-radius: 8px;
+    }
+    .seq-phase::before, .seq-phase::after {
+      content: ""; position: absolute; top: 0; bottom: 0; width: 2px; background: #64748b; z-index: 1;
+    }
+    .seq-phase::before { left: 70px; }
+    .seq-phase::after { right: 70px; }
+
+    .phase-hs { background: rgba(59, 130, 246, 0.1); border: 1px dashed #3b82f6; }
+    .phase-data { background: rgba(16, 185, 129, 0.1); border: 1px dashed #10b981; }
+    
+    .phase-label {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-weight: 900; font-size: 0.85em; padding: 4px 12px; border-radius: 20px; z-index: 2;
+    }
+    .phase-hs .phase-label { background: #3b82f6; color: #fff; }
+    .phase-data .phase-label { background: #10b981; color: #fff; }
+
+    .seq-row { display: flex; align-items: center; justify-content: center; position: relative; height: 50px; z-index: 2; }
+    .seq-line { width: calc(100% - 140px); height: 2px; position: relative; }
+    .seq-line.right { background: #94a3b8; }
+    .seq-line.right::after { content: "▶"; position: absolute; right: -5px; top: -12px; color: #94a3b8; font-size: 1.5em; }
+    .seq-line.left { background: #94a3b8; }
+    .seq-line.left::before { content: "◀"; position: absolute; left: -5px; top: -12px; color: #94a3b8; font-size: 1.5em; }
+    .seq-line.both { background: #fcd34d; height: 4px; }
+    .seq-line.both::after { content: "▶"; position: absolute; right: -5px; top: -11px; color: #fcd34d; font-size: 1.5em; }
+    .seq-line.both::before { content: "◀"; position: absolute; left: -5px; top: -11px; color: #fcd34d; font-size: 1.5em; }
+
+    .seq-msg { position: absolute; top: -20px; background: #334155; padding: 4px 10px; border-radius: 6px; font-size: 0.8em; font-weight: bold; color: #f8fafc; border: 1px solid #475569; white-space: nowrap; }
+    .seq-action { position: absolute; font-size: 0.75em; color: #a7f3d0; font-weight: bold; background: #0f172a; padding: 2px 6px; border-radius: 4px; border: 1px solid #064e3b; }
+    .action-left { left: 80px; }
+    .action-right { right: 80px; }
+
+    /* 前方秘匿性の比較図解 */
+    .pfs-compare {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .pfs-box {
+      flex: 1; min-width: 250px; background: #fff; border: 2px solid; border-radius: 8px; padding: 20px; position: relative;
+    }
+    .box-old { border-color: #ef4444; }
+    .box-new { border-color: #3b82f6; }
+
+    .pfs-header { font-weight: 900; font-size: 1.1em; margin-bottom: 15px; text-align: center; }
+    .box-old .pfs-header { color: #b91c1c; }
+    .box-new .pfs-header { color: #1d4ed8; }
+
+    .pfs-visual { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 15px; border-radius: 6px; font-size: 0.85em; font-weight: bold; color: #334155; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px; }
+    
+    .pfs-leak { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 5px 10px; border-radius: 4px; width: 100%; text-align: center; font-weight: 900; }
+    .pfs-result-bad { background: #7f1d1d; color: #fca5a5; padding: 10px; border-radius: 4px; text-align: center; width: 100%; font-weight: 900; }
+    .pfs-result-good { background: #ecfdf5; color: #047857; border: 1px solid #6ee7b7; padding: 10px; border-radius: 4px; text-align: center; width: 100%; font-weight: 900; }
+
+    .pfs-desc { font-size: 0.85em; color: #475569; line-height: 1.5; font-weight: bold; }
+
+    /* 誤解アラートボックス */
+    .misconception-box {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .mb-title { font-weight: 900; color: #b45309; font-size: 1.1em; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; border-bottom: 1px solid #fcd34d; padding-bottom: 10px; }
+    
+    .mb-list { display: flex; flex-direction: column; gap: 15px; }
+    .mb-item { background: #fff; padding: 15px; border-radius: 6px; border-left: 4px solid #ef4444; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .mb-wrong { color: #ef4444; font-weight: 900; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+    .mb-right { color: #10b981; font-weight: 900; display: flex; align-items: flex-start; gap: 5px; }
+    .mb-right span { font-size: 0.9em; color: #047857; margin-top: 2px; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-20">
+            2026.03.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SSL/TLSの全体像と仕組み：暗号技術のオールスターチーム</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#SSL</span>
+            <span class="tag">#TLS</span>
+            <span class="tag">#暗号化</span>
+            <span class="tag">#前方秘匿性</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「共通鍵」「公開鍵」「ハッシュ」「電子署名」…。これまで個別に学んできたこれらの暗号技術は、単独で使われることはほとんどありません。<br>
+これらすべてを組み合わせて<strong>「安全な通信」を実現する仕組みの集合体</strong>、それこそがインターネットの超重要プロトコルである「SSL/TLS」です。すべての知識が繋がる総決算を見てみましょう。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：TLSとは何か？】<br>
+  TLSとは、1つの技術のことではありません。<br>
+  <strong>「本人確認をしてから鍵を作り、その鍵で安全に通信する仕組み」</strong>全体のことです！
+</div>
+
+<h2>1. TLSは「暗号技術のオールスターチーム」</h2>
+<p>
+  TLSは、通信の安全を守るための3つの要素（真正性・機密性・完全性）を、それぞれ別のスペシャリスト（アルゴリズム）に担当させています。
+</p>
+
+<!-- 図解：オールスターチーム -->
+<div class="diagram-container">
+  <div class="diagram-title">TLSを構成する4つの担当技術</div>
+  <div class="allstar-grid">
+    
+    <div class="as-card card-auth">
+      <span class="as-purpose"><span>🆔</span> 真正性（認証）</span>
+      <span class="as-desc">相手が本物かを確認する</span>
+      <div class="as-tech">RSA署名 / ECDSA</div>
+    </div>
+
+    <div class="as-card card-key">
+      <span class="as-purpose"><span>🤝</span> 鍵共有</span>
+      <span class="as-desc">安全に共通鍵を手元で作る</span>
+      <div class="as-tech">DH / ECDHE</div>
+    </div>
+
+    <div class="as-card card-enc">
+      <span class="as-purpose"><span>📦</span> 機密性（暗号化）</span>
+      <span class="as-desc">データを盗み見られないようにする</span>
+      <div class="as-tech">AES</div>
+    </div>
+
+    <div class="as-card card-hash">
+      <span class="as-purpose"><span>👀</span> 完全性（改ざん検知）</span>
+      <span class="as-desc">途中で書き換えられていないか見破る</span>
+      <div class="as-tech">SHA-2 / HMAC</div>
+    </div>
+
+  </div>
+</div>
+
+<h2>2. 通信の流れ：挨拶から秘密の会話まで</h2>
+<p>
+  私たちがWebサイト（HTTPS）にアクセスした時、裏側では「ハンドシェイク（準備フェーズ）」と「データ通信フェーズ」の2段階のやり取りが行われています。
+</p>
+
+<!-- 図解：シーケンス図 -->
+<div class="diagram-container" style="overflow-x: auto;">
+  <div class="diagram-title">TLS通信のシーケンス（流れ）</div>
+  <div class="sequence-flow">
+    
+    <div class="seq-actors">
+      <span class="seq-actor">📱 クライアント</span>
+      <span class="seq-actor">🏢 サーバ</span>
+    </div>
+
+    <!-- ハンドシェイクフェーズ -->
+    <div class="seq-phase phase-hs">
+      <span class="phase-label">① ハンドシェイク（準備フェーズ）</span>
+      
+      <div class="seq-row">
+        <div class="seq-line right"></div>
+        <span class="seq-msg">「接続したいです！」 (ClientHello)</span>
+      </div>
+
+      <div class="seq-row">
+        <div class="seq-line left"></div>
+        <span class="seq-msg">証明書（公開鍵と署名）と鍵共有のヒントを送る</span>
+      </div>
+
+      <div class="seq-row" style="height:30px;">
+        <span class="seq-action action-left">✅ 署名を検証（本物だ！）</span>
+      </div>
+
+      <div class="seq-row">
+        <div class="seq-line right"></div>
+        <span class="seq-msg">クライアント側の鍵共有のヒントを送る</span>
+      </div>
+
+      <div class="seq-row" style="height:30px;">
+        <span class="seq-action action-left">🔑 ECDHEで共通鍵を作成</span>
+        <span class="seq-action action-right">🔑 ECDHEで共通鍵を作成</span>
+      </div>
+      <div style="text-align:center; font-size:0.8em; color:#93c5fd; font-weight:bold; margin-top:5px;">
+        （この時点で、両者の手元に全く同じ共通鍵が完成✨）
+      </div>
+    </div>
+
+    <!-- 通信フェーズ -->
+    <div class="seq-phase phase-data">
+      <span class="phase-label">② 通信フェーズ（本番）</span>
+      
+      <div class="seq-row">
+        <div class="seq-line both"></div>
+        <span class="seq-msg" style="background:#064e3b; border-color:#10b981; color:#a7f3d0;">【AES】で暗号化 ＋ 【HMAC】で改ざん検知</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. なぜ今は「ECDHE」が主流なのか？（前方秘匿性）</h2>
+<p>
+  昔のTLS（SSL）では、鍵共有に「RSA（共通鍵を作ってから、相手の公開鍵で暗号化して送る）」が使われていました。しかし現在では、<strong>ECDHE（共通鍵を送らずに手元で作る）</strong>が主流です。<br>
+  その理由は、<strong>「前方秘匿性（Perfect Forward Secrecy: PFS）」</strong>という極めて重要な性質を満たすためです。
+</p>
+
+<!-- 図解：前方秘匿性の比較 -->
+<div class="diagram-container">
+  <div class="diagram-title">もし、後になって「サーバの秘密鍵」がハッカーに漏れたら？</div>
+  <div class="pfs-compare">
+    
+    <!-- 昔のRSA -->
+    <div class="pfs-box box-old">
+      <div class="pfs-header">昔の方式（RSA鍵交換）</div>
+      <div class="pfs-visual">
+        <span>共通鍵を「サーバの公開鍵」で<br>暗号化して送っていた</span>
+        <span>⬇</span>
+        <div class="pfs-leak">💥 数年後、サーバの秘密鍵が流出</div>
+        <span>⬇</span>
+        <div class="pfs-result-bad">
+          過去に盗聴・録画されていた<br>すべての通信が<br>芋づる式に解読される！😱
+        </div>
+      </div>
+      <div class="pfs-desc">
+        ハッカーが秘密鍵を使って「過去に送られた共通鍵」を復号できてしまうため、過去の通信データまで全て丸見えになります。
+      </div>
+    </div>
+
+    <!-- 今のECDHE -->
+    <div class="pfs-box box-new">
+      <div class="pfs-header">今の方式（ECDHE鍵共有）</div>
+      <div class="pfs-visual">
+        <span>毎回使い捨てのセッション鍵を<br>「送らずに手元で作る」</span>
+        <span>⬇</span>
+        <div class="pfs-leak">💥 数年後、サーバの秘密鍵が流出</div>
+        <span>⬇</span>
+        <div class="pfs-result-good">
+          過去の通信は解読できない！<br>（前方秘匿性が保たれる）✨
+        </div>
+      </div>
+      <div class="pfs-desc">
+        サーバの秘密鍵は「本人確認（署名）」にしか使っておらず、共通鍵は通信のたびに破棄されているため、後から秘密鍵が漏れても過去の通信は安全です。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>試験対策まとめ：よくある勘違いを正す</h2>
+<p>
+  TLSに関して、初学者が陥りやすい「3つの誤解」を整理しました。試験の選択肢で引っかからないようにしましょう！
+</p>
+
+<div class="diagram-container">
+  <div class="misconception-box">
+    <div class="mb-title">💡 TLSの「よくある誤解」チェック</div>
+    
+    <div class="mb-list">
+      <div class="mb-item">
+        <div class="mb-wrong">❌「TLSは公開鍵暗号でデータを通信している」</div>
+        <div class="mb-right">⭕ 違う！ <span>実際のデータ通信は、処理が高速な<strong>「共通鍵暗号（AESなど）」</strong>で行っています。公開鍵暗号は、最初の手続き（認証や鍵共有）で使われます。</span></div>
+      </div>
+
+      <div class="mb-item">
+        <div class="mb-wrong">❌「DH（鍵共有）を使えばそれだけで安全だ」</div>
+        <div class="mb-right">⭕ 違う！ <span>DHだけでは「相手が本物か（中間者攻撃）」を防げません。必ず<strong>「電子証明書（RSA署名/ECDSA）」による本人確認（認証）</strong>とセットで使います。</span></div>
+      </div>
+
+      <div class="mb-item">
+        <div class="mb-wrong">❌「電子署名は、送るデータ一つ一つに毎回付けている」</div>
+        <div class="mb-right">⭕ 違う！ <span>重い処理である電子署名は、主に<strong>「最初のハンドシェイク（サーバの証明書の提示など）」</strong>で使われます。通信中の改ざん検知には、より軽いMAC（メッセージ認証コード）などが使われます。</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
