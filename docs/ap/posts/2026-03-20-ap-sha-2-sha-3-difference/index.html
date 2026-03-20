@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | SHA-2, SHA-3, SHA-256の違いとは？ハッシュ関数の系統と構造を図解</title>
+  <meta name="description" content="情報セキュリティで混同しやすいハッシュ関数「SHA-2」「SHA-3」「SHA-256」の違いと関係性を図解。シリーズの家系図や、内部構造（Merkle-Damgård構造とスポンジ構造）の違いをわかりやすく解説します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="SHA-2, SHA-3, SHA-256の違いとは？ハッシュ関数の系統と構造を図解" />
+  <meta property="og:description" content="情報セキュリティで混同しやすいハッシュ関数「SHA-2」「SHA-3」「SHA-256」の違いと関係性を図解。シリーズの家系図や、内部構造（Merkle-Damgård構造とスポンジ構造）の違いをわかりやすく解説します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 家系図（ツリー構造）図解 */
+    .family-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid #cbd5e1;
+    }
+    .ft-root {
+      background: #1e293b; color: #fff; font-weight: 900; padding: 10px 20px; border-radius: 8px; font-size: 1.1em; margin-bottom: 20px; position: relative;
+    }
+    .ft-root::after {
+      content: ""; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #94a3b8;
+    }
+    
+    .ft-branches {
+      display: flex; justify-content: center; gap: 40px; position: relative; width: 100%; max-width: 600px;
+    }
+    .ft-branches::before {
+      content: ""; position: absolute; top: -2px; left: 25%; right: 25%; height: 2px; background: #94a3b8;
+    }
+    
+    .ft-branch {
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;
+    }
+    .ft-branch::before {
+      content: ""; position: absolute; top: -2px; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #94a3b8;
+    }
+    
+    .ft-group-title {
+      background: #f8fafc; border: 2px solid; padding: 10px 15px; border-radius: 8px; font-weight: 900; margin-top: 18px; margin-bottom: 15px; width: 180px; text-align: center;
+    }
+    .branch-sha2 .ft-group-title { border-color: #3b82f6; color: #1d4ed8; }
+    .branch-sha3 .ft-group-title { border-color: #10b981; color: #047857; }
+    
+    .ft-desc { font-size: 0.7em; color: #64748b; display: block; margin-top: 5px; }
+
+    .ft-items {
+      display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center; position: relative;
+    }
+    .ft-items::before {
+      content: ""; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 2px; height: 100%; background: #e2e8f0; z-index: 1;
+    }
+    
+    .ft-item {
+      background: #fff; border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; width: 140px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; z-index: 2;
+    }
+    .item-highlight {
+      border: 2px solid #ef4444; background: #fef2f2; transform: scale(1.1); box-shadow: 0 4px 8px rgba(239,68,68,0.2); font-weight: 900; color: #b91c1c; margin: 10px 0;
+    }
+    .item-highlight::after {
+      content: "★今の主役！"; position: absolute; top: -10px; right: -20px; background: #ef4444; color: #fff; font-size: 0.6em; padding: 2px 6px; border-radius: 10px; transform: rotate(10deg);
+    }
+    
+    .ft-abbr { font-weight: bold; font-size: 0.95em; display: block; color: #334155; }
+    .item-highlight .ft-abbr { color: #b91c1c; font-size: 1.1em; }
+
+    /* 内部構造の違い図解 */
+    .vs-layout {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .vs-card {
+      flex: 1;
+      min-width: 250px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .card-old { border-color: #3b82f6; }
+    .card-new { border-color: #10b981; }
+
+    .vs-header {
+      font-weight: 900; font-size: 1.1em; margin-bottom: 10px; text-align: center; display: flex; flex-direction: column; gap: 5px;
+    }
+    .card-old .vs-header { color: #1d4ed8; }
+    .card-new .vs-header { color: #047857; }
+
+    .vs-visual {
+      background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; height: 100px;
+    }
+    
+    /* MD構造のビジュアル */
+    .vis-md { display: flex; align-items: center; gap: 5px; }
+    .md-block { background: #bfdbfe; border: 2px solid #3b82f6; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; font-weight: bold; color: #1e3a8a; }
+    .md-arrow { color: #3b82f6; font-weight: bold; }
+    
+    /* スポンジ構造のビジュアル */
+    .vis-sponge { position: relative; }
+    .sponge-obj { background: #a7f3d0; border: 3px dashed #10b981; width: 80px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #065f46; font-size: 0.8em; }
+    .sponge-in { position: absolute; top: -15px; left: 10px; color: #047857; font-size: 1.2em; font-weight: bold; transform: rotate(45deg); }
+    .sponge-out { position: absolute; bottom: -15px; right: 10px; color: #047857; font-size: 1.2em; font-weight: bold; transform: rotate(45deg); }
+
+    .vs-features {
+      list-style: none; padding: 0; margin: 0; font-size: 0.85em; color: #475569; line-height: 1.6; font-weight: bold;
+    }
+    .vs-features li { margin-bottom: 8px; position: relative; padding-left: 20px; }
+    .vs-features li::before { content: "✔"; position: absolute; left: 0; top: 0; }
+    .card-old .vs-features li::before { color: #3b82f6; }
+    .card-new .vs-features li::before { color: #10b981; }
+
+    /* 混同注意アラート */
+    .alert-box {
+      background: #fef2f2;
+      border-left: 5px solid #ef4444;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 20px;
+    }
+    .alert-title { font-weight: 900; color: #b91c1c; display: flex; align-items: center; gap: 5px; margin-bottom: 10px; font-size: 1.1em; }
+    .alert-text { font-size: 0.9em; color: #7f1d1d; line-height: 1.6; }
+    
+    .name-trap {
+      display: flex; align-items: center; justify-content: center; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; border: 1px dashed #fca5a5; margin-top: 10px; font-weight: 900; font-size: 1.1em;
+    }
+    .trap-item { display: flex; flex-direction: column; align-items: center; }
+    .trap-name { color: #1e293b; }
+    .trap-desc { font-size: 0.7em; color: #64748b; margin-top: 5px; }
+    .trap-vs { color: #ef4444; font-size: 1.5em; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-20">
+            2026.03.20
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">SHA-2, SHA-3, SHA-256の違いとは？ハッシュ関数の系統と構造を図解</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#暗号技術</span>
+            <span class="tag">#ハッシュ関数</span>
+            <span class="tag">#SHA-2</span>
+            <span class="tag">#SHA-3</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>「SHA-2」と「SHA-256」はどう違うの？「SHA-3」って何？<br>
+情報セキュリティの学習で必ず混乱するこのハッシュ関数の名前たち。実は<strong>「シリーズ名（名字）」</strong>と<strong>「具体的なアルゴリズム名（下の名前）」</strong>の違いさえ分かれば、一瞬で整理できるボーナス問題なのです。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：ズバリ結論！】<br>
+  ・<strong>SHA-2</strong> ＝ 今主流の「シリーズ名（家系）」<br>
+  ・<strong>SHA-256</strong> ＝ SHA-2シリーズの中にいる「一番有名な代表選手」<br>
+  ・<strong>SHA-3</strong> ＝ 設計図から作り直した「全く新しい別のシリーズ名（家系）」
+</div>
+
+<h2>1. 一目でわかるハッシュ関数の「家系図」</h2>
+<p>
+  「2」や「3」という数字はシリーズ名（世代）を表し、「256」や「512」という数字は出力されるハッシュ値の長さ（ビット数）を表しています。
+</p>
+
+<!-- 図解：家系図 -->
+<div class="diagram-container">
+  <div class="diagram-title">ハッシュ関数「SHA」ファミリーの家系図</div>
+  <div class="family-tree">
+    
+    <div class="ft-root">ハッシュ関数の世界</div>
+    
+    <div class="ft-branches">
+      
+      <!-- SHA-2系列 -->
+      <div class="ft-branch branch-sha2">
+        <div class="ft-group-title">
+          SHA-2 系列<br>
+          <span class="ft-desc">現在の主流（大黒柱）</span>
+        </div>
+        <div class="ft-items">
+          <div class="ft-item"><span class="ft-abbr">SHA-224</span></div>
+          <div class="ft-item item-highlight"><span class="ft-abbr">SHA-256</span></div>
+          <div class="ft-item"><span class="ft-abbr">SHA-384</span></div>
+          <div class="ft-item"><span class="ft-abbr">SHA-512</span></div>
+        </div>
+      </div>
+
+      <!-- SHA-3系列 -->
+      <div class="ft-branch branch-sha3">
+        <div class="ft-group-title">
+          SHA-3 系列<br>
+          <span class="ft-desc">次世代の備え（別設計）</span>
+        </div>
+        <div class="ft-items">
+          <div class="ft-item"><span class="ft-abbr">SHA3-224</span></div>
+          <div class="ft-item"><span class="ft-abbr">SHA3-256</span></div>
+          <div class="ft-item"><span class="ft-abbr">SHA3-384</span></div>
+          <div class="ft-item"><span class="ft-abbr">SHA3-512</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<h2>2. SHA-2 と SHA-3 は「中身」が全く違う！</h2>
+<p>
+  「なぜわざわざSHA-3を作ったの？SHA-2じゃダメなの？」<br>
+  実は、現在でもSHA-2は非常に安全で、全く破られていません。しかし、万が一将来SHA-2の作り方（構造）に致命的な弱点が見つかった時に備えて、<strong>「SHA-2とは完全に違う作り方（構造）」</strong>のハッシュ関数をスペアとして準備しておく必要がありました。それがSHA-3です。
+</p>
+
+<!-- 図解：構造の違い -->
+<div class="diagram-container">
+  <div class="diagram-title">内部構造の決定的な違い</div>
+  <div class="vs-layout">
+    
+    <!-- SHA-2 -->
+    <div class="vs-card card-old">
+      <div class="vs-header">SHA-2 系列</div>
+      
+      <div class="vs-visual">
+        <div class="vis-md">
+          <div class="md-block">データ</div><span class="md-arrow">➡</span>
+          <div class="md-block">データ</div><span class="md-arrow">➡</span>
+          <div class="md-block" style="background:#1d4ed8; color:#fff; border-color:#1e3a8a;">ハッシュ</div>
+        </div>
+      </div>
+
+      <ul class="vs-features">
+        <li><strong>Merkle-Damgård（MD）構造</strong></li>
+        <li>データを細かくブロックに分け、数珠つなぎに順番に処理していく古典的で実績のある作り方。</li>
+        <li>現在、電子署名やTLS、ブロックチェーンなど世界中で最も普及している。</li>
+      </ul>
+    </div>
+
+    <!-- SHA-3 -->
+    <div class="vs-card card-new">
+      <div class="vs-header">SHA-3 系列</div>
+      
+      <div class="vs-visual">
+        <div class="vis-sponge">
+          <div class="sponge-in">↓</div>
+          <div class="sponge-obj">吸収・絞出</div>
+          <div class="sponge-out">↓</div>
+        </div>
+      </div>
+
+      <ul class="vs-features">
+        <li><strong>スポンジ（Sponge）構造</strong></li>
+        <li>データをスポンジに吸い込ませるように内部状態に混ぜ合わせ、後からギュッと絞り出すような全く新しい作り方。</li>
+        <li>SHA-2が破られた時の安全な代替手段（バックアップ）として設計された。</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 試験対策：一番引っかかる「名前の罠」</h2>
+<p>
+  午前試験の選択肢で、受験生を落とすためによく使われる「引っかけ」があります。
+</p>
+
+<div class="diagram-container">
+  <div class="alert-box">
+    <div class="alert-title">⚠ 絶対に混同してはいけない2つ</div>
+    <div class="alert-text">
+      名前に「256」が入っているからといって同じ系列とは限りません。<br>
+      「ハイフンの位置」に注目してください！
+    </div>
+    <div class="name-trap">
+      <div class="trap-item">
+        <span class="trap-name">SHA-256</span>
+        <span class="trap-desc">SHA-2系列の代表選手</span>
+      </div>
+      <div class="trap-vs">≠</div>
+      <div class="trap-item">
+        <span class="trap-name">SHA3-256</span>
+        <span class="trap-desc">SHA-3系列の256bit版</span>
+      </div>
+    </div>
+    <div class="alert-text" style="margin-top:10px; font-weight:bold; color:#b91c1c;">
+      👉 この2つは名前が似ているだけで、内部の設計図は「MD構造」と「スポンジ構造」で完全に別物です！
+    </div>
+  </div>
+</div>
+
+<h2>まとめ：役割はみんな同じ</h2>
+<p>
+  構造や系列は違っても、ハッシュ関数として「やりたいこと（役割）」は全員同じです。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">シリーズ</th>
+      <th style="width:25%;">内部構造</th>
+      <th>役割（共通）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="td-center" style="font-weight:bold; color:#1d4ed8; background:#eff6ff;">SHA-2 系<br><span style="font-size:0.8em; color:#475569; font-weight:normal;">(SHA-256など)</span></td>
+      <td class="td-center" style="font-weight:bold;">Merkle-Damgård構造<br><span style="font-size:0.8em; color:#475569; font-weight:normal;">(数珠つなぎ)</span></td>
+      <td rowspan="2" style="background:#f8fafc;">
+        <ul style="margin:0; padding-left:20px; font-weight:bold; color:#334155; line-height:1.6;">
+          <li>どんなデータからも固定長の値を出す。</li>
+          <li>元のデータには絶対に戻せない（一方向性）。</li>
+          <li><strong>データの要約（メッセージダイジェスト）作成</strong></li>
+          <li><strong>改ざんの検知</strong></li>
+          <li><strong>電子署名の前処理</strong></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td class="td-center" style="font-weight:bold; color:#047857; background:#ecfdf5;">SHA-3 系<br><span style="font-size:0.8em; color:#475569; font-weight:normal;">(SHA3-256など)</span></td>
+      <td class="td-center" style="font-weight:bold;">スポンジ構造<br><span style="font-size:0.8em; color:#475569; font-weight:normal;">(吸収して絞り出す)</span></td>
+    </tr>
+  </tbody>
+</table>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
