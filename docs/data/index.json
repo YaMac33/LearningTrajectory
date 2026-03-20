@@ -1,5 +1,28 @@
 [
   {
+    "id": "ap-dh-ecdh-technology",
+    "category": "ap",
+    "timestamp": "2026-03-20T22:28:45+09:00",
+    "title": "DH/ECDHの仕組みと共通鍵の生成方法",
+    "summary": "DHとECDHを用いた共通鍵生成の仕組みを解説し、ネットワーク上での安全な鍵共有の方法について理解を深めることができる。",
+    "tags": [
+      "セキュリティ",
+      "暗号技術",
+      "鍵共有",
+      "DH",
+      "ECDH",
+      "中間者攻撃",
+      "TLS"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-20-ap-dh-ecdh-technology/"
+  },
+  {
     "id": "ap-rsa-ecc-dh-public-key-cryptography",
     "category": "ap",
     "timestamp": "2026-03-20T22:00:56+09:00",
