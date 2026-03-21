@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (fixed) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MQ9ZB4LYWP"></script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- GEN: META（生成時に置換） -->
+  <title>Learning Trajectory | OCSPとCRLの違いとは？証明書の「失効確認」の仕組みとOCSP Stapling</title>
+  <meta name="description" content="PKIにおける証明書の失効確認手段「OCSP」と「CRL」の違いを解説。ブラックリスト方式のCRLと、リアルタイム問い合わせ方式のOCSPの比較や、現代の主流である「OCSP Stapling」の仕組みを図解します。" />
+  <meta name="robots" content="index,follow" />
+
+  <!-- Optional: OGP（不要なら空でOK） -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="OCSPとCRLの違いとは？証明書の「失効確認」の仕組みとOCSP Stapling" />
+  <meta property="og:description" content="PKIにおける証明書の失効確認手段「OCSP」と「CRL」の違いを解説。ブラックリスト方式のCRLと、リアルタイム問い合わせ方式のOCSPの比較や、現代の主流である「OCSP Stapling」の仕組みを図解します。" />
+  
+
+  <!-- Assets (article path: docs/<category>/posts/.../index.html) -->
+  <link rel="stylesheet" href="../../../assets/styles.css" />
+
+  <!-- 図解用追加スタイル -->
+  <style>
+    .diagram-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 30px 0;
+      padding: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+    .diagram-title {
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 15px;
+      color: #475569;
+      font-size: 0.9em;
+    }
+
+    /* 1行要約ボックス */
+    .question-box {
+      background: #f1f5f9;
+      border-left: 4px solid #3b82f6;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* 前提知識のブロック図解 */
+    .pki-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid #cbd5e1;
+    }
+    .pt-node {
+      background: #1e293b; color: #fff; padding: 10px 20px; border-radius: 6px; font-weight: 900; position: relative; z-index: 2;
+    }
+    .pt-line { width: 2px; height: 20px; background: #94a3b8; }
+    
+    .pt-branches {
+      display: flex; justify-content: center; gap: 40px; position: relative; width: 100%; max-width: 400px;
+    }
+    .pt-branches::before {
+      content: ""; position: absolute; top: 0; left: 25%; right: 25%; height: 2px; background: #94a3b8;
+    }
+    .pt-branch {
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; padding-top: 20px;
+    }
+    .pt-branch::before {
+      content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 20px; background: #94a3b8;
+    }
+
+    .pt-subnode { background: #f8fafc; border: 2px solid #94a3b8; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; color: #334155; font-size: 0.9em; width: 120px; }
+    
+    .pt-check-group { display: flex; gap: 10px; margin-top: 10px; }
+    .pt-check-item { background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; padding: 5px 10px; border-radius: 4px; font-weight: 900; font-size: 0.85em; }
+
+    /* CRL vs OCSPの比較図解 */
+    .vs-layout {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .vs-card {
+      flex: 1;
+      min-width: 250px;
+      background: #fff;
+      border: 2px solid;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .card-crl { border-color: #64748b; }
+    .card-ocsp { border-color: #3b82f6; }
+
+    .vs-header {
+      font-weight: 900; font-size: 1.2em; margin-bottom: 10px; text-align: center; display: flex; flex-direction: column; gap: 5px;
+    }
+    .card-crl .vs-header { color: #334155; }
+    .card-ocsp .vs-header { color: #1d4ed8; }
+    .vs-sub { font-size: 0.65em; font-weight: normal; color: #64748b; }
+
+    .vs-visual {
+      background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; margin-bottom: 15px; position: relative;
+    }
+    
+    /* CRLのビジュアル */
+    .vis-crl-list { background: #fff; border: 1px solid #94a3b8; width: 80px; height: 100px; position: relative; padding: 10px; box-sizing: border-box; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+    .vis-crl-list::before { content: "ブラック\Aリスト"; font-size: 0.6em; font-weight: bold; color: #ef4444; text-align: center; display: block; white-space: pre-wrap; line-height: 1.2; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; margin-bottom: 4px; }
+    .vis-crl-line { width: 100%; height: 4px; background: #cbd5e1; margin-bottom: 4px; border-radius: 2px; }
+    .vis-crl-arrow { color: #64748b; font-weight: bold; font-size: 0.8em; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+
+    /* OCSPのビジュアル */
+    .vis-ocsp-flow { display: flex; align-items: center; gap: 15px; width: 100%; justify-content: center; }
+    .vis-client { font-size: 2em; }
+    .vis-ocsp-server { background: #1e293b; color: #fff; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.8em; text-align: center; }
+    .vis-arrows { display: flex; flex-direction: column; gap: 5px; font-size: 0.7em; font-weight: bold; color: #3b82f6; }
+    .vis-arrow-req { border-bottom: 2px solid #3b82f6; position: relative; padding-bottom: 2px; }
+    .vis-arrow-req::after { content: "▶"; position: absolute; right: -5px; top: -3px; }
+    .vis-arrow-res { border-top: 2px solid #10b981; position: relative; padding-top: 2px; color: #10b981; }
+    .vis-arrow-res::before { content: "◀"; position: absolute; left: -5px; top: -4px; }
+
+    .vs-desc { font-size: 0.85em; color: #475569; line-height: 1.6; font-weight: bold; }
+    .highlight-red { color: #ef4444; }
+
+    /* OCSP Stapling フロー図解 */
+    .stapling-flow {
+      display: flex;
+      flex-direction: column;
+      background: #fffbeb;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px dashed #f59e0b;
+      min-width: 600px;
+    }
+    .sf-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .sf-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 2;
+    }
+    .sn-icon { font-size: 3em; margin-bottom: 5px; }
+    .sn-label { font-weight: 900; font-size: 0.9em; color: #92400e; }
+
+    .sf-arrow-container {
+      flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; margin: 0 15px;
+    }
+    .sf-line { width: 100%; height: 3px; background: #d97706; position: relative; margin: 15px 0; }
+    .sf-line.right::after { content: "▶"; position: absolute; right: -5px; top: -11px; color: #d97706; font-size: 1.5em; }
+    .sf-line.left::before { content: "◀"; position: absolute; left: -5px; top: -11px; color: #d97706; font-size: 1.5em; }
+    
+    .sf-msg {
+      position: absolute; top: -12px; background: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 900; color: #b45309; border: 2px solid #fcd34d; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .sf-msg-sub { font-size: 0.7em; color: #78350f; margin-top: 5px; font-weight: bold; background: #fef3c7; padding: 2px 6px; border-radius: 4px; }
+
+    /* 実務イメージボックス */
+    .dev-box {
+      background: #eff6ff;
+      border-left: 5px solid #3b82f6;
+      padding: 15px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 15px;
+    }
+    .dev-title { font-weight: 900; color: #1d4ed8; display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+    .dev-desc { font-size: 0.85em; color: #1e3a8a; line-height: 1.6; }
+
+    /* 比較テーブル */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #e5e7eb;
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+    .comparison-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .td-center { text-align: center !important; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <a href="../../../index.html" class="site-title">Learning Trajectory</a>
+    </header>
+
+    <!-- 固定：前後ナビ（JS制御） -->
+    <nav class="post-nav">
+      <a id="prevPost" class="post-nav__link" href="#" style="display:none;">← 前の記事</a>
+      <a id="nextPost" class="post-nav__link" href="#" style="display:none;">次の記事 →</a>
+    </nav>
+
+    <main>
+      <article class="article-content">
+
+        <header class="article-header">
+          <!-- GEN: POST META -->
+          <time class="post-meta" datetime="2026-03-21">
+            2026.03.21
+          </time>
+
+          <!-- GEN: TITLE -->
+          <h1 class="article-title">OCSPとCRLの違いとは？証明書の「失効確認」の仕組みとOCSP Stapling</h1>
+
+          <!-- GEN: TAGS -->
+          <div class="tags">
+            <span class="tag">#セキュリティ</span>
+            <span class="tag">#PKI</span>
+            <span class="tag">#OCSP</span>
+            <span class="tag">#CRL</span>
+            <span class="tag">#応用情報</span>
+          </div>
+        </header>
+
+        <!-- GEN: BODY -->
+        <p>安全な通信を行うためにサーバから送られてくる「電子証明書」。しかし、証明書の中身が正しくても、「秘密鍵がハッカーに盗まれた」「契約が切れた」などの理由で、<strong>有効期限内なのに無効（失効）になっている</strong>ことがあります。<br>
+この「証明書が“今”も使えるかどうか」を確認するための2つの仕組み、CRLとOCSPについて解説します。</p>
+<hr>
+
+<div class="question-box">
+  【1行要約：2つの確認方法】<br>
+  ・<strong>CRL</strong> ＝ 失効した証明書の「ブラックリスト」をまとめてダウンロードして、手元で探す方式。<br>
+  ・<strong>OCSP</strong> ＝ 「この証明書、今有効？」とオンラインの窓口に直接問い合わせて、その場で回答をもらう方式。
+</div>
+
+<h2>1. PKI（公開鍵基盤）における位置づけ</h2>
+<p>
+  認証局（CA）は、証明書を発行するだけでなく、発行した証明書が失効した事実を世の中に知らせる責任も持っています。
+</p>
+
+<!-- 図解：PKIの構造 -->
+<div class="diagram-container">
+  <div class="diagram-title">証明書のライフサイクルと失効確認</div>
+  <div class="pki-tree">
+    
+    <div class="pt-node">🏢 認証局（CA）</div>
+    <div class="pt-line"></div>
+    
+    <div class="pt-branches">
+      
+      <div class="pt-branch">
+        <div class="pt-subnode">
+          ✅ 証明書の発行<br>
+          <span style="font-size:0.8em; color:#64748b; font-weight:normal;">公開鍵の身元を保証</span>
+        </div>
+      </div>
+
+      <div class="pt-branch">
+        <div class="pt-subnode">
+          ❌ 失効情報の提供<br>
+          <span style="font-size:0.8em; color:#64748b; font-weight:normal;">無効になった事を通知</span>
+        </div>
+        
+        <div class="pt-check-group">
+          <div class="pt-check-item">CRL</div>
+          <div class="pt-check-item">OCSP</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <p style="font-size:0.85em; color:#475569; font-weight:bold; margin-top:15px; text-align:center;">
+    証明書を受け取ったクライアント（ブラウザ）は、必ずCRLかOCSPのどちらかを使って「今も有効か」をチェックしてから通信を始めます。
+  </p>
+</div>
+
+<h2>2. CRLとOCSPの「動き」の違い</h2>
+<p>
+  それぞれの仕組みを「指名手配犯の確認」に例えて図解します。
+</p>
+
+<!-- 図解：CRL vs OCSP -->
+<div class="diagram-container">
+  <div class="diagram-title">「リスト方式」と「問い合わせ方式」の比較</div>
+  <div class="vs-layout">
+    
+    <!-- CRL -->
+    <div class="vs-card card-crl">
+      <div class="vs-header">CRL<br><span class="vs-sub">Certificate Revocation List</span></div>
+      
+      <div class="vs-visual">
+        <div class="vis-crl-list">
+          <div class="vis-crl-line"></div><div class="vis-crl-line"></div><div class="vis-crl-line" style="background:#ef4444;"></div><div class="vis-crl-line"></div><div class="vis-crl-line"></div>
+        </div>
+        <div class="vis-crl-arrow">
+          ⬇ 定期的に一括ダウンロード
+        </div>
+      </div>
+
+      <div class="vs-desc">
+        CAが作成した「失効した証明書のシリアル番号の一覧（ブラックリスト）」を丸ごとダウンロードし、自分の手元で照合する方式です。<br>
+        <span class="highlight-red">弱点：リストのデータ量が大きく、更新が遅いため「リアルタイム性」に欠けます。</span>
+      </div>
+    </div>
+
+    <!-- OCSP -->
+    <div class="vs-card card-ocsp">
+      <div class="vs-header">OCSP<br><span class="vs-sub">Online Certificate Status Protocol</span></div>
+      
+      <div class="vs-visual">
+        <div class="vis-ocsp-flow">
+          <div class="vis-client">🧑💻</div>
+          <div class="vis-arrows">
+            <div class="vis-arrow-req">「これ有効？」</div>
+            <div class="vis-arrow-res">「有効です！」</div>
+          </div>
+          <div class="vis-ocsp-server">OCSP<br>レスポンダ</div>
+        </div>
+      </div>
+
+      <div class="vs-desc">
+        証明書を受け取ったタイミングで、OCSP専用のサーバ（レスポンダ）に通信し、その証明書の有効性を直接問い合わせる方式です。<br>
+        <span style="color:#1d4ed8;">利点：必要な通信だけを行うためデータ量が少なく、リアルタイムに確認できます（現在の主流）。</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<h2>3. 現代の主流「OCSP Stapling（ホッチキス留め）」</h2>
+<p>
+  リアルタイムで便利なOCSPですが、実は<strong>「クライアント（あなた）が直接OCSPサーバに問い合わせる」ことによる弱点</strong>がありました。<br>
+  それは、あなたが「どのサイトにアクセスしようとしているか」がOCSPサーバ側に筒抜けになってしまう（プライバシーの懸念）ことと、すべてのユーザーが一斉に問い合わせることでOCSPサーバがパンクしてしまうことです。<br>
+  これを解決したのが<strong>OCSP Stapling</strong>です。
+</p>
+
+<!-- 図解：OCSP Stapling -->
+<div class="diagram-container" style="overflow-x: auto;">
+  <div class="diagram-title">OCSP Stapling（Webサーバが肩代わりする仕組み）</div>
+  <div class="stapling-flow">
+    
+    <!-- 事前準備 -->
+    <div class="sf-row" style="opacity:0.8; margin-bottom:30px;">
+      <div class="sf-node">
+        <span class="sn-icon">🏢</span>
+        <span class="sn-label">Webサーバ</span>
+      </div>
+      <div class="sf-arrow-container">
+        <div class="sf-line right"></div>
+        <span class="sf-msg">①「私の証明書、有効ですよね？」</span>
+        
+        <div class="sf-line left" style="background:#10b981;"></div>
+        <span class="sf-msg" style="top:25px; color:#047857; border-color:#6ee7b7;">②「有効です（署名付き回答）」</span>
+      </div>
+      <div class="sf-node">
+        <span class="sn-icon">🖥️</span>
+        <span class="sn-label">OCSPサーバ</span>
+      </div>
+    </div>
+
+    <!-- 実際の通信 -->
+    <div class="sf-row">
+      <div class="sf-node">
+        <span class="sn-icon">📱</span>
+        <span class="sn-label">クライアント(あなた)</span>
+      </div>
+      <div class="sf-arrow-container">
+        <div class="sf-line left"></div>
+        <span class="sf-msg">③ 証明書 ＋ OCSPの「有効」という回答</span>
+        <span class="sf-msg-sub">（Webサーバが、あらかじめ貰っておいた回答をホッチキス留めして渡す！）</span>
+      </div>
+      <div class="sf-node">
+        <span class="sn-icon">🏢</span>
+        <span class="sn-label">Webサーバ</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="diagram-container">
+  <div class="dev-box">
+    <div class="dev-title">💡 Stapling（ステープリング）のメリット</div>
+    <div class="dev-desc">
+      Webサーバが定期的にOCSPサーバから「自分の証明書の有効性データ」を取得しておき、クライアントがアクセスしてきた際に、<strong>証明書と一緒に「OCSPの回答結果」をホッチキス留め（Stapling）して一緒に渡してあげる仕組み</strong>です。<br>
+      これにより、クライアントは自分でOCSPサーバに問い合わせる必要がなくなり、<strong>「通信の高速化」</strong>と<strong>「プライバシーの保護」</strong>を同時に達成できます。
+    </div>
+  </div>
+</div>
+
+<h2>試験対策まとめ：対立軸で暗記する</h2>
+<p>
+  午前試験では、CRLとOCSPの特徴を比較させる問題が定番です。
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th style="width:25%;">比較項目</th>
+      <th style="width:37%;">CRL（リスト方式）</th>
+      <th style="width:37%;">OCSP（問い合わせ方式）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">データの取得方法</td>
+      <td>失効した証明書の一覧を<strong>まとめてダウンロード</strong>する。</td>
+      <td>調べたい証明書の状態だけを、その都度<strong>個別に問い合わせる</strong>。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">データ量と通信回数</td>
+      <td>1回のデータ量が<strong>大きい</strong>が、通信回数は少ない。</td>
+      <td>1回のデータ量は<strong>少ない</strong>が、通信回数は多くなる。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">リアルタイム性</td>
+      <td><strong>低い</strong>（リストの更新周期に依存する）。</td>
+      <td><strong>高い</strong>（リアルタイムに確認できる）。</td>
+    </tr>
+    <tr>
+      <td style="font-weight:bold; background:#f8fafc;">OCSP Stapling</td>
+      <td class="td-center">-</td>
+      <td>WebサーバがOCSPの問い合わせを肩代わりし、証明書に添付（Stapling）して渡す高速化手法。</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="background:#f8fafc; padding:15px; border-left:4px solid #1d4ed8; font-weight:bold; color:#1e293b; margin-top:20px;">
+  🎯 知識の繋がり<br>
+  「証明書には有効期限がある」だけでなく、「期限内でも無効になる（失効する）ことがあるため、必ずCRLやOCSPで今現在の状態をチェックしなければならない」という、PKIの運用における重要なピースが埋まりました！
+</p>
+
+        <!-- 問い合わせ（固定・修正版） -->
+        <p class="article-contact">
+          <a id="contactLink" href="#" target="_blank">✉ お問い合わせ</a>
+        </p>
+
+        <!-- GEN: REFERENCES（不要なら空） -->
+        
+
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span id="year"></span> Learning Trajectory. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- 記事用JS（前後リンク・問い合わせURL） -->
+  <script src="../../../assets/post.js"></script>
+
+  <!-- 共通：年表示 -->
+  <script>
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
