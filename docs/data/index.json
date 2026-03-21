@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-ocsp-crl-comparison",
+    "category": "ap",
+    "timestamp": "2026-03-21T22:02:28+09:00",
+    "title": "OCSPとCRLの違いを理解しよう",
+    "summary": "OCSPとCRLを用いた証明書の失効確認方法について解説し、それぞれの特徴と利点を理解できるようになることが目的です。",
+    "tags": [
+      "セキュリティ",
+      "PKI",
+      "OCSP",
+      "CRL",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-21-ap-ocsp-crl-comparison/"
+  },
+  {
     "id": "ap-ah-esp-mac-aead-difference",
     "category": "ap",
     "timestamp": "2026-03-21T20:09:10+09:00",
