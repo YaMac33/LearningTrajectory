@@ -1,0 +1,21 @@
+{
+  "id": "ap-ah-esp-mac-aead-difference",
+  "category": "ap",
+  "timestamp": "2026-03-21T20:09:10+09:00",
+  "post_path": "ap/posts/2026-03-21-ap-ah-esp-mac-aead-difference/",
+  "meta": {
+    "title": "IPsecとTLSの暗号化・改ざん検知の違い",
+    "summary": "IPsecとSSL/TLSの間の暗号化および改ざん検知の役割を明確に理解できます。",
+    "tags": [
+      "セキュリティ",
+      "IPsec",
+      "TLS",
+      "暗号化",
+      "改ざん検知"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "セキュリティ"
+    ]
+  }
+}
