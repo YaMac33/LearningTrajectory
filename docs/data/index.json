@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-frame-and-data-link-layer",
+    "category": "ap",
+    "timestamp": "2026-03-23T07:40:28+09:00",
+    "title": "データリンク層におけるフレームの役割と理解",
+    "summary": "データリンク層での「フレーム」について、MACアドレスとデータの呼称の違いについて解説します。これにより、ネットワークにおけるデータの流れを把握できます。",
+    "tags": [
+      "ネットワーク",
+      "データリンク層",
+      "フレーム",
+      "MACアドレス",
+      "基本情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-23-ap-frame-and-data-link-layer/"
+  },
+  {
     "id": "ap-ocsp-crl-comparison",
     "category": "ap",
     "timestamp": "2026-03-21T22:02:28+09:00",
