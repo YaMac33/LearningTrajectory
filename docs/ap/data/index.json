@@ -1,5 +1,27 @@
 [
   {
+    "id": "ap-network-devices-hierarchy",
+    "category": "ap",
+    "timestamp": "2026-03-23T07:52:38+09:00",
+    "title": "ネットワーク機器の役割と階層を図解",
+    "summary": "ネットワーク通信におけるリピータ、ブリッジ、ルータ、ゲートウェイの役割と、OSI参照モデルの階層における位置づけを理解できます。",
+    "tags": [
+      "ネットワーク",
+      "OSI参照モデル",
+      "リピータ",
+      "ブリッジ",
+      "ルータ",
+      "ゲートウェイ"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-23-ap-network-devices-hierarchy/"
+  },
+  {
     "id": "ap-frame-and-data-link-layer",
     "category": "ap",
     "timestamp": "2026-03-23T07:40:28+09:00",
