@@ -1,5 +1,26 @@
 [
   {
+    "id": "ap-network-device-differences",
+    "category": "ap",
+    "timestamp": "2026-03-23T12:47:40+09:00",
+    "title": "L2からL7までのネットワーク機器の違い",
+    "summary": "ネットワーク機器（L2スイッチ、L3スイッチ、L4スイッチ、L7ロードバランサなど）の違いを理解し、OSI参照モデルにおける機能と役割を確認します。",
+    "tags": [
+      "ネットワーク",
+      "スイッチ",
+      "ロードバランサ",
+      "ゲートウェイ",
+      "応用情報"
+    ],
+    "taxonomy": [
+      "テクノロジ",
+      "ネットワーク"
+    ],
+    "dr": null,
+    "status": "public",
+    "post_path": "ap/posts/2026-03-23-ap-network-device-differences/"
+  },
+  {
     "id": "ap-network-devices-hierarchy",
     "category": "ap",
     "timestamp": "2026-03-23T07:52:38+09:00",
